@@ -1,5 +1,8 @@
 {
-  "name": "turborepo-test",
+  "name": "@knocklabs/javascript",
+  "author": "@knocklabs",
+  "version": "0.0.1-rc0",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "turbo build",
@@ -15,7 +18,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "workspaces": [
-    "apps/*",
+    "examples/*",
     "packages/*"
   ]
 }
