@@ -2,7 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
 
-import "@knocklabs/react/dist/theme.css";
+import "@knocklabs/react/dist/index.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

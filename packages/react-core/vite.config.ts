@@ -16,11 +16,6 @@ export default defineConfig(({ command, mode }) => {
   let formats: LibraryFormats[] = ["es"];
   if (CJS) formats = ["cjs"];
 
-  // console.log(`command: ${command}`);
-  // console.log(`mode: ${mode}`);
-  // console.log(`env: ${JSON.stringify(env, null, 2)}`);
-  // console.log(`formats: ${formats}`);
-
   return {
     cacheDir: "../../node_modules/.vite/react-headless",
 

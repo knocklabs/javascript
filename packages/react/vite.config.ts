@@ -2,32 +2,19 @@ import { defineConfig, LibraryFormats, loadEnv } from "vite";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 import noBundlePlugin from "vite-plugin-no-bundle";
+import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
 
   const CJS = env.NX_TASK_TARGET_TARGET?.toLocaleLowerCase()?.match("cjs");
-  const ESM = !CJS;
+  // const ESM = !CJS;
   let formats: LibraryFormats[] = ["es"];
   if (CJS) formats = ["cjs"];
 
   return {
-    // cacheDir: "../../node_modules/.vite/react-headless",
-    plugins: [
-      // TODO: Define types
-      // dts({
-      //   entryRoot: "src",
-      //   tsConfigFilePath: path.join(__dirname, "tsconfig.lib.json"),
-      //   skipDiagnostics: true,
-      //   outputDir: path.join(
-      //     __dirname,
-      //     "../../dist/packages/react-headless/dist/types",
-      //   ),
-      // }),
-      react(),
-      noBundlePlugin({ copy: "**/*.css", root: "./src" }),
-    ],
+    plugins: [dts(), react(), noBundlePlugin({ root: "./src" })],
     build: {
       lib: {
         entry: resolve(__dirname, "src/index.ts"),
@@ -39,8 +26,13 @@ export default defineConfig(({ mode }) => {
         output: {
           interop: "compat",
           format: formats[0],
+          assetFileNames: (assetInfo) => {
+            // Rename styles to index.css
+            if (assetInfo.name === "style.css") return "index.css";
+            return assetInfo.name;
+          },
         },
-        // External packages that should not be bundled into your library.
+        // External packages that should not be bundled
         external: [
           "react",
           "react-dom",

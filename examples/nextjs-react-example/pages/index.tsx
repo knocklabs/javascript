@@ -46,13 +46,12 @@ export default function Home() {
 
   return (
     <KnockFeedProvider
-      userId={userId}
-      apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY}
-      feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID}
+      userId={userId as any}
+      apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
+      feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
       defaultFeedOptions={{ tenant }}
     >
-      <pre>{JSON.stringify(userId ?? "null", null, 2)}</pre>
       <Box maxW="520px" mx="auto" py={12}>
         <Flex mb={8}>
           <Box>

@@ -12,8 +12,6 @@ const NotificationToasts = () => {
       // Whenever we receive a new notification from our real-time stream, show a toast
       // (note here that we can receive > 1 items in a batch)
       items.forEach((notification: any) => {
-        console.log(notification);
-
         if (notification.data.showToast === false) return;
 
         toast({
