@@ -3,6 +3,10 @@
   "globalDependencies": [
     "**/.env.*local"
   ],
+  "globalEnv": [
+    "KNOCK_*",
+    "NEXT_PUBLIC_KNOCK_*"
+  ],
   "pipeline": {
     "build": {
       "dependsOn": [
