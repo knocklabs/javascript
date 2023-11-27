@@ -1,6 +1,7 @@
 const headers = { "Content-Type": "application/json" };
 
 export async function identify(params = {}) {
+  console.log("Identifying with params: ", params);
   try {
     const resp = await fetch("/api/identify", {
       method: "POST",
@@ -16,7 +17,7 @@ export async function identify(params = {}) {
   }
 }
 
-export async function notify(params) {
+export async function notify(params: any) {
   try {
     const resp = await fetch("/api/notify", {
       method: "POST",

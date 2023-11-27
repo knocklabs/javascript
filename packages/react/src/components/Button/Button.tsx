@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-// import { useKnockFeed } from "../KnockFeedProvider";
+import { useKnockFeed } from "../KnockFeedProvider";
 import { ButtonSpinner } from "./ButtonSpinner";
 
 import "./styles.css";
@@ -22,14 +22,14 @@ export const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
   onClick,
   children,
 }) => {
-  // const { colorMode } = useKnockFeed();
+  const { colorMode } = useKnockFeed();
 
   const classNames = [
     "rnf-button",
     `rnf-button--${variant}`,
     isFullWidth ? "rnf-button--full-width" : "",
     isLoading ? "rnf-button--is-loading" : "",
-    // `rnf-button--${colorMode}`,
+    `rnf-button--${colorMode}`,
   ].join(" ");
 
   // In this case when there's no loading text, we still want to display the original
@@ -46,7 +46,7 @@ export const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
       disabled={isLoading || isDisabled}
     >
       {isLoading && <ButtonSpinner hasLabel={!!loadingText} />}
-      {isLoading ? textToShowWhileLoading : children} asdf
+      {isLoading ? textToShowWhileLoading : children}
     </button>
   );
 };

@@ -15,7 +15,14 @@ const IconColors = {
   error: ["red.100", "red.900"],
 };
 
-const Toast = ({ title, description, status = "success", onClose }) => {
+interface Props {
+  title: string;
+  description: string;
+  status?: keyof typeof IconColors;
+  onClose: () => void;
+}
+
+const Toast = ({ title, description, status = "success", onClose }: Props) => {
   const [bgColor, fgColor] = IconColors[status];
   const alignment = description ? "top" : "center";
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
-export function useLocalStorage(key, initialValue) {
-  const initialize = (key) => {
+export function useLocalStorage(key: any, initialValue: any) {
+  const initialize = (key: any) => {
     try {
       const item = localStorage.getItem(key);
       if (item && item !== "undefined") {
@@ -22,12 +22,10 @@ export function useLocalStorage(key, initialValue) {
   }, []);
 
   const setValue = useCallback(
-    (value) => {
+    (value: any) => {
       try {
-        const valueToStore =
-          value instanceof Function ? value(storedValue) : value;
-        setState(valueToStore);
-        localStorage.setItem(key, JSON.stringify(valueToStore));
+        setState(value);
+        localStorage.setItem(key, JSON.stringify(value));
       } catch (error) {
         console.log(error);
       }
@@ -38,7 +36,7 @@ export function useLocalStorage(key, initialValue) {
   const remove = useCallback(() => {
     try {
       localStorage.removeItem(key);
-    } catch {
+    } catch (error) {
       console.log(error);
     }
   }, [key]);

@@ -1,10 +1,17 @@
 import { Knock } from "@knocklabs/node";
 import { v4 as uuidv4 } from "uuid";
 import { faker } from "@faker-js/faker";
+import { NextApiRequest, NextApiResponse } from "next";
 
-const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY);
+const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY, {
+  host: process.env.NEXT_PUBLIC_KNOCK_HOST,
+});
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  console.log("👀 identify");
   if (req.method !== "POST") {
     return res
       .status(405)
@@ -17,13 +24,14 @@ export default async function handler(req, res) {
 
   try {
     const knockUser = await knockClient.users.identify(userId, {
-      name: name || faker.name.findName(),
+      name: name || faker.person.fullName(),
     });
 
     return res.status(200).json({ error: null, user: knockUser });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: error.message || error.toString(), user: null });
+    return res.status(500).json({
+      error: (error as Error).message || (error as Error).toString(),
+      user: null,
+    });
   }
 }

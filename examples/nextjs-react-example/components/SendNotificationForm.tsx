@@ -3,18 +3,22 @@ import {
   Checkbox,
   FormControl,
   FormLabel,
-  Heading,
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { notify } from "../lib/api";
 
-const SendNotificationForm = ({ userId, tenant }) => {
+interface Props {
+  userId: string;
+  tenant: any;
+}
+
+const SendNotificationForm = ({ userId, tenant }: Props) => {
   const [message, setMessage] = useState("");
   const [showToast, setShowToast] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     await notify({ message, showToast, userId, tenant });

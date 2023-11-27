@@ -1,7 +1,7 @@
 import {
   NotificationFeedPopover,
   NotificationIconButton,
-} from "@knocklabs/react-notification-feed";
+} from "@knocklabs/react";
 
 import { useState, useRef } from "react";
 

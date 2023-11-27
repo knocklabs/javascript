@@ -1,9 +1,10 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { NextSeo } from "next-seo";
+import { AppProps } from "next/app";
 
-import "@knocklabs/react-notification-feed/dist/index.css";
+import "@knocklabs/react/dist/theme.css";
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
       <NextSeo

@@ -21,9 +21,7 @@
     "react": "^18.2.0",
     "react-native": "^0.72.3"
   },
-  "dependencies": {
-    "@knocklabs/react-headless": "0.1.0-rc0"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "react": "*",
     "react-native": "*"

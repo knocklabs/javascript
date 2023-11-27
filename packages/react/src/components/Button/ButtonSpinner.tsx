@@ -1,5 +1,5 @@
 import React from "react";
-// import { Spinner } from "../Spinner";
+import { Spinner } from "../Spinner";
 
 import "./styles.css";
 
@@ -13,7 +13,6 @@ export const ButtonSpinner: React.FC<ButtonSpinnerProps> = ({ hasLabel }) => (
       hasLabel ? "with-label" : "without-label"
     }`}
   >
-    Spinner
-    {/* <Spinner /> */}
+    <Spinner />
   </div>
 );
