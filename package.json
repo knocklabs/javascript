@@ -11,8 +11,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@knocklabs/eslint-config": "*",
+    "@knocklabs/typescript-config": "*",
     "prettier": "^3.1.0",
     "turbo": "latest"
   },
