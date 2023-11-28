@@ -1,16 +1,32 @@
 {
   "name": "@knocklabs/react",
   "version": "0.0.1-rc0",
-  "type": "module",
-  "main": "dist/index.js",
+  "description": "A set of React components to build notification experiences powered by Knock",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "typings": "dist/types/index.d.ts",
+  "style": "dist/index.css",
+  "exports": {
+    "./dist/index.css": "./dist/index.css",
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/esm/index.mjs"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
+    "clean": "rimraf dist",
     "dev": "tsc && vite build --watch",
     "//": "dev:local runs a dev server and lets you test components at localhost:5173",
     "dev:local": "vite",
-    "build": "tsc && vite build",
+    "build": "yarn clean && yarn build:esm && yarn build:cjs",
+    "build:esm": "export BUILD_TARGET=esm; tsc && vite build && mv dist/esm/index.css dist/index.css",
+    "build:cjs": "export BUILD_TARGET=cjs; tsc && vite build && mv dist/cjs/index.css dist/index.css",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -43,6 +59,7 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
