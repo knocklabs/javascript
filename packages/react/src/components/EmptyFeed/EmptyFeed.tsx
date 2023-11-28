@@ -1,6 +1,5 @@
 import React from "react";
-import { useTranslations } from "../../hooks/useTranslations";
-import { useKnockFeed } from "../KnockFeedProvider";
+import { useTranslations, useKnockFeed } from "@knocklabs/react-core";
 import "./styles.css";
 
 export const EmptyFeed: React.FC = () => {

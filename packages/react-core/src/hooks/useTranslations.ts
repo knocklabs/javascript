@@ -15,7 +15,7 @@ export function useTranslations() {
     },
     dateFnsLocale: (): DateFnLocale => {
       return locale in dateFnsLocales
-        ? dateFnsLocales[locale]
+        ? dateFnsLocales[locale as keyof typeof dateFnsLocales]
         : dateFnsLocales.enUS;
     },
   };

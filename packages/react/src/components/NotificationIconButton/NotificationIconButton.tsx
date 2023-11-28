@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from "react";
 import { BellIcon } from "../Icons";
-import { useKnockFeed } from "../KnockFeedProvider";
+import { useKnockFeed } from "@knocklabs/react-core";
 import { BadgeCountType, UnseenBadge } from "../UnseenBadge";
 
 import "./styles.css";

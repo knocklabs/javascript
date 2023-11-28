@@ -5,7 +5,7 @@ import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
 import useComponentVisible from "../../hooks/useComponentVisible";
 
 import "./styles.css";
-import { useKnockFeed } from "../KnockFeedProvider";
+import { useKnockFeed } from "@knocklabs/react-core";
 import { Feed, FeedStoreState } from "@knocklabs/client";
 
 type OnOpenOptions = {

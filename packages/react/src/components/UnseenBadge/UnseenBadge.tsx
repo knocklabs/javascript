@@ -1,6 +1,5 @@
 import React from "react";
-import { useKnockFeed } from "../KnockFeedProvider";
-import { formatBadgeCount } from "../../utils";
+import { useKnockFeed, formatBadgeCount } from "@knocklabs/react-core";
 
 import "./styles.css";
 import { FeedMetadata } from "@knocklabs/client";
@@ -13,7 +12,7 @@ export type UnseenBadgeProps = {
 
 function selectBadgeCount(
   badgeCountType: BadgeCountType,
-  metadata: FeedMetadata
+  metadata: FeedMetadata,
 ) {
   switch (badgeCountType) {
     case "all":
@@ -30,7 +29,7 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
 }) => {
   const { useFeedStore } = useKnockFeed();
   const badgeCountValue = useFeedStore((state) =>
-    selectBadgeCount(badgeCountType, state.metadata)
+    selectBadgeCount(badgeCountType, state.metadata),
   );
 
   return badgeCountValue !== 0 ? (

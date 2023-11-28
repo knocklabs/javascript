@@ -2,11 +2,14 @@ import React, { ReactNode, useMemo } from "react";
 import { ContentBlock, FeedItem } from "@knocklabs/client";
 import { Avatar } from "./Avatar";
 import { ArchiveButton } from "./ArchiveButton";
-import { useKnockFeed } from "../KnockFeedProvider";
-import { formatTimestamp, renderNodeOrFallback } from "../../utils";
+import {
+  useKnockFeed,
+  useTranslations,
+  formatTimestamp,
+  renderNodeOrFallback,
+} from "@knocklabs/react-core";
 
 import "./styles.css";
-import { useTranslations } from "../../hooks/useTranslations";
 
 export interface NotificationCellProps {
   item: FeedItem;

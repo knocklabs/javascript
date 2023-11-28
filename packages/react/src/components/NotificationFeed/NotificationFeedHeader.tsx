@@ -1,8 +1,7 @@
 import React, { SetStateAction } from "react";
 import { FeedItem } from "@knocklabs/client";
 
-import { FilterStatus } from "../../constants";
-import { useTranslations } from "../../hooks/useTranslations";
+import { FilterStatus, useTranslations } from "@knocklabs/react-core";
 import { Dropdown } from "./Dropdown";
 import { MarkAsRead } from "./MarkAsRead";
 

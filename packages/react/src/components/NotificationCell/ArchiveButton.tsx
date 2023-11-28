@@ -1,9 +1,8 @@
 import { FeedItem } from "@knocklabs/client";
 import React, { MouseEvent, useCallback } from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
-import { useTranslations } from "../../hooks/useTranslations";
+import { useTranslations, useKnockFeed } from "@knocklabs/react-core";
 import { CloseCircle } from "../Icons";
-import { useKnockFeed } from "../KnockFeedProvider";
 
 export interface ArchiveButtonProps {
   item: FeedItem;
@@ -20,15 +19,11 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
 
       feedClient.markAsArchived(item);
     },
-    [item]
+    [item],
   );
 
-  const {
-    getTooltipProps,
-    setTooltipRef,
-    setTriggerRef,
-    visible,
-  } = usePopperTooltip({ placement: "top-end" });
+  const { getTooltipProps, setTooltipRef, setTriggerRef, visible } =
+    usePopperTooltip({ placement: "top-end" });
 
   return (
     <button

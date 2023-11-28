@@ -8,10 +8,15 @@ import React, {
   useState,
 } from "react";
 import { EmptyFeed } from "../EmptyFeed";
-import { useKnockFeed } from "../KnockFeedProvider";
+import {
+  useKnockFeed,
+  useFeedSettings,
+  ColorMode,
+  FilterStatus,
+  useTranslations,
+} from "@knocklabs/react-core";
 import { Spinner } from "../Spinner";
 import { NotificationCell } from "../NotificationCell";
-import { ColorMode, FilterStatus } from "../../constants";
 import {
   NotificationFeedHeader,
   NotificationFeedHeaderProps,
@@ -19,8 +24,6 @@ import {
 
 import "./styles.css";
 import useOnBottomScroll from "../../hooks/useOnBottomScroll";
-import useFeedSettings from "../../hooks/useFeedSettings";
-import { useTranslations } from "../../hooks/useTranslations";
 
 export type OnNotificationClick = (item: FeedItem) => void;
 export type RenderItem = ({ item }: RenderItemProps) => ReactNode;

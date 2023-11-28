@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import "./styles.css";
 
 export const KnockFeedContainer: React.FC<PropsWithChildren> = ({

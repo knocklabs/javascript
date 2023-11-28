@@ -1,2 +1,2 @@
-export * from "./KnockFeedProviderBase";
-export * from "./KnockFeedContainerBase";
+export * from "./KnockFeedProvider";
+export * from "./KnockFeedContainer";

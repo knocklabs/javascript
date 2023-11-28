@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from "react";
 import { ChevronDown } from "../Icons";
-import { useKnockFeed } from "../KnockFeedProvider";
+import { useKnockFeed } from "@knocklabs/react-core";
 
 import "./styles.css";
 

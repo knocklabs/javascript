@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-import { useKnockFeed } from "../KnockFeedProvider";
+import { useKnockFeed } from "@knocklabs/react-core";
 import { ButtonSpinner } from "./ButtonSpinner";
 
 import "./styles.css";
