@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
         outDir: "dist/types",
       }),
       react(),
-      noBundlePlugin({ root: "./src" }),
+      noBundlePlugin({ copy: "**/*.css", root: "./src" }),
     ],
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",
