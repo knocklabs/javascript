@@ -96,7 +96,10 @@ export default function Home() {
           </Flex>
         </Flex>
 
-        <SendNotificationForm userId={userId} tenant={tenant} />
+        <SendNotificationForm
+          userId={userId as unknown as string}
+          tenant={tenant}
+        />
         <NotificationToasts />
 
         <Flex mt={6} borderTopWidth={1} borderTopColor="gray.100" py={2}>

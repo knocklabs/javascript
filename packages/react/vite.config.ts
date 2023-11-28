@@ -28,7 +28,6 @@ export default defineConfig(({ mode }) => {
         formats,
       },
       rollupOptions: {
-        dynamicImportInCjs: false,
         output: {
           interop: "compat",
           format: formats[0],
