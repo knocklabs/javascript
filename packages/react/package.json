@@ -3,7 +3,7 @@
   "description": "A set of React components to build notification experiences powered by Knock",
   "author": "@knocklabs",
   "version": "0.1.0-rc.0",
-  "license": "ISC",
+  "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
