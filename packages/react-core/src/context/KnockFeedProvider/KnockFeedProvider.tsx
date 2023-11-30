@@ -86,7 +86,6 @@ export const KnockFeedProvider: React.FC<KnockFeedProviderProps> = ({
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useKnockFeed = (): KnockFeedProviderState => {
   const context = React.useContext(FeedStateContext);
   if (context === undefined) {
