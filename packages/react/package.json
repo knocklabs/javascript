@@ -23,12 +23,12 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "dev": "tsc && vite build --watch && mv dist/esm/index.css dist/index.css",
+    "dev": "tsc && vite build --watch",
     "//": "dev:local runs a dev server and lets you test components at localhost:5173",
     "dev:local": "vite",
     "build": "yarn clean && yarn build:esm && yarn build:cjs",
-    "build:esm": "export BUILD_TARGET=esm; tsc && vite build && mv dist/esm/index.css dist/index.css",
-    "build:cjs": "export BUILD_TARGET=cjs; tsc && vite build && mv dist/cjs/index.css dist/index.css",
+    "build:esm": "export BUILD_TARGET=esm; tsc && vite build",
+    "build:cjs": "export BUILD_TARGET=cjs; tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -61,6 +61,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "rimraf": "^5.0.5",
+    "rollup-plugin-delete": "^2.0.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
