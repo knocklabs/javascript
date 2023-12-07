@@ -1,12 +1,4 @@
 import "./theme.css";
-export * from "./components/Button";
-export * from "./components/EmptyFeed";
-export * from "./components/Icons";
-export * from "./components/NotificationCell";
-export * from "./components/NotificationFeed";
-export * from "./components/NotificationFeedPopover";
-export * from "./components/NotificationIconButton";
-export * from "./components/Spinner";
-export * from "./components/UnseenBadge";
-export * from "./hooks";
+export * from "./modules/core";
+export * from "./modules/feed";
 export * from "@knocklabs/react-core";

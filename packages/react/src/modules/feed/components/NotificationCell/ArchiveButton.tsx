@@ -2,7 +2,7 @@ import { FeedItem } from "@knocklabs/client";
 import React, { MouseEvent, useCallback } from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
 import { useTranslations, useKnockFeed } from "@knocklabs/react-core";
-import { CloseCircle } from "../Icons";
+import { CloseCircle } from "../../../core/components/Icons";
 
 export interface ArchiveButtonProps {
   item: FeedItem;

@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-import { ChevronDown } from "../Icons";
+import { ChevronDown } from "../../../core/components/Icons";
 import { useKnockFeed } from "@knocklabs/react-core";
 
 import "./styles.css";

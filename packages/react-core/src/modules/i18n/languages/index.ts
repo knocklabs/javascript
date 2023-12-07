@@ -1,5 +1,5 @@
-import en from "./languages/en";
-import de from "./languages/de";
+import en from "./en";
+import de from "./de";
 
 export interface Translations {
   readonly emptyFeedTitle: string;

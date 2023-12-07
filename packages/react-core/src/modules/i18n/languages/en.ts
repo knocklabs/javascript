@@ -1,4 +1,4 @@
-import { I18nContent } from "..";
+import { I18nContent } from ".";
 
 const en: I18nContent = {
   translations: {

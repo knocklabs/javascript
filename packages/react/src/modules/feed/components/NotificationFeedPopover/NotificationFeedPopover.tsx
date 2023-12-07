@@ -2,7 +2,7 @@ import React, { RefObject, useEffect } from "react";
 import { usePopper } from "react-popper";
 import { Placement } from "@popperjs/core";
 import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
-import useComponentVisible from "../../hooks/useComponentVisible";
+import useComponentVisible from "../../../core/hooks/useComponentVisible";
 
 import "./styles.css";
 import { useKnockFeed } from "@knocklabs/react-core";

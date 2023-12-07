@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Locale as DateFnLocale } from "date-fns";
 import * as dateFnsLocales from "date-fns/locale";
-import { I18nContent, locales } from "../i18n";
+import { I18nContent, locales } from "../languages";
 import { I18nContext } from "../context/KnockI18nProvider";
 
 export function useTranslations() {

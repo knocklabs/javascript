@@ -1,5 +1,5 @@
 import React from "react";
-import { locales, I18nContent } from "../../i18n";
+import { locales, I18nContent } from "../languages";
 
 export const I18nContext = React.createContext<I18nContent>(locales.en);
 

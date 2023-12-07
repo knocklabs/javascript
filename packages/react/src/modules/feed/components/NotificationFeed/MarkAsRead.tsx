@@ -1,7 +1,7 @@
 import * as React from "react";
 import { FeedItem } from "@knocklabs/client";
 import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
-import { CheckmarkCircle } from "../Icons";
+import { CheckmarkCircle } from "../../../core/components/Icons";
 
 import "./styles.css";
 

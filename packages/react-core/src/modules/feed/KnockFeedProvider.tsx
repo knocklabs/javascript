@@ -6,12 +6,12 @@ import Knock, {
 } from "@knocklabs/client";
 import create, { StoreApi, UseStore } from "zustand";
 
-import { ColorMode } from "../../constants";
-import { useAuthenticatedKnockClient, useNotifications } from "../../hooks";
-import { feedProviderKey } from "../../utils";
+import { ColorMode } from "../core/constants";
+import { useAuthenticatedKnockClient } from "../core/hooks";
+import useNotifications from "./useNotifications";
+import { feedProviderKey } from "../core/utils";
 import { KnockFeedContainer } from "./KnockFeedContainer";
-import { KnockI18nProvider } from "../KnockI18nProvider";
-import { I18nContent } from "../../i18n";
+import { KnockI18nProvider, I18nContent } from "../i18n";
 
 export interface KnockFeedProviderState {
   knock: Knock;

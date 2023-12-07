@@ -15,7 +15,7 @@ import {
   FilterStatus,
   useTranslations,
 } from "@knocklabs/react-core";
-import { Spinner } from "../Spinner";
+import { Spinner } from "../../../core/components/Spinner";
 import { NotificationCell } from "../NotificationCell";
 import {
   NotificationFeedHeader,
@@ -23,7 +23,7 @@ import {
 } from "./NotificationFeedHeader";
 
 import "./styles.css";
-import useOnBottomScroll from "../../hooks/useOnBottomScroll";
+import useOnBottomScroll from "../../../core/hooks/useOnBottomScroll";
 
 export type OnNotificationClick = (item: FeedItem) => void;
 export type RenderItem = ({ item }: RenderItemProps) => ReactNode;
