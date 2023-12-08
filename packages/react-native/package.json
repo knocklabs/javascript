@@ -17,6 +17,10 @@
     "dist",
     "README.md"
   ],
+  "scripts": {
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
   "devDependencies": {
     "react": "^18.2.0",
     "react-native": "^0.72.3"

@@ -11,7 +11,9 @@ export const Avatar: React.FC<AvatarProps> = ({ name, src }) => {
     const [firstName, lastName] = name.split(" ");
     return firstName && lastName
       ? `${firstName.charAt(0)}${lastName.charAt(0)}`
-      : firstName.charAt(0);
+      : firstName
+        ? firstName.charAt(0)
+        : "";
   }
 
   return (
