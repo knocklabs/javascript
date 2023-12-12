@@ -12,7 +12,7 @@ Knock is flexible, reliable notifications infrastructure that's built to scale w
 2. Follow the [Quick start guide](https://docs.knock.app/getting-started/quick-start) to integrate Knock into an app
 3. Explore the [Knock Documentation](https://docs.knock.app/) for more in-depth guides
 
-This repository contains all the Knock JavaScript SDKs and examples applications to help you get started with Knock.
+This repository contains all the Knock JavaScript SDKs and example applications to help you get started with Knock.
 
 ## How to Contribute
 

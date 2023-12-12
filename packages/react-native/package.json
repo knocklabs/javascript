@@ -25,7 +25,9 @@
     "react": "^18.2.0",
     "react-native": "^0.72.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@knocklabs/client": "*"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
