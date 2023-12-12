@@ -40,7 +40,7 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "dependencies": {
-    "@knocklabs/client": "^0.8.15",
+    "@knocklabs/client": "*",
     "@knocklabs/react-core": "0.1.0-rc.0",
     "date-fns": "^2.30.0",
     "lodash.debounce": "^4.0.8",
