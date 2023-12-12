@@ -1,13 +1,12 @@
 # @knocklabs/react
 
-A set of components for integrating [Knock](https://knock.app) in-app notifications into a React application.
+A set of components for integrating [Knock](https://knock.app) into a React application.
 
 [See a live demo](https://knock-in-app-notifications-react.vercel.app/)
 
 ![In-app feed component example](NotificationFeed.png)
 
-**Note: these components are currently designed to be used in conjunction with the Knock in-app feed
-channel, and via React for web only.**
+**Note: these components are designed to be used via React for web only.**
 
 [Full documentation](https://docs.knock.app/in-app-ui/react/overview)
 
@@ -30,15 +29,16 @@ yarn add @knocklabs/react
 To configure the feed you will need:
 
 1. A public API key (found in the Knock dashboard)
-2. A feed channel ID (found in the Knock dashboard)
-3. A user ID, and optionally an auth token for production environments
+1. A user ID, and optionally an auth token for production environments
+1. If integrating an in-app feed, a feed channel ID (found in the Knock dashboard)
 
 ## Usage
 
-You can integrate the feed into your app as follows:
+You can integrate Knock into your app as follows:
 
 ```jsx
 import {
+  KnockProvider,
   KnockFeedProvider,
   NotificationIconButton,
   NotificationFeedPopover,
@@ -52,23 +52,25 @@ const YourAppLayout = () => {
   const notifButtonRef = useRef(null);
 
   return (
-    <KnockFeedProvider
+    <KnockProvider
       apiKey={process.env.KNOCK_PUBLIC_API_KEY}
       feedId={process.env.KNOCK_FEED_ID}
-      userId={currentUser.id}
     >
-      <>
-        <NotificationIconButton
-          ref={notifButtonRef}
-          onClick={(e) => setIsVisible(!isVisible)}
-        />
-        <NotificationFeedPopover
-          buttonRef={notifButtonRef}
-          isVisible={isVisible}
-          onClose={() => setIsVisible(false)}
-        />
-      </>
-    </KnockFeedProvider>
+      {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
+      <KnockFeedProvider feedId={process.env.KNOCK_FEED_ID}>
+        <>
+          <NotificationIconButton
+            ref={notifButtonRef}
+            onClick={(e) => setIsVisible(!isVisible)}
+          />
+          <NotificationFeedPopover
+            buttonRef={notifButtonRef}
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+          />
+        </>
+      </KnockFeedProvider>
+    </KnockProvider>
   );
 };
 ```
