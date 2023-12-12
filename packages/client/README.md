@@ -45,7 +45,7 @@ knockClient.authenticate(
 
 ## Usage
 
-You can find an example usage in a React application in the [example/App.js](https://github.com/knocklabs/client-js/blob/main/example/src/App.js) file, which is a plain-old Create React App.
+You can find an example usage in a React application in the [example/App.js](../../examples/client-example/src/App.js) file, which is a plain-old Create React App.
 
 ### Retrieving new items from the feed
 
@@ -182,24 +182,3 @@ await knockClient.preferences.setWorkflow("dinosaurs-loose", {
   },
 });
 ```
-
-### Managing the current user's channel data
-
-```typescript
-// Get user channel data
-await knockClient.user.getChannelData({
-  channelId: "channel-id",
-});
-```
-
-```typescript
-// Set push channel data for a user
-await knockClient.user.setChannelData({
-  channelId: "channel-id",
-  channelData: {
-    tokens: ["apns-user-push-token"],
-  },
-});
-```
-
-See provider requirements for setting channel data [here]("https://docs.knock.app/managing-recipients/setting-channel-data#provider-data-requirements").

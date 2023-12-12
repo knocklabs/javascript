@@ -1,0 +1,69 @@
+{
+  "name": "@knocklabs/client",
+  "version": "0.8.15",
+  "description": "The clientside library for interacting with Knock",
+  "homepage": "https://github.com/knocklabs/knock-client-js",
+  "author": "@knocklabs",
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "typings": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/esm/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knocklabs/knock-client-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/knocklabs/knock-client-js/issues"
+  },
+  "scripts": {
+    "lint": "eslint \"src/**/*.+(ts|js|tsx)\"",
+    "prettier": "prettier \"src/**/*.{js,ts,tsx}\" --check",
+    "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:types",
+    "build:esm": "cross-env BABEL_ENV=esm babel src --extensions .ts,.tsx -d dist/esm --source-maps --ignore 'src/stories/*'",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --extensions .ts,.tsx -d dist/cjs --source-maps --ignore 'src/stories/*'",
+    "build:types": "tsc --emitDeclarationOnly --declaration --declarationDir dist/types",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.7",
+    "@babel/core": "^7.16.7",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
+    "@babel/plugin-transform-runtime": "^7.16.7",
+    "@babel/preset-env": "^7.16.7",
+    "@babel/preset-typescript": "^7.16.7",
+    "@types/phoenix": "^1.5.4",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "cross-env": "^7.0.3",
+    "eslint": "7.23.0",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.46.0",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "axios-retry": "^3.1.9",
+    "eventemitter2": "^6.4.5",
+    "phoenix": "1.6.16",
+    "zustand": "^3.7.2"
+  }
+}
