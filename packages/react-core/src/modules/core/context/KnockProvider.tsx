@@ -1,13 +1,11 @@
 import * as React from "react";
 import Knock from "@knocklabs/client";
 
-import { ColorMode } from "../constants";
 import { useAuthenticatedKnockClient } from "../hooks";
 import { KnockI18nProvider, I18nContent } from "../../i18n";
 
 export interface KnockProviderState {
   knock: Knock;
-  colorMode: ColorMode;
 }
 
 const ProviderStateContext = React.createContext<KnockProviderState | null>(
@@ -24,7 +22,6 @@ export interface KnockProviderProps {
 
   // Extra options
   children?: React.ReactElement;
-  colorMode?: ColorMode;
 
   // i18n translations
   i18n?: I18nContent;
@@ -36,7 +33,6 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
   userId,
   userToken,
   children,
-  colorMode = "light",
   i18n,
 }) => {
   const knock = useAuthenticatedKnockClient(apiKey, userId, userToken, {
@@ -47,7 +43,6 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
     <ProviderStateContext.Provider
       value={{
         knock,
-        colorMode,
       }}
     >
       <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
@@ -55,10 +50,10 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
   );
 };
 
-export const useKnock = (): KnockProviderState => {
-  const context = React.useContext(ProviderStateContext);
+export const useKnockClient = (): Knock => {
+  const context = React.useContext(ProviderStateContext) as KnockProviderState;
   if (context === undefined) {
     throw new Error("useKnock must be used within a KnockProvider");
   }
-  return context as KnockProviderState;
+  return context.knock;
 };
