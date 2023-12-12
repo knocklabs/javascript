@@ -28,6 +28,7 @@
     "url": "https://github.com/knocklabs/knock-client-js/issues"
   },
   "scripts": {
+    "dev": "yarn build",
     "lint": "eslint \"src/**/*.+(ts|js|tsx)\"",
     "prettier": "prettier \"src/**/*.{js,ts,tsx}\" --check",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
