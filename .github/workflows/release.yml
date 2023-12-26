@@ -27,6 +27,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          commit: "chore(repo): Version packages"
           publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
