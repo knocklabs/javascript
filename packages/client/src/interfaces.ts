@@ -41,3 +41,8 @@ export interface Activity<T = GenericData> {
   actor: Recipient | null;
   data: T | null;
 }
+
+export interface ChannelData<T = any> {
+  channel_id: string;
+  data: T;
+}

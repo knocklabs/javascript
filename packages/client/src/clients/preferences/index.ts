@@ -27,6 +27,9 @@ class Preferences {
     this.instance = instance;
   }
 
+  /**
+   * @deprecated Use `user.getAllPreferences()` instead
+   */
   async getAll() {
     const result = await this.instance.client().makeRequest({
       method: "GET",
@@ -36,6 +39,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.getPreferences()` instead
+   */
   async get(options: PreferenceOptions = {}) {
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
@@ -47,6 +53,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async set(
     preferenceSet: SetPreferencesProperties,
     options: PreferenceOptions = {},
@@ -62,6 +71,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async setChannelTypes(
     channelTypePreferences: ChannelTypePreferences,
     options: PreferenceOptions = {},
@@ -77,6 +89,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async setChannelType(
     channelType: ChannelType,
     setting: boolean,
@@ -93,6 +108,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async setWorkflows(
     workflowPreferences: WorkflowPreferences,
     options: PreferenceOptions = {},
@@ -108,6 +126,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async setWorkflow(
     workflowKey: string,
     setting: WorkflowPreferenceSetting,
@@ -125,6 +146,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async setCategories(
     categoryPreferences: WorkflowPreferences,
     options: PreferenceOptions = {},
@@ -140,6 +164,9 @@ class Preferences {
     return this.handleResponse(result);
   }
 
+  /**
+   * @deprecated Use `user.setPreferences(preferenceSet, options)` instead
+   */
   async setCategory(
     categoryKey: string,
     setting: WorkflowPreferenceSetting,
