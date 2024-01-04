@@ -2,6 +2,8 @@
 
 A set of components for integrating [Knock](https://knock.app) into a React application.
 
+> Using `@knocklabs/react-notification-feed`? See the [migration guide](https://docs.knock.app/in-app-ui/react/migrating-from-react-notification-feed) for instructions on switching to `@knocklabs/react`.
+
 [See a live demo](https://knock-in-app-notifications-react.vercel.app/)
 
 ![In-app feed component example](NotificationFeed.png)
@@ -52,10 +54,7 @@ const YourAppLayout = () => {
   const notifButtonRef = useRef(null);
 
   return (
-    <KnockProvider
-      apiKey={process.env.KNOCK_PUBLIC_API_KEY}
-      feedId={process.env.KNOCK_FEED_ID}
-    >
+    <KnockProvider apiKey={process.env.KNOCK_PUBLIC_API_KEY} userId={userId}>
       {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
       <KnockFeedProvider feedId={process.env.KNOCK_FEED_ID}>
         <>

@@ -14,6 +14,8 @@ export interface FeedClientOptions {
   tenant?: string;
   // Optionally scope to notifications with any tenancy or no tenancy
   has_tenant?: boolean;
+  // Optionally scope to notifications with any of the categories provided
+  workflow_categories?: string[];
   // Optionally scope to a given archived status (defaults to `exclude`)
   archived?: "include" | "exclude" | "only";
   // Optionally scope all notifications that contain this argument as part of their trigger payload
