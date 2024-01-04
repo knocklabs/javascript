@@ -2,6 +2,8 @@
 
 A set of components for integrating [Knock](https://knock.app) into a React application.
 
+> Using `@knocklabs/react-notification-feed`? See the [migration guide](https://docs.knock.app/in-app-ui/react/migrating-from-react-notification-feed) for instructions on switching to `@knocklabs/react`.
+
 [See a live demo](https://knock-in-app-notifications-react.vercel.app/)
 
 ![In-app feed component example](NotificationFeed.png)
