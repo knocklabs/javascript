@@ -52,10 +52,7 @@ const YourAppLayout = () => {
   const notifButtonRef = useRef(null);
 
   return (
-    <KnockProvider
-      apiKey={process.env.KNOCK_PUBLIC_API_KEY}
-      feedId={process.env.KNOCK_FEED_ID}
-    >
+    <KnockProvider apiKey={process.env.KNOCK_PUBLIC_API_KEY} userId={userId}>
       {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
       <KnockFeedProvider feedId={process.env.KNOCK_FEED_ID}>
         <>
