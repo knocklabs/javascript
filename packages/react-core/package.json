@@ -35,6 +35,9 @@
   "bugs": {
     "url": "https://github.com/knocklabs/javascript/issues"
   },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
   "dependencies": {
     "@knocklabs/client": "*"
   },
@@ -52,8 +55,5 @@
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
     "vite-plugin-no-bundle": "^3.0.0"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0"
   }
 }

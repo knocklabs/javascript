@@ -6,7 +6,7 @@ A set of components for integrating [Knock](https://knock.app) into a React appl
 
 [See a live demo](https://knock-in-app-notifications-react.vercel.app/)
 
-![In-app feed component example](NotificationFeed.png)
+![In-app feed component example](/NotificationFeed.png)
 
 **Note: these components are designed to be used via React for web only.**
 
