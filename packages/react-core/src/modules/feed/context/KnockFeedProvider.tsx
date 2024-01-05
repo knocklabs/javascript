@@ -9,7 +9,6 @@ import create, { StoreApi, UseStore } from "zustand";
 import { ColorMode } from "../../core/constants";
 import useNotifications from "../hooks/useNotifications";
 import { feedProviderKey } from "../../core/utils";
-import { KnockFeedContainer } from "./KnockFeedContainer";
 import { useKnockClient } from "../../core";
 
 export interface KnockFeedProviderState {
@@ -29,7 +28,6 @@ export interface KnockFeedProviderProps {
 
   // Extra options
   children?: React.ReactElement;
-  rootless?: boolean;
   colorMode?: ColorMode;
 
   // Feed client options
@@ -40,19 +38,12 @@ export const KnockFeedProvider: React.FC<KnockFeedProviderProps> = ({
   feedId,
   children,
   defaultFeedOptions = {},
-  rootless = false,
   colorMode = "light",
 }) => {
   const knock = useKnockClient();
 
   const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
   const useFeedStore = create(feedClient.store as StoreApi<FeedStoreState>);
-
-  const content = rootless ? (
-    children
-  ) : (
-    <KnockFeedContainer>{children}</KnockFeedContainer>
-  );
 
   return (
     <FeedStateContext.Provider
@@ -64,7 +55,7 @@ export const KnockFeedProvider: React.FC<KnockFeedProviderProps> = ({
         colorMode,
       }}
     >
-      {content}
+      {children}
     </FeedStateContext.Provider>
   );
 };
