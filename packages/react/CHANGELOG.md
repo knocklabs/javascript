@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- d8a216e: fix: react-core build process
+  fix: remove headless prop from KnockFeedProvider
+  fix: move KnockFeedContainer from react-core to react and rename to NotificationFeedContainer
+- Updated dependencies [d8a216e]
+  - @knocklabs/react-core@0.1.1
+
 ## 0.1.0
 
 ### Patch Changes
