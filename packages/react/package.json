@@ -39,13 +39,15 @@
   "bugs": {
     "url": "https://github.com/knocklabs/javascript/issues"
   },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
   "dependencies": {
     "@knocklabs/client": "*",
-    "@knocklabs/react-core": "0.1.0",
+    "@knocklabs/react-core": "*",
     "date-fns": "^2.30.0",
     "lodash.debounce": "^4.0.8",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2",
     "zustand": "^3.5.10"
