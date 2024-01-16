@@ -15,7 +15,11 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
-      react(),
+      react({
+        babel: {
+          plugins: ["babel-plugin-date-fns"],
+        },
+      }),
       noBundlePlugin({ root: "./src" }),
     ],
     build: {
@@ -27,12 +31,18 @@ export default defineConfig(({ mode }) => {
         formats,
       },
       rollupOptions: {
+        // External packages that should not be bundled
+        external: ["react"],
         output: {
           interop: "compat",
           format: formats[0],
+          globals: {
+            react: "React",
+          },
+          entryFileNames: () => {
+            return "[name].js";
+          },
         },
-        // External packages that should not be bundled
-        external: ["react"],
       },
     },
   };

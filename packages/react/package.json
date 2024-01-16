@@ -46,11 +46,9 @@
   "dependencies": {
     "@knocklabs/client": "*",
     "@knocklabs/react-core": "*",
-    "date-fns": "^2.30.0",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
-    "react-popper-tooltip": "^4.4.2",
-    "zustand": "^3.5.10"
+    "react-popper-tooltip": "^4.4.2"
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
