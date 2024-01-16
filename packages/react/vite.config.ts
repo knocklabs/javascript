@@ -61,7 +61,7 @@ export default defineConfig(({ mode }) => {
                 if (file?.type === "chunk") {
                   // Replace .css imports and requires
                   const pattern =
-                    /(import\s+['"].+\.css(\.mjs)?['"];?)|(require\(['"].+\.css(\.js)?['"]\);?)/;
+                    /(import\s+['"].+\.css(\.mjs)?['"];?)|(require\(['"][^()]+\.css(\.js)?['"]\);?)/;
                   file.code = file.code.replace(pattern, "");
                 }
               }
