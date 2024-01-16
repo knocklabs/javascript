@@ -28,9 +28,14 @@ export default defineConfig(({ mode }) => {
         formats,
       },
       rollupOptions: {
+        // External packages that should not be bundled
+        external: ["react", "react-dom"],
         output: {
           interop: "compat",
           format: formats[0],
+          globals: {
+            react: "React",
+          },
           assetFileNames: (assetInfo) => {
             // Rename styles to index.css
             if (assetInfo.name === "style.css") {
@@ -39,8 +44,6 @@ export default defineConfig(({ mode }) => {
             return assetInfo.name;
           },
         },
-        // External packages that should not be bundled
-        external: ["react", "react-dom"],
         plugins: [
           execute([
             // Move index.css to root of dist
@@ -55,7 +58,7 @@ export default defineConfig(({ mode }) => {
               for (const fileName in bundle) {
                 const file = bundle[fileName];
 
-                if (file.type === "chunk") {
+                if (file?.type === "chunk") {
                   // Replace .css imports and requires
                   const pattern =
                     /(import\s+['"].+\.css(\.mjs)?['"];?)|(require\(['"].+\.css(\.js)?['"]\);?)/;
