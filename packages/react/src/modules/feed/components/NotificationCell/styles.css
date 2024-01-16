@@ -170,7 +170,9 @@
   margin-left: auto;
   color: var(--rnf-archive-notification-btn-bg-color);
   padding: var(--rnf-spacing-1) var(--rnf-spacing-2);
-  transition: color 0.1s ease-in-out, opacity 0.2s ease-in-out;
+  transition:
+    color 0.1s ease-in-out,
+    opacity 0.2s ease-in-out;
 }
 
 .rnf-notification-cell:focus .rnf-archive-notification-btn,
@@ -227,4 +229,10 @@
 
 .rnf-tooltip--dark {
   background-color: #565a61;
+}
+
+@media screen and (hover: none) {
+  .rnf-archive-notification-btn {
+    opacity: 1;
+  }
 }
