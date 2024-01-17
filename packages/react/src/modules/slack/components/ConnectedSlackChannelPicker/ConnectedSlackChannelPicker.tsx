@@ -1,4 +1,3 @@
-import { User } from "@knocklabs/client";
 import { useState } from "react";
 import { ContainerObject, useSlackChannels, Channel } from "../..";
 
@@ -6,14 +5,12 @@ import "./styles.css";
 import { useKnockClient } from "@knocklabs/react-core";
 
 type Props = {
-  user: User;
   tenant: string;
   connectionsObject: ContainerObject;
   knockSlackChannelId: string;
 };
 
 export const ConnectedSlackChannelPicker: React.FC<Props> = ({
-  user,
   tenant,
   connectionsObject,
   knockSlackChannelId,
@@ -23,18 +20,15 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
   const [toggleForRefetch, setToggleForRefetch] = useState(false);
   const [isSettingChannels, setIsSettingChannels] = useState(false);
   const [showChannelPicker, setShowChannelPicker] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<null | string>(null);
 
   const { data, isLoading: isLoadingSlackChannels } = useSlackChannels(
     tenant,
     connectionsObject,
-
     knockSlackChannelId,
-
-    user,
     toggleForRefetch,
-    setHasError,
-    hasError,
+    setErrorMessage,
+    errorMessage,
   );
 
   const isLoading = isSettingChannels || isLoadingSlackChannels;
@@ -67,11 +61,11 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
           knockChannelId: knockSlackChannelId,
           slackChannelId: channelId,
           connections: channelsToSendToKnock,
-          userId: user.id,
+          userId: knockClient.userId!
         });
         setToggleForRefetch((state) => !state);
       } catch (error) {
-        setHasError(true);
+        setErrorMessage("");
         setShowChannelPicker(false);
       }
       setIsSettingChannels(false);
@@ -79,12 +73,12 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
   };
 
   const channelsConnectedMessage = () => {
-    if (hasError) {
-      return "Error fetching channels";
+    if (errorMessage) {
+      return errorMessage;
     }
 
     if (isLoading) {
-      return "Loading...";
+      return "Fetching channels...";
     }
 
     const numberConnectedChannels = channels.filter(
@@ -117,13 +111,13 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
             key={"select"}
             className="rnf-header"
             onClick={() => {
-              if (!hasError) {
+              if (!errorMessage) {
                 setShowChannelPicker(!showChannelPicker);
               }
             }}
           >
             {channelsConnectedMessage()}
-            {!hasError && (
+            {!errorMessage && (
               <span className="rnf-icon">
                 {showChannelPicker ? (
                   <svg
