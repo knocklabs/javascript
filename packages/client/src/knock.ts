@@ -1,6 +1,7 @@
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import Preferences from "./clients/preferences";
+import SlackClient from "./clients/slack";
 import UserClient from "./clients/users";
 import { KnockOptions } from "./interfaces";
 
@@ -14,6 +15,7 @@ class Knock {
 
   readonly feeds = new FeedClient(this);
   readonly preferences = new Preferences(this);
+  readonly slack = new SlackClient(this);
   readonly user = new UserClient(this);
 
   constructor(
