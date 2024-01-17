@@ -5,6 +5,7 @@ export * from "./interfaces";
 export * from "./clients/feed/types";
 export * from "./clients/feed/interfaces";
 export * from "./clients/preferences/interfaces";
+export * from "./clients/slack";
 export * from "./clients/users";
 export * from "./networkStatus";
 
