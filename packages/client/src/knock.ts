@@ -1,19 +1,23 @@
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
+import ObjectClient from "./clients/objects";
 import Preferences from "./clients/preferences";
+import SlackClient from "./clients/slack";
 import UserClient from "./clients/users";
 import { KnockOptions } from "./interfaces";
 
 const DEFAULT_HOST = "https://api.knock.app";
 
 class Knock {
-  private host: string;
+  public host: string;
   private apiClient: ApiClient | null = null;
   public userId: string | undefined;
   public userToken: string | undefined;
 
   readonly feeds = new FeedClient(this);
+  readonly objects = new ObjectClient(this);
   readonly preferences = new Preferences(this);
+  readonly slack = new SlackClient(this);
   readonly user = new UserClient(this);
 
   constructor(

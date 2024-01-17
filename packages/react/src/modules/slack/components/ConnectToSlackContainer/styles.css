@@ -1,0 +1,28 @@
+.rnf-slack-container-container {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--Gray-Gray-100, #e4e8ee);
+  background: var(--Gray-White, #fff);
+  font-family: var(--slack-connect-font-family);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rnf-slack-container-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.rnf-slack-container-title {
+  margin-top: 16px;
+  color: rgba(26, 31, 54, 1);
+  font-size: 16px;
+  line-height: 20px;
+}
+
+.rnf-slack-container-description {
+  color: rgba(81, 86, 105, 1);
+  font-size: 14px;
+  line-height: 20px;
+}
