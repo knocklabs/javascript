@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- 8988230: Fix esm exports and date-fns/locale imports
+- 8315372: Fix cjs build output for React components
+- Updated dependencies [8988230]
+- Updated dependencies [8315372]
+  - @knocklabs/react-core@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
