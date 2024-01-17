@@ -50,6 +50,7 @@ class ApiClient {
       });
     }
 
+    // @ts-ignore
     axiosRetry(this.axiosClient, {
       retries: 3,
       retryCondition: this.canRetryRequest,
