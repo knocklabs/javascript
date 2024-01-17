@@ -1,4 +1,9 @@
-import { Button, ButtonGroup, KnockFeedProvider, KnockProvider } from ".";
+import {
+  Button,
+  ButtonGroup,
+  KnockFeedProvider,
+  KnockProvider,
+} from ".";
 
 // Test out components here by running yarn dev:local in the package
 function App() {
