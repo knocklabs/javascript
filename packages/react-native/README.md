@@ -83,7 +83,7 @@ const YourAppLayout = () => {
     notificationFeed.fetch();
   }, [notificationFeed]);
 
-  return <View>Total unread: {metadata.unread_count}</View>;
+  return <Text>Total unread: {metadata.unread_count}</Text>;
 };
 ```
 
