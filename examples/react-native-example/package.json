@@ -1,7 +1,7 @@
 {
-  "name": "react-native-example",
+  "name": "@knocklabs/react-native-example",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@knocklabs/react-native": "*",
     "expo": "~50.0.2",
     "expo-status-bar": "~1.11.1",
     "react": "^18.2.0",
