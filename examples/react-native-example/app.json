@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-example",
-    "slug": "react-native-example",
+    "name": "@knocklabs/react-native-example",
+    "slug": "@knocklabs/react-native-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
