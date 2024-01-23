@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         // External packages that should not be bundled into your library.
-        external: ["react", "react-native", "react-dom"],
+        external: ["react", "react-native"],
         output: {
           interop: "compat",
           format: formats[0],

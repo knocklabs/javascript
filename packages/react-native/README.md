@@ -31,7 +31,11 @@ To configure the feed you will need:
 You can integrate the feed into your app as follows:
 
 ```jsx
-import { KnockProvider, KnockFeedProvider } from "@knocklabs/react-native";
+import {
+  KnockProvider,
+  KnockFeedProvider,
+  NotificationFeedContainer,
+} from "@knocklabs/react-native";
 
 const YourAppLayout = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -41,9 +45,9 @@ const YourAppLayout = () => {
     <KnockProvider apiKey={process.env.KNOCK_PUBLIC_API_KEY} userId={userId}>
       {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
       <KnockFeedProvider feedId={process.env.KNOCK_FEED_ID}>
-        <View>
+        <NotificationFeedContainer>
           <Text>Notifications go in here!</Text>
-        </View>
+        </NotificationFeedContainer>
       </KnockFeedProvider>
     </KnockProvider>
   );
