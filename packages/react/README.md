@@ -57,7 +57,7 @@ const YourAppLayout = () => {
     <KnockProvider apiKey={process.env.KNOCK_PUBLIC_API_KEY} userId={userId}>
       {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
       <KnockFeedProvider feedId={process.env.KNOCK_FEED_ID}>
-        <>
+        <div>
           <NotificationIconButton
             ref={notifButtonRef}
             onClick={(e) => setIsVisible(!isVisible)}
@@ -67,7 +67,7 @@ const YourAppLayout = () => {
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
           />
-        </>
+        </div>
       </KnockFeedProvider>
     </KnockProvider>
   );

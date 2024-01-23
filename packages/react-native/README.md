@@ -23,26 +23,29 @@ yarn add @knocklabs/react-native
 To configure the feed you will need:
 
 1. A public API key (found in the Knock dashboard)
-2. A feed channel ID (found in the Knock dashboard)
-3. A user ID, and optionally an auth token for production environments
+1. A user ID, and optionally an auth token for production environments
+1. If integrating an in-app feed, a feed channel ID (found in the Knock dashboard)
 
 ## Usage
 
 You can integrate the feed into your app as follows:
 
 ```jsx
-import { KnockFeedProvider, NotificationIconButton, NotificationFeedPopover } from "@knocklabs/react-native";
+import { KnockProvider, KnockFeedProvider } from "@knocklabs/react-native";
 
 const YourAppLayout = () => {
   const [isVisible, setIsVisible] = useState(false);
   const notifButtonRef = useRef(null);
 
   return (
-    <KnockFeedProvider apiKey={process.env.KNOCK_PUBLIC_API_KEY} feedId={process.env.KNOCK_FEED_ID} userId={currentUser.id}>
-      <View>
-        <Text>Notifications go in here!</Text>
-      </View>
-    </KnockFeedProvider>
+    <KnockProvider apiKey={process.env.KNOCK_PUBLIC_API_KEY} userId={userId}>
+      {/* Optionally, use the KnockFeedProvider to connect an in-app feed */}
+      <KnockFeedProvider feedId={process.env.KNOCK_FEED_ID}>
+        <View>
+          <Text>Notifications go in here!</Text>
+        </View>
+      </KnockFeedProvider>
+    </KnockProvider>
   );
 };
 ```
@@ -52,13 +55,22 @@ const YourAppLayout = () => {
 Alternatively, if you don't want to use our components you can render the feed in a headless mode using our hooks:
 
 ```jsx
-import { useAuthenticatedKnockClient, useNotifications } from "@knocklabs/react-native";
+import {
+  useAuthenticatedKnockClient,
+  useNotifications,
+} from "@knocklabs/react-native";
 import create from "zustand";
 
 const YourAppLayout = () => {
-  const knockClient = useAuthenticatedKnockClient(process.env.KNOCK_PUBLIC_API_KEY, currentUser.id);
+  const knockClient = useAuthenticatedKnockClient(
+    process.env.KNOCK_PUBLIC_API_KEY,
+    currentUser.id,
+  );
 
-  const notificationFeed = useNotifications(knockClient, process.env.KNOCK_FEED_ID);
+  const notificationFeed = useNotifications(
+    knockClient,
+    process.env.KNOCK_FEED_ID,
+  );
 
   const useNotificationStore = create(notificationFeed.store);
   const { metadata } = useNotificationStore();
@@ -67,7 +79,7 @@ const YourAppLayout = () => {
     notificationFeed.fetch();
   }, [notificationFeed]);
 
-  return <span>Total unread: {metadata.unread_count}</span>;
+  return <View>Total unread: {metadata.unread_count}</View>;
 };
 ```
 
