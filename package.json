@@ -10,18 +10,20 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "release": "turbo run build && changeset version && changeset publish"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "@knocklabs/eslint-config": "*",
-    "@knocklabs/typescript-config": "*",
-    "prettier": "^3.1.0",
-    "turbo": "^1.10.16"
+    "release": "turbo run build && changeset version && changeset publish",
+    "postinstall": "manypkg check"
   },
   "packageManager": "yarn@1.22.19",
   "workspaces": [
     "examples/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@knocklabs/eslint-config": "*",
+    "@knocklabs/typescript-config": "*",
+    "@manypkg/cli": "^0.21.2",
+    "prettier": "^3.1.0",
+    "turbo": "^1.10.16"
+  }
 }
