@@ -37,13 +37,16 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
   archived: "exclude",
 };
 
+const DISCONNECT_DELAY = 2000;
+
 class Feed {
   private apiClient: ApiClient;
   private userFeedId: string;
   private channel: Channel | undefined;
   private broadcaster: EventEmitter;
   private defaultOptions: FeedClientOptions;
-  private broadcastChannel: BroadcastChannel | null;
+  private broadcastChannel!: BroadcastChannel | null;
+  private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -60,6 +63,44 @@ class Feed {
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = { ...feedClientDefaults, ...options };
 
+    this.setup();
+
+    if (this.apiClient.socket) {
+      // Listen for changes to document visibility and automatically disconnect
+      // or reconnect the socket after a delay
+      document.addEventListener("visibilitychange", () => {
+        console.log("Document visibility change: ", document.visibilityState);
+        if (document.visibilityState === "hidden") {
+          // When the tab is hidden, clean up the socket connection after a delay
+          this.disconnectTimer = setTimeout(() => {
+            console.log("Tearing down");
+            this.teardown();
+            this.apiClient.disconnectSocket();
+            this.disconnectTimer = null;
+          }, DISCONNECT_DELAY);
+        } else {
+          // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
+          if (this.disconnectTimer) {
+            console.log("Canceled timer");
+            clearTimeout(this.disconnectTimer);
+            this.disconnectTimer = null;
+          }
+          // If the socket is not connected, try to reconnect
+          if (!this.apiClient.socket) {
+            console.log("Actually reconnecting!!");
+            this.apiClient.connectSocket();
+            this.setup();
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Sets up feed instance by creating the store, managing socket
+   * connections, and event emitters
+   */
+  setup() {
     // In server environments we might not have a socket connection
     if (this.apiClient.socket) {
       this.channel = this.apiClient.socket.channel(

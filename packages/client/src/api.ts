@@ -42,14 +42,7 @@ class ApiClient {
       },
     });
 
-    if (typeof window !== "undefined") {
-      this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
-        params: {
-          user_token: this.userToken,
-          api_key: this.apiKey,
-        },
-      });
-    }
+    this.connectSocket();
 
     axiosRetry(this.axiosClient, {
       retries: 3,
@@ -79,6 +72,26 @@ class ApiClient {
         body: undefined,
         error: e,
       };
+    }
+  }
+
+  connectSocket() {
+    if (typeof window !== "undefined") {
+      console.log("Connect socket");
+      this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
+        params: {
+          user_token: this.userToken,
+          api_key: this.apiKey,
+        },
+      });
+    }
+  }
+
+  disconnectSocket() {
+    if (this.socket) {
+      console.log("Disconnect socket");
+      this.socket.disconnect();
+      this.socket = undefined;
     }
   }
 
