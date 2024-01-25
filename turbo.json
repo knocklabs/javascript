@@ -27,6 +27,14 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "test:watch": {
+      "cache": false
     }
   }
 }
