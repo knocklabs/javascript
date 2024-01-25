@@ -37,7 +37,7 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
   archived: "exclude",
 };
 
-const DISCONNECT_DELAY = 2000;
+const DEFAULT_DISCONNECT_DELAY = 2000;
 
 class Feed {
   private apiClient: ApiClient;
@@ -65,29 +65,29 @@ class Feed {
 
     this.setup();
 
-    if (this.apiClient.socket) {
+    if (options.auto_manage_socket_connection && this.apiClient.socket) {
       // Listen for changes to document visibility and automatically disconnect
       // or reconnect the socket after a delay
+      const disconnectDelay =
+        typeof options.auto_manage_socket_connection === "number"
+          ? options.auto_manage_socket_connection
+          : DEFAULT_DISCONNECT_DELAY;
       document.addEventListener("visibilitychange", () => {
-        console.log("Document visibility change: ", document.visibilityState);
         if (document.visibilityState === "hidden") {
           // When the tab is hidden, clean up the socket connection after a delay
           this.disconnectTimer = setTimeout(() => {
-            console.log("Tearing down");
             this.teardown();
             this.apiClient.disconnectSocket();
             this.disconnectTimer = null;
-          }, DISCONNECT_DELAY);
+          }, disconnectDelay);
         } else {
           // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
           if (this.disconnectTimer) {
-            console.log("Canceled timer");
             clearTimeout(this.disconnectTimer);
             this.disconnectTimer = null;
           }
           // If the socket is not connected, try to reconnect
           if (!this.apiClient.socket) {
-            console.log("Actually reconnecting!!");
             this.apiClient.connectSocket();
             this.setup();
           }
@@ -103,6 +103,9 @@ class Feed {
   setup() {
     // In server environments we might not have a socket connection
     if (this.apiClient.socket) {
+      if (!this.apiClient.socket.isConnected()) {
+        this.apiClient.socket.connect();
+      }
       this.channel = this.apiClient.socket.channel(
         `feeds:${this.userFeedId}`,
         this.defaultOptions,

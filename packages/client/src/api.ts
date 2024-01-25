@@ -77,7 +77,6 @@ class ApiClient {
 
   connectSocket() {
     if (typeof window !== "undefined") {
-      console.log("Connect socket");
       this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
         params: {
           user_token: this.userToken,
@@ -89,7 +88,6 @@ class ApiClient {
 
   disconnectSocket() {
     if (this.socket) {
-      console.log("Disconnect socket");
       this.socket.disconnect();
       this.socket = undefined;
     }

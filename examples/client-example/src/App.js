@@ -12,7 +12,9 @@ knockClient.authenticate(process.env.REACT_APP_KNOCK_USER_ID);
 const useNotificationFeed = (knockClient, feedId) => {
   return useMemo(() => {
     // Create the notification feed instance
-    const notificationFeed = knockClient.feeds.initialize(feedId);
+    const notificationFeed = knockClient.feeds.initialize(feedId, {
+      auto_manage_socket_connection: 250,
+    });
     const notificationStore = create(notificationFeed.store);
     notificationFeed.fetch();
 
