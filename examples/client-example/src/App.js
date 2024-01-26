@@ -62,14 +62,18 @@ function App() {
       {loading && <span>Loading...</span>}
 
       {items.map((item) => (
-        <div key={item.id}>
+        <div key={item.id} className="feed-item">
           ID: {item.id}
           <br />
           Actor ID: {item.actors?.[0]?.id}
           <br />
           Actor email: {item.actors?.[0]?.email}
           <br />
-          Inserted: {item.inserted_at}
+          Inserted:{" "}
+          {new Intl.DateTimeFormat("en-US", {
+            dateStyle: "short",
+            timeStyle: "medium",
+          }).format(new Date(item.inserted_at))}
           <br />
         </div>
       ))}
