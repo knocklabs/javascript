@@ -63,49 +63,8 @@ class Feed {
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = { ...feedClientDefaults, ...options };
 
-    this.setup();
-
-    if (options.auto_manage_socket_connection && this.apiClient.socket) {
-      // Listen for changes to document visibility and automatically disconnect
-      // or reconnect the socket after a delay
-      const disconnectDelay =
-        typeof options.auto_manage_socket_connection === "number"
-          ? options.auto_manage_socket_connection
-          : DEFAULT_DISCONNECT_DELAY;
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") {
-          // When the tab is hidden, clean up the socket connection after a delay
-          this.disconnectTimer = setTimeout(() => {
-            this.teardown();
-            this.apiClient.disconnectSocket();
-            this.disconnectTimer = null;
-          }, disconnectDelay);
-        } else {
-          // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
-          if (this.disconnectTimer) {
-            clearTimeout(this.disconnectTimer);
-            this.disconnectTimer = null;
-          }
-          // If the socket is not connected, try to reconnect
-          if (!this.apiClient.socket) {
-            this.apiClient.connectSocket();
-            this.setup();
-          }
-        }
-      });
-    }
-  }
-
-  /**
-   * Sets up feed instance by creating the store, managing socket
-   * connections, and event emitters
-   */
-  setup() {
     // In server environments we might not have a socket connection
     if (this.apiClient.socket) {
-      if (!this.apiClient.socket.isConnected()) {
-        this.apiClient.socket.connect();
-      }
       this.channel = this.apiClient.socket.channel(
         `feeds:${this.userFeedId}`,
         this.defaultOptions,
@@ -120,6 +79,10 @@ class Feed {
       typeof self !== "undefined" && "BroadcastChannel" in self
         ? new BroadcastChannel(`knock:feed:${this.userFeedId}`)
         : null;
+
+    if (options.auto_manage_socket_connection && this.apiClient.socket) {
+      this.setupAutoSocketManager(options.auto_manage_socket_connection);
+    }
   }
 
   /**
@@ -710,6 +673,42 @@ class Feed {
     } catch (e) {
       console.warn(`Could not broadcast ${type}, got error: ${e}`);
     }
+  }
+
+  /**
+   * Listen for changes to document visibility and automatically disconnect
+   * or reconnect the socket after a delay
+   */
+  private setupAutoSocketManager(
+    auto_manage_socket_connection: boolean | number,
+  ) {
+    const disconnectDelay =
+      typeof auto_manage_socket_connection === "number"
+        ? auto_manage_socket_connection
+        : DEFAULT_DISCONNECT_DELAY;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        // When the tab is hidden, clean up the socket connection after a delay
+        this.disconnectTimer = setTimeout(() => {
+          this.apiClient.disconnectSocket();
+          this.disconnectTimer = null;
+        }, disconnectDelay);
+      } else if (document.visibilityState === "visible") {
+        // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
+        // This handles cases where the tab is only briefly hidden to avoid unnecessary disconnects
+        if (this.disconnectTimer) {
+          clearTimeout(this.disconnectTimer);
+          this.disconnectTimer = null;
+        }
+
+        // If the socket is not connected, try to reconnect
+        if (!this.apiClient.socket?.isConnected()) {
+          this.apiClient.reconnectSocket();
+          this.fetch();
+        }
+      }
+    });
   }
 }
 
