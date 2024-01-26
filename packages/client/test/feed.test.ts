@@ -19,7 +19,7 @@ describe("it can create a feed client", () => {
   });
 });
 
-describe.only("it can auto manage socket connections", () => {
+describe("it can auto manage socket connections", () => {
   let addEventListenerSpy: MockInstance;
 
   beforeEach(() => {
