@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3
+
+### Patch Changes
+
+- 4673d95: fix: scope feed provider styles to only Knock elements
+- Updated dependencies [7bc5e4a]
+  - @knocklabs/client@0.8.16
+
 ## 0.1.2
 
 ### Patch Changes

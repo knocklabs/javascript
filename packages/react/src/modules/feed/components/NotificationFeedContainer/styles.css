@@ -4,7 +4,7 @@
   padding: 0 !important;
 }
 
-.rnf-feed-provider * {
+.rnf-feed-provider [class^="rnf-"] {
   font-family: var(--rnf-font-family-sanserif) !important;
   box-sizing: border-box;
 }

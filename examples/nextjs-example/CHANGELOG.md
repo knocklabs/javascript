@@ -1,5 +1,13 @@
 # nextjs-example
 
+## 1.0.4
+
+### Patch Changes
+
+- 4673d95: fix: scope feed provider styles to only Knock elements
+- Updated dependencies [4673d95]
+  - @knocklabs/react@0.1.3
+
 ## 1.0.3
 
 ### Patch Changes
