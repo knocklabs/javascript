@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => {
             react: "React",
           },
           entryFileNames: () => {
-            return "[name].js";
+            return CJS ? "[name].cjs" : "[name].js";
           },
         },
       },

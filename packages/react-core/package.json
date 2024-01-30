@@ -4,13 +4,13 @@
   "author": "@knocklabs",
   "version": "0.1.2",
   "license": "MIT",
-  "main": "dist/cjs/index.js",
+  "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/cjs/index.js",
+      "require": "./dist/cjs/index.cjs",
       "types": "./dist/types/index.d.ts",
       "default": "./dist/esm/index.js"
     }
