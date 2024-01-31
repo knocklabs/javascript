@@ -71,6 +71,10 @@ export default defineConfig(({ mode }) => {
         ],
       },
     },
-    test: {},
+    test: {
+      global: true,
+      environment: "jsdom",
+      setupFiles: "./setupTest.ts",
+    },
   };
 });
