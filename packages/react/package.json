@@ -46,6 +46,7 @@
   "dependencies": {
     "@knocklabs/client": "*",
     "@knocklabs/react-core": "*",
+    "@popperjs/core": "^2.11.8",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2"
