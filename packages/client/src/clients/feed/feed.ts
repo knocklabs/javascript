@@ -81,7 +81,7 @@ class Feed {
         : null;
 
     if (options.auto_manage_socket_connection && this.apiClient.socket) {
-      this.setupAutoSocketManager(options.auto_manage_socket_connection);
+      this.setupAutoSocketManager(options.auto_manage_socket_connection_delay);
     }
   }
 
@@ -679,13 +679,9 @@ class Feed {
    * Listen for changes to document visibility and automatically disconnect
    * or reconnect the socket after a delay
    */
-  private setupAutoSocketManager(
-    auto_manage_socket_connection: boolean | number,
-  ) {
+  private setupAutoSocketManager(autoManageSocketConnectionDelay?: number) {
     const disconnectDelay =
-      typeof auto_manage_socket_connection === "number"
-        ? auto_manage_socket_connection
-        : DEFAULT_DISCONNECT_DELAY;
+      autoManageSocketConnectionDelay ?? DEFAULT_DISCONNECT_DELAY;
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {

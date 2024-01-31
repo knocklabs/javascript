@@ -13,7 +13,8 @@ const useNotificationFeed = (knockClient, feedId) => {
   return useMemo(() => {
     // Create the notification feed instance
     const notificationFeed = knockClient.feeds.initialize(feedId, {
-      auto_manage_socket_connection: 250,
+      auto_manage_socket_connection: true,
+      auto_manage_socket_connection_delay: 500,
     });
     const notificationStore = create(notificationFeed.store);
     notificationFeed.fetch();
@@ -58,6 +59,7 @@ function App() {
   return (
     <div className="App">
       <h1>Feed items</h1>
+      <pre>{JSON.stringify(process.env, null, 2)}</pre>
 
       {loading && <span>Loading...</span>}
 
