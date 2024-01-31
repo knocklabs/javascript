@@ -15,6 +15,7 @@ type ConnectionStatus =
 
 type UseManageSlackConnectionProps = {
   connectionStatus: ConnectionStatus;
+  setConnectionStatus: (status: ConnectionStatus) => void;
   errorLabel: string | null;
   setErrorLabel: (errorLabel: string) => void;
   actionLabel: string | null;
@@ -84,7 +85,6 @@ export function useManageSlackConnection(
         // This is for any Knock errors that would require a reconnect.
         setConnectionStatus("error");
       } catch (error) {
-        console.error(error);
         setConnectionStatus("error");
       }
     };
@@ -106,7 +106,6 @@ export function useManageSlackConnection(
         setConnectionStatus("error");
       }
     } catch (error) {
-      console.error("Error revoking token:", error);
       setConnectionStatus("error");
     }
   }, [tenant, knockSlackChannelId, setConnectionStatus, knock.slack]);
@@ -138,6 +137,7 @@ export function useManageSlackConnection(
 
   return {
     connectionStatus,
+    setConnectionStatus,
     errorLabel,
     setErrorLabel,
     actionLabel,

@@ -56,7 +56,6 @@ export function useSlackChannels(
               return;
             });
         } catch (error) {
-          console.error(error);
           setErrorMessage("Something went wrong.");
         }
       };

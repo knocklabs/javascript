@@ -8,7 +8,7 @@ import { KnockOptions } from "./interfaces";
 const DEFAULT_HOST = "https://api.knock.app";
 
 class Knock {
-  private host: string;
+  public host: string;
   private apiClient: ApiClient | null = null;
   public userId: string | undefined;
   public userToken: string | undefined;
@@ -18,7 +18,10 @@ class Knock {
   readonly slack = new SlackClient(this);
   readonly user = new UserClient(this);
 
-  constructor(readonly apiKey: string, options: KnockOptions = {}) {
+  constructor(
+    readonly apiKey: string,
+    options: KnockOptions = {},
+  ) {
     this.host = options.host || DEFAULT_HOST;
 
     // Fail loudly if we're using the wrong API key

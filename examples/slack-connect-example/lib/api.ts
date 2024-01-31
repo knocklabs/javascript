@@ -12,8 +12,6 @@ export async function setToken(params = {}) {
 
     return jsonResponse;
   } catch (e) {
-    console.error(e);
-
     return { error: "Error sending request" };
   }
 }
