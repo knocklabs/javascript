@@ -27,9 +27,6 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "coverage": "vitest run --coverage",
     "preview": "vite preview"
   },
   "repository": {
