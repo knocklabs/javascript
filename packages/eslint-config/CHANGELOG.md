@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.3
+
+### Patch Changes
+
+- 092b8f5: fix: move eslint-config devDeps to deps so they're accessible when installed
+
 ## 0.0.2
 
 ### Patch Changes
