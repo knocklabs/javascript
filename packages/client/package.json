@@ -5,6 +5,7 @@
   "homepage": "https://github.com/knocklabs/knock-client-js",
   "author": "@knocklabs",
   "license": "MIT",
+  "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -65,7 +66,7 @@
   },
   "dependencies": {
     "axios": "^1.6.0",
-    "axios-retry": "^3.1.9",
+    "axios-retry": "^4.0",
     "eventemitter2": "^6.4.5",
     "phoenix": "1.6.16",
     "zustand": "^3.7.2"

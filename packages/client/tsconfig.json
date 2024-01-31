@@ -1,8 +1,10 @@
 {
   "extends": "@knocklabs/typescript-config/base.json",
   "compilerOptions": {
-    "jsx": "react"
+    "jsx": "react",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

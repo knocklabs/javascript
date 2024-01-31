@@ -1,6 +1,5 @@
 import { Channel } from "phoenix";
 import { StoreApi } from "zustand";
-import { EventEmitter2 as EventEmitter } from "eventemitter2";
 import ApiClient from "../../api";
 import createStore from "./store";
 import {
@@ -22,6 +21,9 @@ import {
 } from "./interfaces";
 import Knock from "../../knock";
 import { isRequestInFlight, NetworkStatus } from "../../networkStatus";
+import EventEmitter2 from "eventemitter2";
+// @ts-expect-error https://github.com/EventEmitter2/EventEmitter2/issues/281
+const { EventEmitter2: EventEmitter } = EventEmitter2;
 
 export type Status =
   | "seen"
@@ -41,7 +43,7 @@ class Feed {
   private apiClient: ApiClient;
   private userFeedId: string;
   private channel: Channel | undefined;
-  private broadcaster: EventEmitter;
+  private broadcaster: EventEmitter2;
   private defaultOptions: FeedClientOptions;
   private broadcastChannel: BroadcastChannel | null;
 
