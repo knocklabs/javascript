@@ -1,13 +1,12 @@
 {
   "name": "@knocklabs/eslint-config",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2",
   "files": [
     "library.js",
     "next.js",
     "react-internal.js"
   ],
-  "devDependencies": {
+  "dependencies": {
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "@vercel/style-guide": "^5.1.0",
