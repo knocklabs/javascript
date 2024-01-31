@@ -1,9 +1,7 @@
-import { useKnockClient } from "@knocklabs/react-core";
 import { SlackIcon } from "../SlackIcon";
 import "./styles.css";
 
-export const SLACK_AUTHORIZE_URL = "https://slack.com/oauth/v2/authorize";
-const TENANT_COLLECTION = "$tenants";
+import { useManageSlackConnection } from "../../hooks/useManageSlackConnection";
 
 type Props = {
   tenant: string;
@@ -18,32 +16,70 @@ export const ConnectToSlackButton: React.FC<Props> = ({
   slackClientId,
   redirectUrl,
 }) => {
-  const knock = useKnockClient();
+  const { connectionStatus, actionLabel, errorLabel, setActionLabel, buildSlackAuthUrl, disconnectFromSlack } =
+    useManageSlackConnection(
+      knockSlackChannelId,
+      tenant,
+      slackClientId,
+      redirectUrl,
+    );
 
-  const rawParams = {
-    state: JSON.stringify({
-      redirect_url: redirectUrl,
-      access_token_object: {
-        object_id: tenant,
-        collection: TENANT_COLLECTION,
-      },
-      channel_id: knockSlackChannelId,
-      public_key: knock.apiKey,
-      user_token: knock.userToken,
-    }),
-    client_id: slackClientId,
-    scope: "chat:write,chat:write.public,channels:read,groups:read",
-  } as Record<string, string>;
-  const params = new URLSearchParams(rawParams);
+  // Loading states
+  if (connectionStatus === "loading" || connectionStatus === "disconnecting") {
+    return (
+      <div className="rnf-slackConnect-button rnf-slackConnect-button--loading">
+        <SlackIcon height="16px" width="16px" />
+        <span>
+          {connectionStatus === "loading"
+            ? "Connecting to Slack..."
+            : "Disconnecting..."}
+        </span>
+      </div>
+    );
+  }
 
+  // Error state
+  if (connectionStatus === "error") {
+    return (
+      <a
+        href={buildSlackAuthUrl()}
+        className="rnf-slackConnect-button rnf-slackConnect-button--error"
+        onMouseEnter={() => setActionLabel("Reconnect")}
+        onMouseLeave={() => setActionLabel("")}
+      >
+        <SlackIcon height="16px" width="16px" />
+        <span className="rnf-slackConnect-text--error">
+          {actionLabel || errorLabel || "Error"}
+        </span>
+      </a>
+    );
+  }
+
+  // Disconnected state
+  if (connectionStatus === "disconnected") {
+    return (
+      <a
+        href={buildSlackAuthUrl()}
+        className="rnf-slackConnect-button rnf-slackConnect-button--disconnected"
+      >
+        <SlackIcon height="16px" width="16px" />
+        <span>Connect to Slack</span>
+      </a>
+    );
+  }
+
+  // Connected state
   return (
     <a
-      href={`${SLACK_AUTHORIZE_URL}?${params}`}
-      className="rnf-link"
-      style={{ width: "150px" }}
+      onClick={disconnectFromSlack}
+      className="rnf-slackConnect-button rnf-slackConnect-button--connected"
+      onMouseEnter={() => setActionLabel("Disconnect")}
+      onMouseLeave={() => setActionLabel("")}
     >
       <SlackIcon height="16px" width="16px" />
-      <span className="rnf-textContainer">Connect to Slack</span>
+      <span className="rnf-slackConnect-text--connected">
+        {actionLabel || "Connected"}
+      </span>
     </a>
   );
 };

@@ -24,7 +24,17 @@ type GetSlackChannelsInput = {
   knockChannelId: string;
 };
 
-const TENANT_COLLECTION = "$tenants"
+type AuthCheckInput = {
+  tenant: string;
+  knockChannelId: string;
+};
+
+type RevokeAccessTokenInput = {
+  tenant: string;
+  knockChannelId: string;
+};
+
+const TENANT_COLLECTION = "$tenants";
 
 class SlackClient {
   private instance: Knock;
@@ -33,20 +43,40 @@ class SlackClient {
     this.instance = instance;
   }
 
-  async getChannels(params: GetSlackChannelsInput) {
+  async authCheck({ tenant, knockChannelId }: AuthCheckInput) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
-      url: `/v1/providers/slack/channels`,
+      url: `/v1/providers/slack/${knockChannelId}/auth_check`,
       params: {
         access_token_object: {
-          object_id: params.tenant,
+          object_id: tenant,
+          collection: TENANT_COLLECTION,
+        },
+        channel_id: knockChannelId,
+      },
+    });
+
+    return this.handleResponse(result);
+  }
+
+  async getChannels({
+    knockChannelId,
+    tenant,
+    connectionsObject,
+  }: GetSlackChannelsInput) {
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `/v1/providers/slack/${knockChannelId}/channels`,
+      params: {
+        access_token_object: {
+          object_id: tenant,
           collection: TENANT_COLLECTION,
         },
         connections_object: {
-          object_id: params.connectionsObject.objectId,
-          collection: params.connectionsObject.collection,
+          object_id: connectionsObject.objectId,
+          collection: connectionsObject.collection,
         },
-        channel_id: params.knockChannelId,
+        channel_id: knockChannelId,
       },
     });
 
@@ -69,8 +99,27 @@ class SlackClient {
     return this.handleResponse(result);
   }
 
+  async revokeAccessToken({ tenant, knockChannelId }: RevokeAccessTokenInput) {
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `/v1/providers/slack/${knockChannelId}/revoke_access`,
+      params: {
+        access_token_object: {
+          object_id: tenant,
+          collection: TENANT_COLLECTION,
+        },
+        channel_id: knockChannelId,
+      },
+    });
+
+    return this.handleResponse(result);
+  }
+
   private handleResponse(response: ApiResponse) {
     if (response.statusCode === "error") {
+      if (response.error?.response?.status < 500) {
+        return response.error || response.body;
+      }
       throw new Error(response.error || response.body);
     }
 
