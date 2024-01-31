@@ -7,15 +7,15 @@ export const ConnectToSlackContainer = ({
   actionButton: React.ReactElement;
 }) => {
   return (
-    <div className="rnf-container">
-      <div>
+    <div className="rnf-slack-container-container">
+      <div className="rnf-slack-container-header">
         <SlackIcon height="32px" width="32px" />
-        <div className="rnf-title">Slack</div>
-        <div className="rnf-description">
-          Connect to get notifications in your Slack workspace.
-        </div>
+        <div>{actionButton}</div>
       </div>
-      <div>{actionButton}</div>
+      <div className="rnf-slack-container-title">Slack</div>
+      <div className="rnf-slack-container-description">
+        Connect to get notifications in your Slack workspace.
+      </div>
     </div>
   );
 };

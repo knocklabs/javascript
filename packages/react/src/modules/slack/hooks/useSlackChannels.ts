@@ -1,4 +1,3 @@
-import { User } from "@knocklabs/client";
 import { useKnockClient } from "@knocklabs/react-core";
 import { useState, useEffect } from "react";
 
@@ -16,13 +15,10 @@ export type ContainerObject = {
 export function useSlackChannels(
   tenant: string,
   connectionsObject: ContainerObject,
-
   knockSlackChannelId: string,
-
-  user: User,
   shouldRefetch: boolean,
-  setHasError: (hasError: boolean) => void,
-  hasError: boolean,
+  setErrorMessage: (errorMessage: string | null) => void,
+  errorMessage: string | null,
 ): {
   data: { channels: Channel[] };
   isLoading: boolean;
@@ -33,10 +29,10 @@ export function useSlackChannels(
     channels: [],
   });
 
-  const knockClient = useKnockClient()
+  const knockClient = useKnockClient();
 
   useEffect(() => {
-    if (!hasError) {
+    if (!errorMessage) {
       const fetchChannels = async () => {
         try {
           await knockClient.slack
@@ -46,13 +42,22 @@ export function useSlackChannels(
               knockChannelId: knockSlackChannelId,
             })
             .then((res) => {
-              const { channels } = res;
-              setData({ channels });
+              if (res.code === "ERR_BAD_REQUEST") {
+                const message = res.response?.data?.message
+                setData({ channels: [] });
+                setErrorMessage(message);
+                setIsLoading(false);
+                return;
+              }
+
+              setData({ channels: res.channels });
+              setErrorMessage(null);
               setIsLoading(false);
+              return;
             });
         } catch (error) {
           console.error(error);
-          setHasError(true);
+          setErrorMessage("Something went wrong.");
         }
       };
 
@@ -62,10 +67,10 @@ export function useSlackChannels(
   }, [
     tenant,
     connectionsObject,
-    hasError,
+    errorMessage,
     knockClient.slack,
     knockSlackChannelId,
-    setHasError,
+    setErrorMessage,
     shouldRefetch,
   ]);
 

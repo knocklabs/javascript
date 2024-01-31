@@ -70,7 +70,6 @@ export default function Home() {
               userToken={localStorage.getItem("knock-user-token")!}
             >
               <ConnectedSlackChannelPicker
-                user={user}
                 tenant={tenant}
                 connectionsObject={connectionsObject}
                 knockSlackChannelId={
