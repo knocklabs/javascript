@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+### Patch Changes
+
+- 4c16762: fix: update popperjs dependency
+
 ## 0.1.3
 
 ### Patch Changes
