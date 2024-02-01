@@ -16,7 +16,10 @@ class Knock {
   readonly preferences = new Preferences(this);
   readonly user = new UserClient(this);
 
-  constructor(readonly apiKey: string, options: KnockOptions = {}) {
+  constructor(
+    readonly apiKey: string,
+    options: KnockOptions = {},
+  ) {
     this.host = options.host || DEFAULT_HOST;
 
     // Fail loudly if we're using the wrong API key

@@ -1,11 +1,8 @@
+import { GenericData } from "@knocklabs/types";
+
 export interface KnockOptions {
   host?: string;
 }
-
-export type GenericData = {
-  // eslint-disable-next-line
-  [x: string]: any;
-};
 
 export interface KnockObject<T = GenericData> {
   id: string;
@@ -23,12 +20,6 @@ export interface User extends GenericData {
   avatar: string | null;
   updated_at: string;
   created_at: string | null;
-}
-
-export interface PageInfo {
-  after: string | null;
-  before: string | null;
-  page_size: number;
 }
 
 export type Recipient = User | KnockObject;

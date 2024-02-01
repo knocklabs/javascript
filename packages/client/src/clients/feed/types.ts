@@ -1,4 +1,4 @@
-import { PageInfo } from "../../interfaces";
+import { PageInfo } from "@knocklabs/types";
 import { NetworkStatus } from "../../networkStatus";
 import { FeedItem, FeedMetadata, FeedResponse } from "./interfaces";
 

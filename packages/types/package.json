@@ -2,22 +2,13 @@
   "name": "@knocklabs/types",
   "description": "Type definitions for Knock libraries",
   "author": "@knocklabs",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "types": "./src/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
-    "build": "tsup --env.NODE_ENV production",
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "tsup": "^8.0.1",
     "typescript": "^5.2.2"
   },
   "publishConfig": {
