@@ -22,6 +22,11 @@ export interface FeedClientOptions {
   trigger_data?: GenericData;
   // Optionally enable cross browser feed updates for this feed
   __experimentalCrossBrowserUpdates?: boolean;
+  // Optionally automatically manage socket connections on changes to tab visibility (defaults to `false`)
+  auto_manage_socket_connection?: boolean;
+  // Optionally set the delay amount in milliseconds when automatically disconnecting sockets from inactive tabs (defaults to `2000`)
+  // Requres `auto_manage_socket_connection` to be `true`
+  auto_manage_socket_connection_delay?: number;
 }
 
 export type FetchFeedOptions = {

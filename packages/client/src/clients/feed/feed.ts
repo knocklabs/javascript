@@ -37,13 +37,16 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
   archived: "exclude",
 };
 
+const DEFAULT_DISCONNECT_DELAY = 2000;
+
 class Feed {
   private apiClient: ApiClient;
   private userFeedId: string;
   private channel: Channel | undefined;
   private broadcaster: EventEmitter;
   private defaultOptions: FeedClientOptions;
-  private broadcastChannel: BroadcastChannel | null;
+  private broadcastChannel!: BroadcastChannel | null;
+  private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -76,6 +79,10 @@ class Feed {
       typeof self !== "undefined" && "BroadcastChannel" in self
         ? new BroadcastChannel(`knock:feed:${this.userFeedId}`)
         : null;
+
+    if (options.auto_manage_socket_connection && this.apiClient.socket) {
+      this.setupAutoSocketManager(options.auto_manage_socket_connection_delay);
+    }
   }
 
   /**
@@ -666,6 +673,38 @@ class Feed {
     } catch (e) {
       console.warn(`Could not broadcast ${type}, got error: ${e}`);
     }
+  }
+
+  /**
+   * Listen for changes to document visibility and automatically disconnect
+   * or reconnect the socket after a delay
+   */
+  private setupAutoSocketManager(autoManageSocketConnectionDelay?: number) {
+    const disconnectDelay =
+      autoManageSocketConnectionDelay ?? DEFAULT_DISCONNECT_DELAY;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        // When the tab is hidden, clean up the socket connection after a delay
+        this.disconnectTimer = setTimeout(() => {
+          this.apiClient.disconnectSocket();
+          this.disconnectTimer = null;
+        }, disconnectDelay);
+      } else if (document.visibilityState === "visible") {
+        // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
+        // This handles cases where the tab is only briefly hidden to avoid unnecessary disconnects
+        if (this.disconnectTimer) {
+          clearTimeout(this.disconnectTimer);
+          this.disconnectTimer = null;
+        }
+
+        // If the socket is not connected, try to reconnect
+        if (!this.apiClient.socket?.isConnected()) {
+          this.apiClient.reconnectSocket();
+          this.fetch();
+        }
+      }
+    });
   }
 }
 

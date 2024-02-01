@@ -82,6 +82,18 @@ class ApiClient {
     }
   }
 
+  reconnectSocket() {
+    if (this.socket && !this.socket.isConnected()) {
+      this.socket.connect();
+    }
+  }
+
+  disconnectSocket() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
+
   private canRetryRequest(error: AxiosError) {
     // Retry Network Errors.
     if (axiosRetry.isNetworkError(error)) {
