@@ -466,6 +466,8 @@ class Feed {
       __loadingType: undefined,
       __fetchSource: undefined,
       __experimentalCrossBrowserUpdates: undefined,
+      auto_manage_socket_connection: undefined,
+      auto_manage_socket_connection_delay: undefined
     };
 
     const result = await this.apiClient.makeRequest({

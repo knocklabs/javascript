@@ -191,3 +191,20 @@ await knockClient.user.setChannelData({
 ```
 
 See provider requirements for setting channel data [here]("https://docs.knock.app/managing-recipients/setting-channel-data#provider-data-requirements").
+
+### Automatically disconnect sockets from inactive tabs
+
+Optionally, you can configure the client to disconnect socket connections with inactive tabs after a brief delay. If the tab becomes active again, the socket will reconnect to continue receiving real-time notification updates.
+
+```typescript
+// Initialize the feed and configure the automatic disconnect settings
+const feedClient = knockClient.feeds.initialize(
+  process.env.KNOCK_FEED_CHANNEL_ID,
+  {
+    // Turn on the automatic connection manager
+    auto_manage_socket_connection: true,
+    // Optionally, customize the delay amount in milliseconds. Defaults to 2000ms or 2s
+    auto_manage_socket_connection_delay: 2500,
+  },
+);
+```
