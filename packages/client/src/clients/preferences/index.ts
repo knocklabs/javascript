@@ -1,8 +1,8 @@
+import { ChannelType } from "@knocklabs/types";
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
 import {
   ChannelTypePreferences,
-  ChannelType,
   PreferenceOptions,
   SetPreferencesProperties,
   WorkflowPreferenceSetting,

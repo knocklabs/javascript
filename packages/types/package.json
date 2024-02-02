@@ -1,0 +1,17 @@
+{
+  "name": "@knocklabs/types",
+  "description": "Type definitions for Knock libraries",
+  "author": "@knocklabs",
+  "version": "0.1.0",
+  "license": "MIT",
+  "types": "./src/index.d.ts",
+  "scripts": {
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,4 +1,5 @@
-import { Activity, GenericData, PageInfo, Recipient } from "../../interfaces";
+import { GenericData, PageInfo } from "@knocklabs/types";
+import { Activity, Recipient } from "../../interfaces";
 import { NetworkStatus } from "../../networkStatus";
 
 // Specific feed interfaces

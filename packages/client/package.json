@@ -2,7 +2,7 @@
   "name": "@knocklabs/client",
   "version": "0.8.17",
   "description": "The clientside library for interacting with Knock",
-  "homepage": "https://github.com/knocklabs/knock-client-js",
+  "homepage": "https://github.com/knocklabs/javascript/tree/main/packages/client",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -22,10 +22,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knocklabs/knock-client-js.git"
+    "url": "git+https://github.com/knocklabs/javascript.git"
   },
   "bugs": {
-    "url": "https://github.com/knocklabs/knock-client-js/issues"
+    "url": "https://github.com/knocklabs/javascript/issues"
   },
   "scripts": {
     "dev": "yarn build",
@@ -52,6 +52,7 @@
     "@babel/plugin-transform-runtime": "^7.16.7",
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@knocklabs/types": "0.1.0",
     "@types/phoenix": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
