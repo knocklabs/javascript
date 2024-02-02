@@ -28,7 +28,7 @@ export const NotificationCell = React.forwardRef<
   NotificationCellProps
 >(({ item, onItemClick, avatar, children, archiveButton }, ref) => {
   const { feedClient, colorMode } = useKnockFeed();
-  const { dateFnsLocale } = useTranslations();
+  const { locale } = useTranslations();
 
   const blocksByName: BlockByName = useMemo(() => {
     return item.blocks.reduce((acc, block) => {
@@ -102,7 +102,7 @@ export const NotificationCell = React.forwardRef<
           )}
 
           <span className="rnf-notification-cell__timestamp">
-            {formatTimestamp(item.inserted_at, { locale: dateFnsLocale() })}
+            {formatTimestamp(item.inserted_at, { locale })}
           </span>
         </div>
 

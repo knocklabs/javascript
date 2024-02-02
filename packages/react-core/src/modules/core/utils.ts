@@ -1,5 +1,5 @@
 import { FeedClientOptions } from "@knocklabs/client";
-import { parseISO, formatDistance, Locale } from "date-fns";
+import { parseISO, intlFormatDistance } from "date-fns";
 import { ReactNode } from "react";
 
 export function formatBadgeCount(count: number): string | number {
@@ -7,7 +7,7 @@ export function formatBadgeCount(count: number): string | number {
 }
 
 type FormatTimestampOptions = {
-  locale?: Locale;
+  locale?: string | string[];
 };
 
 export function formatTimestamp(
@@ -16,8 +16,7 @@ export function formatTimestamp(
 ) {
   try {
     const parsedTs = parseISO(ts);
-    const formatted = formatDistance(parsedTs, new Date(), {
-      addSuffix: true,
+    const formatted = intlFormatDistance(parsedTs, new Date(), {
       locale: options.locale,
     });
 
