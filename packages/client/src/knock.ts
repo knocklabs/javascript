@@ -8,7 +8,7 @@ import { KnockOptions } from "./interfaces";
 const DEFAULT_HOST = "https://api.knock.app";
 
 class Knock {
-  private host: string;
+  public host: string;
   private apiClient: ApiClient | null = null;
   public userId: string | undefined;
   public userToken: string | undefined;
