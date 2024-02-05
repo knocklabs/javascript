@@ -16,11 +16,7 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
-      react({
-        babel: {
-          plugins: ["babel-plugin-date-fns"],
-        },
-      }),
+      react(),
       noBundlePlugin({ root: "./src" }),
     ],
     build: {
