@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.5
+
+### Patch Changes
+
+- 1050660: feat: switch timestamp formatting to date-fns intlFormatDistance
+- Updated dependencies [e53c200]
+- Updated dependencies [1050660]
+- Updated dependencies [d4ba1f2]
+  - @knocklabs/client@0.8.18
+  - @knocklabs/react-core@0.1.3
+
 ## 0.1.4
 
 ### Patch Changes
