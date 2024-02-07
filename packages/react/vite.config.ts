@@ -1,5 +1,9 @@
 /// <reference types="vitest" />
-import { defineConfig, LibraryFormats, loadEnv } from "vite";
+import {
+  defineConfig,
+  LibraryFormats,
+  loadEnv,
+} from "vite";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 import noBundlePlugin from "vite-plugin-no-bundle";
@@ -9,8 +13,7 @@ import execute from "rollup-plugin-execute";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const CJS = env.BUILD_TARGET?.toLocaleLowerCase()?.match("cjs");
-  const formats: LibraryFormats[] = CJS ? ["cjs"] : ["es"];
+  const target = env?.BUILD_TARGET?.toLowerCase() as LibraryFormats;
 
   return {
     plugins: [
@@ -18,25 +21,27 @@ export default defineConfig(({ mode }) => {
         outDir: "dist/types",
       }),
       react(),
-      noBundlePlugin({ root: "./src" }),
+      // splitVendorChunkPlugin(),
+      noBundlePlugin({ root: resolve(__dirname, "src") }),
     ],
     build: {
-      outDir: CJS ? "dist/cjs" : "dist/esm",
+      // cssMinify: "lightningcss",
+      outDir: target === "cjs" ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
         entry: resolve(__dirname, "src/index.ts"),
+        fileName: "[name]",
+        formats: [target],
         name: "react",
-        formats,
       },
       rollupOptions: {
-        // External packages that should not be bundled
-        external: ["react", "react-dom"],
+        external: ["react"],
         output: {
           interop: "compat",
-          format: formats[0],
           globals: {
             react: "React",
           },
+          // External packages that should not be bundled
           assetFileNames: (assetInfo) => {
             // Rename styles to index.css
             if (assetInfo.name === "style.css") {
@@ -50,7 +55,10 @@ export default defineConfig(({ mode }) => {
             // Move index.css to root of dist
             `mv dist/esm/index.css dist/index.css`,
             // Delete extra .css.js files
-            `rm dist/**/*.css.*`,
+            `find ./dist -name "*.css.js" -delete`,
+            `find ./dist -name "*.css.js.map" -delete`,
+            `find ./dist -name "*.css.esm.js" -delete`,
+            `find ./dist -name "*.css.esm.js.map" -delete`,
           ]),
           // Remove css imports
           {
@@ -61,8 +69,7 @@ export default defineConfig(({ mode }) => {
 
                 if (file?.type === "chunk") {
                   // Replace .css imports and requires
-                  const pattern =
-                    /(import\s+['"].+\.css(\.mjs)?['"];?)|(require\(['"][^()]+\.css(\.js)?['"]\);?)/;
+                  const pattern = /import ".*?\.css\..*?";/g;
                   file.code = file.code.replace(pattern, "");
                 }
               }

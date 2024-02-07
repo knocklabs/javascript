@@ -4,8 +4,6 @@
   "author": "@knocklabs",
   "version": "0.1.5",
   "license": "MIT",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
   "style": "dist/index.css",
@@ -14,7 +12,8 @@
     ".": {
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.mjs"
+      "import": "./dist/esm/index.esm.js",
+      "default": "./dist/esm/index.esm.js"
     }
   },
   "files": [
@@ -68,6 +67,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "jsdom": "^24.0.0",
+    "lightningcss": "^1.23.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
