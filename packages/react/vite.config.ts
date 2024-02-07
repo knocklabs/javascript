@@ -1,9 +1,5 @@
 /// <reference types="vitest" />
-import {
-  defineConfig,
-  LibraryFormats,
-  loadEnv,
-} from "vite";
+import { defineConfig, LibraryFormats, loadEnv } from "vite";
 import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 import noBundlePlugin from "vite-plugin-no-bundle";
@@ -21,11 +17,9 @@ export default defineConfig(({ mode }) => {
         outDir: "dist/types",
       }),
       react(),
-      // splitVendorChunkPlugin(),
       noBundlePlugin({ root: resolve(__dirname, "src") }),
     ],
     build: {
-      // cssMinify: "lightningcss",
       outDir: target === "cjs" ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
@@ -69,7 +63,8 @@ export default defineConfig(({ mode }) => {
 
                 if (file?.type === "chunk") {
                   // Replace .css imports and requires
-                  const pattern = /import ".*?\.css\..*?";/g;
+                  const pattern =
+                    /(import ".*?\.css\..*?";)|(require\(['"][^()]+\.css(\.js)?['"]\);?)/g;
                   file.code = file.code.replace(pattern, "");
                 }
               }
