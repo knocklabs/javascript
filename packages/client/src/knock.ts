@@ -17,6 +17,7 @@ class Knock {
   private apiClient: ApiClient | null = null;
   public userId: string | undefined;
   public userToken: string | undefined;
+  private tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly feeds = new FeedClient(this);
   readonly preferences = new Preferences(this);
@@ -71,14 +72,11 @@ class Knock {
     this.userId = userId;
     this.userToken = userToken;
 
-    // If a user token and callback function has been given, then we want to
-    if (
-      this.userToken &&
-      options?.onUserTokenExpiring &&
-      options?.onUserTokenExpiring instanceof Function
-    ) {
-      // TODO: make the time before expiration configurable in the options here
-      this.maybeScheduleUserTokenExpiration(options.onUserTokenExpiring);
+    if (this.userToken && options?.onUserTokenExpiring instanceof Function) {
+      this.maybeScheduleUserTokenExpiration(
+        options.onUserTokenExpiring,
+        options.timeBeforeExpirationInMs,
+      );
     }
 
     return;
@@ -94,6 +92,9 @@ class Knock {
 
   // Used to teardown any connected instances
   teardown() {
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer);
+    }
     if (!this.apiClient) return;
     if (this.apiClient.socket) {
       this.apiClient.socket.disconnect();
@@ -102,31 +103,31 @@ class Knock {
 
   private async maybeScheduleUserTokenExpiration(
     callbackFn: UserTokenExpiringCallback,
+    timeBeforeExpirationInMs: number = 1000,
   ) {
     if (!this.userToken) return;
 
     const decoded = jwtDecode(this.userToken);
-    const now = Date.now();
+    const expiresAtMs = (decoded.exp ?? 0) * 1000;
+    const nowMs = Date.now();
 
     // Expiration is in the future
-    if (decoded.exp && decoded.exp * 1000 > now) {
-      // TODO: compute when this should fire based off of exp
-      const msInFuture = 0;
+    if (expiresAtMs && expiresAtMs > nowMs) {
+      // Check how long until the token should be regenerated
+      // | ----------------- | ----------------------- |
+      // ^ now               ^ expiration offset       ^ expires at
+      const msInFuture = expiresAtMs - timeBeforeExpirationInMs - nowMs;
 
-      setTimeout(() => {
-        const result = callbackFn(this.userToken as string, decoded);
-
-        // TODO: why do we need to type this as Promise<string>?
-        let resultPromise: Promise<string> =
-          typeof result === "string" ? new Promise(() => result) : result;
-
-        resultPromise.then((newToken) => {
-          // TODO: probably need to refresh the socket connection here as well when the token
-          // updates. It might be easier to have a top level function to do this? or handle it
-          // gracefully in the authenticate/2 function?
-          this.userToken = newToken;
-          this.maybeScheduleUserTokenExpiration(callbackFn);
-        });
+      this.tokenExpirationTimer = setTimeout(async () => {
+        const newToken = await callbackFn(this.userToken as string, decoded);
+        this.userToken = newToken;
+        // TODO: probably need to refresh the socket connection here as well when the token
+        // updates. It might be easier to have a top level function to do this? or handle it
+        // gracefully in the authenticate/2 function?
+        this.maybeScheduleUserTokenExpiration(
+          callbackFn,
+          timeBeforeExpirationInMs,
+        );
       }, msInFuture);
     }
   }
