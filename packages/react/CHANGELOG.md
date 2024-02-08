@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+
+### Patch Changes
+
+- 59ce044: fix: build process causing esm issues
+
 ## 0.1.5
 
 ### Patch Changes
