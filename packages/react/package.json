@@ -5,7 +5,7 @@
   "version": "0.1.5",
   "license": "MIT",
   "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.mjs",
+  "module": "dist/esm/index.esm.js",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
   "style": "dist/index.css",
@@ -14,7 +14,8 @@
     ".": {
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.mjs"
+      "import": "./dist/esm/index.esm.js",
+      "default": "./dist/esm/index.esm.js"
     }
   },
   "files": [
