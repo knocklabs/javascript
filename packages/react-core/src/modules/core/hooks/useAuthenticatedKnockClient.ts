@@ -4,7 +4,7 @@ import Knock, { KnockOptions } from "@knocklabs/client";
 function useAuthenticatedKnockClient(
   apiKey: string,
   userId: string,
-  userToken: string | undefined,
+  userToken?: string,
   options: KnockOptions = {},
 ) {
   const knockRef = React.useRef<Knock | null>();

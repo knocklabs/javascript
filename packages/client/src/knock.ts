@@ -1,8 +1,14 @@
+import { jwtDecode } from "jwt-decode";
+
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import Preferences from "./clients/preferences";
 import UserClient from "./clients/users";
-import { KnockOptions } from "./interfaces";
+import {
+  AuthenticateOptions,
+  KnockOptions,
+  UserTokenExpiringCallback,
+} from "./interfaces";
 
 const DEFAULT_HOST = "https://api.knock.app";
 
@@ -57,9 +63,23 @@ class Knock {
     Authenticates the current user. In non-sandbox environments
     the userToken must be specified.
   */
-  authenticate(userId: string, userToken?: string) {
+  authenticate(
+    userId: string,
+    userToken?: string,
+    options?: AuthenticateOptions,
+  ) {
     this.userId = userId;
     this.userToken = userToken;
+
+    // If a user token and callback function has been given, then we want to
+    if (
+      this.userToken &&
+      options?.onUserTokenExpiring &&
+      options?.onUserTokenExpiring instanceof Function
+    ) {
+      // TODO: make the time before expiration configurable in the options here
+      this.maybeScheduleUserTokenExpiration(options.onUserTokenExpiring);
+    }
 
     return;
   }
@@ -77,6 +97,37 @@ class Knock {
     if (!this.apiClient) return;
     if (this.apiClient.socket) {
       this.apiClient.socket.disconnect();
+    }
+  }
+
+  private async maybeScheduleUserTokenExpiration(
+    callbackFn: UserTokenExpiringCallback,
+  ) {
+    if (!this.userToken) return;
+
+    const decoded = jwtDecode(this.userToken);
+    const now = Date.now();
+
+    // Expiration is in the future
+    if (decoded.exp && decoded.exp * 1000 > now) {
+      // TODO: compute when this should fire based off of exp
+      const msInFuture = 0;
+
+      setTimeout(() => {
+        const result = callbackFn(this.userToken as string, decoded);
+
+        // TODO: why do we need to type this as Promise<string>?
+        let resultPromise: Promise<string> =
+          typeof result === "string" ? new Promise(() => result) : result;
+
+        resultPromise.then((newToken) => {
+          // TODO: probably need to refresh the socket connection here as well when the token
+          // updates. It might be easier to have a top level function to do this? or handle it
+          // gracefully in the authenticate/2 function?
+          this.userToken = newToken;
+          this.maybeScheduleUserTokenExpiration(callbackFn);
+        });
+      }, msInFuture);
     }
   }
 }

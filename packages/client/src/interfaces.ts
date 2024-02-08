@@ -37,3 +37,13 @@ export interface ChannelData<T = any> {
   channel_id: string;
   data: T;
 }
+
+export type UserTokenExpiringCallback = (
+  currentToken: string,
+  decodedToken: any,
+) => Promise<string> | string;
+
+export interface AuthenticateOptions {
+  onUserTokenExpiring: UserTokenExpiringCallback;
+  timeBeforeExpirationInMs: number;
+}
