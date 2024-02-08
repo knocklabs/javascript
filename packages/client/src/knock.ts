@@ -134,6 +134,9 @@ class Knock {
         this.userToken = newToken;
 
         // Resync socket connection
+        if (this.apiClient && this.apiClient.socket) {
+          this.apiClient.socket.disconnect();
+        }
         this.createApiClient();
 
         this.maybeScheduleUserTokenExpiration(
