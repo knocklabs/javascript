@@ -60,6 +60,17 @@ class Knock {
     return this.apiClient;
   }
 
+  /**
+   * Initiates an API client
+   */
+  createApiClient() {
+    this.apiClient = new ApiClient({
+      apiKey: this.apiKey,
+      host: this.host,
+      userToken: this.userToken,
+    });
+  }
+
   /*
     Authenticates the current user. In non-sandbox environments
     the userToken must be specified.
@@ -121,9 +132,10 @@ class Knock {
       this.tokenExpirationTimer = setTimeout(async () => {
         const newToken = await callbackFn(this.userToken as string, decoded);
         this.userToken = newToken;
-        // TODO: probably need to refresh the socket connection here as well when the token
-        // updates. It might be easier to have a top level function to do this? or handle it
-        // gracefully in the authenticate/2 function?
+
+        // Resync socket connection
+        this.createApiClient();
+
         this.maybeScheduleUserTokenExpiration(
           callbackFn,
           timeBeforeExpirationInMs,

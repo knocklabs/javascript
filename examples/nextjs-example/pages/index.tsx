@@ -32,7 +32,7 @@ const TenantLabels = {
 };
 
 export default function Home() {
-  const { userId, isLoading } = useIdentify();
+  const { userId, isLoading, userToken } = useIdentify();
   const [tenant, setTenant] = useState(Tenants.TeamA);
 
   if (isLoading) {
@@ -51,12 +51,15 @@ export default function Home() {
   return (
     <KnockProvider
       userId={userId as any}
+      userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
       authenticateOptions={{
         onUserTokenExpiring: async () => {
-          // TODO: Get new signed token
-          return "";
+          // Refresh the user token 1s before it expires
+          const res = await fetch(`/api/auth?id=${userId}`);
+          const json = await res.json();
+          return json.userToken;
         },
         timeBeforeExpirationInMs: 500,
       }}
