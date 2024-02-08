@@ -29,13 +29,13 @@ export default defineConfig(({ mode }) => {
         name: "react",
       },
       rollupOptions: {
-        external: ["react"],
+        // External packages that should not be bundled
+        external: ["react", "react-dom"],
         output: {
           interop: "compat",
           globals: {
             react: "React",
           },
-          // External packages that should not be bundled
           assetFileNames: (assetInfo) => {
             // Rename styles to index.css
             if (assetInfo.name === "style.css") {
