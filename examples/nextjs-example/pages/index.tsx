@@ -53,10 +53,21 @@ export default function Home() {
       userId={userId as any}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
+      authenticateOptions={{
+        onUserTokenExpiring: async () => {
+          // TODO: Get new signed token
+          return "";
+        },
+        timeBeforeExpirationInMs: 500,
+      }}
     >
       <KnockFeedProvider
         feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
-        defaultFeedOptions={{ tenant, auto_manage_socket_connection: true, auto_manage_socket_connection_delay: 2500 }}
+        defaultFeedOptions={{
+          tenant,
+          auto_manage_socket_connection: true,
+          auto_manage_socket_connection_delay: 2500,
+        }}
       >
         <NotificationFeedContainer>
           <Box maxW="520px" mx="auto" py={12}>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import Knock from "@knocklabs/client";
+import Knock, { AuthenticateOptions } from "@knocklabs/client";
 
 import { useAuthenticatedKnockClient } from "../hooks";
 import { KnockI18nProvider, I18nContent } from "../../i18n";
@@ -19,6 +19,7 @@ export interface KnockProviderProps {
   // Authentication props
   userId: string;
   userToken?: string;
+  authenticateOptions?: AuthenticateOptions;
 
   // Extra options
   children?: React.ReactElement;
@@ -32,12 +33,19 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
   host,
   userId,
   userToken,
+  authenticateOptions,
   children,
   i18n,
 }) => {
-  const knock = useAuthenticatedKnockClient(apiKey, userId, userToken, {
-    host,
-  });
+  const knock = useAuthenticatedKnockClient(
+    apiKey,
+    userId,
+    userToken,
+    {
+      host,
+    },
+    authenticateOptions,
+  );
 
   return (
     <ProviderStateContext.Provider

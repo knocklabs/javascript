@@ -45,5 +45,5 @@ export type UserTokenExpiringCallback = (
 
 export interface AuthenticateOptions {
   onUserTokenExpiring: UserTokenExpiringCallback;
-  timeBeforeExpirationInMs: number;
+  timeBeforeExpirationInMs?: number;
 }
