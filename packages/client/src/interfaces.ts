@@ -44,6 +44,6 @@ export type UserTokenExpiringCallback = (
 ) => Promise<string> | string;
 
 export interface AuthenticateOptions {
-  onUserTokenExpiring: UserTokenExpiringCallback;
+  onUserTokenExpiring?: UserTokenExpiringCallback;
   timeBeforeExpirationInMs?: number;
 }

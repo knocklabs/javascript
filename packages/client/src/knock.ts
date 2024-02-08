@@ -114,7 +114,7 @@ class Knock {
 
   private async maybeScheduleUserTokenExpiration(
     callbackFn: UserTokenExpiringCallback,
-    timeBeforeExpirationInMs: number = 1000,
+    timeBeforeExpirationInMs: number = 30_000,
   ) {
     if (!this.userToken) return;
 

@@ -19,7 +19,8 @@ export interface KnockProviderProps {
   // Authentication props
   userId: string;
   userToken?: string;
-  authenticateOptions?: AuthenticateOptions;
+  onUserTokenExpiring?: AuthenticateOptions["onUserTokenExpiring"];
+  timeBeforeExpirationInMs?: AuthenticateOptions["timeBeforeExpirationInMs"];
 
   // Extra options
   children?: React.ReactElement;
@@ -33,19 +34,16 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
   host,
   userId,
   userToken,
-  authenticateOptions,
+  onUserTokenExpiring,
+  timeBeforeExpirationInMs,
   children,
   i18n,
 }) => {
-  const knock = useAuthenticatedKnockClient(
-    apiKey,
-    userId,
-    userToken,
-    {
-      host,
-    },
-    authenticateOptions,
-  );
+  const knock = useAuthenticatedKnockClient(apiKey, userId, userToken, {
+    host,
+    onUserTokenExpiring,
+    timeBeforeExpirationInMs,
+  });
 
   return (
     <ProviderStateContext.Provider

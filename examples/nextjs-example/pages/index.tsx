@@ -54,15 +54,13 @@ export default function Home() {
       userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
-      authenticateOptions={{
-        onUserTokenExpiring: async () => {
-          // Refresh the user token 1s before it expires
-          const res = await fetch(`/api/auth?id=${userId}`);
-          const json = await res.json();
-          return json.userToken;
-        },
-        timeBeforeExpirationInMs: 500,
+      onUserTokenExpiring={async () => {
+        // Refresh the user token 1s before it expires
+        const res = await fetch(`/api/auth?id=${userId}`);
+        const json = await res.json();
+        return json.userToken;
       }}
+      timeBeforeExpirationInMs={1000}
     >
       <KnockFeedProvider
         feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}

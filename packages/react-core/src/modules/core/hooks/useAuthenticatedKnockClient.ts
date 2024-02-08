@@ -5,8 +5,7 @@ function useAuthenticatedKnockClient(
   apiKey: string,
   userId: string,
   userToken?: string,
-  options: KnockOptions = {},
-  authenticateOptions?: AuthenticateOptions,
+  options: KnockOptions & AuthenticateOptions = {},
 ) {
   const knockRef = React.useRef<Knock | null>();
 
@@ -14,11 +13,14 @@ function useAuthenticatedKnockClient(
     if (knockRef.current) knockRef.current.teardown();
 
     const knock = new Knock(apiKey, options);
-    knock.authenticate(userId, userToken, authenticateOptions);
+    knock.authenticate(userId, userToken, {
+      onUserTokenExpiring: options?.onUserTokenExpiring,
+      timeBeforeExpirationInMs: options?.timeBeforeExpirationInMs,
+    });
     knockRef.current = knock;
 
     return knock;
-  }, [apiKey, userId, userToken, options, authenticateOptions]);
+  }, [apiKey, userId, userToken, options]);
 }
 
 export default useAuthenticatedKnockClient;
