@@ -1,10 +1,17 @@
 import { useKnockClient } from "@knocklabs/react-core";
-import { useState, useEffect } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
-export interface Channel {
+const MAX_COUNT = 1000;
+const LIMIT_PER_PAGE = 200;
+
+export interface SlackChannel {
   name: string;
   id: string;
-  connected: boolean;
+  user: string;
+  is_private: boolean;
+  is_im: boolean;
+  context_team_id: boolean;
 }
 
 export type ContainerObject = {
@@ -12,66 +19,69 @@ export type ContainerObject = {
   collection: string;
 };
 
-export function useSlackChannels(
-  tenant: string,
-  connectionsObject: ContainerObject,
-  knockSlackChannelId: string,
-  shouldRefetch: boolean,
-  setErrorMessage: (errorMessage: string | null) => void,
-  errorMessage: string | null,
-): {
-  data: { channels: Channel[] };
-  isLoading: boolean;
-  error: boolean;
-} {
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<{ channels: Channel[] }>({
-    channels: [],
-  });
+type SlackChannelQueryOptions = {
+  maxCount?: number;
+  limitPerPage?: number;
+  excludeArchived?: boolean;
+  types?: string;
+  teamId?: string;
+};
 
+type UseSlackChannelsProps = {
+  tenant: string;
+  connectionsObject: ContainerObject;
+  queryOptions?: SlackChannelQueryOptions;
+  knockSlackChannelId: string;
+};
+
+type UseSlackChannelOutput = {
+  data: SlackChannel[];
+  isLoading: boolean;
+  refetch: () => void;
+};
+
+export function useSlackChannels({
+  tenant,
+  connectionsObject,
+  knockSlackChannelId,
+  queryOptions,
+}: UseSlackChannelsProps): UseSlackChannelOutput {
   const knockClient = useKnockClient();
 
+  const fetchChannels = ({ pageParam }: { pageParam: string }) => {
+    return knockClient.slack.getChannels({
+      tenant,
+      connectionsObject,
+      knockChannelId: knockSlackChannelId,
+      queryOptions: {
+        ...queryOptions,
+        cursor: pageParam,
+        limit: queryOptions?.limitPerPage || LIMIT_PER_PAGE,
+      },
+    });
+  };
+
+  const { data, isLoading, isFetching, fetchNextPage, hasNextPage, refetch } =
+    useInfiniteQuery({
+      queryKey: ["slackChannels"],
+      queryFn: fetchChannels,
+      initialPageParam: "",
+      getNextPageParam: (lastPage) =>
+        lastPage?.next_cursor === "" ? null : lastPage?.next_cursor,
+    });
+
+  const slackChannels =
+    data?.pages
+      ?.flatMap((page) => page?.slack_channels)
+      .filter((channel) => !!channel) || [];
+
+  const maxCount = queryOptions?.maxCount || MAX_COUNT;
+
   useEffect(() => {
-    if (!errorMessage) {
-      const fetchChannels = async () => {
-        try {
-          await knockClient.slack
-            .getChannels({
-              tenant,
-              connectionsObject,
-              knockChannelId: knockSlackChannelId,
-            })
-            .then((res) => {
-              if (res.code === "ERR_BAD_REQUEST") {
-                const message = res.response?.data?.message
-                setData({ channels: [] });
-                setErrorMessage(message);
-                setIsLoading(false);
-                return;
-              }
-
-              setData({ channels: res.channels });
-              setErrorMessage(null);
-              setIsLoading(false);
-              return;
-            });
-        } catch (error) {
-          setErrorMessage("Something went wrong.");
-        }
-      };
-
-      setIsLoading(true);
-      fetchChannels();
+    if (hasNextPage && !isFetching && slackChannels?.length < maxCount) {
+      fetchNextPage();
     }
-  }, [
-    tenant,
-    connectionsObject,
-    errorMessage,
-    knockClient.slack,
-    knockSlackChannelId,
-    setErrorMessage,
-    shouldRefetch,
-  ]);
+  }, [slackChannels?.length, fetchNextPage, hasNextPage, isFetching, maxCount]);
 
-  return { data, isLoading, error: false };
+  return { data: slackChannels, isLoading, refetch };
 }
