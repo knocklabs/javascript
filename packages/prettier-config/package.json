@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/prettier-config",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "main": "index.js",
   "repository": "https://github.com/knocklabs/javascript/blob/main/packages/prettier-config",
   "author": "@knocklabs",
