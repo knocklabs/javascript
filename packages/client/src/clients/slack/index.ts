@@ -1,18 +1,9 @@
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
 
-type SlackChannelConnection = {
+export type SlackChannelConnection = {
   access_token?: string;
   channel_id: string;
-};
-
-type ChannelConnectionInput = {
-  objectId: string;
-  collection: string;
-  knockChannelId: string;
-  slackChannelId: string;
-  connections: SlackChannelConnection[];
-  userId: string;
 };
 
 type GetSlackChannelsInput = {
@@ -22,6 +13,13 @@ type GetSlackChannelsInput = {
     collection: string;
   };
   knockChannelId: string;
+  queryOptions?: {
+    limit?: number;
+    cursor?: string;
+    excludeArchived?: boolean;
+    teamId?: string;
+    types?: string;
+  };
 };
 
 type AuthCheckInput = {
@@ -59,11 +57,10 @@ class SlackClient {
     return this.handleResponse(result);
   }
 
-  async getChannels({
-    knockChannelId,
-    tenant,
-    connectionsObject,
-  }: GetSlackChannelsInput) {
+  async getChannels(input: GetSlackChannelsInput) {
+    const { knockChannelId, tenant } = input;
+    const queryOptions = input.queryOptions || {};
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/providers/slack/${knockChannelId}/channels`,
@@ -72,28 +69,15 @@ class SlackClient {
           object_id: tenant,
           collection: TENANT_COLLECTION,
         },
-        connections_object: {
-          object_id: connectionsObject.objectId,
-          collection: connectionsObject.collection,
-        },
         channel_id: knockChannelId,
+        query_options: {
+          cursor: queryOptions.cursor,
+          limit: queryOptions.limit,
+          exclude_archived: queryOptions.excludeArchived,
+          team_id: queryOptions.teamId,
+          types: queryOptions.types,
+        },
       },
-    });
-
-    return this.handleResponse(result);
-  }
-
-  async setChannelConnections({
-    objectId,
-    collection,
-    knockChannelId,
-    connections,
-    userId,
-  }: ChannelConnectionInput) {
-    const result = await this.instance.client().makeRequest({
-      method: "PUT",
-      url: `v1/objects/${collection}/${objectId}/channel_data/${knockChannelId}`,
-      data: { data: { connections }, user_id: userId },
     });
 
     return this.handleResponse(result);

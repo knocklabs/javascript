@@ -53,11 +53,13 @@
     "@knocklabs/client": "*",
     "@knocklabs/react-core": "*",
     "@popperjs/core": "^2.11.8",
+    "@tanstack/react-query": "^5.18.1",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2"
   },
   "devDependencies": {
+    "@tanstack/react-query-devtools": "^5.20.1",
     "@testing-library/react": "^14.2.0",
     "@types/lodash.debounce": "^4.0.9",
     "@types/react": "^18.2.37",
