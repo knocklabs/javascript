@@ -15,6 +15,7 @@
     "release": "turbo run build && changeset version && changeset publish",
     "postinstall": "manypkg check"
   },
+  "prettier": "@knocklabs/prettier-config",
   "packageManager": "yarn@1.22.19",
   "workspaces": [
     "examples/*",
@@ -23,6 +24,7 @@
   "dependencies": {
     "@changesets/cli": "^2.27.1",
     "@knocklabs/eslint-config": "*",
+    "@knocklabs/prettier-config": "*",
     "@knocklabs/typescript-config": "*",
     "@manypkg/cli": "^0.21.2",
     "prettier": "^3.1.0",
