@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@knocklabs/client": "*",
+    "@tanstack/react-query": "^5.18.1",
     "date-fns": "^3.3.1",
     "zustand": "^3.7.2"
   },

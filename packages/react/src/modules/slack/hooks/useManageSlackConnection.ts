@@ -3,8 +3,13 @@ import { useState, useEffect, useCallback } from "react";
 
 const SLACK_AUTHORIZE_URL = "https://slack.com/oauth/v2/authorize";
 const TENANT_OBJECT_COLLECTION = "$tenants";
-const SLACK_SCOPES =
-  "chat:write,chat:write.public,channels:read,groups:read,im:read,im:write,users:read";
+const DEFAULT_SLACK_SCOPES = [
+  "chat:write",
+  "chat:write.public",
+  "channels:read",
+  "groups:read",
+  "groups:write",
+];
 
 type ConnectionStatus =
   | "loading"
@@ -123,7 +128,7 @@ export function useManageSlackConnection(
         user_token: knock.userToken,
       }),
       client_id: slackClientId,
-      scope: SLACK_SCOPES,
+      scope: DEFAULT_SLACK_SCOPES.join(","),
     };
     return `${SLACK_AUTHORIZE_URL}?${new URLSearchParams(rawParams)}`;
   }, [

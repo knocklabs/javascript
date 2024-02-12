@@ -1,8 +1,6 @@
 import {
   Button,
   ButtonGroup,
-  ConnectToSlackButton,
-  ConnectToSlackContainer,
   KnockFeedProvider,
   KnockProvider,
 } from ".";
