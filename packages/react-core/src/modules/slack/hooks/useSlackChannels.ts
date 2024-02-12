@@ -1,22 +1,12 @@
-import { useKnockClient } from "@knocklabs/react-core";
+import { ContainerObject } from "..";
+import { SlackChannel } from "@knocklabs/client";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { useKnockClient } from "../../core";
+
 const MAX_COUNT = 1000;
 const LIMIT_PER_PAGE = 200;
-
-export interface SlackChannel {
-  name: string;
-  id: string;
-  is_private: boolean;
-  is_im: boolean;
-  context_team_id: boolean;
-}
-
-export type ContainerObject = {
-  objectId: string;
-  collection: string;
-};
 
 type SlackChannelQueryOptions = {
   maxCount?: number;
@@ -39,16 +29,16 @@ type UseSlackChannelOutput = {
   refetch: () => void;
 };
 
-export function useSlackChannels({
+function useSlackChannels({
   tenant,
   connectionsObject,
   knockSlackChannelId,
   queryOptions,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
-  const knockClient = useKnockClient();
+  const knock = useKnockClient();
 
   const fetchChannels = ({ pageParam }: { pageParam: string }) => {
-    return knockClient.slack.getChannels({
+    return knock.slack.getChannels({
       tenant,
       connectionsObject,
       knockChannelId: knockSlackChannelId,
@@ -84,3 +74,5 @@ export function useSlackChannels({
 
   return { data: slackChannels, isLoading, refetch };
 }
+
+export default useSlackChannels;

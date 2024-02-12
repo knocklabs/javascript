@@ -13,7 +13,6 @@ type SetChannelDataInput = {
   collection: string;
   channelId: string;
   data: any;
-  userId: string;
 };
 
 class ObjectClient {
@@ -40,12 +39,11 @@ class ObjectClient {
     collection,
     channelId,
     data,
-    userId,
   }: SetChannelDataInput) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `v1/objects/${collection}/${objectId}/channel_data/${channelId}`,
-      data: { data, user_id: userId },
+      data: { data },
     });
 
     return this.handleResponse(result);

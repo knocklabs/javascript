@@ -1,4 +1,4 @@
-import { SlackChannel } from "../..";
+import { SlackChannel } from "@knocklabs/client";
 
 type Props = {
   channel: SlackChannel;

@@ -1,36 +1,6 @@
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
-
-export type SlackChannelConnection = {
-  access_token?: string;
-  channel_id: string;
-};
-
-type GetSlackChannelsInput = {
-  tenant: string;
-  connectionsObject: {
-    objectId: string;
-    collection: string;
-  };
-  knockChannelId: string;
-  queryOptions?: {
-    limit?: number;
-    cursor?: string;
-    excludeArchived?: boolean;
-    teamId?: string;
-    types?: string;
-  };
-};
-
-type AuthCheckInput = {
-  tenant: string;
-  knockChannelId: string;
-};
-
-type RevokeAccessTokenInput = {
-  tenant: string;
-  knockChannelId: string;
-};
+import { AuthCheckInput, GetSlackChannelsInput, RevokeAccessTokenInput } from "./interfaces";
 
 const TENANT_COLLECTION = "$tenants";
 

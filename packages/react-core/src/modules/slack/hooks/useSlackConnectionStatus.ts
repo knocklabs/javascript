@@ -1,32 +1,20 @@
-import { useKnockClient } from "@knocklabs/react-core";
-import { useState, useEffect, useCallback } from "react";
+import Knock from "@knocklabs/client";
+import { useEffect, useState } from "react";
 
-const SLACK_AUTHORIZE_URL = "https://slack.com/oauth/v2/authorize";
-const TENANT_OBJECT_COLLECTION = "$tenants";
-const DEFAULT_SLACK_SCOPES = [
-  "chat:write",
-  "chat:write.public",
-  "channels:read",
-  "groups:read",
-  "groups:write",
-];
-
-type ConnectionStatus =
+export type ConnectionStatus =
   | "loading"
   | "connected"
   | "disconnected"
   | "error"
   | "disconnecting";
 
-type UseManageSlackConnectionProps = {
+type UseSlackConnectionStatusOutput = {
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (status: ConnectionStatus) => void;
   errorLabel: string | null;
   setErrorLabel: (errorLabel: string) => void;
   actionLabel: string | null;
   setActionLabel: (actionLabel: string) => void;
-  buildSlackAuthUrl: () => string;
-  disconnectFromSlack: () => void;
 };
 
 /**
@@ -41,13 +29,11 @@ const formatSlackErrorMessage = (errorMessage: string) => {
   return firstLetter?.concat(rest).replace("_", " ");
 };
 
-export function useManageSlackConnection(
+function useSlackConnectionStatus(
+  knock: Knock,
   knockSlackChannelId: string,
   tenant: string,
-  slackClientId: string,
-  redirectUrl?: string,
-): UseManageSlackConnectionProps {
-  const knock = useKnockClient();
+): UseSlackConnectionStatusOutput {
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("loading");
   const [errorLabel, setErrorLabel] = useState<string | null>(null);
@@ -55,6 +41,7 @@ export function useManageSlackConnection(
 
   useEffect(() => {
     const checkAuthStatus = async () => {
+      setActionLabel("");
       if (connectionStatus !== "loading") return;
 
       try {
@@ -65,6 +52,7 @@ export function useManageSlackConnection(
 
         if (authRes.connection?.ok) {
           setConnectionStatus("connected");
+
           return;
         }
 
@@ -82,12 +70,14 @@ export function useManageSlackConnection(
         if (!authRes.connection?.ok && authRes.connection?.error) {
           const errorLabel = formatSlackErrorMessage(authRes.connection?.error);
           setErrorLabel(errorLabel);
+
           setConnectionStatus("error");
 
           return;
         }
 
         // This is for any Knock errors that would require a reconnect.
+
         setConnectionStatus("error");
       } catch (error) {
         setConnectionStatus("error");
@@ -97,49 +87,6 @@ export function useManageSlackConnection(
     checkAuthStatus();
   }, [connectionStatus, tenant, knockSlackChannelId, knock.slack]);
 
-  const disconnectFromSlack = useCallback(async () => {
-    setConnectionStatus("disconnecting");
-    try {
-      const revoke = await knock.slack.revokeAccessToken({
-        tenant,
-        knockChannelId: knockSlackChannelId,
-      });
-
-      if (revoke === "ok") {
-        setConnectionStatus("disconnected");
-      } else {
-        setConnectionStatus("error");
-      }
-    } catch (error) {
-      setConnectionStatus("error");
-    }
-  }, [tenant, knockSlackChannelId, setConnectionStatus, knock.slack]);
-
-  const buildSlackAuthUrl = useCallback(() => {
-    const rawParams = {
-      state: JSON.stringify({
-        redirect_url: redirectUrl,
-        access_token_object: {
-          object_id: tenant,
-          collection: TENANT_OBJECT_COLLECTION,
-        },
-        channel_id: knockSlackChannelId,
-        public_key: knock.apiKey,
-        user_token: knock.userToken,
-      }),
-      client_id: slackClientId,
-      scope: DEFAULT_SLACK_SCOPES.join(","),
-    };
-    return `${SLACK_AUTHORIZE_URL}?${new URLSearchParams(rawParams)}`;
-  }, [
-    redirectUrl,
-    tenant,
-    knockSlackChannelId,
-    knock.apiKey,
-    knock.userToken,
-    slackClientId,
-  ]);
-
   return {
     connectionStatus,
     setConnectionStatus,
@@ -147,7 +94,7 @@ export function useManageSlackConnection(
     setErrorLabel,
     actionLabel,
     setActionLabel,
-    buildSlackAuthUrl,
-    disconnectFromSlack,
   };
 }
+
+export default useSlackConnectionStatus;

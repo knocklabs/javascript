@@ -1,11 +1,8 @@
 import Knock from "@knocklabs/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 
 import { I18nContent, KnockI18nProvider } from "../../i18n";
 import { useAuthenticatedKnockClient } from "../hooks";
-
-const queryClient = new QueryClient();
 
 export interface KnockProviderState {
   knock: Knock;
@@ -48,15 +45,7 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
         knock,
       }}
     >
-      <KnockI18nProvider i18n={i18n}>
-        {/**
-         * TODO 5211: Move this QueryClientProvider into the SlackProvider when we create it MKD
-         * https://linear.app/knock/issue/KNO-5211/[react]-add-knockslackprovider
-         *  */}
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </KnockI18nProvider>
+      <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
     </ProviderStateContext.Provider>
   );
 };
