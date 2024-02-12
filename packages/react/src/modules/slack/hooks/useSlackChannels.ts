@@ -8,7 +8,6 @@ const LIMIT_PER_PAGE = 200;
 export interface SlackChannel {
   name: string;
   id: string;
-  user: string;
   is_private: boolean;
   is_im: boolean;
   context_team_id: boolean;
