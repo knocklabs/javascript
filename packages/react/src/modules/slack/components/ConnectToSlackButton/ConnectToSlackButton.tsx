@@ -1,13 +1,12 @@
-import { SlackIcon } from "../SlackIcon";
-import "./styles.css";
+import { useKnockSlackClient } from "@knocklabs/react-core";
+import { useEffect } from "react";
 
 import { useManageSlackConnection } from "../../hooks/useManageSlackConnection";
-import { useEffect } from "react";
-import { useKnockClient } from "@knocklabs/react-core";
+import { SlackIcon } from "../SlackIcon";
+
+import "./styles.css";
 
 type Props = {
-  tenant: string;
-  knockSlackChannelId: string;
   slackClientId: string;
   redirectUrl?: string;
 };
@@ -36,24 +35,19 @@ const openSlackOauthPopup = (url: string) => {
 };
 
 export const ConnectToSlackButton: React.FC<Props> = ({
-  tenant,
-  knockSlackChannelId,
   slackClientId,
   redirectUrl,
 }) => {
-  const knock = useKnockClient();
-
   const {
+    knock,
+    setConnectionStatus,
     connectionStatus,
+    setActionLabel,
     actionLabel,
     errorLabel,
-    setConnectionStatus,
-    setActionLabel,
-    buildSlackAuthUrl,
-    disconnectFromSlack,
-  } = useManageSlackConnection(
-    knockSlackChannelId,
-    tenant,
+  } = useKnockSlackClient();
+
+  const { buildSlackAuthUrl, disconnectFromSlack } = useManageSlackConnection(
     slackClientId,
     redirectUrl,
   );

@@ -1,5 +1,5 @@
 import { SlackChannelConnection } from "@knocklabs/client";
-import { useKnockClient } from "@knocklabs/react-core";
+import { useKnockSlackClient } from "@knocklabs/react-core";
 import { useCallback, useEffect, useState } from "react";
 
 import { ContainerObject } from "./useSlackChannels";
@@ -20,17 +20,16 @@ export function useConnectedChannels({
   connectionsObject: { objectId, collection },
   knockSlackChannelId,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
+  const { knock, setErrorLabel } = useKnockSlackClient();
   const [connectedChannels, setConnectedChannels] = useState<
     null | SlackChannelConnection[]
   >(null);
   const [shouldRefetch, setShouldRefetch] = useState(false);
 
-  const knockClient = useKnockClient();
-
   const fetchAndSetConnectedChannels = useCallback(() => {
     try {
       const getConnectedChannelIds = async () =>
-        await knockClient.objects.getChannelData({
+        await knock.objects.getChannelData({
           collection,
           objectId,
           channelId: knockSlackChannelId,
@@ -39,9 +38,9 @@ export function useConnectedChannels({
         setConnectedChannels(res?.data?.connections);
       });
     } catch (error) {
-      console.log(error);
+      setErrorLabel("Error fetching channels.")
     }
-  }, [collection, knockClient.objects, knockSlackChannelId, objectId]);
+  }, [collection, knock.objects, knockSlackChannelId, objectId, setErrorLabel]);
 
   useEffect(() => {
     if (!connectedChannels || shouldRefetch) {
@@ -54,16 +53,16 @@ export function useConnectedChannels({
     channelsToSendToKnock: SlackChannelConnection[],
   ) => {
     try {
-      await knockClient.objects.setChannelData({
+      await knock.objects.setChannelData({
         objectId,
         collection,
         channelId: knockSlackChannelId,
         data: { connections: channelsToSendToKnock },
-        userId: knockClient.userId!,
+        userId: knock.userId!,
       });
       setShouldRefetch(true);
     } catch (error) {
-      console.log(error);
+      setErrorLabel("Error setting channels.")
     }
   };
 

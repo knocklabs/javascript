@@ -1,5 +1,5 @@
 import { FeedClientOptions } from "@knocklabs/client";
-import { parseISO, intlFormatDistance } from "date-fns";
+import { intlFormatDistance, parseISO } from "date-fns";
 import { ReactNode } from "react";
 
 export function formatBadgeCount(count: number): string | number {
@@ -48,6 +48,28 @@ export function feedProviderKey(
     options.tenant,
     options.has_tenant,
     options.archived,
+  ]
+    .filter((f) => f !== null && f !== undefined)
+    .join("-");
+}
+
+/*
+  Used to build a consistent key for the KnockSlackProvider so that React knows when
+  to trigger a re-render of the context when a key property changes.
+*/
+export function slackProviderKey(
+  knockSlackChannelId: string,
+  tenant: string,
+  connectionStatus: string,
+  errorLabel: string | null,
+  actionLabel: string | null,
+) {
+  return [
+    knockSlackChannelId,
+    tenant,
+    connectionStatus,
+    errorLabel,
+    actionLabel,
   ]
     .filter((f) => f !== null && f !== undefined)
     .join("-");

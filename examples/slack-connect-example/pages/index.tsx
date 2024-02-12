@@ -1,10 +1,12 @@
-import useSetToken from "../hooks/useSetToken";
+import { KnockSlackProvider } from "@knocklabs/react";
 import {
   ConnectToSlackButton,
   ConnectToSlackContainer,
   ConnectedSlackChannelPicker,
   KnockProvider,
 } from "@knocklabs/react";
+
+import useSetToken from "../hooks/useSetToken";
 
 export default function Home() {
   const tenant = process.env.NEXT_PUBLIC_TENANT!;
@@ -39,124 +41,104 @@ export default function Home() {
   }
 
   return (
-    <>
-      <div
-        style={{
-          marginBottom: "20px",
-          fontFamily: "monospace",
-          fontSize: "40px",
-        }}
+    <KnockProvider
+      apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
+      userId={user.id}
+      host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
+      userToken={localStorage.getItem("knock-user-token")!}
+    >
+      <KnockSlackProvider
+        knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
+        tenant={tenant}
       >
-        Slack connector examples
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div>
+        <>
+          {" "}
           <div
             style={{
-              marginBottom: "10px",
-              marginTop: "40px",
+              marginBottom: "20px",
               fontFamily: "monospace",
-              fontSize: "25px",
-              color: "gray",
+              fontSize: "40px",
             }}
           >
-            Slack Channel Picker
+            Slack connector examples
           </div>
-          <div style={{ margin: "10px", padding: "10px" }}>
-            <KnockProvider
-              apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
-              userId={user.id}
-              host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
-              userToken={localStorage.getItem("knock-user-token")!}
-            >
-              <ConnectedSlackChannelPicker
-                tenant={tenant}
-                connectionsObject={connectionsObject}
-                knockSlackChannelId={
-                  process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!
-                }
-              />
-            </KnockProvider>
-          </div>
-        </div>
-        <div>
-          <div
-            style={{
-              marginBottom: "10px",
-              marginTop: "40px",
-              fontFamily: "monospace",
-              fontSize: "25px",
-              color: "gray",
-            }}
-          >
-            Slack Connector options
-          </div>
-
-          <div>
-            <div
-              style={{
-                marginBottom: "10px",
-                marginTop: "40px",
-                fontFamily: "monospace",
-                fontSize: "18px",
-                color: "gray",
-              }}
-            >
-              Button
-            </div>
-            <div style={{ margin: "10px", padding: "10px" }}>
-              <KnockProvider
-                apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
-                userId={user.id}
-                host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
-                userToken={localStorage.getItem("knock-user-token")!}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  marginTop: "40px",
+                  fontFamily: "monospace",
+                  fontSize: "25px",
+                  color: "gray",
+                }}
               >
-                <ConnectToSlackButton
-                  tenant={tenant}
-                  knockSlackChannelId={
-                    process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!
-                  }
-                  slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
-                  redirectUrl={redirectUrl}
+                Slack Channel Picker
+              </div>
+              <div style={{ margin: "10px", padding: "10px" }}>
+                <ConnectedSlackChannelPicker
+                  connectionsObject={connectionsObject}
                 />
-              </KnockProvider>
+              </div>
             </div>
-          </div>
+            <div>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  marginTop: "40px",
+                  fontFamily: "monospace",
+                  fontSize: "25px",
+                  color: "gray",
+                }}
+              >
+                Slack Connector options
+              </div>
 
-          <div
-            style={{
-              marginBottom: "10px",
-              marginTop: "40px",
-              fontFamily: "monospace",
-              fontSize: "18px",
-              color: "gray",
-            }}
-          >
-            Container with button
-          </div>
-          <div style={{ margin: "10px", padding: "10px" }}>
-            <KnockProvider
-              apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
-              userId={user.id}
-              host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
-              userToken={localStorage.getItem("knock-user-token")!}
-            >
-              <ConnectToSlackContainer
-                actionButton={
+              <div>
+                <div
+                  style={{
+                    marginBottom: "10px",
+                    marginTop: "40px",
+                    fontFamily: "monospace",
+                    fontSize: "18px",
+                    color: "gray",
+                  }}
+                >
+                  Button
+                </div>
+                <div style={{ margin: "10px", padding: "10px" }}>
                   <ConnectToSlackButton
-                    tenant={tenant}
-                    knockSlackChannelId={
-                      process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!
-                    }
                     slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                     redirectUrl={redirectUrl}
                   />
-                }
-              />
-            </KnockProvider>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginBottom: "10px",
+                  marginTop: "40px",
+                  fontFamily: "monospace",
+                  fontSize: "18px",
+                  color: "gray",
+                }}
+              >
+                Container with button
+              </div>
+              <div style={{ margin: "10px", padding: "10px" }}>
+                <ConnectToSlackContainer
+                  actionButton={
+                    <ConnectToSlackButton
+                      slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
+                      redirectUrl={redirectUrl}
+                    />
+                  }
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </>
+        </>
+      </KnockSlackProvider>
+    </KnockProvider>
   );
 }
