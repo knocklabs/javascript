@@ -1,9 +1,12 @@
 import { SlackChannelConnection } from "@knocklabs/client";
-import { useKnockSlackClient } from "@knocklabs/react-core";
+import {
+  ContainerObject,
+  SlackChannel,
+  useConnectedSlackChannels,
+  useKnockSlackClient,
+  useSlackChannels,
+} from "@knocklabs/react-core";
 import { useCallback, useState } from "react";
-
-import { ContainerObject, SlackChannel, useSlackChannels } from "../..";
-import { useConnectedChannels } from "../../hooks/useConnectedChannels";
 
 import SlackChannelOption from "./SlackChannelOption";
 import "./styles.css";
@@ -30,7 +33,7 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
   });
 
   const { data: connectedChannels, updateConnectedChannels } =
-    useConnectedChannels({
+    useConnectedSlackChannels({
       connectionsObject,
       knockSlackChannelId,
     });

@@ -1,4 +1,4 @@
-import { useKnockSlackClient } from "@knocklabs/react-core";
+import { useKnockSlackClient } from "..";
 import { useCallback } from "react";
 
 const SLACK_AUTHORIZE_URL = "https://slack.com/oauth/v2/authorize";
@@ -16,7 +16,7 @@ type UseManageSlackConnectionOutput = {
   disconnectFromSlack: () => void;
 };
 
-export function useManageSlackConnection(
+function useManageSlackConnection(
   slackClientId: string,
   redirectUrl?: string,
 ): UseManageSlackConnectionOutput {
@@ -83,3 +83,5 @@ export function useManageSlackConnection(
     disconnectFromSlack,
   };
 }
+
+export default useManageSlackConnection;

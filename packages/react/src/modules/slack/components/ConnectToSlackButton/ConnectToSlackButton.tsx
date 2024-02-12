@@ -1,7 +1,9 @@
-import { useKnockSlackClient } from "@knocklabs/react-core";
+import {
+  useKnockSlackClient,
+  useManageSlackConnection,
+} from "@knocklabs/react-core";
 import { useEffect } from "react";
 
-import { useManageSlackConnection } from "../../hooks/useManageSlackConnection";
 import { SlackIcon } from "../SlackIcon";
 
 import "./styles.css";

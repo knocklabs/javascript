@@ -1,8 +1,7 @@
-import { SlackChannelConnection } from "@knocklabs/client";
-import { useKnockSlackClient } from "@knocklabs/react-core";
-import { useCallback, useEffect, useState } from "react";
 
-import { ContainerObject } from "./useSlackChannels";
+import { SlackChannelConnection } from "@knocklabs/client";
+import { useCallback, useEffect, useState } from "react";
+import { ContainerObject, useKnockSlackClient } from "..";
 
 type UseSlackChannelsProps = {
   connectionsObject: ContainerObject;
@@ -16,7 +15,7 @@ type UseSlackChannelOutput = {
   ) => void;
 };
 
-export function useConnectedChannels({
+function useConnectedSlackChannels({
   connectionsObject: { objectId, collection },
   knockSlackChannelId,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
@@ -38,7 +37,7 @@ export function useConnectedChannels({
         setConnectedChannels(res?.data?.connections);
       });
     } catch (error) {
-      setErrorLabel("Error fetching channels.")
+      setErrorLabel("Error fetching channels.");
     }
   }, [collection, knock.objects, knockSlackChannelId, objectId, setErrorLabel]);
 
@@ -62,7 +61,7 @@ export function useConnectedChannels({
       });
       setShouldRefetch(true);
     } catch (error) {
-      setErrorLabel("Error setting channels.")
+      setErrorLabel("Error setting channels.");
     }
   };
 
@@ -71,3 +70,5 @@ export function useConnectedChannels({
     updateConnectedChannels,
   };
 }
+
+export default useConnectedSlackChannels;
