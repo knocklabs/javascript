@@ -1,23 +1,25 @@
-import { SlackChannelConnection } from "@knocklabs/client";
-import { useState } from "react";
-
-import { ContainerObject, SlackChannel, useSlackChannels } from "../..";
-import { useConnectedChannels } from "../../hooks/useConnectedChannels";
+import { SlackChannel, SlackChannelConnection } from "@knocklabs/client";
+import {
+  ContainerObject,
+  useConnectedSlackChannels,
+  useKnockSlackClient,
+  useSlackChannels,
+} from "@knocklabs/react-core";
+import { useCallback, useState } from "react";
 
 import SlackChannelOption from "./SlackChannelOption";
 import "./styles.css";
 
 type Props = {
-  tenant: string;
   connectionsObject: ContainerObject;
-  knockSlackChannelId: string;
 };
 
 export const ConnectedSlackChannelPicker: React.FC<Props> = ({
-  tenant,
   connectionsObject,
-  knockSlackChannelId,
 }) => {
+  const { connectionStatus, errorLabel, tenant, knockSlackChannelId } =
+    useKnockSlackClient();
+
   const [showChannelPicker, setShowChannelPicker] = useState(false);
 
   const { data: slackChannels, isLoading } = useSlackChannels({
@@ -30,7 +32,7 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
   });
 
   const { data: connectedChannels, updateConnectedChannels } =
-    useConnectedChannels({
+    useConnectedSlackChannels({
       connectionsObject,
       knockSlackChannelId,
     });
@@ -58,13 +60,21 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
     }
   };
 
-  const channelsConnectedMessage = () => {
-    if (isLoading) {
+  const channelsConnectedMessage = useCallback(() => {
+    if (connectionStatus === "disconnected") {
+      return "Not connected to Slack.";
+    }
+
+    if (connectionStatus === "error") {
+      return errorLabel;
+    }
+
+    if (connectionStatus === "loading" || isLoading) {
       return "Fetching channels...";
     }
 
     if (slackChannels.length === 0) {
-      return "No slack channels."
+      return "No slack channels.";
     }
 
     const numberConnectedChannels = connectedChannels?.length;
@@ -82,7 +92,13 @@ export const ConnectedSlackChannelPicker: React.FC<Props> = ({
     }
 
     return "Multiple channels connected";
-  };
+  }, [
+    connectedChannels,
+    connectionStatus,
+    errorLabel,
+    isLoading,
+    slackChannels,
+  ]);
 
   return (
     <div
