@@ -21,6 +21,12 @@
     "examples/*",
     "packages/*"
   ],
+  "manypkg": {
+    "defaultBranch": "main",
+    "ignoredRules": [
+      "INTERNAL_MISMATCH"
+    ]
+  },
   "dependencies": {
     "@changesets/cli": "^2.27.1",
     "@knocklabs/eslint-config": "workspace:^",
