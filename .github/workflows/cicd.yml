@@ -21,7 +21,7 @@ jobs:
           scope: "@knocklabs"
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Run tests
         run: yarn test

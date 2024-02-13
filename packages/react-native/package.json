@@ -41,8 +41,8 @@
     "react-native": ">=0.60.0"
   },
   "dependencies": {
-    "@knocklabs/client": "*",
-    "@knocklabs/react-core": "*"
+    "@knocklabs/client": "workspace:^",
+    "@knocklabs/react-core": "workspace:^"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

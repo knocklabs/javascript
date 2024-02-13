@@ -44,7 +44,7 @@
     "react": ">=16.8.0"
   },
   "dependencies": {
-    "@knocklabs/client": "*",
+    "@knocklabs/client": "workspace:^",
     "date-fns": "^3.3.1",
     "zustand": "^3.7.2"
   },
