@@ -36,3 +36,9 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Yarn Berry
+.yarn/unplugged
+.yarn/install-state.gz
+.yarn/build-state.yml
+.pnp*
