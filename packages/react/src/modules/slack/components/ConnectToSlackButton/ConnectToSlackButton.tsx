@@ -80,12 +80,12 @@ export const ConnectToSlackButton: React.FC<Props> = ({
   }, [knock.host, setConnectionStatus]);
 
   // Loading states
-  if (connectionStatus === "loading" || connectionStatus === "disconnecting") {
+  if (connectionStatus === "connecting" || connectionStatus === "disconnecting") {
     return (
       <div className="rnf-slackConnect-button rnf-slackConnect-button--loading">
         <SlackIcon height="16px" width="16px" />
         <span>
-          {connectionStatus === "loading"
+          {connectionStatus === "connecting"
             ? "Connecting to Slack..."
             : "Disconnecting..."}
         </span>

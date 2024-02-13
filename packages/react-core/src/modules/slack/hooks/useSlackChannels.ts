@@ -1,20 +1,13 @@
-import { ContainerObject } from "..";
+import { ContainerObject, SlackChannelQueryOptions } from "..";
 import { SlackChannel } from "@knocklabs/client";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useKnockClient } from "../../core";
 
 const MAX_COUNT = 1000;
 const LIMIT_PER_PAGE = 200;
-
-type SlackChannelQueryOptions = {
-  maxCount?: number;
-  limitPerPage?: number;
-  excludeArchived?: boolean;
-  types?: string;
-  teamId?: string;
-};
+const CHANNEL_TYPES = "private_channel,public_channel";
 
 type UseSlackChannelsProps = {
   tenant: string;
@@ -46,6 +39,7 @@ function useSlackChannels({
         ...queryOptions,
         cursor: pageParam,
         limit: queryOptions?.limitPerPage || LIMIT_PER_PAGE,
+        types: queryOptions?.types || CHANNEL_TYPES,
       },
     });
   };
@@ -59,10 +53,13 @@ function useSlackChannels({
         lastPage?.next_cursor === "" ? null : lastPage?.next_cursor,
     });
 
-  const slackChannels =
-    data?.pages
-      ?.flatMap((page) => page?.slack_channels)
-      .filter((channel) => !!channel) || [];
+  const slackChannels = useMemo(() => {
+    return (
+      data?.pages
+        ?.flatMap((page) => page?.slack_channels)
+        .filter((channel) => !!channel) || []
+    );
+  }, [data?.pages]);
 
   const maxCount = queryOptions?.maxCount || MAX_COUNT;
 

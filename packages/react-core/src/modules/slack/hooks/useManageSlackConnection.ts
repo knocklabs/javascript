@@ -1,7 +1,8 @@
 import { useKnockSlackClient } from "..";
-import { useCallback } from "react";
-import { useKnockClient } from "../../core";
 import { TENANT_OBJECT_COLLECTION } from "@knocklabs/client";
+import { useCallback } from "react";
+
+import { useKnockClient } from "../../core";
 
 const SLACK_AUTHORIZE_URL = "https://slack.com/oauth/v2/authorize";
 const DEFAULT_SLACK_SCOPES = [
@@ -21,13 +22,9 @@ function useManageSlackConnection(
   slackClientId: string,
   redirectUrl?: string,
 ): UseManageSlackConnectionOutput {
-  const knock = useKnockClient()
-  const {
-    setConnectionStatus,
-    knockSlackChannelId,
-    tenant,
-    setActionLabel,
-  } = useKnockSlackClient();
+  const knock = useKnockClient();
+  const { setConnectionStatus, knockSlackChannelId, tenant, setActionLabel } =
+    useKnockSlackClient();
 
   const disconnectFromSlack = useCallback(async () => {
     setActionLabel("");

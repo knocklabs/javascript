@@ -1,0 +1,91 @@
+.rnf-trigger-container {
+  width: 256px;
+}
+
+.rnf-input-icon-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.rnf-input-with-icon {
+  padding-left: 2rem;
+  height: 32px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.rnf-input-with-icon-error {
+  background-color: rgba(255, 255, 240, 1);
+  border: 1px solid rgba(247, 212, 102, 1);
+  cursor: not-allowed;
+}
+
+.rnf-input-with-icon-error::placeholder {
+  color: rgba(169, 88, 35, 1);
+}
+
+.rnf-input-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ccc;
+}
+
+.rnf-input-icon-error {
+  color: rgba(247, 212, 102, 1);
+}
+
+.rnf-list-box {
+  margin-top: 4px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  width: 286px;
+  margin-left: 2rem;
+  height: 223px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow:
+    0px 1px 2px 0px rgba(0, 0, 0, 0.06),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+}
+
+.rnf-channel-option {
+  display: flex;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  background-color: white;
+  border-width: 0px;
+}
+
+.rnf-channel-option:disabled {
+  color: #3c4257;
+  cursor: not-allowed;
+}
+
+.rnf-icon {
+  display: flex;
+  margin-right: 4px;
+}
+
+.rnf-disconnected-info-container {
+  display: flex;
+  width: 276px;
+  padding: 0.5rem;
+  align-items: flex-start;
+  justify-content: center;
+  margin-top: 0.25rem;
+  background: rgba(228, 232, 238, 1);
+  border-radius: 4px;
+  gap: 4px;
+}
+
+.rnf-info-container-text {
+  color: #3c4257;
+  font-family: Inter, sans-serif;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
