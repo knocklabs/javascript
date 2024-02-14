@@ -2,7 +2,7 @@ import Knock from "@knocklabs/client";
 import { useEffect, useState } from "react";
 
 export type ConnectionStatus =
-  | "loading"
+  | "connecting"
   | "connected"
   | "disconnected"
   | "error"
@@ -35,14 +35,14 @@ function useSlackConnectionStatus(
   tenant: string,
 ): UseSlackConnectionStatusOutput {
   const [connectionStatus, setConnectionStatus] =
-    useState<ConnectionStatus>("loading");
+    useState<ConnectionStatus>("connecting");
   const [errorLabel, setErrorLabel] = useState<string | null>(null);
   const [actionLabel, setActionLabel] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       setActionLabel("");
-      if (connectionStatus !== "loading") return;
+      if (connectionStatus !== "connecting") return;
 
       try {
         const authRes = await knock.slack.authCheck({
@@ -51,9 +51,7 @@ function useSlackConnectionStatus(
         });
 
         if (authRes.connection?.ok) {
-          setConnectionStatus("connected");
-
-          return;
+          return setConnectionStatus("connected");
         }
 
         // This is a normal response for a tenant that doesn't have an access
@@ -70,9 +68,7 @@ function useSlackConnectionStatus(
         if (!authRes.connection?.ok && authRes.connection?.error) {
           const errorLabel = formatSlackErrorMessage(authRes.connection?.error);
           setErrorLabel(errorLabel);
-
           setConnectionStatus("error");
-
           return;
         }
 

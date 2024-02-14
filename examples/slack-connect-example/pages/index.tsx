@@ -2,8 +2,8 @@ import { KnockSlackProvider } from "@knocklabs/react";
 import {
   ConnectToSlackButton,
   ConnectToSlackContainer,
-  ConnectedSlackChannelPicker,
   KnockProvider,
+  SlackChannelCombobox,
 } from "@knocklabs/react";
 
 import { useSetToken } from "../hooks";
@@ -75,9 +75,7 @@ export default function Home() {
                 Slack Channel Picker
               </div>
               <div style={{ margin: "10px", padding: "10px" }}>
-                <ConnectedSlackChannelPicker
-                  connectionsObject={connectionsObject}
-                />
+                <SlackChannelCombobox connectionsObject={connectionsObject} />
               </div>
             </div>
             <div>
