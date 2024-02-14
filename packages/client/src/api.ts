@@ -42,19 +42,23 @@ class ApiClient {
       },
     });
 
-    if (typeof window !== "undefined") {
-      this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
-        params: {
-          user_token: this.userToken,
-          api_key: this.apiKey,
-        },
-      });
-    }
+    this.initializeSocket();
 
     axiosRetry(this.axiosClient, {
       retries: 3,
       retryCondition: this.canRetryRequest,
       retryDelay: axiosRetry.exponentialDelay,
+    });
+  }
+
+  initializeSocket() {
+    if (typeof window === "undefined") return;
+
+    this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
+      params: {
+        user_token: this.userToken,
+        api_key: this.apiKey,
+      },
     });
   }
 

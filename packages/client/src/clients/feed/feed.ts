@@ -2,7 +2,6 @@ import { EventEmitter2 as EventEmitter } from "eventemitter2";
 import { Channel } from "phoenix";
 import { StoreApi } from "zustand";
 
-import ApiClient from "../../api";
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 
@@ -42,13 +41,13 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
 const DEFAULT_DISCONNECT_DELAY = 2000;
 
 class Feed {
-  private apiClient: ApiClient;
   private userFeedId: string;
-  private channel: Channel | undefined;
+  private channel?: Channel;
   private broadcaster: EventEmitter;
   private defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private hasSubscribedToRealTimeUpdates: Boolean = false;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -58,33 +57,33 @@ class Feed {
     readonly feedId: string,
     options: FeedClientOptions,
   ) {
-    this.apiClient = knock.client();
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = { ...feedClientDefaults, ...options };
 
-    // In server environments we might not have a socket connection
-    if (this.apiClient.socket) {
-      this.channel = this.apiClient.socket.channel(
-        `feeds:${this.userFeedId}`,
-        this.defaultOptions,
-      );
+    // Attempt to setup a realtime connection (does not join)
+    this.initializeRealtimeConnection();
 
-      this.channel.on("new-message", (resp) => this.onNewMessageReceived(resp));
-    }
+    this.setupBroadcastChannel();
+  }
 
-    // Attempt to bind to listen to other events from this feed in different tabs
-    // Note: here we ensure `self` is available (it's not in server rendered envs)
-    this.broadcastChannel =
-      typeof self !== "undefined" && "BroadcastChannel" in self
-        ? new BroadcastChannel(`knock:feed:${this.userFeedId}`)
-        : null;
+  /**
+   * Used to reinitialize a current feed instance, which is useful when reauthenticating users
+   */
+  reinitialize() {
+    // Reinitialize the user feed id incase the userId changed
+    this.userFeedId = this.buildUserFeedId();
 
-    if (options.auto_manage_socket_connection && this.apiClient.socket) {
-      this.setupAutoSocketManager(options.auto_manage_socket_connection_delay);
-    }
+    // Reinitialize the real-time connection
+    this.initializeRealtimeConnection();
+
+    // Reinitialize our broadcast channel
+    this.setupBroadcastChannel();
+
+    // Refetch the store state
+    this.fetch();
   }
 
   /**
@@ -97,12 +96,25 @@ class Feed {
       this.channel.off("new-message");
     }
 
-    this.broadcaster.removeAllListeners();
-    this.store.destroy();
+    if (this.disconnectTimer) {
+      clearTimeout(this.disconnectTimer);
+      this.disconnectTimer = null;
+    }
 
     if (this.broadcastChannel) {
       this.broadcastChannel.close();
     }
+
+    this.broadcaster.removeAllListeners();
+
+    // Wipe the entire state of the store
+    this.store.destroy();
+  }
+
+  /** Tears down an instance and removes it entirely from the feed manager */
+  dispose() {
+    this.teardown();
+    this.knock.feeds.removeInstance(this);
   }
 
   /*
@@ -110,42 +122,18 @@ class Feed {
     current ApiClient instance if the socket is not already connected.
   */
   listenForUpdates() {
+    this.hasSubscribedToRealTimeUpdates = true;
+
+    const maybeSocket = this.knock.client().socket;
+
     // Connect the socket only if we don't already have a connection
-    if (this.apiClient.socket && !this.apiClient.socket.isConnected()) {
-      this.apiClient.socket.connect();
+    if (maybeSocket && !maybeSocket.isConnected()) {
+      maybeSocket.connect();
     }
 
     // Only join the channel if we're not already in a joining state
     if (this.channel && ["closed", "errored"].includes(this.channel.state)) {
       this.channel.join();
-    }
-
-    // Opt into receiving updates from _other tabs for the same user / feed_ via the broadcast
-    // channel (iff it's enabled and exists)
-    if (
-      this.broadcastChannel &&
-      this.defaultOptions.__experimentalCrossBrowserUpdates === true
-    ) {
-      this.broadcastChannel.onmessage = (e) => {
-        switch (e.data.type) {
-          case "items:archived":
-          case "items:unarchived":
-          case "items:seen":
-          case "items:unseen":
-          case "items:read":
-          case "items:unread":
-          case "items:all_read":
-          case "items:all_seen":
-          case "items:all_archived":
-            // When items are updated in any other tab, simply refetch to get the latest state
-            // to make sure that the state gets updated accordingly. In the future here we could
-            // maybe do this optimistically without the fetch.
-            return this.fetch();
-            break;
-          default:
-            return null;
-        }
-      };
     }
   }
 
@@ -472,7 +460,7 @@ class Feed {
       auto_manage_socket_connection_delay: undefined,
     };
 
-    const result = await this.apiClient.makeRequest({
+    const result = await this.knock.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.knock.userId}/feeds/${this.feedId}`,
       params: queryParams,
@@ -620,7 +608,7 @@ class Feed {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const itemIds = items.map((item) => item.id);
 
-    const result = await this.apiClient.makeRequest({
+    const result = await this.knock.client().makeRequest({
       method: "POST",
       url: `/v1/messages/batch/${type}`,
       data: { message_ids: itemIds },
@@ -652,11 +640,47 @@ class Feed {
         : undefined,
     };
 
-    return await this.apiClient.makeRequest({
+    return await this.knock.client().makeRequest({
       method: "POST",
       url: `/v1/channels/${this.feedId}/messages/bulk/${type}`,
       data: options,
     });
+  }
+
+  private setupBroadcastChannel() {
+    // Attempt to bind to listen to other events from this feed in different tabs
+    // Note: here we ensure `self` is available (it's not in server rendered envs)
+    this.broadcastChannel =
+      typeof self !== "undefined" && "BroadcastChannel" in self
+        ? new BroadcastChannel(`knock:feed:${this.userFeedId}`)
+        : null;
+
+    // Opt into receiving updates from _other tabs for the same user / feed_ via the broadcast
+    // channel (iff it's enabled and exists)
+    if (
+      this.broadcastChannel &&
+      this.defaultOptions.__experimentalCrossBrowserUpdates === true
+    ) {
+      this.broadcastChannel.onmessage = (e) => {
+        switch (e.data.type) {
+          case "items:archived":
+          case "items:unarchived":
+          case "items:seen":
+          case "items:unseen":
+          case "items:read":
+          case "items:unread":
+          case "items:all_read":
+          case "items:all_seen":
+          case "items:all_archived":
+            // When items are updated in any other tab, simply refetch to get the latest state
+            // to make sure that the state gets updated accordingly. In the future here we could
+            // maybe do this optimistically without the fetch.
+            return this.fetch();
+          default:
+            return null;
+        }
+      };
+    }
   }
 
   private broadcastOverChannel(type: string, payload: any) {
@@ -679,6 +703,34 @@ class Feed {
     }
   }
 
+  private initializeRealtimeConnection() {
+    const { socket: maybeSocket } = this.knock.client();
+
+    // In server environments we might not have a socket connection
+    if (!maybeSocket) return;
+
+    // Reinitialize channel connections incase the socket changed
+    this.channel = maybeSocket.channel(
+      `feeds:${this.userFeedId}`,
+      this.defaultOptions,
+    );
+
+    this.channel.on("new-message", (resp) => this.onNewMessageReceived(resp));
+
+    if (this.defaultOptions.auto_manage_socket_connection) {
+      this.setupAutoSocketManager(
+        this.defaultOptions.auto_manage_socket_connection_delay,
+      );
+    }
+
+    // If we're initializing but they have previously opted to listen to real-time updates
+    // then we will automatically reconnect on their behalf
+    if (this.hasSubscribedToRealTimeUpdates) {
+      maybeSocket.connect();
+      this.channel.join();
+    }
+  }
+
   /**
    * Listen for changes to document visibility and automatically disconnect
    * or reconnect the socket after a delay
@@ -691,7 +743,7 @@ class Feed {
       if (document.visibilityState === "hidden") {
         // When the tab is hidden, clean up the socket connection after a delay
         this.disconnectTimer = setTimeout(() => {
-          this.apiClient.disconnectSocket();
+          this.knock.client().disconnectSocket();
           this.disconnectTimer = null;
         }, disconnectDelay);
       } else if (document.visibilityState === "visible") {
@@ -702,9 +754,11 @@ class Feed {
           this.disconnectTimer = null;
         }
 
+        const client = this.knock.client();
+
         // If the socket is not connected, try to reconnect
-        if (!this.apiClient.socket?.isConnected()) {
-          this.apiClient.reconnectSocket();
+        if (!client.socket?.isConnected()) {
+          this.initializeRealtimeConnection();
           this.fetch();
         }
       }

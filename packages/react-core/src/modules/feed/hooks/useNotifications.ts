@@ -9,7 +9,7 @@ function useNotifications(
   const feedClientRef = useRef<Feed | null>();
 
   return useMemo(() => {
-    if (feedClientRef.current) feedClientRef.current.teardown();
+    if (feedClientRef.current) feedClientRef.current.dispose();
 
     const feedClient = knock.feeds.initialize(feedId, options);
 
