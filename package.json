@@ -8,6 +8,7 @@
     "build": "turbo build",
     "build:packages": "turbo build --filter=\"./packages/*\"",
     "dev": "turbo dev",
+    "dev:next-example": "turbo dev --filter=\"./packages/*\" --filter=nextjs-example",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",

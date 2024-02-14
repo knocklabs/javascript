@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "dev": "tsc && vite build --watch",
+    "dev": "tsc && vite build --watch --emptyOutDir false",
     "//": "dev:local runs a dev server and lets you test components at localhost:5173",
     "dev:local": "vite",
     "build": "yarn clean && yarn build:esm && yarn build:cjs",
