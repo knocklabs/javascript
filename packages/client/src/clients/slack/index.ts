@@ -1,6 +1,11 @@
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
-import { AuthCheckInput, GetSlackChannelsInput, RevokeAccessTokenInput } from "./interfaces";
+
+import {
+  AuthCheckInput,
+  GetSlackChannelsInput,
+  RevokeAccessTokenInput,
+} from "./interfaces";
 
 const TENANT_COLLECTION = "$tenants";
 
