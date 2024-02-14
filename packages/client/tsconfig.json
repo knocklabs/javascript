@@ -1,4 +1,7 @@
 {
   "extends": "@knocklabs/typescript-config/base.json",
-  "include": ["src"]
+  "include": ["src"],
+  "compilerOptions": {
+    "outDir": "dist"
+  }
 }
