@@ -1,6 +1,12 @@
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
-import { AuthCheckInput, GetSlackChannelsInput, RevokeAccessTokenInput } from "./interfaces";
+
+import {
+  AuthCheckInput,
+  GetConnectedChannelsInput,
+  GetSlackChannelsInput,
+  RevokeAccessTokenInput,
+} from "./interfaces";
 
 const TENANT_COLLECTION = "$tenants";
 
@@ -47,6 +53,24 @@ class SlackClient {
           team_id: queryOptions.teamId,
           types: queryOptions.types,
         },
+      },
+    });
+
+    return this.handleResponse(result);
+  }
+
+  async getConnectedChannels(input: GetConnectedChannelsInput) {
+    const { knockChannelId, connectionsObject } = input;
+
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `/v1/providers/slack/${knockChannelId}/channels`,
+      params: {
+        access_token_object: {
+          object_id: connectionsObject.objectId,
+          collection: connectionsObject.collection,
+        },
+        channel_id: knockChannelId,
       },
     });
 

@@ -5,10 +5,6 @@ export type SlackChannelConnection = {
 
 export type GetSlackChannelsInput = {
   tenant: string;
-  connectionsObject: {
-    objectId: string;
-    collection: string;
-  };
   knockChannelId: string;
   queryOptions?: {
     limit?: number;
@@ -16,6 +12,14 @@ export type GetSlackChannelsInput = {
     excludeArchived?: boolean;
     teamId?: string;
     types?: string;
+  };
+};
+
+export type GetConnectedChannelsInput = {
+  knockChannelId: string;
+  connectionsObject: {
+    objectId: string;
+    collection: string;
   };
 };
 
