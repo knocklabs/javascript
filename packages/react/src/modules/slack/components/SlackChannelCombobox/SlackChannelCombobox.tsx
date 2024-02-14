@@ -61,29 +61,18 @@ export const SlackChannelCombobox = ({
   inputMessages,
 }: Props) => {
   // Gather API data
-  const {
-    tenant,
-    knockSlackChannelId,
-    connectionStatus,
-    errorLabel: connectionErrorLabel,
-  } = useKnockSlackClient();
+  const { connectionStatus, errorLabel: connectionErrorLabel } =
+    useKnockSlackClient();
 
   const { data: slackChannels, isLoading: slackChannelsLoading } =
-    useSlackChannels({
-      tenant,
-      knockSlackChannelId,
-      queryOptions,
-    });
+    useSlackChannels({ queryOptions });
 
   const {
     data: connectedChannels,
     updateConnectedChannels,
     loading: connectedChannelsLoading,
     error: connectedChannelsError,
-  } = useConnectedSlackChannels({
-    connectionsObject,
-    knockSlackChannelId,
-  });
+  } = useConnectedSlackChannels({ connectionsObject });
 
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");

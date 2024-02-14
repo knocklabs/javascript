@@ -1,4 +1,4 @@
-import { ContainerObject } from "..";
+import { ContainerObject, useKnockSlackClient } from "..";
 import { SlackChannelConnection } from "@knocklabs/client";
 import { useCallback, useEffect, useState } from "react";
 
@@ -6,7 +6,6 @@ import { useKnockClient } from "../../core";
 
 type UseSlackChannelsProps = {
   connectionsObject: ContainerObject;
-  knockSlackChannelId: string;
 };
 
 type UseSlackChannelOutput = {
@@ -20,14 +19,13 @@ type UseSlackChannelOutput = {
 
 function useConnectedSlackChannels({
   connectionsObject: { objectId, collection },
-  knockSlackChannelId,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
   const knock = useKnockClient();
+  const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
   const [connectedChannels, setConnectedChannels] = useState<
     null | SlackChannelConnection[]
   >(null);
   const [error, setError] = useState<string | null>(null);
-
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchAndSetConnectedChannels = useCallback(() => {
@@ -40,21 +38,37 @@ function useConnectedSlackChannels({
 
     getConnectedChannels()
       .then((res) => {
+        if (res?.data?.connections) {
+          setConnectedChannels(res?.data?.connections);
+        } else {
+          setConnectedChannels([]);
+        }
         setError(null);
         setIsLoading(false);
-        setConnectedChannels(res?.data?.connections);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.error(e);
         setError("Error fetching channels.");
         setIsLoading(false);
       });
   }, [collection, knock.slack, knockSlackChannelId, objectId]);
 
   useEffect(() => {
-    if (!connectedChannels && !error && !isLoading) {
+    if (
+      connectionStatus === "connected" &&
+      !connectedChannels &&
+      !error &&
+      !isLoading
+    ) {
       fetchAndSetConnectedChannels();
     }
-  }, [connectedChannels, fetchAndSetConnectedChannels, isLoading, error]);
+  }, [
+    connectedChannels,
+    fetchAndSetConnectedChannels,
+    isLoading,
+    error,
+    connectionStatus,
+  ]);
 
   const updateConnectedChannels = async (
     channelsToSendToKnock: SlackChannelConnection[],

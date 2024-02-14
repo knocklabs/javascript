@@ -64,9 +64,9 @@ class SlackClient {
 
     const result = await this.instance.client().makeRequest({
       method: "GET",
-      url: `/v1/providers/slack/${knockChannelId}/channels`,
+      url: `/v1/providers/slack/${knockChannelId}/connected_channels`,
       params: {
-        access_token_object: {
+        connections_object: {
           object_id: connectionsObject.objectId,
           collection: connectionsObject.collection,
         },
@@ -74,7 +74,11 @@ class SlackClient {
       },
     });
 
-    return this.handleResponse(result);
+    if (result.statusCode === "error") {
+      throw new Error(result.error || result.body);
+    }
+
+    return result.body;
   }
 
   async revokeAccessToken({ tenant, knockChannelId }: RevokeAccessTokenInput) {

@@ -43,15 +43,7 @@ export const KnockSlackProvider: React.FC<KnockSlackProviderProps> = ({
     actionLabel,
     setActionLabel,
   } = useSlackConnectionStatus(knock, knockSlackChannelId, tenant);
-  console.log(
-    "slack provider key",
-    slackProviderKey({
-      knockSlackChannelId,
-      tenant,
-      connectionStatus,
-      errorLabel,
-    }),
-  );
+
   return (
     <SlackProviderStateContext.Provider
       key={slackProviderKey({

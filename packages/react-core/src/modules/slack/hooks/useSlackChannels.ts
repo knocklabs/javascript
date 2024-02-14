@@ -1,4 +1,4 @@
-import { SlackChannelQueryOptions } from "..";
+import { SlackChannelQueryOptions, useKnockSlackClient } from "..";
 import { SlackChannel } from "@knocklabs/client";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
@@ -10,9 +10,7 @@ const LIMIT_PER_PAGE = 200;
 const CHANNEL_TYPES = "private_channel,public_channel";
 
 type UseSlackChannelsProps = {
-  tenant: string;
   queryOptions?: SlackChannelQueryOptions;
-  knockSlackChannelId: string;
 };
 
 type UseSlackChannelOutput = {
@@ -22,11 +20,11 @@ type UseSlackChannelOutput = {
 };
 
 function useSlackChannels({
-  tenant,
-  knockSlackChannelId,
   queryOptions,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
   const knock = useKnockClient();
+  const { knockSlackChannelId, tenant, connectionStatus } =
+    useKnockSlackClient();
 
   const fetchChannels = ({ pageParam }: { pageParam: string }) => {
     return knock.slack.getChannels({
@@ -49,8 +47,6 @@ function useSlackChannels({
     hasNextPage,
     refetch,
     error,
-    isError,
-    failureReason,
   } = useInfiniteQuery({
     queryKey: ["slackChannels"],
     queryFn: fetchChannels,
@@ -58,10 +54,6 @@ function useSlackChannels({
     getNextPageParam: (lastPage) =>
       lastPage?.next_cursor === "" ? null : lastPage?.next_cursor,
   });
-
-  console.log("error in use slack channels", error);
-  console.log("isError in use slack channels", isError);
-  console.log("failureReason in use slack channels", failureReason);
 
   const slackChannels = useMemo(() => {
     return (
@@ -73,23 +65,25 @@ function useSlackChannels({
 
   const maxCount = queryOptions?.maxCount || MAX_COUNT;
 
-  // useEffect(() => {
-  //   if (
-  //     !error &&
-  //     hasNextPage &&
-  //     !isFetching &&
-  //     slackChannels?.length < maxCount
-  //   ) {
-  //     fetchNextPage();
-  //   }
-  // }, [
-  //   slackChannels?.length,
-  //   fetchNextPage,
-  //   hasNextPage,
-  //   isFetching,
-  //   maxCount,
-  //   error,
-  // ]);
+  useEffect(() => {
+    if (
+      connectionStatus === "connected" &&
+      !error &&
+      hasNextPage &&
+      !isFetching &&
+      slackChannels?.length < maxCount
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    slackChannels?.length,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    maxCount,
+    error,
+    connectionStatus,
+  ]);
 
   return { data: slackChannels, isLoading, refetch };
 }
