@@ -4847,7 +4847,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/react@workspace:^, @knocklabs/react@workspace:packages/react":
+"@knocklabs/react@file:../../packages/react::locator=nextjs-example%40workspace%3Aexamples%2Fnextjs-example":
+  version: 0.1.6
+  resolution: "@knocklabs/react@file:../../packages/react#../../packages/react::hash=f748d3&locator=nextjs-example%40workspace%3Aexamples%2Fnextjs-example"
+  dependencies:
+    "@knocklabs/client": "workspace:^"
+    "@knocklabs/react-core": "workspace:^"
+    "@popperjs/core": "npm:^2.11.8"
+    lodash.debounce: "npm:^4.0.8"
+    react-popper: "npm:^2.3.0"
+    react-popper-tooltip: "npm:^4.4.2"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 10c0/076af9051d468490f87adec44e850f554e7dfcc01e7bb5c814d13bb37860bc0fef159afb1b21090cc2bdab9b73d070abe844839b4e37ef94ef4ae09eb7ec1bd9
+  languageName: node
+  linkType: hard
+
+"@knocklabs/react@workspace:packages/react":
   version: 0.0.0-use.local
   resolution: "@knocklabs/react@workspace:packages/react"
   dependencies:
@@ -16653,7 +16670,7 @@ __metadata:
     "@faker-js/faker": "npm:^8.3.1"
     "@knocklabs/eslint-config": "workspace:^"
     "@knocklabs/node": "npm:0.6.1"
-    "@knocklabs/react": "workspace:^"
+    "@knocklabs/react": "file:../../packages/react"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^14.0.2"
     "@types/eslint": "npm:^8.44.7"

@@ -28,7 +28,7 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "scripts": {
-    "dev": "yarn build",
+    "dev": "yarn build --watch",
     "lint": "eslint \"src/**/*.+(ts|js|tsx)\"",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",

@@ -1,8 +1,8 @@
-import * as React from "react";
 import Knock, { AuthenticateOptions } from "@knocklabs/client";
+import * as React from "react";
 
+import { I18nContent, KnockI18nProvider } from "../../i18n";
 import { useAuthenticatedKnockClient } from "../hooks";
-import { KnockI18nProvider, I18nContent } from "../../i18n";
 
 export interface KnockProviderState {
   knock: Knock;

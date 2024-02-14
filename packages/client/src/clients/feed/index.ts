@@ -1,4 +1,5 @@
 import Knock from "../../knock";
+
 import Feed from "./feed";
 import { FeedClientOptions } from "./interfaces";
 

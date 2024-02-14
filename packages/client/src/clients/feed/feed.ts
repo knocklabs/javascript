@@ -1,27 +1,29 @@
+import { EventEmitter2 as EventEmitter } from "eventemitter2";
 import { Channel } from "phoenix";
 import { StoreApi } from "zustand";
-import { EventEmitter2 as EventEmitter } from "eventemitter2";
+
 import ApiClient from "../../api";
+import Knock from "../../knock";
+import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
+
+import {
+  FeedClientOptions,
+  FeedItem,
+  FeedMetadata,
+  FeedResponse,
+  FetchFeedOptions,
+} from "./interfaces";
 import createStore from "./store";
 import {
   BindableFeedEvent,
-  FeedMessagesReceivedPayload,
-  FeedEventCallback,
   FeedEvent,
-  FeedItemOrItems,
-  FeedStoreState,
+  FeedEventCallback,
   FeedEventPayload,
+  FeedItemOrItems,
+  FeedMessagesReceivedPayload,
   FeedRealTimeCallback,
+  FeedStoreState,
 } from "./types";
-import {
-  FeedItem,
-  FeedClientOptions,
-  FetchFeedOptions,
-  FeedResponse,
-  FeedMetadata,
-} from "./interfaces";
-import Knock from "../../knock";
-import { isRequestInFlight, NetworkStatus } from "../../networkStatus";
 
 export type Status =
   | "seen"
@@ -467,7 +469,7 @@ class Feed {
       __fetchSource: undefined,
       __experimentalCrossBrowserUpdates: undefined,
       auto_manage_socket_connection: undefined,
-      auto_manage_socket_connection_delay: undefined
+      auto_manage_socket_connection_delay: undefined,
     };
 
     const result = await this.apiClient.makeRequest({
