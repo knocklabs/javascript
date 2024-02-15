@@ -13,8 +13,9 @@ import { useFilter } from "react-aria";
 
 import { useOutsideClick } from "../../../core";
 
+import AddConnectedSlackChannelInput from "./AddConnectedSlackChannelInput";
+import ConnectionErrorInfoBoxes from "./ConnectionErrorInfoBoxes";
 import SlackChannelListBox from "./SlackChannelListBox";
-import InfoIcon from "./icons/InfoIcon";
 import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
@@ -28,6 +29,8 @@ const DEFAULT_INPUT_MESSAGES = {
   noSlackChannelsFound: "No slack channels.",
   channelsError: "Error fetching channels.",
 };
+
+const MAX_ALLOWED_CHANNELS = 1000;
 
 type SlackChannelComboboxInputMessages = {
   connecting: string;
@@ -72,6 +75,7 @@ export const SlackChannelCombobox = ({
     updateConnectedChannels,
     loading: connectedChannelsLoading,
     error: connectedChannelsError,
+    updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ connectionsObject });
 
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
@@ -202,6 +206,18 @@ export const SlackChannelCombobox = ({
     [connectedChannelsError, connectionStatus],
   );
 
+  if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
+    return (
+      <AddConnectedSlackChannelInput
+        isErrorState={!!isErrorState}
+        connectedChannels={currentConnectedChannels || []}
+        updateConnectedChannels={updateConnectedChannels}
+        connectedChannelsError={connectedChannelsError}
+        connectedChannelsUpdating={connectedChannelsUpdating}
+      />
+    );
+  }
+
   return (
     <div ref={comboboxRef}>
       <Popover.Root
@@ -230,53 +246,11 @@ export const SlackChannelCombobox = ({
                 onFocus={() => setComboboxListOpen(true)}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={searchPlaceholder || "Search channels"}
-                disabled={
-                  connectionStatus === "disconnected" ||
-                  connectionStatus === "error" ||
-                  !!connectedChannelsError
-                }
+                disabled={!!isErrorState}
                 {...inputProps}
               />
             </div>
-            {connectionStatus === "disconnected" && (
-              <div className="rnf-disconnected-info-container">
-                <span>
-                  <InfoIcon />
-                </span>
-
-                <div className="rnf-info-container-text">
-                  Try reconnecting to Slack to find and select channels from
-                  your workspace.
-                </div>
-              </div>
-            )}
-
-            {connectionStatus === "error" && (
-              <div className="rnf-disconnected-info-container">
-                <span>
-                  <InfoIcon />
-                </span>
-
-                <div className="rnf-info-container-text">
-                  There was an error connecting to Slack. Try reconnecting to
-                  find and select channels from your workspace.
-                </div>
-              </div>
-            )}
-
-            {connectedChannelsError && (
-              <div className="rnf-disconnected-info-container">
-                <span>
-                  <InfoIcon />
-                </span>
-
-                <div className="rnf-info-container-text">
-                  There was an error fetching Slack channels. Try disconnecting
-                  and reconnecting to find and select channels from your
-                  workspace.
-                </div>
-              </div>
-            )}
+            <ConnectionErrorInfoBoxes />
           </div>
         </Popover.Trigger>
 

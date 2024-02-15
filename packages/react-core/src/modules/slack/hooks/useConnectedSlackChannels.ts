@@ -15,6 +15,7 @@ type UseSlackChannelOutput = {
   ) => void;
   loading: boolean;
   error: string | null;
+  updating: boolean;
 };
 
 function useConnectedSlackChannels({
@@ -27,6 +28,7 @@ function useConnectedSlackChannels({
   >(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const fetchAndSetConnectedChannels = useCallback(() => {
     setIsLoading(true);
@@ -74,6 +76,7 @@ function useConnectedSlackChannels({
   const updateConnectedChannels = async (
     channelsToSendToKnock: SlackChannelConnection[],
   ) => {
+    setIsUpdating(true)
     try {
       await knock.objects.setChannelData({
         objectId,
@@ -83,13 +86,15 @@ function useConnectedSlackChannels({
       });
       fetchAndSetConnectedChannels();
     } catch (error) {
-      setError("Error setting channels.");
+      setError("Error setting channel.");
     }
+    setIsUpdating(false)
   };
 
   return {
     data: connectedChannels,
     updateConnectedChannels,
+    updating: isUpdating,
     loading: isLoading,
     error,
   };

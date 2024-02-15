@@ -8,6 +8,33 @@
   width: 100%;
 }
 
+.rnf-input {
+  padding-left: 0.5rem;
+  width: 270px;
+  height: 32px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.rnf-button {
+  height: 24px;
+  border-radius: 6px;
+  border-color: #dddee1;
+  background-color: #fff;
+  color: #000;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px;
+  text-decoration: none;
+  font-family: Inter, sans-serif;
+  gap: 8px;
+}
+
+.rnf-button:hover {
+  background-color: rgba(247, 247, 248, 1);
+}
+
 .rnf-input-with-icon {
   padding-left: 2rem;
   height: 32px;
@@ -15,6 +42,12 @@
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+.rnf-input-error {
+  background-color: rgba(255, 255, 240, 1);
+  border: 1px solid rgba(247, 212, 102, 1);
+}
+
 .rnf-input-with-icon-error {
   background-color: rgba(255, 255, 240, 1);
   border: 1px solid rgba(247, 212, 102, 1);
@@ -88,4 +121,28 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+}
+
+.rnf-connect-channel-input-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.rnf-spinner {
+  border: 1px solid #000000;
+  border-radius: 50%;
+  border-bottom: 1px solid transparent;
+  width: 14px;
+  height: 14px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
