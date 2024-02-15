@@ -26,6 +26,7 @@ const DEFAULT_INPUT_MESSAGES = {
   multipleChannelsConnected: "Multiple channels connected",
   noChannelsConnected: "Search channels",
   noSlackChannelsFound: "No slack channels.",
+  channelsError: "Error fetching channels.",
 };
 
 type SlackChannelComboboxInputMessages = {
@@ -60,24 +61,18 @@ export const SlackChannelCombobox = ({
   inputMessages,
 }: Props) => {
   // Gather API data
-  const { tenant, knockSlackChannelId, connectionStatus, errorLabel } =
+  const { connectionStatus, errorLabel: connectionErrorLabel } =
     useKnockSlackClient();
+
   const { data: slackChannels, isLoading: slackChannelsLoading } =
-    useSlackChannels({
-      tenant,
-      connectionsObject,
-      knockSlackChannelId,
-      queryOptions,
-    });
+    useSlackChannels({ queryOptions });
 
   const {
     data: connectedChannels,
     updateConnectedChannels,
     loading: connectedChannelsLoading,
-  } = useConnectedSlackChannels({
-    connectionsObject,
-    knockSlackChannelId,
-  });
+    error: connectedChannelsError,
+  } = useConnectedSlackChannels({ connectionsObject });
 
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
@@ -113,7 +108,11 @@ export const SlackChannelCombobox = ({
     }
 
     if (connectionStatus === "error") {
-      return inputMessages?.error || errorLabel;
+      return inputMessages?.error || connectionErrorLabel;
+    }
+
+    if (connectedChannelsError) {
+      return inputMessages?.error || DEFAULT_INPUT_MESSAGES.channelsError;
     }
 
     // Channel messages
@@ -154,12 +153,13 @@ export const SlackChannelCombobox = ({
     );
   }, [
     connectionStatus,
+    connectedChannelsError,
     slackChannelsLoading,
     connectedChannelsLoading,
     slackChannels,
     connectedChannels,
     inputMessages,
-    errorLabel,
+    connectionErrorLabel,
   ]);
 
   // Handle channel click
@@ -194,6 +194,14 @@ export const SlackChannelCombobox = ({
     contains(slackChannel.name, inputValue),
   );
 
+  const isErrorState = useMemo(
+    () =>
+      connectionStatus === "disconnected" ||
+      connectionStatus === "error" ||
+      connectedChannelsError,
+    [connectedChannelsError, connectionStatus],
+  );
+
   return (
     <div ref={comboboxRef}>
       <Popover.Root
@@ -209,13 +217,13 @@ export const SlackChannelCombobox = ({
               {...inputContainerProps}
             >
               <span
-                className={`rnf-input-icon ${(connectionStatus === "disconnected" || connectionStatus === "error") && "rnf-input-icon-error"}`}
+                className={`rnf-input-icon ${isErrorState && "rnf-input-icon-error"}`}
               >
                 <SearchIcon />
               </span>
 
               <input
-                className={`rnf-input-with-icon ${(connectionStatus === "disconnected" || connectionStatus === "error") && "rnf-input-with-icon-error"}`}
+                className={`rnf-input-with-icon ${isErrorState && "rnf-input-with-icon-error"}`}
                 tabIndex={-1}
                 id="slack-channel-search"
                 type="text"
@@ -224,7 +232,8 @@ export const SlackChannelCombobox = ({
                 placeholder={searchPlaceholder || "Search channels"}
                 disabled={
                   connectionStatus === "disconnected" ||
-                  connectionStatus === "error"
+                  connectionStatus === "error" ||
+                  !!connectedChannelsError
                 }
                 {...inputProps}
               />
@@ -251,6 +260,20 @@ export const SlackChannelCombobox = ({
                 <div className="rnf-info-container-text">
                   There was an error connecting to Slack. Try reconnecting to
                   find and select channels from your workspace.
+                </div>
+              </div>
+            )}
+
+            {connectedChannelsError && (
+              <div className="rnf-disconnected-info-container">
+                <span>
+                  <InfoIcon />
+                </span>
+
+                <div className="rnf-info-container-text">
+                  There was an error fetching Slack channels. Try disconnecting
+                  and reconnecting to find and select channels from your
+                  workspace.
                 </div>
               </div>
             )}
