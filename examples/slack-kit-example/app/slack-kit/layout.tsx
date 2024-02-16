@@ -10,26 +10,28 @@ const currentTime = Math.floor(Date.now() / 1000);
 const expireInSeconds = 60 * 60;
 const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
-const userToken = jwt.sign(
-  {
-    sub: userId,
-    iat: currentTime,
-    exp: currentTime + expireInSeconds,
-    grants: {
-      [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
-        "slack/channels_read": [{}],
+const userToken = signingKey
+  ? jwt.sign(
+      {
+        sub: userId,
+        iat: currentTime,
+        exp: currentTime + expireInSeconds,
+        grants: {
+          [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
+            "slack/channels_read": [{}],
+          },
+          [`https://api.knock.app/v1/objects/${collection}/${objectId}`]: {
+            "channel_data/read": [{}],
+            "channel_data/write": [{}],
+          },
+        },
       },
-      [`https://api.knock.app/v1/objects/${collection}/${objectId}`]: {
-        "channel_data/read": [{}],
-        "channel_data/write": [{}],
+      signingKey,
+      {
+        algorithm: "RS256",
       },
-    },
-  },
-  signingKey,
-  {
-    algorithm: "RS256",
-  },
-);
+    )
+  : "secretOrPrivateKey";
 
 function MyApp({ children }: { children: React.ReactElement }) {
   return (
