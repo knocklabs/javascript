@@ -63,6 +63,8 @@ class Feed {
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = { ...feedClientDefaults, ...options };
 
+    this.knock.log(`[Feed] Initialized a feed on channel ${feedId}`);
+
     // Attempt to setup a realtime connection (does not join)
     this.initializeRealtimeConnection();
 
@@ -91,6 +93,8 @@ class Feed {
    * an open socket connection.
    */
   teardown() {
+    this.knock.log("[Feed] Tearing down feed instance");
+
     if (this.channel) {
       this.channel.leave();
       this.channel.off("new-message");
@@ -104,16 +108,14 @@ class Feed {
     if (this.broadcastChannel) {
       this.broadcastChannel.close();
     }
-
-    this.broadcaster.removeAllListeners();
-
-    // Wipe the entire state of the store
-    this.store.destroy();
   }
 
   /** Tears down an instance and removes it entirely from the feed manager */
   dispose() {
+    this.knock.log("[Feed] Disposing of feed instance");
     this.teardown();
+    this.broadcaster.removeAllListeners();
+    this.store.setState((store) => store.resetStore());
     this.knock.feeds.removeInstance(this);
   }
 
@@ -122,6 +124,8 @@ class Feed {
     current ApiClient instance if the socket is not already connected.
   */
   listenForUpdates() {
+    this.knock.log("[Feed] Connecting to real-time service");
+
     this.hasSubscribedToRealTimeUpdates = true;
 
     const maybeSocket = this.knock.client().socket;
@@ -538,6 +542,8 @@ class Feed {
   private async onNewMessageReceived({
     metadata,
   }: FeedMessagesReceivedPayload) {
+    this.knock.log("[Feed] Received new real-time message");
+
     // Handle the new message coming in
     const { getState, setState } = this.store;
     const { items } = getState();
@@ -726,7 +732,7 @@ class Feed {
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
     if (this.hasSubscribedToRealTimeUpdates) {
-      maybeSocket.connect();
+      if (!maybeSocket.isConnected()) maybeSocket.connect();
       this.channel.join();
     }
   }
@@ -743,7 +749,7 @@ class Feed {
       if (document.visibilityState === "hidden") {
         // When the tab is hidden, clean up the socket connection after a delay
         this.disconnectTimer = setTimeout(() => {
-          this.knock.client().disconnectSocket();
+          // this.knock.client().disconnectSocket();
           this.disconnectTimer = null;
         }, disconnectDelay);
       } else if (document.visibilityState === "visible") {

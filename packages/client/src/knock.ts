@@ -7,6 +7,7 @@ import UserClient from "./clients/users";
 import {
   AuthenticateOptions,
   KnockOptions,
+  LogLevel,
   UserTokenExpiringCallback,
 } from "./interfaces";
 
@@ -16,9 +17,9 @@ class Knock {
   private host: string;
   private apiClient: ApiClient | null = null;
   public userId: string | undefined;
-  public userToken: string | undefined;
+  public userToken?: string;
+  public logLevel?: LogLevel;
   private tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
-
   readonly feeds = new FeedClient(this);
   readonly preferences = new Preferences(this);
   readonly user = new UserClient(this);
@@ -28,6 +29,9 @@ class Knock {
     options: KnockOptions = {},
   ) {
     this.host = options.host || DEFAULT_HOST;
+    this.logLevel = options.logLevel;
+
+    this.log("Initialized Knock instance");
 
     // Fail loudly if we're using the wrong API key
     if (this.apiKey && this.apiKey.startsWith("sk_")) {
@@ -71,9 +75,10 @@ class Knock {
     // If we've previously been initialized and the values have now changed, then we
     // need to reinitialize any stateful connections we have
     if (
-      (this.userId !== userId || this.userToken !== userToken) &&
-      currentApiClient
+      currentApiClient &&
+      (this.userId !== userId || this.userToken !== userToken)
     ) {
+      this.log("userId or userToken changed; reinitializing connections");
       this.feeds.teardownInstances();
       this.teardown();
       reinitializeApi = true;
@@ -81,6 +86,8 @@ class Knock {
 
     this.userId = userId;
     this.userToken = userToken;
+
+    this.log(`Authenticated with userId ${userId}`);
 
     if (this.userToken && options?.onUserTokenExpiring instanceof Function) {
       this.maybeScheduleUserTokenExpiration(
@@ -95,6 +102,7 @@ class Knock {
     if (reinitializeApi) {
       this.apiClient = this.createApiClient();
       this.feeds.reinitializeInstances();
+      this.log("Reinitialized real-time connections");
     }
 
     return;
@@ -105,7 +113,7 @@ class Knock {
     of the userToken as well.
   */
   isAuthenticated(checkUserToken = false) {
-    return checkUserToken ? this.userId && this.userToken : this.userId;
+    return checkUserToken ? !!(this.userId && this.userToken) : !!this.userId;
   }
 
   // Used to teardown any connected instances
@@ -113,9 +121,14 @@ class Knock {
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
     }
-    if (!this.apiClient) return;
-    if (this.apiClient.socket) {
+    if (this.apiClient?.socket && this.apiClient.socket.isConnected()) {
       this.apiClient.socket.disconnect();
+    }
+  }
+
+  log(message: string) {
+    if (this.logLevel === "debug") {
+      console.log(`[Knock] ${message}`);
     }
   }
 
@@ -149,8 +162,14 @@ class Knock {
 
       this.tokenExpirationTimer = setTimeout(async () => {
         const newToken = await callbackFn(this.userToken as string, decoded);
+
         // Reauthenticate which will handle reinitializing sockets
-        this.authenticate(this.userId!, newToken);
+        if (typeof newToken === "string") {
+          this.authenticate(this.userId!, newToken, {
+            onUserTokenExpiring: callbackFn,
+            timeBeforeExpirationInMs: timeBeforeExpirationInMs,
+          });
+        }
       }, msInFuture);
     }
   }

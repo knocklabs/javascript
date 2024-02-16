@@ -1,4 +1,4 @@
-import Knock, { AuthenticateOptions } from "@knocklabs/client";
+import Knock, { AuthenticateOptions, LogLevel } from "@knocklabs/client";
 import * as React from "react";
 
 import { I18nContent, KnockI18nProvider } from "../../i18n";
@@ -27,11 +27,14 @@ export interface KnockProviderProps {
 
   // i18n translations
   i18n?: I18nContent;
+
+  logLevel?: LogLevel;
 }
 
 export const KnockProvider: React.FC<KnockProviderProps> = ({
   apiKey,
   host,
+  logLevel,
   userId,
   userToken,
   onUserTokenExpiring,
@@ -39,11 +42,25 @@ export const KnockProvider: React.FC<KnockProviderProps> = ({
   children,
   i18n,
 }) => {
-  const knock = useAuthenticatedKnockClient(apiKey, userId, userToken, {
-    host,
-    onUserTokenExpiring,
-    timeBeforeExpirationInMs,
-  });
+  // We memoize the options here so that we don't create a new object on every re-render
+  // TODO: we probably need to put this optimization into the `useAuthenticatedKnockClient`
+  // hook itself to fix this
+  const authenticateOptions = React.useMemo(
+    () => ({
+      host,
+      onUserTokenExpiring,
+      timeBeforeExpirationInMs,
+      logLevel,
+    }),
+    [host, onUserTokenExpiring, timeBeforeExpirationInMs, logLevel],
+  );
+
+  const knock = useAuthenticatedKnockClient(
+    apiKey,
+    userId,
+    userToken,
+    authenticateOptions,
+  );
 
   return (
     <ProviderStateContext.Provider

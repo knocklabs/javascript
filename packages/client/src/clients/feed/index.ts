@@ -15,7 +15,7 @@ class FeedClient {
     const feedInstance = new Feed(this.instance, feedChannelId, options);
     this.feedInstances.push(feedInstance);
 
-    return this.feedInstances;
+    return feedInstance;
   }
 
   removeInstance(feed: Feed) {
@@ -30,7 +30,7 @@ class FeedClient {
 
   reinitializeInstances() {
     for (const feed of this.feedInstances) {
-      feed.initializeRealtimeConnection();
+      feed.reinitialize();
     }
   }
 }

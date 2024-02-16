@@ -1,7 +1,7 @@
-import { Knock } from "@knocklabs/node";
-import { v4 as uuidv4 } from "uuid";
 import { faker } from "@faker-js/faker";
+import { Knock } from "@knocklabs/node";
 import { NextApiRequest, NextApiResponse } from "next";
+import { v4 as uuidv4 } from "uuid";
 
 const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY, {
   host: process.env.NEXT_PUBLIC_KNOCK_HOST,

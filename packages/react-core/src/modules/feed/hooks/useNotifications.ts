@@ -3,15 +3,17 @@ import { useMemo, useRef } from "react";
 
 function useNotifications(
   knock: Knock,
-  feedId: string,
+  feedChannelId: string,
   options: FeedClientOptions = {},
 ) {
   const feedClientRef = useRef<Feed | null>();
 
   return useMemo(() => {
-    if (feedClientRef.current) feedClientRef.current.dispose();
+    if (feedClientRef.current) {
+      feedClientRef.current.dispose();
+    }
 
-    const feedClient = knock.feeds.initialize(feedId, options);
+    const feedClient = knock.feeds.initialize(feedChannelId, options);
 
     feedClient.listenForUpdates();
     feedClientRef.current = feedClient;
@@ -19,7 +21,7 @@ function useNotifications(
     return feedClient;
   }, [
     knock,
-    feedId,
+    feedChannelId,
     options.source,
     options.tenant,
     options.has_tenant,
