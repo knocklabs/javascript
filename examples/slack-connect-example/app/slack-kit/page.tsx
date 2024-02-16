@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Page({ children }: { children: React.ReactNode }) {
+export default function Page() {
   const envVars = [
     { name: "Slack Client Id", value: process.env.NEXT_PUBLIC_SLACK_CLIENT_ID },
     {

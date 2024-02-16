@@ -1,11 +1,8 @@
 import Link from "next/link";
+
 import { getAppDetails } from "../lib/knock";
 
-export default async function Page({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function Page() {
   const appDetails = await getAppDetails();
 
   return (

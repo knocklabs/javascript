@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import {
   getAppDetails,
   getChannelData,
@@ -6,11 +7,7 @@ import {
   getTenant,
 } from "../lib/knock";
 
-export default async function Page({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function Page() {
   const { tenant, collection, objectId } = await getAppDetails();
   const objectRecipientChannelData = await getChannelData(
     collection,

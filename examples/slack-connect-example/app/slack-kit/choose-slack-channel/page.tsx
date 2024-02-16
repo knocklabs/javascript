@@ -3,11 +3,7 @@ import Link from "next/link";
 import SlackChannelWrapper from "../components/slack-channel-wrapper";
 import { getAppDetails } from "../lib/knock";
 
-export default async function Page({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function Page() {
   const { collection, objectId } = await getAppDetails();
   return (
     <>

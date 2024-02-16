@@ -1,12 +1,9 @@
 import Link from "next/link";
+
 import AuthWrapper from "../components/slack-auth-wrapper";
 import { getAppDetails, getTenant } from "../lib/knock";
 
-export default async function Page({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function Page() {
   const { tenant } = await getAppDetails();
   const tenantDetails = await getTenant(tenant);
   return (
