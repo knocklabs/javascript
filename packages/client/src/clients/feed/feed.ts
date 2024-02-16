@@ -742,10 +742,12 @@ class Feed {
       autoManageSocketConnectionDelay ?? DEFAULT_DISCONNECT_DELAY;
 
     document.addEventListener("visibilitychange", () => {
+      const client = this.knock.client();
+
       if (document.visibilityState === "hidden") {
         // When the tab is hidden, clean up the socket connection after a delay
         this.disconnectTimer = setTimeout(() => {
-          // this.knock.client().disconnectSocket();
+          client.socket?.disconnect();
           this.disconnectTimer = null;
         }, disconnectDelay);
       } else if (document.visibilityState === "visible") {
@@ -755,8 +757,6 @@ class Feed {
           clearTimeout(this.disconnectTimer);
           this.disconnectTimer = null;
         }
-
-        const client = this.knock.client();
 
         // If the socket is not connected, try to reconnect
         if (!client.socket?.isConnected()) {
