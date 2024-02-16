@@ -1,9 +1,7 @@
-import Link from "next/link";
-
 import { getAppDetails } from "../lib/app-details";
 import { triggerWorkflow } from "../lib/knock";
 
-export default async function Page() {
+export default async function AuthenticatedContent() {
   const { workflowKey, collection, objectId, tenant } = getAppDetails();
   return (
     <>
@@ -49,9 +47,6 @@ export default async function Page() {
         <textarea name="message" id="" cols={30} rows={10}></textarea>
         <button type="submit">Trigger Workflow</button>
       </form>
-      <Link href="/slack-kit/examine-channel-data">Previous</Link>
     </>
   );
 }
-
-export const dynamic = "force-dynamic";

@@ -2,7 +2,7 @@ import "@knocklabs/react/dist/index.css";
 import jwt from "jsonwebtoken";
 
 import Providers from "./components/providers";
-import { getAppDetails } from "./lib/knock";
+import { getAppDetails } from "./lib/app-details";
 
 const { userId, tenant, collection, objectId } = getAppDetails();
 
@@ -36,10 +36,20 @@ function MyApp({ children }: { children: React.ReactElement }) {
     <>
       <html>
         <body>
-          <h1>SlackKit Demo App</h1>
-          <Providers userToken={userToken} knockUserId={userId} tenant={tenant}>
-            {children}
-          </Providers>
+          {process.env.KNOCK_API_KEY ? (
+            <>
+              <h1>SlackKit Demo App</h1>
+              <Providers
+                userToken={userToken}
+                knockUserId={userId}
+                tenant={tenant}
+              >
+                {children}
+              </Providers>
+            </>
+          ) : (
+            <h1>SlackKit Demo App</h1>
+          )}
         </body>
       </html>
     </>

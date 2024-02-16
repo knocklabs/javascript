@@ -1,25 +1,18 @@
 import Link from "next/link";
 
 import AuthWrapper from "../components/slack-auth-wrapper";
-import { getAppDetails, getTenant } from "../lib/knock";
+import { getAppDetails } from "../lib/app-details";
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function Page() {
   const { tenant } = getAppDetails();
-  const tenantDetails = await getTenant(tenant);
+
   return (
     <>
       <h2>Authenticate with Slack</h2>
       <p>
         In this step, you&apos;ll authenticate with Slack using OAuth. After
         completing the OAuth flow, Knock will store an <code>access_token</code>{" "}
-        property on the channel data for the{" "}
-        <code>{tenantDetails.properties.name}</code> tenant.
+        property on the channel data for the <code>{tenant}</code> tenant.
       </p>
       <p>
         This page uses the <code>SlackAuthButton</code> and{" "}

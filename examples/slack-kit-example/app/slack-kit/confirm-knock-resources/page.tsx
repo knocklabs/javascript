@@ -1,14 +1,8 @@
 import Link from "next/link";
 
-import { getAppDetails } from "../lib/knock";
+import { getAppDetails } from "../lib/app-details";
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function Page() {
   const appDetails = getAppDetails();
 
   return (
