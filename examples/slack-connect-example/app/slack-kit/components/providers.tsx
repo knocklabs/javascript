@@ -2,8 +2,6 @@
 
 import { KnockProvider, KnockSlackProvider } from "@knocklabs/react";
 
-import { getAppDetails } from "../lib/knock";
-
 export default function Providers({
   knockToken,
   knockUserId,

@@ -20,7 +20,7 @@ export default async function Page() {
         <code>SlackAuthContainer</code> components to facilitate the OAuth flow
         between Slack and Knock's API.
       </p>
-      <AuthWrapper tenant={tenant}></AuthWrapper>
+      <AuthWrapper></AuthWrapper>
       <Link href="/slack-kit/confirm-knock-resources">Previous</Link>
       <Link href="/slack-kit/choose-slack-channel">Next</Link>
     </>

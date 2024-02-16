@@ -5,7 +5,7 @@ import {
   ConnectToSlackContainer,
 } from "@knocklabs/react";
 
-export default function AuthWrapper({ tenant }: { tenant: string }) {
+export default function AuthWrapper() {
   return (
     <div>
       <ConnectToSlackContainer
