@@ -71,8 +71,8 @@ export default async function Page() {
 }
         `}
       </pre>
-      <Link href="/slack-kit/choose-slack-channel">Previous</Link>
-      <Link href="/slack-kit/trigger-workflow">Next</Link>
+      <Link href="/choose-slack-channel">Previous</Link>
+      <Link href="/trigger-workflow">Next</Link>
     </>
   );
 }

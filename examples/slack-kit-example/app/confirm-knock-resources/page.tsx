@@ -37,8 +37,7 @@ export default async function Page() {
         {appDetails.workflowKey ? "✅" : "❌"} Knock Workflow Key:{" "}
         {appDetails.workflowKey}
       </p>
-      <Link href="/slack-kit">Previous</Link>|
-      <Link href="/slack-kit/initiate-auth">Next</Link>
+      <Link href="/">Previous</Link>|<Link href="/initiate-auth">Next</Link>
     </>
   );
 }

@@ -30,8 +30,8 @@ export default async function Page() {
         collection={collection}
         objectId={objectId}
       ></SlackChannelWrapper>
-      <Link href="/slack-kit/initiate-auth">Previous</Link>
-      <Link href="/slack-kit/examine-channel-data">Next</Link>
+      <Link href="/initiate-auth">Previous</Link>
+      <a href="/examine-channel-data">Next</a>
     </>
   );
 }

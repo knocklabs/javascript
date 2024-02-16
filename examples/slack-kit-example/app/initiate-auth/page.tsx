@@ -20,8 +20,8 @@ export default async function Page() {
         between Slack and Knock's API.
       </p>
       <AuthWrapper></AuthWrapper>
-      <Link href="/slack-kit/confirm-knock-resources">Previous</Link>
-      <Link href="/slack-kit/choose-slack-channel">Next</Link>
+      <Link href="/confirm-knock-resources">Previous</Link>
+      <Link href="/choose-slack-channel">Next</Link>
     </>
   );
 }

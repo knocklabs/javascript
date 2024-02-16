@@ -34,7 +34,7 @@ export default function Page() {
           </p>
         );
       })}
-      <Link href="/slack-kit/confirm-knock-resources">Next</Link>
+      <Link href="/confirm-knock-resources">Next</Link>
     </>
   );
 }

@@ -43,13 +43,14 @@ export default async function Page() {
       <form
         action={async (formData: FormData) => {
           "use server";
+          console.log("getting called");
           await triggerWorkflow(formData);
         }}
       >
         <textarea name="message" id="" cols={30} rows={10}></textarea>
         <button type="submit">Trigger Workflow</button>
       </form>
-      <Link href="/slack-kit/examine-channel-data">Previous</Link>
+      <Link href="/examine-channel-data">Previous</Link>
     </>
   );
 }
