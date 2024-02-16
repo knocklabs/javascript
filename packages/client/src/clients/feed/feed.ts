@@ -83,9 +83,6 @@ class Feed {
 
     // Reinitialize our broadcast channel
     this.setupBroadcastChannel();
-
-    // Refetch the store state
-    this.fetch();
   }
 
   /**
@@ -115,7 +112,6 @@ class Feed {
     this.knock.log("[Feed] Disposing of feed instance");
     this.teardown();
     this.broadcaster.removeAllListeners();
-    this.store.setState((store) => store.resetStore());
     this.knock.feeds.removeInstance(this);
   }
 
@@ -765,7 +761,6 @@ class Feed {
         // If the socket is not connected, try to reconnect
         if (!client.socket?.isConnected()) {
           this.initializeRealtimeConnection();
-          this.fetch();
         }
       }
     });
