@@ -38,20 +38,10 @@ function MyApp({ children }: { children: React.ReactElement }) {
     <>
       <html>
         <body>
-          {process.env.KNOCK_API_KEY ? (
-            <>
-              <h1>SlackKit Demo App</h1>
-              <Providers
-                userToken={userToken}
-                knockUserId={userId}
-                tenant={tenant}
-              >
-                {children}
-              </Providers>
-            </>
-          ) : (
-            <h1>SlackKit Demo App</h1>
-          )}
+          <h1>SlackKit Demo App</h1>
+          <Providers userToken={userToken} knockUserId={userId} tenant={tenant}>
+            {children}
+          </Providers>
         </body>
       </html>
     </>
