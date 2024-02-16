@@ -43,7 +43,6 @@ export default async function Page() {
       <form
         action={async (formData: FormData) => {
           "use server";
-          console.log("getting called");
           await triggerWorkflow(formData);
         }}
       >

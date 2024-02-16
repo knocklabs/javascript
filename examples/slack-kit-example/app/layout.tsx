@@ -2,6 +2,7 @@ import "@knocklabs/react/dist/index.css";
 import jwt from "jsonwebtoken";
 
 import Providers from "./components/providers";
+// import "./global.css";
 import { getAppDetails } from "./lib/app-details";
 
 const { userId, tenant, collection, objectId } = getAppDetails();
