@@ -19,7 +19,7 @@ export default async function Page() {
     <>
       <h2>Confirm Channel Data</h2>
       <p>
-        In this step, we'll look at how Knock stores you Slack{" "}
+        In this step, we'll look at how Knock stores your Slack{" "}
         <code>access_token</code> and Slack channel connections as channel data
         on the <code>{tenant}</code> tenant and <code>{objectId}</code> object
         recipient.{" "}
