@@ -1,5 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { AxiosError } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 

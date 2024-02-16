@@ -13,7 +13,7 @@ import {
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { IoDocument, IoLogoGithub } from "react-icons/io5";
 
 import NotificationFeed from "../components/NotificationFeed";
@@ -33,26 +33,17 @@ const TenantLabels = {
 
 export default function Home() {
   const { userId, isLoading, userToken } = useIdentify();
-  const [currentUserToken, setCurrentUserToken] = useState(null);
   const [tenant, setTenant] = useState(Tenants.TeamA);
-
-  useEffect(() => {
-    if (userToken) {
-      setCurrentUserToken(userToken);
-    }
-  }, [userToken]);
 
   const tokenRefreshHandler = useCallback(async () => {
     // Refresh the user token 1s before it expires
     const res = await fetch(`/api/auth?id=${userId}`);
     const json = await res.json();
 
-    setCurrentUserToken(json.userToken);
+    return json.userToken;
+  }, [userId]);
 
-    return;
-  }, [userId, setCurrentUserToken]);
-
-  if (isLoading || !currentUserToken) {
+  if (isLoading || !userToken) {
     return (
       <Flex
         alignItems="center"
@@ -68,7 +59,7 @@ export default function Home() {
   return (
     <KnockProvider
       userId={userId}
-      userToken={currentUserToken || undefined}
+      userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
       onUserTokenExpiring={tokenRefreshHandler}
