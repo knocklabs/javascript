@@ -10,7 +10,7 @@ const currentTime = Math.floor(Date.now() / 1000);
 const expireInSeconds = 60 * 60;
 const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
-const knockToken = jwt.sign(
+const userToken = jwt.sign(
   {
     sub: userId,
     iat: currentTime,
@@ -37,11 +37,7 @@ function MyApp({ children }: { children: React.ReactElement }) {
       <html>
         <body>
           <h1>SlackKit Demo App</h1>
-          <Providers
-            knockToken={knockToken}
-            knockUserId={userId}
-            tenant={tenant}
-          >
+          <Providers userToken={userToken} knockUserId={userId} tenant={tenant}>
             {children}
           </Providers>
         </body>

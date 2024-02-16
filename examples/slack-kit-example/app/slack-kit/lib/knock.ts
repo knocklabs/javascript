@@ -41,7 +41,6 @@ export async function getObject(collection: string, objectId: string) {
 
 export async function triggerWorkflow(formData: FormData) {
   "use server";
-  console.log("getting called");
   const { workflowKey, collection, objectId, tenant } = await getAppDetails();
   const result = await knockClient.workflows.trigger(workflowKey, {
     recipients: [
@@ -55,5 +54,5 @@ export async function triggerWorkflow(formData: FormData) {
       message: formData.get("message"),
     },
   });
-  console.log(result);
+  return result;
 }

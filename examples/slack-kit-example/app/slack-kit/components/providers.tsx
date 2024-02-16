@@ -3,12 +3,12 @@
 import { KnockProvider, KnockSlackProvider } from "@knocklabs/react";
 
 export default function Providers({
-  knockToken,
+  userToken,
   knockUserId,
   tenant,
   children,
 }: {
-  knockToken: string;
+  userToken: string;
   knockUserId: string;
   tenant: string;
   children: JSX.Element;
@@ -19,7 +19,7 @@ export default function Providers({
         apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
         userId={knockUserId}
         host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
-        userToken={knockToken}
+        userToken={userToken}
       >
         <KnockSlackProvider
           knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
