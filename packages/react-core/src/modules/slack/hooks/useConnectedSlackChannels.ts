@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useKnockClient } from "../../core";
 
 type UseSlackChannelsProps = {
-  connectionsObject: ContainerObject;
+  slackChannelsRecipientObject: ContainerObject;
 };
 
 type UseSlackChannelOutput = {
@@ -19,7 +19,7 @@ type UseSlackChannelOutput = {
 };
 
 function useConnectedSlackChannels({
-  connectionsObject: { objectId, collection },
+  slackChannelsRecipientObject: { objectId, collection },
 }: UseSlackChannelsProps): UseSlackChannelOutput {
   const knock = useKnockClient();
   const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();

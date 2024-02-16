@@ -1,8 +1,8 @@
-import { KnockSlackProvider } from "@knocklabs/react";
 import {
-  ConnectToSlackButton,
-  ConnectToSlackContainer,
   KnockProvider,
+  KnockSlackProvider,
+  SlackAuthButton,
+  SlackAuthContainer,
   SlackChannelCombobox,
 } from "@knocklabs/react";
 
@@ -21,7 +21,7 @@ export default function Home() {
   };
   const redirectUrl = "http://localhost:3001/";
 
-  const connectionsObject = {
+  const slackChannelsRecipientObject = {
     objectId: process.env.NEXT_PUBLIC_CONNECTIONS_OBJECT_ID!,
     collection: process.env.NEXT_PUBLIC_CONNECTIONS_COLLECTION!,
   };
@@ -29,7 +29,7 @@ export default function Home() {
   const { isLoading, isError } = useSetToken({
     tenant,
     user,
-    connectionsObject,
+    slackChannelsRecipientObject,
   });
 
   if (isLoading) {
@@ -75,7 +75,7 @@ export default function Home() {
                 Slack Channel Picker
               </div>
               <div style={{ margin: "10px", padding: "10px" }}>
-                <SlackChannelCombobox connectionsObject={connectionsObject} />
+                <SlackChannelCombobox slackChannelsRecipientObject={slackChannelsRecipientObject} />
               </div>
             </div>
             <div>
@@ -104,7 +104,7 @@ export default function Home() {
                   Button
                 </div>
                 <div style={{ margin: "10px", padding: "10px" }}>
-                  <ConnectToSlackButton
+                  <SlackAuthButton
                     slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                     redirectUrl={redirectUrl}
                   />
@@ -123,9 +123,9 @@ export default function Home() {
                 Container with button
               </div>
               <div style={{ margin: "10px", padding: "10px" }}>
-                <ConnectToSlackContainer
+                <SlackAuthContainer
                   actionButton={
-                    <ConnectToSlackButton
+                    <SlackAuthButton
                       slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                       redirectUrl={redirectUrl}
                     />

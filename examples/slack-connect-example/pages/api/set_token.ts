@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,7 +12,7 @@ export default async function handler(
       .json({ error: `${req.method} method is not accepted.` });
   }
 
-  const { tenant, user, connectionsObject } = req.body;
+  const { tenant, user, slackChannelsRecipientObject } = req.body;
   try {
     const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
@@ -31,7 +31,7 @@ export default async function handler(
           [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
             "slack/channels_read": [{}],
           },
-          [`https://api.knock.app/v1/objects/${connectionsObject.collection}/${connectionsObject.objectId}`]:
+          [`https://api.knock.app/v1/objects/${slackChannelsRecipientObject.collection}/${slackChannelsRecipientObject.objectId}`]:
             {
               "channel_data/read": [{}],
               "channel_data/write": [{}],

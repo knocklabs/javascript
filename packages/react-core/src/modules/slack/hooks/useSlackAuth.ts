@@ -13,15 +13,15 @@ const DEFAULT_SLACK_SCOPES = [
   "groups:write",
 ];
 
-type UseManageSlackConnectionOutput = {
+type UseSlackAuthOutput = {
   buildSlackAuthUrl: () => string;
   disconnectFromSlack: () => void;
 };
 
-function useManageSlackConnection(
+function useSlackAuth(
   slackClientId: string,
   redirectUrl?: string,
-): UseManageSlackConnectionOutput {
+): UseSlackAuthOutput {
   const knock = useKnockClient();
   const { setConnectionStatus, knockSlackChannelId, tenant, setActionLabel } =
     useKnockSlackClient();
@@ -82,4 +82,4 @@ function useManageSlackConnection(
   };
 }
 
-export default useManageSlackConnection;
+export default useSlackAuth;

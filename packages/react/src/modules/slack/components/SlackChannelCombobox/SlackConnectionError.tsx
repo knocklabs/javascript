@@ -2,7 +2,7 @@ import { useKnockSlackClient } from "@knocklabs/react-core";
 
 import InfoIcon from "./icons/InfoIcon";
 
-const ConnectionErrorInfoBoxes = () => {
+const SlackConnectionError = () => {
   const { connectionStatus } = useKnockSlackClient();
 
   if (connectionStatus === "disconnected" || connectionStatus === "error") {
@@ -24,4 +24,4 @@ const ConnectionErrorInfoBoxes = () => {
   return <div />;
 };
 
-export default ConnectionErrorInfoBoxes;
+export default SlackConnectionError;

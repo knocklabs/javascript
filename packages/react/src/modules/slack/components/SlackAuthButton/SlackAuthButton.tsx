@@ -1,7 +1,7 @@
 import {
   useKnockClient,
   useKnockSlackClient,
-  useManageSlackConnection,
+  useSlackAuth,
 } from "@knocklabs/react-core";
 import { useEffect } from "react";
 
@@ -37,7 +37,7 @@ const openSlackOauthPopup = (url: string) => {
   window.open(url, "Slack OAuth", features);
 };
 
-export const ConnectToSlackButton: React.FC<Props> = ({
+export const SlackAuthButton: React.FC<Props> = ({
   slackClientId,
   redirectUrl,
 }) => {
@@ -51,7 +51,7 @@ export const ConnectToSlackButton: React.FC<Props> = ({
     errorLabel,
   } = useKnockSlackClient();
 
-  const { buildSlackAuthUrl, disconnectFromSlack } = useManageSlackConnection(
+  const { buildSlackAuthUrl, disconnectFromSlack } = useSlackAuth(
     slackClientId,
     redirectUrl,
   );

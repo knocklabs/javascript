@@ -1,7 +1,7 @@
 import { SlackIcon } from "../SlackIcon";
 import "./styles.css";
 
-export const ConnectToSlackContainer = ({
+export const SlackAuthContainer = ({
   actionButton,
 }: {
   actionButton: React.ReactElement;

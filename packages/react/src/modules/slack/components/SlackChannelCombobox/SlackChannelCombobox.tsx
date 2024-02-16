@@ -13,9 +13,9 @@ import { useFilter } from "react-aria";
 
 import { Spinner, useOutsideClick } from "../../../core";
 
-import AddConnectedSlackChannelInput from "./AddConnectedSlackChannelInput";
-import ConnectionErrorInfoBoxes from "./ConnectionErrorInfoBoxes";
+import SlackAddChannelInput from "./SlackAddChannelInput";
 import SlackChannelListBox from "./SlackChannelListBox";
+import SlackConnectionError from "./SlackConnectionError";
 import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
@@ -39,7 +39,7 @@ type SlackChannelComboboxInputMessages = {
 };
 
 type Props = {
-  connectionsObject: ContainerObject;
+  slackChannelsRecipientObject: ContainerObject;
   queryOptions?: SlackChannelQueryOptions;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   inputContainerProps?: React.HTMLAttributes<HTMLDivElement>;
@@ -49,7 +49,7 @@ type Props = {
 };
 
 export const SlackChannelCombobox = ({
-  connectionsObject,
+  slackChannelsRecipientObject,
   queryOptions,
   inputProps,
   inputContainerProps,
@@ -70,7 +70,7 @@ export const SlackChannelCombobox = ({
     loading: connectedChannelsLoading,
     error: connectedChannelsError,
     updating: connectedChannelsUpdating,
-  } = useConnectedSlackChannels({ connectionsObject });
+  } = useConnectedSlackChannels({ slackChannelsRecipientObject });
 
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
@@ -194,7 +194,7 @@ export const SlackChannelCombobox = ({
 
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
-      <AddConnectedSlackChannelInput
+      <SlackAddChannelInput
         inErrorState={!!inErrorState}
         connectedChannels={currentConnectedChannels || []}
         updateConnectedChannels={updateConnectedChannels}
@@ -241,7 +241,7 @@ export const SlackChannelCombobox = ({
                 />
               </div>
             </div>
-            <ConnectionErrorInfoBoxes />
+            <SlackConnectionError />
           </div>
         </Popover.Trigger>
 

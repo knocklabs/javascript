@@ -1,4 +1,4 @@
-export * from "./components/ConnectToSlackButton";
-export * from "./components/ConnectToSlackContainer";
+export * from "./components/SlackAuthButton";
+export * from "./components/SlackAuthContainer";
 export * from "./components/SlackChannelCombobox";
 

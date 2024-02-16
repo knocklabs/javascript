@@ -3,14 +3,18 @@ import useSWR from "swr";
 
 import { setToken } from "../lib/api";
 
-const useSetToken = ({tenant, user, connectionsObject,}: {
+const useSetToken = ({
+  tenant,
+  user,
+  slackChannelsRecipientObject,
+}: {
   tenant: string;
   user: { id: string };
-  connectionsObject: { objectId: string; collection: string };
+  slackChannelsRecipientObject: { objectId: string; collection: string };
 }) => {
   const { data, error } = useSWR(
     ["/api/set_token"],
-    () => setToken({ tenant, user, connectionsObject }),
+    () => setToken({ tenant, user, slackChannelsRecipientObject }),
     {},
   );
 

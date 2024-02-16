@@ -3,11 +3,11 @@ import { useState } from "react";
 
 import { SlackIcon } from "../SlackIcon";
 
-import ConnectionErrorInfoBoxes from "./ConnectionErrorInfoBoxes";
+import ConnectionErrorInfoBoxes from "./SlackConnectionError";
 import "./styles.css";
 import { Spinner } from "../../../core";
 
-const AddConnectedSlackChannelInput = ({
+const SlackAddChannelInput = ({
   inErrorState,
   connectedChannels = [],
   updateConnectedChannels,
@@ -70,4 +70,4 @@ const AddConnectedSlackChannelInput = ({
   );
 };
 
-export default AddConnectedSlackChannelInput;
+export default SlackAddChannelInput;
