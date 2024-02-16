@@ -9,9 +9,9 @@ export function getAppDetails() {
   return {
     //TODO: Rename to tenant and collection to remain consistent with component params
     tenant: "knock-projects",
-    collection: "repostitories",
+    collection: "repositories",
     objectId: "repo-2",
-    userId: "clobp9y8k000014nuhhwvllft",
+    userId: "123",
     workflowKey: "new-issue",
   };
 }
