@@ -49,17 +49,15 @@ class ApiClient {
       retryCondition: this.canRetryRequest,
       retryDelay: axiosRetry.exponentialDelay,
     });
-  }
 
-  initializeSocket() {
-    if (typeof window === "undefined") return;
-
-    this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
-      params: {
-        user_token: this.userToken,
-        api_key: this.apiKey,
-      },
-    });
+    if (typeof window !== "undefined") {
+      this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
+        params: {
+          user_token: this.userToken,
+          api_key: this.apiKey,
+        },
+      });
+    }
   }
 
   async makeRequest(req: AxiosRequestConfig): Promise<ApiResponse> {
