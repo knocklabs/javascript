@@ -9,12 +9,12 @@ export default async function Page() {
       <h2>Trigger a Workflow</h2>
       <p>
         Now that you have a good understanding of how the SlackKit components
-        work with Knock primitives like Objects and Tenants, let's actually send
-        a message.
+        work with Knock primitives like Objects and Tenants, let&apos;s actually
+        send a message.
       </p>
       <p>
-        Under the hood, we'll call a server action that's going to run this code
-        using the values you provided:
+        Under the hood, we&apos;ll call a server action that&apos;s going to run
+        this code using the values you provided:
       </p>
       <pre>
         {`

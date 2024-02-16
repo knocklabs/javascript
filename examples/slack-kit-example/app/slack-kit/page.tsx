@@ -21,10 +21,10 @@ export default function Page() {
     <>
       <h2>Welcome to the SlackKit example app</h2>
       <p>
-        Using this app, you'll learn how to use Knock's SlackKit components to
-        make working with Slack apps easy. In this step, we'll check to make
-        sure you have the right environment variables declared to work with the
-        Knock SDK and Slack.
+        Using this app, you&apos;ll learn how to use Knock&apos;s SlackKit
+        components to make working with Slack apps easy. In this step,
+        we&apos;ll check to make sure you have the right environment variables
+        declared to work with the Knock SDK and Slack.
       </p>
       {envVars.map((envVar) => {
         return (

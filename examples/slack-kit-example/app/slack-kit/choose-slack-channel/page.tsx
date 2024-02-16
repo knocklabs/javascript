@@ -9,7 +9,7 @@ export default async function Page() {
     <>
       <h2>Choose a Slack Channel</h2>
       <p>
-        In this step, you'll associate one or more Slack channels with the{" "}
+        In this step, you&apos;ll associate one or more Slack channels with the{" "}
         <code>{objectId}</code> object in the <code>{collection}</code>{" "}
         collection. Knock will store these Slack channel ids as channel data on
         your selected object.

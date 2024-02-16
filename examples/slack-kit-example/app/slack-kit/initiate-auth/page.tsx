@@ -10,7 +10,7 @@ export default async function Page() {
     <>
       <h2>Authenticate with Slack</h2>
       <p>
-        In this step, you'll authenticate with Slack using OAuth. After
+        In this step, you&apos;ll authenticate with Slack using OAuth. After
         completing the OAuth flow, Knock will store an <code>access_token</code>{" "}
         property on the channel data for the{" "}
         <code>{tenantDetails.properties.name}</code> tenant.

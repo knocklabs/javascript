@@ -9,14 +9,14 @@ export default async function Page() {
     <>
       <h2>Confirm Your Knock Resources</h2>
       <p>
-        In this step, we'll check to make sure you've defined all of the Knock
-        resources you'll need to complete this application. If you're missing
-        any variables, please add them to your code in the{" "}
+        In this step, we&apos;ll check to make sure you've defined all of the
+        Knock resources you&apos;ll need to complete this application. If
+        you&apos;re missing any variables, please add them to your code in the{" "}
         <code>/app/lib/knock.ts</code> file and refresh the page.
       </p>
       <p>
-        Typically, these values would come from your application's business
-        logic, but for this app we'll just hardcode them in the{" "}
+        Typically, these values would come from your application&apos;s business
+        logic, but for this app we&apos;ll just hardcode them in the{" "}
         <code>getAppDetails</code> function.
       </p>
       <p>

@@ -19,22 +19,22 @@ export default async function Page() {
     <>
       <h2>Confirm Channel Data</h2>
       <p>
-        In this step, we'll look at how Knock stores your Slack{" "}
+        In this step, we&apos;ll look at how Knock stores your Slack{" "}
         <code>access_token</code> and Slack channel connections as channel data
         on the <code>{tenant}</code> tenant and <code>{objectId}</code> object
         recipient.{" "}
       </p>
       <p>
-        We've fetched this channel data for you from the resources you
+        We&apos;ve fetched this channel data for you from the resources you
         designated in the app.
       </p>
 
       <h3>Tenant</h3>
       <p>
-        Your designated tenant stores your Slack bot's <code>access_token</code>{" "}
-        as channel data. When you trigger a workflow and pass{" "}
-        <code>{tenant}</code> for the <code>tenant</code> property, Slack
-        channel steps will use this token for any Slack messages.{" "}
+        Your designated tenant stores your Slack bot&apos;s{" "}
+        <code>access_token</code> as channel data. When you trigger a workflow
+        and pass <code>{tenant}</code> for the <code>tenant</code> property,
+        Slack channel steps will use this token for any Slack messages.{" "}
       </p>
       <pre style={{ maxWidth: "800px" }}>
         {`
