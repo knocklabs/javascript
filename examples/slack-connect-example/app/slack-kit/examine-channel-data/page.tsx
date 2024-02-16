@@ -1,11 +1,6 @@
 import Link from "next/link";
 
-import {
-  getAppDetails,
-  getChannelData,
-  getObject,
-  getTenant,
-} from "../lib/knock";
+import { getAppDetails, getChannelData } from "../lib/knock";
 
 export default async function Page() {
   const { tenant, collection, objectId } = await getAppDetails();

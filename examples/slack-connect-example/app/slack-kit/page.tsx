@@ -16,7 +16,6 @@ export default function Page() {
       value: process.env.KNOCK_API_KEY,
     },
   ];
-  const hasRequiredVariables = envVars.every((envVar) => envVar.value);
 
   return (
     <>
