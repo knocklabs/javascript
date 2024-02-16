@@ -2,7 +2,13 @@ import Link from "next/link";
 
 import { getAppDetails } from "../lib/knock";
 
-export default async function Page() {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const appDetails = getAppDetails();
 
   return (
@@ -42,3 +48,4 @@ export default async function Page() {
     </>
   );
 }
+export const dynamic = "force-dynamic";

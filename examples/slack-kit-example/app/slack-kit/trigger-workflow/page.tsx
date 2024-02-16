@@ -2,7 +2,13 @@ import Link from "next/link";
 
 import { getAppDetails, triggerWorkflow } from "../lib/knock";
 
-export default async function Page() {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const { workflowKey, collection, objectId, tenant } = getAppDetails();
   return (
     <>
@@ -52,3 +58,5 @@ export default async function Page() {
     </>
   );
 }
+
+export const dynamic = "force-dynamic";

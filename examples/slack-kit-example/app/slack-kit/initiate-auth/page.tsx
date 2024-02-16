@@ -3,7 +3,13 @@ import Link from "next/link";
 import AuthWrapper from "../components/slack-auth-wrapper";
 import { getAppDetails, getTenant } from "../lib/knock";
 
-export default async function Page() {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const { tenant } = getAppDetails();
   const tenantDetails = await getTenant(tenant);
   return (
@@ -26,3 +32,4 @@ export default async function Page() {
     </>
   );
 }
+export const dynamic = "force-dynamic";
