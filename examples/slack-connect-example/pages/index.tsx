@@ -1,15 +1,17 @@
 import { KnockSlackProvider } from "@knocklabs/react";
-import { ConnectToSlackButton, ConnectToSlackContainer, KnockProvider, SlackChannelCombobox } from "@knocklabs/react";
-
-
+import {
+  ConnectToSlackButton,
+  ConnectToSlackContainer,
+  KnockProvider,
+  SlackChannelCombobox,
+} from "@knocklabs/react";
 
 import { useSetToken } from "../hooks";
-
 
 export default function Home() {
   const tenant = process.env.NEXT_PUBLIC_TENANT!;
   const user = {
-    id: "clobp9y8k000014nuhhwvllft",
+    id: "123",
     email: "",
     name: "",
     phone_number: "",
