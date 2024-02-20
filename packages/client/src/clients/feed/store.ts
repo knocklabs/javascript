@@ -1,5 +1,7 @@
 import create from "zustand/vanilla";
+
 import { NetworkStatus } from "../../networkStatus";
+
 import { FeedItem } from "./interfaces";
 import { FeedStoreState } from "./types";
 import { deduplicateItems, sortItems } from "./utils";
@@ -37,9 +39,6 @@ export default function createStore() {
     // The network status indicates what's happening with the request
     networkStatus: NetworkStatus.ready,
     loading: false,
-    // TODO: remove this function from the store as we're now using the
-    // `setNetworkStatus` function to derive this information instead
-    setLoading: (loading) => set(() => ({ loading })),
 
     setNetworkStatus: (networkStatus: NetworkStatus) =>
       set(() => ({

@@ -13,7 +13,7 @@ import {
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { IoDocument, IoLogoGithub } from "react-icons/io5";
 
 import NotificationFeed from "../components/NotificationFeed";
@@ -35,6 +35,14 @@ export default function Home() {
   const { userId, isLoading, userToken } = useIdentify();
   const [tenant, setTenant] = useState(Tenants.TeamA);
 
+  const tokenRefreshHandler = useCallback(async () => {
+    // Refresh the user token 1s before it expires
+    const res = await fetch(`/api/auth?id=${userId}`);
+    const json = await res.json();
+
+    return json.userToken;
+  }, [userId]);
+
   if (isLoading || !userToken) {
     return (
       <Flex
@@ -50,25 +58,17 @@ export default function Home() {
 
   return (
     <KnockProvider
-      userId={userId as any}
+      userId={userId}
       userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
-      onUserTokenExpiring={async () => {
-        // Refresh the user token 1s before it expires
-        const res = await fetch(`/api/auth?id=${userId}`);
-        const json = await res.json();
-        return json.userToken;
-      }}
-      timeBeforeExpirationInMs={1000}
+      onUserTokenExpiring={tokenRefreshHandler}
+      timeBeforeExpirationInMs={5000}
+      logLevel="debug"
     >
       <KnockFeedProvider
         feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
-        defaultFeedOptions={{
-          tenant,
-          auto_manage_socket_connection: true,
-          auto_manage_socket_connection_delay: 2500,
-        }}
+        defaultFeedOptions={{ tenant }}
       >
         <NotificationFeedContainer>
           <Box maxW="520px" mx="auto" py={12}>

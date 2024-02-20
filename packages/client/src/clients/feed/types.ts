@@ -1,5 +1,7 @@
 import { PageInfo } from "@knocklabs/types";
+
 import { NetworkStatus } from "../../networkStatus";
+
 import { FeedItem, FeedMetadata, FeedResponse } from "./interfaces";
 
 export type StoreFeedResultOptions = {
@@ -15,7 +17,6 @@ export type FeedStoreState = {
   networkStatus: NetworkStatus;
   setResult: (response: FeedResponse, opts?: StoreFeedResultOptions) => void;
   setMetadata: (metadata: FeedMetadata) => void;
-  setLoading: (loading: boolean) => void;
   setNetworkStatus: (networkStatus: NetworkStatus) => void;
   setItemAttrs: (itemIds: string[], attrs: object) => void;
   resetStore: (metadata?: FeedMetadata) => void;
