@@ -7,17 +7,17 @@ export default async function Page() {
   const { workflowKey, collection, objectId, tenant } = getAppDetails();
   return (
     <>
-      <h2>Trigger a Workflow</h2>
-      <p>
+      <h2 className="text-xl font-bold my-4">Trigger a Workflow</h2>
+      <p className="mb-4">
         Now that you have a good understanding of how the SlackKit components
         work with Knock primitives like Objects and Tenants, let&apos;s actually
         send a message.
       </p>
-      <p>
+      <p className="mb-4">
         Under the hood, we&apos;ll call a server action that&apos;s going to run
         this code using the values you provided:
       </p>
-      <pre>
+      <pre className="text-xs bg-zinc-900 text-white rounded-md">
         {`
   await knockClient.workflows.trigger(${workflowKey}, {
     recipients: [
@@ -33,23 +33,38 @@ export default async function Page() {
   });
           `}
       </pre>
-      <p>
+      <p className="my-4">
         As you can see, you pass the Object storing the Slack{" "}
-        <code>channel_id</code> as a recipient and specify the tenant with the{" "}
-        <code>access_token</code> using the <code>tenant</code> option.
+        <code className="text-[#E95744]">channel_id</code> as a recipient and
+        specify the tenant with the{" "}
+        <code className="text-[#E95744]">access_token</code> using the{" "}
+        <code className="text-[#E95744]">tenant</code> option.
       </p>
-      <p>Go ahead and submit the form below to test your Slack integration.</p>
+      <p className="mb-4">
+        Go ahead and submit the form below to test your Slack integration.
+      </p>
 
       <form
+        className="block"
         action={async (formData: FormData) => {
           "use server";
           await triggerWorkflow(formData);
         }}
       >
         <textarea name="message" id="" cols={30} rows={10}></textarea>
-        <button type="submit">Trigger Workflow</button>
+        <button
+          className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+          type="submit"
+        >
+          Trigger Workflow
+        </button>
       </form>
-      <Link href="/examine-channel-data">Previous</Link>
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/examine-channel-data"
+      >
+        Previous
+      </Link>
     </>
   );
 }

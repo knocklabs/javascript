@@ -17,26 +17,29 @@ export default async function Page() {
   );
   return (
     <>
-      <h2>Confirm Channel Data</h2>
-      <p>
+      <h2 className="text-xl font-bold my-4">Confirm Channel Data</h2>
+      <p className="mb-4">
         In this step, we&apos;ll look at how Knock stores your Slack{" "}
-        <code>access_token</code> and Slack channel connections as channel data
-        on the <code>{tenant}</code> tenant and <code>{objectId}</code> object
-        recipient.{" "}
+        <code className="text-[#E95744]">access_token</code> and Slack channel
+        connections as channel data on the{" "}
+        <code className="text-[#E95744]">{tenant}</code> tenant and{" "}
+        <code className="text-[#E95744]">{objectId}</code> object recipient.{" "}
       </p>
-      <p>
+      <p className="mb-4">
         We&apos;ve fetched this channel data for you from the resources you
         designated in the app.
       </p>
 
-      <h3>Tenant</h3>
-      <p>
+      <h3 className="text-lg font-bold my-4">Tenant</h3>
+      <p className="mb-4">
         Your designated tenant stores your Slack bot&apos;s{" "}
-        <code>access_token</code> as channel data. When you trigger a workflow
-        and pass <code>{tenant}</code> for the <code>tenant</code> property,
-        Slack channel steps will use this token for any Slack messages.{" "}
+        <code className="text-[#E95744]">access_token</code> as channel data.
+        When you trigger a workflow and pass{" "}
+        <code className="text-[#E95744]">{tenant}</code> for the{" "}
+        <code className="text-[#E95744]">tenant</code> property, Slack channel
+        steps will use this token for any Slack messages.{" "}
       </p>
-      <pre style={{ maxWidth: "800px" }}>
+      <pre className="text-xs p-2 bg-zinc-900 text-white rounded-md">
         {`
 {
   "__typename": "ChannelData",
@@ -50,29 +53,56 @@ export default async function Page() {
 }
         `}
       </pre>
-      <h3>Object Recipient</h3>
-      <p>
-        Your object recipient stores the <code>channel_id</code> inside an
-        object on the <code>connections</code> array. When <code>objectId</code>{" "}
-        is passed as a workflow recipient, Knock will generate a Slack
-        notification for each connection in the <code>connections</code> array.
+      <h3 className="text-lg font-bold my-4">Object Recipient</h3>
+      <p className="mb-4">
+        Your object recipient stores the{" "}
+        <code className="text-[#E95744]">channel_id</code> inside an object on
+        the <code className="text-[#E95744]">connections</code> array. When{" "}
+        <code className="text-[#E95744]">objectId</code> is passed as a workflow
+        recipient, Knock will generate a Slack notification for each connection
+        in the <code className="text-[#E95744]">connections</code> array.
       </p>
-      <pre>
+      <pre className="text-xs p-2 bg-zinc-900 text-white rounded-md">
         {`
 {
   "__typename": "ChannelData",
   "channel_id": ${objectRecipientChannelData.channel_id},
   "data": {
     "connections": [
-      ${objectRecipientChannelData.data.connections.map((connection: object) => JSON.stringify(connection)).join(",/n")}  
+      ${objectRecipientChannelData.data.connections.map(
+        (connection: {
+          access_token: any;
+          channel_id: any;
+          incoming_webhook: any;
+          user_id: any;
+        }) => {
+          return `
+          {
+            "access_token": ${connection.access_token},
+            "channel_id": ${connection.channel_id},
+            "incoming_webhook": ${connection.incoming_webhook},
+            "user_id": ${connection.user_id}
+          }`;
+        },
+      )}  
     ],
     "token": ${objectRecipientChannelData.data.token}
   }
 }
         `}
       </pre>
-      <Link href="/choose-slack-channel">Previous</Link>
-      <Link href="/trigger-workflow">Next</Link>
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/choose-slack-channel"
+      >
+        Previous
+      </Link>
+      <Link
+        className="mt-6 mx-4 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/trigger-workflow"
+      >
+        Next
+      </Link>
     </>
   );
 }

@@ -8,20 +8,33 @@ export default async function Page() {
 
   return (
     <>
-      <h2>Authenticate with Slack</h2>
-      <p>
+      <h2 className="text-xl font-bold my-4">Authenticate with Slack</h2>
+      <p className="mb-4">
         In this step, you&apos;ll authenticate with Slack using OAuth. After
-        completing the OAuth flow, Knock will store an <code>access_token</code>{" "}
-        property on the channel data for the <code>{tenant}</code> tenant.
+        completing the OAuth flow, Knock will store an{" "}
+        <code className="text-[#E95744]">access_token</code> property on the
+        channel data for the <code className="text-[#E95744]">{tenant}</code>{" "}
+        tenant.
       </p>
-      <p>
-        This page uses the <code>SlackAuthButton</code> and{" "}
-        <code>SlackAuthContainer</code> components to facilitate the OAuth flow
-        between Slack and Knock's API.
+      <p className="mb-4">
+        This page uses the{" "}
+        <code className="text-[#E95744]">SlackAuthButton</code> and{" "}
+        <code className="text-[#E95744]">SlackAuthContainer</code> components to
+        facilitate the OAuth flow between Slack and Knock's API.
       </p>
       <AuthWrapper></AuthWrapper>
-      <Link href="/confirm-knock-resources">Previous</Link>
-      <Link href="/choose-slack-channel">Next</Link>
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/confirm-knock-resources"
+      >
+        Previous
+      </Link>
+      <Link
+        className="mt-6 mx-4 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/choose-slack-channel"
+      >
+        Next
+      </Link>
     </>
   );
 }

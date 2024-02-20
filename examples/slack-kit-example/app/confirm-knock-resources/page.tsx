@@ -7,37 +7,62 @@ export default async function Page() {
 
   return (
     <>
-      <h2>Confirm Your Knock Resources</h2>
-      <p>
+      <h2 className="text-xl font-bold my-4">Confirm Your Knock Resources</h2>
+      <p className="mb-4">
         In this step, we&apos;ll check to make sure you've defined all of the
         Knock resources you&apos;ll need to complete this application. If
         you&apos;re missing any variables, please add them to your code in the{" "}
-        <code>/app/lib/knock.ts</code> file and refresh the page.
+        <code className="text-[#E95744]">/app/lib/knock.ts</code> file and
+        refresh the page.
       </p>
-      <p>
+      <p className="mb-4">
         Typically, these values would come from your application&apos;s business
         logic, but for this app we&apos;ll just hardcode them in the{" "}
-        <code>getAppDetails</code> function.
+        <code className="text-[#E95744]">getAppDetails</code> function.
       </p>
-      <p>
-        {appDetails.tenant ? "✅" : "❌"} Knock Tenant Id: {appDetails.tenant}
+      <p className="mt-2 font-medium">
+        {appDetails.tenant ? "✅" : "❌"} Knock Tenant Id:{" "}
+        <span className="font-normal text-neutral-800">
+          {appDetails.tenant}
+        </span>
       </p>
-      <p>
+      <p className="mt-2 font-medium">
         {appDetails.collection ? "✅" : "❌"} Knock Object Collection:{" "}
-        {appDetails.collection}
+        <span className="font-normal text-neutral-800">
+          {appDetails.collection}
+        </span>
       </p>
-      <p>
+      <p className="mt-2 font-medium">
         {appDetails.objectId ? "✅" : "❌"} Knock Object Id:{" "}
-        {appDetails.objectId}
+        <span className="font-normal text-neutral-800">
+          {appDetails.objectId}
+        </span>
       </p>
-      <p>
-        {appDetails.userId ? "✅" : "❌"} Knock User Id: {appDetails.userId}
+      <p className="mt-2 font-medium">
+        {appDetails.userId ? "✅" : "❌"} Knock User Id:{" "}
+        <span className="font-normal text-neutral-800">
+          {appDetails.userId}
+        </span>
       </p>
-      <p>
+      <p className="mt-2 font-medium">
         {appDetails.workflowKey ? "✅" : "❌"} Knock Workflow Key:{" "}
-        {appDetails.workflowKey}
+        <span className="font-normal text-neutral-800">
+          {appDetails.workflowKey}
+        </span>
       </p>
-      <Link href="/">Previous</Link>|<Link href="/initiate-auth">Next</Link>
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/"
+      >
+        Previous
+      </Link>
+      &nbsp;&nbsp;&nbsp;
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/initiate-auth"
+      >
+        Next
+      </Link>
     </>
   );
 }

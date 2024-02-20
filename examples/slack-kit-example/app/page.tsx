@@ -19,8 +19,10 @@ export default function Page() {
 
   return (
     <>
-      <h2>Welcome to the SlackKit example app</h2>
-      <p>
+      <h2 className="text-xl font-bold my-4">
+        Confirm your environment variables
+      </h2>
+      <p className="mb-4">
         Using this app, you&apos;ll learn how to use Knock&apos;s SlackKit
         components to make working with Slack apps easy. In this step,
         we&apos;ll check to make sure you have the right environment variables
@@ -28,13 +30,18 @@ export default function Page() {
       </p>
       {envVars.map((envVar) => {
         return (
-          <p key={envVar.name}>
+          <p key={envVar.name} className="mt-2 font-medium">
             {envVar.value ? "✅" : "❌"}&nbsp;
             {envVar.name}
           </p>
         );
       })}
-      <Link href="/confirm-knock-resources">Next</Link>
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/confirm-knock-resources"
+      >
+        Next
+      </Link>
     </>
   );
 }

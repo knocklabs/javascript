@@ -7,17 +7,20 @@ export default async function Page() {
   const { collection, objectId } = getAppDetails();
   return (
     <>
-      <h2>Choose a Slack Channel</h2>
-      <p>
+      <h2 className="text-xl font-bold my-4">Choose a Slack Channel</h2>
+      <p className="mb-4">
         In this step, you&apos;ll associate one or more Slack channels with the{" "}
-        <code>{objectId}</code> object in the <code>{collection}</code>{" "}
-        collection. Knock will store these Slack channel ids as channel data on
-        your selected object.
+        <code className="text-[#E95744]">{objectId}</code> object in the{" "}
+        <code className="text-[#E95744]">{collection}</code> collection. Knock
+        will store these Slack channel ids as channel data on your selected
+        object.
       </p>
-      <p>
-        This step uses the <code>SlackChannelsCombobox</code> component to
-        associate public and private channels with your <code>{objectId}</code>{" "}
-        object recipient. You can read more about{" "}
+      <p className="mb-4">
+        This step uses the{" "}
+        <code className="text-[#E95744]">SlackChannelsCombobox</code> component
+        to associate public and private channels with your{" "}
+        <code className="text-[#E95744]">{objectId}</code> object recipient. You
+        can read more about{" "}
         <a
           href="https://docs.knock.app/managing-recipients/setting-channel-data"
           target="_blank"
@@ -27,11 +30,22 @@ export default async function Page() {
         in the docs.
       </p>
       <SlackChannelWrapper
+        className="my-6"
         collection={collection}
         objectId={objectId}
       ></SlackChannelWrapper>
-      <Link href="/initiate-auth">Previous</Link>
-      <a href="/examine-channel-data">Next</a>
+      <Link
+        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/initiate-auth"
+      >
+        Previous
+      </Link>
+      <a
+        className="mt-6 mx-4 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/examine-channel-data"
+      >
+        Next
+      </a>
     </>
   );
 }
