@@ -11,7 +11,8 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFilter } from "react-aria";
 
-import { useOutsideClick } from "../../../core";
+
+import { Spinner, useOutsideClick } from "../../../core";
 
 import AddConnectedSlackChannelInput from "./AddConnectedSlackChannelInput";
 import ConnectionErrorInfoBoxes from "./ConnectionErrorInfoBoxes";
@@ -20,9 +21,7 @@ import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
 const DEFAULT_INPUT_MESSAGES = {
-  connecting: "Connecting to Slack...",
-  disconnecting: "Disconnecting...",
-  channelsLoading: "Fetching channels...",
+
   disconnected: "Slack is not connected.",
   multipleChannelsConnected: "Multiple channels connected",
   noChannelsConnected: "Search channels",
@@ -33,10 +32,7 @@ const DEFAULT_INPUT_MESSAGES = {
 const MAX_ALLOWED_CHANNELS = 1000;
 
 type SlackChannelComboboxInputMessages = {
-  connecting: string;
-  channelsLoading: string;
   disconnected: string;
-  disconnecting: string;
   error: string;
   singleChannelConnected: string;
   multipleChannelsConnected: string;
@@ -94,19 +90,26 @@ export const SlackChannelCombobox = ({
     setCurrentConnectedChannels(connectedChannels);
   }, [connectedChannels]);
 
+  const inErrorState = useMemo(
+    () =>
+      connectionStatus === "disconnected" ||
+      connectionStatus === "error" ||
+      connectedChannelsError,
+    [connectedChannelsError, connectionStatus],
+  );
+
+  const inLoadingState = useMemo(
+    () =>
+      connectionStatus === "connecting" ||
+      connectionStatus === "disconnecting" ||
+      slackChannelsLoading,
+
+    [connectionStatus, slackChannelsLoading],
+  );
+
   // Construct placeholder text
   const searchPlaceholder = useMemo(() => {
-    // Connection status messages
-    if (connectionStatus === "connecting") {
-      return inputMessages?.connecting || DEFAULT_INPUT_MESSAGES.connecting;
-    }
-
-    if (connectionStatus === "disconnecting") {
-      return (
-        inputMessages?.disconnecting || DEFAULT_INPUT_MESSAGES.disconnecting
-      );
-    }
-
+    // Connection status message
     if (connectionStatus === "disconnected") {
       return inputMessages?.disconnected || DEFAULT_INPUT_MESSAGES.disconnected;
     }
@@ -115,34 +118,24 @@ export const SlackChannelCombobox = ({
       return inputMessages?.error || connectionErrorLabel;
     }
 
-    if (connectedChannelsError) {
-      return inputMessages?.error || DEFAULT_INPUT_MESSAGES.channelsError;
-    }
-
-    // Channel messages
-    if (slackChannelsLoading || connectedChannelsLoading) {
-      return (
-        inputMessages?.channelsLoading || DEFAULT_INPUT_MESSAGES.channelsLoading
-      );
-    }
-
-    if (slackChannels.length === 0) {
+    // Channels status messages
+    if (!inLoadingState && slackChannels.length === 0) {
       return (
         inputMessages?.noSlackChannelsFound ||
         DEFAULT_INPUT_MESSAGES.noSlackChannelsFound
       );
     }
 
-    const numberConnectedChannels = connectedChannels?.length;
+    const numberConnectedChannels = connectedChannels?.length || 0;
 
-    if (numberConnectedChannels === 0 || !connectedChannels) {
+    if (connectedChannels && numberConnectedChannels === 0) {
       return (
         inputMessages?.noChannelsConnected ||
         DEFAULT_INPUT_MESSAGES.noChannelsConnected
       );
     }
 
-    if (numberConnectedChannels === 1) {
+    if (connectedChannels && numberConnectedChannels === 1) {
       const connectedChannel = slackChannels?.find(
         (slackChannel) => slackChannel.id === connectedChannels[0]?.channel_id,
       );
@@ -152,14 +145,17 @@ export const SlackChannelCombobox = ({
       );
     }
 
-    return (
-      inputMessages?.multipleChannelsConnected || "Multiple channels connected"
-    );
+    if (connectedChannels && numberConnectedChannels > 1) {
+      return (
+        inputMessages?.multipleChannelsConnected ||
+        `${numberConnectedChannels} channels connected`
+      );
+    }
+
+    return "";
   }, [
+    inLoadingState,
     connectionStatus,
-    connectedChannelsError,
-    slackChannelsLoading,
-    connectedChannelsLoading,
     slackChannels,
     connectedChannels,
     inputMessages,
@@ -198,18 +194,11 @@ export const SlackChannelCombobox = ({
     contains(slackChannel.name, inputValue),
   );
 
-  const isErrorState = useMemo(
-    () =>
-      connectionStatus === "disconnected" ||
-      connectionStatus === "error" ||
-      connectedChannelsError,
-    [connectedChannelsError, connectionStatus],
-  );
 
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
       <AddConnectedSlackChannelInput
-        isErrorState={!!isErrorState}
+        inErrorState={!!inErrorState}
         connectedChannels={currentConnectedChannels || []}
         updateConnectedChannels={updateConnectedChannels}
         connectedChannelsError={connectedChannelsError}
@@ -232,23 +221,29 @@ export const SlackChannelCombobox = ({
               className={"rnf-input-icon-container"}
               {...inputContainerProps}
             >
-              <span
-                className={`rnf-input-icon ${isErrorState && "rnf-input-icon-error"}`}
-              >
-                <SearchIcon />
-              </span>
 
-              <input
-                className={`rnf-input-with-icon ${isErrorState && "rnf-input-with-icon-error"}`}
-                tabIndex={-1}
-                id="slack-channel-search"
-                type="text"
-                onFocus={() => setComboboxListOpen(true)}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={searchPlaceholder || "Search channels"}
-                disabled={!!isErrorState}
-                {...inputProps}
-              />
+              <div
+                className={`rnf-input-icon ${inErrorState && "rnf-input-icon-error"}`}
+              >
+                {inLoadingState ? (
+                  <Spinner size="15px" thickness={3} />
+                ) : (
+                  <SearchIcon />
+                )}
+              </div>
+              <div>
+                <input
+                  className={`rnf-input-with-icon ${inErrorState && "rnf-input-with-icon-error"}`}
+                  tabIndex={-1}
+                  id="slack-channel-search"
+                  type="text"
+                  onFocus={() => setComboboxListOpen(true)}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={searchPlaceholder || ""}
+                  disabled={!!inErrorState}
+                  {...inputProps}
+                />
+              </div>
             </div>
             <ConnectionErrorInfoBoxes />
           </div>
@@ -257,6 +252,7 @@ export const SlackChannelCombobox = ({
         <Popover.Content>
           <SlackChannelListBox
             isLoading={slackChannelsLoading || connectedChannelsLoading}
+            isUpdating={connectedChannelsUpdating}
             connectedChannels={currentConnectedChannels}
             onClick={handleOptionClick}
             slackChannels={matchedChannels}

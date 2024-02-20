@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.11.0",
     "@faker-js/faker": "^8.3.1",
     "@knocklabs/node": "^0.4.25",
-    "@knocklabs/react": "*",
+    "@knocklabs/react": "workspace:^",
     "framer-motion": "^10.16.5",
     "next": "14.0.4",
     "next-seo": "^6.4.0",
@@ -25,8 +25,8 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@knocklabs/eslint-config": "*",
-    "@knocklabs/typescript-config": "*",
+    "@knocklabs/eslint-config": "workspace:^",
+    "@knocklabs/typescript-config": "workspace:^",
     "@next/eslint-plugin-next": "^14.0.2",
     "@types/eslint": "^8.44.7",
     "@types/node": "^20",

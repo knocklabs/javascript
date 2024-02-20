@@ -3,10 +3,9 @@
   "compilerOptions": {
     "plugins": [
       {
-        "name": "next"
-      }
-    ],
-    "strictNullChecks": true
+       "name": "next"
+
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -15,7 +14,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

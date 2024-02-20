@@ -6,14 +6,16 @@ import { SlackIcon } from "../SlackIcon";
 import ConnectionErrorInfoBoxes from "./ConnectionErrorInfoBoxes";
 import "./styles.css";
 
+import { Spinner } from "../../../core";
+
 const AddConnectedSlackChannelInput = ({
-  isErrorState,
+  inErrorState,
   connectedChannels = [],
   updateConnectedChannels,
   connectedChannelsError,
   connectedChannelsUpdating,
 }: {
-  isErrorState: boolean;
+  inErrorState: boolean;
   connectedChannels: SlackChannelConnection[];
   updateConnectedChannels: (channels: SlackChannelConnection[]) => void;
   connectedChannelsError: string | null;
@@ -48,7 +50,7 @@ const AddConnectedSlackChannelInput = ({
   return (
     <div className="rnf-connect-channel-input-container">
       <input
-        className={`rnf-input ${((isErrorState || !!localError) && !value) && "rnf-input-error"}`}
+        className={`rnf-input ${((inErrorState || !!localError) && !value) && "rnf-input-error"}`}
         tabIndex={-1}
         id="slack-channel-search"
         type="text"
@@ -58,7 +60,7 @@ const AddConnectedSlackChannelInput = ({
       />
       <button className="rnf-button" onClick={submitChannel}>
         {connectedChannelsUpdating ? (
-          <div className="rnf-spinner"></div>
+          <Spinner size="15px" thickness={3} />
         ) : (
           <SlackIcon height="16px" width="16px" />
         )}

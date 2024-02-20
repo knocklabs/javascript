@@ -11,6 +11,9 @@ type Props = AriaListBoxOptions<unknown> & {
   onClick: (channelId: string) => void;
   listBoxProps?: React.HTMLAttributes<HTMLDivElement>;
   channelOptionProps?: React.HtmlHTMLAttributes<HTMLButtonElement>;
+
+  isUpdating: boolean;
+
 };
 
 const SlackChannelListBox = ({
@@ -19,7 +22,10 @@ const SlackChannelListBox = ({
   connectedChannels,
   onClick,
   listBoxProps,
-  channelOptionProps
+
+  channelOptionProps,
+  isUpdating,
+
 }: Props) => {
   return (
     <div className="rnf-list-box" {...listBoxProps}>
@@ -38,6 +44,8 @@ const SlackChannelListBox = ({
             }
             onClick={onClick}
             channelOptionProps={channelOptionProps}
+
+            isUpdating={isUpdating}
 
           />
         );

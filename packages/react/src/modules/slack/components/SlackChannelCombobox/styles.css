@@ -5,6 +5,8 @@
 .rnf-input-icon-container {
   position: relative;
   display: inline-block;
+  align-items: center;
+  justify-content: center;
   width: 100%;
 }
 
@@ -61,7 +63,7 @@
 .rnf-input-icon {
   position: absolute;
   left: 10px;
-  top: 50%;
+  top: 53%;
   transform: translateY(-50%);
   color: #ccc;
 }
@@ -129,20 +131,3 @@
   align-items: center;
 }
 
-.rnf-spinner {
-  border: 1px solid #000000;
-  border-radius: 50%;
-  border-bottom: 1px solid transparent;
-  width: 14px;
-  height: 14px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
