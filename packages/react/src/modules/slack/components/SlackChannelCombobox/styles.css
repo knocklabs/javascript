@@ -87,21 +87,26 @@
     0px 1px 3px 0px rgba(0, 0, 0, 0.1);
 }
 
-.rnf-channel-option {
+.rnf-channel-option-button {
   display: flex;
-  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  padding: 0.5rem 0rem 0.5rem 0rem;
   background-color: white;
   border-width: 0px;
 }
 
-.rnf-channel-option:disabled {
+.rnf-channel-option-button:disabled {
   color: #3c4257;
   cursor: not-allowed;
 }
 
 .rnf-icon {
   display: flex;
-  margin-right: 4px;
+  margin-right: 0.15rem;
+  margin-top: 0.15rem;
+}
+
+.rnf-connected-status-icon {
+  width: 20px;
 }
 
 .rnf-disconnected-info-container {
@@ -129,4 +134,10 @@
   display: flex;
   gap: 4px;
   align-items: center;
+}
+
+.rnf-slack-channel-option-text-with-icon {
+  display: flex;
+  gap: 0.25rem;
+  height: 20px;
 }
