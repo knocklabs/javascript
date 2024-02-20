@@ -10012,7 +10012,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^10.4.13":
+"autoprefixer@npm:^10.0.1, autoprefixer@npm:^10.4.13":
   version: 10.4.17
   resolution: "autoprefixer@npm:10.4.17"
   dependencies:
@@ -20561,7 +20561,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.3.5, postcss@npm:^8.4.23, postcss@npm:^8.4.33, postcss@npm:^8.4.35, postcss@npm:^8.4.4, postcss@npm:~8.4.32":
+"postcss@npm:^8, postcss@npm:^8.3.5, postcss@npm:^8.4.23, postcss@npm:^8.4.33, postcss@npm:^8.4.35, postcss@npm:^8.4.4, postcss@npm:~8.4.32":
   version: 8.4.35
   resolution: "postcss@npm:8.4.35"
   dependencies:
@@ -22637,6 +22637,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"slack-kit-example@workspace:examples/slack-kit-example":
+  version: 0.0.0-use.local
+  resolution: "slack-kit-example@workspace:examples/slack-kit-example"
+  dependencies:
+    "@knocklabs/react": "npm:*"
+    "@types/node": "npm:^20"
+    "@types/react": "npm:^18.2.37"
+    "@types/react-dom": "npm:^18.2.15"
+    autoprefixer: "npm:^10.0.1"
+    eslint: "npm:^8.53.0"
+    eslint-config-next: "npm:14.0.4"
+    jsonwebtoken: "npm:^9.0.2"
+    next: "npm:14.0.4"
+    postcss: "npm:^8"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    tailwindcss: "npm:^3.3.0"
+    typescript: "npm:^5.2.2"
+  languageName: unknown
+  linkType: soft
+
 "slash@npm:^2.0.0":
   version: 2.0.0
   resolution: "slash@npm:2.0.0"
@@ -23513,7 +23534,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:^3.0.2":
+"tailwindcss@npm:^3.0.2, tailwindcss@npm:^3.3.0":
   version: 3.4.1
   resolution: "tailwindcss@npm:3.4.1"
   dependencies:
