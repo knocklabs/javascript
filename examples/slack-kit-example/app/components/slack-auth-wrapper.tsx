@@ -9,7 +9,7 @@ export default function AuthWrapper() {
         actionButton={
           <SlackAuthButton
             slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
-            redirectUrl={"http://localhost:3001/"}
+            redirectUrl={process.env.NEXT_PUBLIC_REDIRECT_URL}
           />
         }
       />
