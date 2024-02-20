@@ -1,5 +1,13 @@
 # @knocklabs/react-native-example
 
+## 1.0.2
+
+### Patch Changes
+
+- 7786ec5: chore: upgrade to yarn modern and update local package references
+- Updated dependencies [7786ec5]
+  - @knocklabs/react-native@0.1.2
+
 ## 1.0.1
 
 ### Patch Changes

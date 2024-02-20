@@ -1,5 +1,16 @@
 # nextjs-example
 
+## 1.0.5
+
+### Patch Changes
+
+- 9dd0d15: chore: update dependencies
+- 7786ec5: chore: upgrade to yarn modern and update local package references
+- Updated dependencies [9dd0d15]
+- Updated dependencies [7786ec5]
+- Updated dependencies [9dd0d15]
+  - @knocklabs/react@0.1.7
+
 ## 1.0.4
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/client",
-  "version": "0.8.18",
+  "version": "0.8.19",
   "description": "The clientside library for interacting with Knock",
   "homepage": "https://github.com/knocklabs/javascript/tree/main/packages/client",
   "author": "@knocklabs",
@@ -51,7 +51,7 @@
     "@babel/plugin-transform-runtime": "^7.16.7",
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
-    "@knocklabs/types": "0.1.1",
+    "@knocklabs/types": "0.1.2",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/phoenix": "^1.5.4",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
