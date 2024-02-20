@@ -19,7 +19,7 @@ export default function Home() {
     updated_at: "",
     created_at: "",
   };
-  const redirectUrl = "http://localhost:3001/";
+  const redirectUrl = process.env.NEXT_PUBLIC_REDIRECT_URL;
 
   const slackChannelsRecipientObject = {
     objectId: process.env.NEXT_PUBLIC_CONNECTIONS_OBJECT_ID!,
