@@ -1,20 +1,20 @@
-import * as React from "react";
 import Knock, {
   Feed,
   FeedClientOptions,
   FeedStoreState,
 } from "@knocklabs/client";
-import create, { StoreApi, UseStore } from "zustand";
+import * as React from "react";
+import create, { UseBoundStore } from "zustand";
 
-import { ColorMode } from "../../core/constants";
-import useNotifications from "../hooks/useNotifications";
-import { feedProviderKey } from "../../core/utils";
 import { useKnockClient } from "../../core";
+import { ColorMode } from "../../core/constants";
+import { feedProviderKey } from "../../core/utils";
+import useNotifications from "../hooks/useNotifications";
 
 export interface KnockFeedProviderState {
   knock: Knock;
   feedClient: Feed;
-  useFeedStore: UseStore<FeedStoreState>;
+  useFeedStore: UseBoundStore<FeedStoreState>;
   colorMode: ColorMode;
 }
 
@@ -41,9 +41,8 @@ export const KnockFeedProvider: React.FC<KnockFeedProviderProps> = ({
   colorMode = "light",
 }) => {
   const knock = useKnockClient();
-
   const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
-  const useFeedStore = create(feedClient.store as StoreApi<FeedStoreState>);
+  const useFeedStore = create<FeedStoreState>(feedClient.store);
 
   return (
     <FeedStateContext.Provider

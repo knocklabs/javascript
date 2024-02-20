@@ -1,8 +1,7 @@
 {
   "extends": "@knocklabs/typescript-config/base.json",
+  "include": ["src"],
   "compilerOptions": {
-    "jsx": "react"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+    "outDir": "dist"
+  }
 }

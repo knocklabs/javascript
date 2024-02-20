@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useLocalStorage(key: any, initialValue: any) {
   const initialize = (key: any) => {
@@ -15,7 +15,7 @@ export function useLocalStorage(key: any, initialValue: any) {
     }
   };
 
-  const [state, setState] = useState(null);
+  const [state, setState] = useState<any>(null);
 
   useEffect(() => {
     setState(initialize(key));

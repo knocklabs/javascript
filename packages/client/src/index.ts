@@ -1,5 +1,5 @@
-import Knock from "./knock";
 import FeedClient, { Feed } from "./clients/feed";
+import Knock from "./knock";
 
 export * from "./interfaces";
 export * from "./clients/feed/types";

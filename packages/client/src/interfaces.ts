@@ -1,7 +1,10 @@
 import { GenericData } from "@knocklabs/types";
 
+export type LogLevel = "debug";
+
 export interface KnockOptions {
   host?: string;
+  logLevel?: LogLevel;
 }
 
 export interface KnockObject<T = GenericData> {
@@ -36,4 +39,14 @@ export interface Activity<T = GenericData> {
 export interface ChannelData<T = any> {
   channel_id: string;
   data: T;
+}
+
+export type UserTokenExpiringCallback = (
+  currentToken: string,
+  decodedToken: any,
+) => Promise<string | void>;
+
+export interface AuthenticateOptions {
+  onUserTokenExpiring?: UserTokenExpiringCallback;
+  timeBeforeExpirationInMs?: number;
 }

@@ -1,7 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
-import { AxiosError } from "axios";
 
 type ApiClientOptions = {
   host: string;
@@ -79,18 +78,6 @@ class ApiClient {
         body: undefined,
         error: e,
       };
-    }
-  }
-
-  reconnectSocket() {
-    if (this.socket && !this.socket.isConnected()) {
-      this.socket.connect();
-    }
-  }
-
-  disconnectSocket() {
-    if (this.socket) {
-      this.socket.disconnect();
     }
   }
 
