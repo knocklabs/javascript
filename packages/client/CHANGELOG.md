@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.19
+
+### Patch Changes
+
+- 7786ec5: chore: upgrade to yarn modern and update local package references
+- 9dd0d15: feat: add onUserTokenExpiring callback option to client
+
 ## 0.8.18
 
 ### Patch Changes

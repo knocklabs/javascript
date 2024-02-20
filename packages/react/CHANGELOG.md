@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.7
+
+### Patch Changes
+
+- 9dd0d15: chore: update dependencies
+- 7786ec5: chore: upgrade to yarn modern and update local package references
+- 9dd0d15: feat: add onUserTokenExpiring callback option to client
+- Updated dependencies [7786ec5]
+- Updated dependencies [9dd0d15]
+  - @knocklabs/react-core@0.1.4
+  - @knocklabs/client@0.8.19
+
 ## 0.1.6
 
 ### Patch Changes

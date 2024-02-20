@@ -1,5 +1,14 @@
 # client-example
 
+## 0.1.2
+
+### Patch Changes
+
+- 7786ec5: chore: upgrade to yarn modern and update local package references
+- Updated dependencies [7786ec5]
+- Updated dependencies [9dd0d15]
+  - @knocklabs/client@0.8.19
+
 ## 0.1.1
 
 ### Patch Changes
