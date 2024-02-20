@@ -89,7 +89,7 @@
 
 .rnf-channel-option {
   display: flex;
-  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  padding: 0.5rem 0rem 0.5rem 0rem;
   background-color: white;
   border-width: 0px;
 }
@@ -101,7 +101,8 @@
 
 .rnf-icon {
   display: flex;
-  margin-right: 4px;
+  margin-right: 0.15rem;
+  margin-top: 0.15rem
 }
 
 .rnf-disconnected-info-container {
