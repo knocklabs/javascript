@@ -31,15 +31,15 @@ const SlackChannelOption = ({
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   const icon = () => {
-    if (submittedId === channel.id && isUpdating) {
-      return <Spinner size="15px" thickness={3} />;
+    if (submittedId === channel.id && (isUpdating || isLoading)) {
+      return <Spinner thickness={3} />;
     }
 
     if (isHovered || isConnected) {
       return <CheckmarkIcon isConnected={isConnected} />;
     }
 
-    return <div style={{ width: "15px", height: "18.5px" }} />;
+    return <div />;
   };
 
   const handleOptionClick = (channelId: string) => {
@@ -51,12 +51,12 @@ const SlackChannelOption = ({
     if (submittedId && !isUpdating) {
       return setSubmittedId(null);
     }
-  }, [isUpdating, submittedId]);
+  }, [isLoading, isUpdating, submittedId]);
 
   return (
     <button
       key={channel.id}
-      className="rnf-channel-option"
+      className="rnf-channel-option-button"
       onClick={() => !isLoading && handleOptionClick(channel.id)}
       disabled={isLoading || isUpdating}
       onMouseEnter={() => setIsHovered(true)}
@@ -64,10 +64,12 @@ const SlackChannelOption = ({
       tabIndex={tabIndex}
       {...channelOptionProps}
     >
-      <div style={{ marginRight: "0.25rem" }}>{icon()}</div>
-      <span className="rnf-icon">
-        {channel.is_private ? <LockIcon /> : <HashtagIcon />}
-      </span>
+      <div className="rnf-slack-channel-option-text-with-icon">
+        <div className="rnf-connected-status-icon">{icon()}</div>
+        <div className="rnf-icon">
+          {channel.is_private ? <LockIcon /> : <HashtagIcon />}
+        </div>
+      </div>
       {channel.name}
     </button>
   );

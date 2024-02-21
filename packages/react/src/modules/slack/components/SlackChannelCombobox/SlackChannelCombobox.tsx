@@ -57,6 +57,13 @@ export const SlackChannelCombobox = ({
   channelOptionProps,
   inputMessages,
 }: Props) => {
+  const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState("");
+
+  // Used to close the combobox when clicking outside of it
+  const comboboxRef = useRef(null);
+  useOutsideClick({ ref: comboboxRef, fn: () => setComboboxListOpen(false) });
+
   // Gather API data
   const { connectionStatus, errorLabel: connectionErrorLabel } =
     useKnockSlackClient();
@@ -72,21 +79,25 @@ export const SlackChannelCombobox = ({
     updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ slackChannelsRecipientObject });
 
-  const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState("");
-
-  // Used to close the combobox when clicking outside of it
-  const comboboxRef = useRef(null);
-  useOutsideClick({ ref: comboboxRef, fn: () => setComboboxListOpen(false) });
-
-  // Used to optimistically show when user toggles a channel connected or not
   const [currentConnectedChannels, setCurrentConnectedChannels] = useState<
     SlackChannelConnection[] | null
   >(null);
 
   useEffect(() => {
-    setCurrentConnectedChannels(connectedChannels);
-  }, [connectedChannels]);
+    // Used to make sure we're only showing currently available channels to select from.
+    // There are cases where a channel is "connected" in Knock, but it wouldn't be
+    // posting to it if the channel is private and the Slackbot doesn't belong to it,
+    // so the channel won't show up here and it won't be posted to.
+    const slackChannelsMap = new Map(
+      slackChannels.map((channel) => [channel.id, channel]),
+    );
+
+    const channels = connectedChannels?.filter((connectedChannel) => {
+      return slackChannelsMap.has(connectedChannel.channel_id);
+    }) || [];
+
+    setCurrentConnectedChannels(channels);
+  }, [connectedChannels, slackChannels]);
 
   const inErrorState = useMemo(
     () =>
@@ -124,26 +135,27 @@ export const SlackChannelCombobox = ({
       );
     }
 
-    const numberConnectedChannels = connectedChannels?.length || 0;
+    const numberConnectedChannels = currentConnectedChannels?.length || 0;
 
-    if (connectedChannels && numberConnectedChannels === 0) {
+    if (currentConnectedChannels && numberConnectedChannels === 0) {
       return (
         inputMessages?.noChannelsConnected ||
         DEFAULT_INPUT_MESSAGES.noChannelsConnected
       );
     }
 
-    if (connectedChannels && numberConnectedChannels === 1) {
+    if (currentConnectedChannels && numberConnectedChannels === 1) {
       const connectedChannel = slackChannels?.find(
-        (slackChannel) => slackChannel.id === connectedChannels[0]?.channel_id,
+        (slackChannel) =>
+          slackChannel.id === currentConnectedChannels[0]?.channel_id,
       );
 
       return (
-        inputMessages?.singleChannelConnected || `#${connectedChannel?.name}`
+        inputMessages?.singleChannelConnected || `# ${connectedChannel?.name}`
       );
     }
 
-    if (connectedChannels && numberConnectedChannels > 1) {
+    if (currentConnectedChannels && numberConnectedChannels > 1) {
       return (
         inputMessages?.multipleChannelsConnected ||
         `${numberConnectedChannels} channels connected`
@@ -152,35 +164,37 @@ export const SlackChannelCombobox = ({
 
     return "";
   }, [
-    inLoadingState,
     connectionStatus,
+    inLoadingState,
     slackChannels,
-    connectedChannels,
+    currentConnectedChannels,
     inputMessages,
     connectionErrorLabel,
   ]);
 
   // Handle channel click
   const handleOptionClick = async (channelId: string) => {
-    if (!connectedChannels) {
+    if (!currentConnectedChannels) {
       return;
     }
 
-    const isChannelConnected = connectedChannels.find(
+    const isChannelConnected = currentConnectedChannels.find(
       (channel) => channel.channel_id === channelId,
     );
 
     if (isChannelConnected) {
-      const channelsToSendToKnock = connectedChannels.filter(
+      const channelsToSendToKnock = currentConnectedChannels.filter(
         (connectedChannel) => connectedChannel.channel_id !== channelId,
       );
+
       setCurrentConnectedChannels(channelsToSendToKnock);
       updateConnectedChannels(channelsToSendToKnock);
     } else {
       const channelsToSendToKnock = [
-        ...connectedChannels,
+        ...currentConnectedChannels,
         { channel_id: channelId } as SlackChannelConnection,
       ];
+
       setCurrentConnectedChannels(channelsToSendToKnock);
       updateConnectedChannels(channelsToSendToKnock);
     }
