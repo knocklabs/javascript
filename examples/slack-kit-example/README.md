@@ -18,7 +18,7 @@ The other set of values would typically be determined by your product's business
 
 ### Environment variables
 
-All of these values are sourced from environment variables. The example app will check for these values as the first step.
+All of these values are sourced from environment variables. The example app will check for these values as the first step. Make a copy of `.env.sample` using the following command: `cp .env.sample .env.local`
 
 | Env Var                            | Description                                                                                                                                                                                                                                                                                   |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -28,7 +28,7 @@ All of these values are sourced from environment variables. The example app will
 | KNOCK_API_KEY                      | This value comes from Knock and is used to authenticate server-side API requests. You can find it listed as the secret key under "Developers" > "API keys." **This is a secret value and should not be exposed publicly.**                                                                    |
 | NEXT_PUBLIC_KNOCK_CLIENT_ID        | This value comes from Knock and is used to authenticate public API requests from the browser. You can find it listed as the public key under "Developers" > "API keys."                                                                                                                       |
 | NEXT_PUBLIC_KNOCK_API_URL          | This value comes from Knock and is used to construct the URL for API endpoints                                                                                                                                                                                                                |
-| NEXT_PUBLIC_REDIRECT_URL           | This value comes from your application. It is where Knock will redirect your user after the OAuth flow with Slack.                                                                                                                                                                            |
+| NEXT_PUBLIC_REDIRECT_URL           | This value comes from your application. It is where Knock will redirect your user after the OAuth flow with Slack. The default of `http://localhost:3000` is valid when running this project locally.                                                                                         |
 
 ### Knock Resource Variables
 
