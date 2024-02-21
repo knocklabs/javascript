@@ -16,9 +16,19 @@ The other set of values would typically be determined by your product's business
 6. Also under "OAuth and Permissions", add this Knock URL to that field:https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you.
 7. Under "Manage distribution", allow it to be publicly distributed
 
+### Setting up Knock
+
+#### Create a Slack channel
+
+Add a Slack channel with the `Client Id` and `Client Secret` from the `Basic Info` section of your Slack. Take note of this channel id for use in the next step.
+
+#### Create a new workflow
+
+Create a new [workflow](https://docs.knock.app/concepts/workflows) with a Slack channel step pointing to this Slack channel. Take note of this workflow key for use in the following steps.In the message template use the following liquid tag to test your ability to send messages: `A new issue was submitted: {{message}}`
+
 ### Environment variables
 
-All of these values are sourced from environment variables. The example app will check for these values as the first step. Make a copy of `.env.sample` using the following command: `cp .env.sample .env.local`
+All of these values are sourced from environment variables at runtime. The example app will check for these values as the first step. Make a copy of `.env.sample` using the following command: `cp .env.sample .env.local`
 
 | Env Var                            | Description                                                                                                                                                                                                                                                                                   |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -49,4 +59,19 @@ export function getAppDetails() {
     redirectUrl: "http://localhost:3000",
   };
 }
+```
+
+You should already have a value for `workflowKey` from a previous step, and you can choose a [user identifier](https://docs.knock.app/concepts/users#user-identifiers) to use from the dashboard.
+
+#### Create a tenant
+
+In Knock, [tenants](https://docs.knock.app/concepts/tenants) are an important concept, and with SlackKit they are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include it's ID as the value for the `tenant` property in the `getAppDetails` function. You can also use this CURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
+
+```
+curl --location --request PUT 'https://api.knock.app/v1/tenants/<tenant-id>' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <KNOCK_API_KEY>' \
+--data '{
+  "name": "<tenant-name>",
+}'
 ```
