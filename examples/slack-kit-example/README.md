@@ -8,13 +8,17 @@ The other set of values would typically be determined by your product's business
 
 ### Setting up a Slack app
 
-1. Visit https://api.slack.com/apps and sign into your account.
-2. Click "Create new app" and "from scratch"
-3. Select which workspace to develop it in. You'll still be able to use it in other workspaces.
-4. Under "Add features and functionality" select “Bots” features
-5. Under "OAuth and Permissions", give it `channels:read` scope (it doesn’t really need any scope here since we’ll be sending scopes we need from the component, but we need the user to do this so we can expose the redirect url form.)
-6. Also under "OAuth and Permissions", add this Knock URL to that field:https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you.
-7. Under "Manage distribution", allow it to be publicly distributed
+### Create a new app
+
+First, visit https://api.slack.com/apps and sign into your account. Then click `Create new app` and select the `from scratch` option. Next, select which workspace to develop it in. You'll still be able to use it in other workspaces, so this selection isn't critical.
+
+### Add bots features
+
+Under `Add features and functionality` select `Bots` features. Then, under `OAuth and Permissions`, give it `channels:read` scope. It doesn’t really need any scopes here since we’ll be sending scopes we need from the component, but we need to do this so we can expose the redirect url form.
+
+### Add redirect URL
+
+Also under `OAuth and Permissions`, add this Knock URL to that field: https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you. Finally, Under `Manage distribution`, allow it to be publicly distributed
 
 ### Setting up Knock
 
@@ -40,7 +44,7 @@ All of these values are sourced from environment variables at runtime. The examp
 | NEXT_PUBLIC_KNOCK_API_URL          | This value comes from Knock and is used to construct the URL for API endpoints                                                                                                                                                                                                                |
 | NEXT_PUBLIC_REDIRECT_URL           | This value comes from your application. It is where Knock will redirect your user after the OAuth flow with Slack. The default of `http://localhost:3000` is valid when running this project locally.                                                                                         |
 
-### Knock Resource Variables
+### Knock resource variables
 
 To make the connection to Slack channels and Knock objects, you'll also need to provide ids for several types of resources in Knock. To do this, you can replace the values in the `getAppDetails` function inside of the `/app/lib/app-details.ts` file. That function looks like this:
 
@@ -56,7 +60,6 @@ export function getAppDetails() {
     objectId: "repo-2",
     userId: "123",
     workflowKey: "new-issue",
-    redirectUrl: "http://localhost:3000",
   };
 }
 ```
@@ -74,4 +77,37 @@ curl --location --request PUT 'https://api.knock.app/v1/tenants/<tenant-id>' \
 --data '{
   "name": "<tenant-name>",
 }'
+```
+
+#### Create an object
+
+In Knock, [objects](https://docs.knock.app/concepts/objects) are flexible abstractions, and with SlackKit they are used to store channels and act as the recipient of your workflows. You can't create a new object from the dashboard, so you can use this cURL command to create an object by replacing the values for `object-collection`, `object-id`, `KNOCK_API_KEY`, and `object-name`:
+
+```
+curl --location --request PUT 'https://api.knock.app/v1/objects/<object-collection>/<object-id>' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <KNOCK_API_KEY>' \
+--data '{
+    "name": "<object-name>"
+}'
+```
+
+Once you've done that, update the values in the `getAppDetails` function to point to your new object.
+
+## Running the app locally
+
+Now that you have all of the configuration out of the way, you can install your dependencies using one of the following commands:
+
+```
+npm install
+//or
+yarn install
+```
+
+After your dependencies have installed, you can run the app in dev mode:
+
+```
+npm run dev
+//or
+yarn dev
 ```
