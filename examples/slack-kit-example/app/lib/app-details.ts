@@ -4,7 +4,6 @@
 
 export function getAppDetails() {
   return {
-    //TODO: Rename to tenant and collection to remain consistent with component params
     tenant: "knock-projects",
     collection: "repositories",
     objectId: "repo-2",

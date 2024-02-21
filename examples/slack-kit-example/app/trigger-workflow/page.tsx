@@ -1,7 +1,8 @@
 import Link from "next/link";
 
+import WorkflowForm from "../components/workflow-form";
+import triggerWorkflow from "../lib/actions/triggerWorkflow";
 import { getAppDetails } from "../lib/app-details";
-import { triggerWorkflow } from "../lib/knock";
 
 export default async function Page() {
   const { workflowKey, collection, objectId, tenant } = getAppDetails();
@@ -14,8 +15,8 @@ export default async function Page() {
         send a message.
       </p>
       <p className="mb-4">
-        Under the hood, we&apos;ll call a server action that&apos;s going to run
-        this code using the values you provided:
+        Under the hood, we&apos;ll call a server action to run this code using
+        the values you provided:
       </p>
       <pre className="text-xs bg-zinc-900 text-white rounded-md">
         {`
@@ -34,33 +35,21 @@ export default async function Page() {
           `}
       </pre>
       <p className="my-4">
-        As you can see, you pass the Object storing the Slack{" "}
-        <code className="text-[#E95744]">channel_id</code> as a recipient and
-        specify the tenant with the{" "}
+        As you can see, you pass the{" "}
+        <code className="text-[#E95744]">{objectId}</code> Object storing the
+        Slack <code className="text-[#E95744]">channel_id</code> as a workflow
+        recipient and specify the{" "}
+        <code className="text-[#E95744]">{tenant}</code> tenant with the{" "}
         <code className="text-[#E95744]">access_token</code> using the{" "}
         <code className="text-[#E95744]">tenant</code> option.
       </p>
       <p className="mb-4">
-        Go ahead and submit the form below to test your Slack integration.
+        Go ahead and submit the form below to test your Slack integration, then
+        check your Slack channel to see your message.
       </p>
-
-      <form
-        className="block"
-        action={async (formData: FormData) => {
-          "use server";
-          await triggerWorkflow(formData);
-        }}
-      >
-        <textarea name="message" id="" cols={30} rows={10}></textarea>
-        <button
-          className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
-          type="submit"
-        >
-          Trigger Workflow
-        </button>
-      </form>
+      <WorkflowForm action={triggerWorkflow}></WorkflowForm>
       <Link
-        className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        className="mt-8 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
         href="/examine-channel-data"
       >
         Previous

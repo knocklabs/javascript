@@ -22,6 +22,7 @@ export default async function Page() {
         <code className="text-[#E95744]">{objectId}</code> object recipient. You
         can read more about{" "}
         <a
+          className="underline text-blue-700"
           href="https://docs.knock.app/managing-recipients/setting-channel-data"
           target="_blank"
         >
