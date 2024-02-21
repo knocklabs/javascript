@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5
+
+### Patch Changes
+
+- Re-releasing packages
+- Updated dependencies
+  - @knocklabs/client@0.8.20
+
 ## 0.1.4
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.20
+
+### Patch Changes
+
+- Re-releasing packages
+
 ## 0.8.19
 
 ### Patch Changes
