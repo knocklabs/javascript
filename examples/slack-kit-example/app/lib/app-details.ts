@@ -9,6 +9,5 @@ export function getAppDetails() {
     objectId: "repo-2",
     userId: "123",
     workflowKey: "new-issue",
-    redirectUrl: "http://localhost:3000",
   };
 }

@@ -50,12 +50,6 @@ export default async function Page() {
           {appDetails.workflowKey}
         </span>
       </p>
-      <p className="mt-2 font-medium">
-        {appDetails.redirectUrl ? "✅" : "❌"} App Redirect URL:{" "}
-        <span className="font-normal text-neutral-800">
-          {appDetails.redirectUrl}
-        </span>
-      </p>
       <Link
         className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
         href="/"

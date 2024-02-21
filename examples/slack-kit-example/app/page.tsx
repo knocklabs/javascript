@@ -15,6 +15,10 @@ export default function Page() {
       name: "Knock Private API Key",
       value: process.env.KNOCK_API_KEY,
     },
+    {
+      name: "Redirect URL (your application URL)",
+      value: process.env.NEXT_PUBLIC_REDIRECT_URL,
+    },
   ];
 
   return (
