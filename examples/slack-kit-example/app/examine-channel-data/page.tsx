@@ -58,9 +58,10 @@ export default async function Page() {
         Your object recipient stores the{" "}
         <code className="text-[#E95744]">channel_id</code> inside an object on
         the <code className="text-[#E95744]">connections</code> array. When{" "}
-        <code className="text-[#E95744]">objectId</code> is passed as a workflow
-        recipient, Knock will generate a Slack notification for each connection
-        in the <code className="text-[#E95744]">connections</code> array.
+        <code className="text-[#E95744]">{objectId}</code> is passed as a
+        workflow recipient, Knock will generate a Slack notification for each
+        connection in the <code className="text-[#E95744]">connections</code>{" "}
+        array.
       </p>
       <pre className="text-xs p-2 bg-zinc-900 text-white rounded-md">
         {`

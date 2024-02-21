@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
 
 ## Getting Started
 
-First, run the development server:
+For this project, there are quite a bit of configuration variables you need before you can get started. Some of these are typical environment variables you would supply to your application, like API keys, tokens, or client ids. The other set of values would typically be determined by your product's business logic, but you can hardcode these values for the time being.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Environment Variables
+
+All of these values are sourced from environment variables. The example app will check for these values as the first step.
+
+NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID
+NEXT_PUBLIC_SLACK_CLIENT_ID
+KNOCK_SIGNING_KEY
+KNOCK_API_KEY
+NEXT_PUBLIC_KNOCK_CLIENT_ID
+NEXT_PUBLIC_KNOCK_API_URL
+
+### Knock Resource Variables
+
+To make the connection to Slack channels and Knock objects, you'll also need to provide ids for several types of resources in Knock. To do this, you can replace the values in the `getAppDetails` function inside of the `/app/lib/app-details.ts` file. That function looks like this:
+
 ```
+// TODO:Add your app details
+// This function returns some values that would normally be determined
+// by your application's business logic. We're hardcoding them for convenience
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+export function getAppDetails() {
+  return {
+    tenant: "knock-projects",
+    collection: "repositories",
+    objectId: "repo-2",
+    userId: "123",
+    workflowKey: "new-issue",
+    redirectUrl: "http://localhost:3000",
+  };
+}
+```
