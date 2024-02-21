@@ -8,17 +8,17 @@ The other set of values would typically be determined by your product's business
 
 ### Setting up a Slack app
 
-### Create a new app
+#### Create a new app
 
 First, visit https://api.slack.com/apps and sign into your account. Then click `Create new app` and select the `from scratch` option. Next, select which workspace to develop it in. You'll still be able to use it in other workspaces, so this selection isn't critical.
 
-### Add bots features
+#### Add bots features
 
 Under `Add features and functionality` select `Bots` features. Then, under `OAuth and Permissions`, give it `channels:read` scope. It doesn’t really need any scopes here since we’ll be sending scopes we need from the component, but we need to do this so we can expose the redirect url form.
 
-### Add redirect URL
+#### Add redirect URL
 
-Also under `OAuth and Permissions`, add this Knock URL to that field: https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you. Finally, Under `Manage distribution`, allow it to be publicly distributed
+Also under `OAuth and Permissions`, find the redirect URL section and add this Knock URL to that field: https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you. Finally, Under `Manage distribution`, allow it to be publicly distributed
 
 ### Setting up Knock
 
