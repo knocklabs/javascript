@@ -10,9 +10,9 @@ The other set of values would typically be determined by your product's business
 
 #### Create a new app
 
-First, visit https://api.slack.com/apps and sign into your account. Then click `Create new app` and select the `from scratch` option. Next, select which workspace to develop it in. You'll still be able to use it in other workspaces, so this selection isn't critical.
+First, visit https://api.slack.com/apps and sign into your account. Then click `Create new app` and select the `From scratch` option. Next, select which workspace to develop it in. You'll still be able to use it in other workspaces, so this selection isn't critical.
 
-#### Add bots features
+#### Add bot features
 
 Under `Add features and functionality` select `Bots` features. Then, under `OAuth and Permissions`, give it `channels:read` scope. It doesn’t really need any scopes here since we’ll be sending scopes we need from the component, but we need to do this so we can expose the redirect url form.
 
@@ -113,11 +113,13 @@ yarn dev
 ```
 
 If you open the app in a browser at `http://localhost:3000` you should see a screen that looks like this:
+
 ![confirm env vars screen](./images/confirm-env-vars.png)
 
 This step gives you an opportunity to confirm that you have all of the necessary environment variables needed to use the application.
 
 If you click `Next` you'll navigate to a screen where you can confirm the Knock resources you'll use to connect your Slack app:
+
 ![confirm Knock resources screen](./images/confirm-knock-resources.png)
 
 If all of the values in this step look good, you can click `Next` to authenticate with your Slack app and store the `access_token` in Knock.
@@ -288,3 +290,19 @@ export default function SlackChannelWrapper({
 As you select channels using the combobox input, the component will update the channel data for that object to store the Slack channel ids.
 
 ![choose Slack channels](./images/choose-slack-channel.png)
+
+**Note: if you want to use a private Slack channel, you need to make sure that the Slack Bot has been invited to that channel.**
+
+At this point, Knock has all of the information it needs to send Slack messages to your selected channels. Click `Next` to examine the channel data for your object and tenant.
+
+## Examine channel data
+
+In this step, you're not required to take any action, but this route uses the Node SDK to pull channel data for your object recipient and tenant. Hopefully, this gives you an idea of how Knock is storing the data and these two abstractions interact.
+
+If you select `Previous` and modify your selected channels, you should see the channel ids stored on the object channel data change if you reload this route. If you click `Next` you can test your workflow end-to-end.
+
+## Trigger your workflow
+
+In this step, you can see a code sample using the Node SDK of how you'd trigger your workflow. This is actually the code that gets run in a server action when you submit the form on this page. Go ahead and do that to send a Slack message into your designated channels:
+
+![trigger a workflow](./images/trigger-workflow.png)
