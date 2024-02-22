@@ -233,6 +233,7 @@ export default MyApp;
 ## Authenticating with Slack
 
 On this screen, you can initiate the OAuth flow with Slack. This page uses two SlackKit components to help facilitate this interaction: `SlackAuthButton` and `SlackAuthContainer`.
+
 ![initiate Slack OAuth](./images/initiate-slack-auth.png)
 
 Both of these components are client-side components. The `SlackAuthButton` component takes your `redirectUrl` and `slackClientId` as props:
@@ -251,3 +252,39 @@ Both of these components are client-side components. The `SlackAuthButton` compo
 When this button is clicked, it will create an OAuth flow in a pop-up window where the user can authenticate with Slack and choose a workspace to install the app. Once the flow is complete, the pop-up window should close and the state of the component should update to show it is `Connected` to Slack. Behind the scenes, Knock handles the OAuth callback from Slack and stores an `access_token` on the `tenant` you provided to the `KnockSlackProvider` as [channel data](https://docs.knock.app/managing-recipients/setting-channel-data).
 
 **Note: if the pop-up window does not close, double check that the `redirectUrl` matches your current environment.**
+
+From here, you can click `Next` to choose one or more Slack channels to associate with your object recipient.
+
+## Choosing Slack channels
+
+On this route, you can associate your Knock object recipient with one or more Slack channels using the `SlackChannelCombobox` component. It accepts a `slackChannelsRecipientObject` as a prop that specifies a `collection` and `objectId` for the recipient object:
+
+```
+"use client";
+
+import { SlackChannelCombobox } from "@knocklabs/react";
+
+export default function SlackChannelWrapper({
+  collection,
+  objectId,
+  className,
+}: {
+  collection: string;
+  objectId: string;
+  className: string;
+}) {
+  const slackChannelsRecipientObject = {
+    objectId: objectId,
+    collection: collection,
+  };
+  return (
+    <div className={className}>
+      <SlackChannelCombobox slackChannelsRecipientObject={slackChannelsRecipientObject} />
+    </div>
+  );
+}
+```
+
+As you select channels using the combobox input, the component will update the channel data for that object to store the Slack channel ids.
+
+![choose Slack channels](./images/choose-slack-channel.png)
