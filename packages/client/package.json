@@ -6,14 +6,15 @@
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.mjs",
       "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.js"
+      "default": "./dist/esm/index.mjs"
     }
   },
   "files": [
@@ -39,8 +40,8 @@
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "build": "yarn clean && yarn build:cjs && yarn build:esm",
-    "build:esm": "BUILD_TARGET=esm; tsc && vite build",
-    "build:cjs": "BUILD_TARGET=cjs; tsc && vite build",
+    "build:esm": "BUILD_TARGET=esm;  vite build",
+    "build:cjs": "BUILD_TARGET=cjs;  vite build",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
