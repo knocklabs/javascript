@@ -21,16 +21,15 @@ export default defineConfig(({ mode }) => {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
-        entry: resolve(__dirname, "src/index.ts"),
+        entry: resolve(__dirname, "src"),
+        fileName: `[name]`,
         name: "client",
         formats,
       },
       rollupOptions: {
         output: {
-          interop: "compat",
-          format: formats[0],
           entryFileNames: () => {
-            return "[name].js";
+            return `[name].${CJS ? "js" : "mjs"}`;
           },
           // Override to allow named and default exports in the same file
           exports: "named",
