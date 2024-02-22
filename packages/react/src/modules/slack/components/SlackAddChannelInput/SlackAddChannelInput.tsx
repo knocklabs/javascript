@@ -3,9 +3,11 @@ import { useState } from "react";
 
 import { SlackIcon } from "../SlackIcon";
 
-import ConnectionErrorInfoBoxes from "./SlackConnectionError";
-import "./styles.css";
+import ConnectionErrorInfoBoxes from "../SlackChannelCombobox/SlackConnectionError";
 import { Spinner } from "../../../core";
+
+import "./styles.css";
+import "../../theme.css"
 
 const SlackAddChannelInput = ({
   inErrorState,
@@ -47,9 +49,9 @@ const SlackAddChannelInput = ({
   };
 
   return (
-    <div className="rnf-connect-channel-input-container">
+    <div className="rsk-connect-channel">
       <input
-        className={`rnf-input ${((inErrorState || !!localError) && !value) && "rnf-input-error"}`}
+        className={`rsk-connect-channel__input ${((inErrorState || !!localError) && !value) && "rsk-connect-channel__input--error"}`}
         tabIndex={-1}
         id="slack-channel-search"
         type="text"
@@ -57,7 +59,7 @@ const SlackAddChannelInput = ({
         onChange={(e) => setValue(e.target.value)}
         value={value || ""}
       />
-      <button className="rnf-button" onClick={submitChannel}>
+      <button className="rsk-connect-channel__button" onClick={submitChannel}>
         {connectedChannelsUpdating ? (
           <Spinner size="15px" thickness={3} />
         ) : (

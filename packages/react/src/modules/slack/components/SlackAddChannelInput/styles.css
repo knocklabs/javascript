@@ -1,0 +1,32 @@
+.rsk-connect-channel {
+	align-items: center;
+	display: flex;
+	gap: var(--rsk-spacing-1);
+}
+
+.rsk-connect-channel__input {
+	border: 1px solid var(--rsk-color-gray-200);
+	border-radius: var(--rsk-border-radius-md);
+	height: 32px;
+	padding-left: var(--rsk-spacing-2);
+	width: 270px;
+}
+
+.rsk-connect-channel__button {
+	background-color: var(--rsk-color-white);
+	border-color: var(--rsk-color-gray-200);
+	border-radius: var(--rsk-button-border-radius);
+	color: var(--rsk-color-black);
+	display: inline-flex;
+	font-family: var(--rsk-font-family-sanserif);
+	font-size: var(--rsk-font-size-sm);
+	font-weight: var(--rsk-font-weight-normal);
+	gap: var(--rsk-spacing-2);
+	height: 24px;
+	padding: var(--rsk-spacing-2);
+	text-decoration: none;
+}
+
+.rsk-connect-channel__button:hover {
+	background-color: var(--rsk-button-hover-color);
+}
