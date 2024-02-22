@@ -303,6 +303,12 @@ If you select `Previous` and modify your selected channels, you should see the c
 
 ## Trigger your workflow
 
-In this step, you can see a code sample using the Node SDK of how you'd trigger your workflow. This is actually the code that gets run in a server action when you submit the form on this page. Go ahead and do that to send a Slack message into your designated channels:
+In this step, you can see a code sample using the Node SDK of how you'd trigger your workflow. This is actually the code that gets run in a server action when you submit the form on this page. Go ahead and submit a form to send a Slack message into your designated channels:
 
 ![trigger a workflow](./images/trigger-workflow.png)
+
+## Wrapping up
+
+We know this is a long tutorial, but just imagine how long it would be if you had to do all of this with SlackKit components and APIs. If you need help implementing any of the code in this example app, consider joining our [Slack community](https://knock.app/join-slack). We've got over 500 other developers in there learning how to improve their notification experiences with Knock.
+
+Thanks for reading and Knock on 🤘
