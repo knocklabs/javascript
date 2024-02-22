@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.21
+
+### Patch Changes
+
+- c9faba5: fix esm build issues with mjs files
+
 ## 0.8.20
 
 ### Patch Changes
