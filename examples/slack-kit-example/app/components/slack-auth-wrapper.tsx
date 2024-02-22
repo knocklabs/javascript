@@ -1,6 +1,9 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 "use client";
 
 import { SlackAuthButton, SlackAuthContainer } from "@knocklabs/react";
+
+/* eslint-disable turbo/no-undeclared-env-vars */
 
 export default function AuthWrapper() {
   return (
