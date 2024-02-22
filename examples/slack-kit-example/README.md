@@ -171,6 +171,65 @@ export default function Providers({
 }
 ```
 
+To create some of the necessary authentication data, like `userToken` and `userId` when implement the `Providers` component inside of the root `layout.tsx` file. In this code, we also add some additional grants to the `userToken` JWT to allow the user to interact with the Slack resources stored in Knock. You can read more about these [security and authentication steps in the docs](https://docs.knock.app/in-app-ui/security-and-authentication).
+
+**Note: this is necessary because the user in this context is an end user in your application who does not have access to Knock as a [member of the account](https://docs.knock.app/manage-your-account/managing-members). Therefore, these grants provide them elevated privileges to operate on specific resources using the API.**
+
+```
+import "@knocklabs/react/dist/index.css";
+import jwt from "jsonwebtoken";
+
+import Providers from "./components/providers";
+import "./global.css";
+import { getAppDetails } from "./lib/app-details";
+
+const { userId, tenant, collection, objectId } = getAppDetails();
+
+const currentTime = Math.floor(Date.now() / 1000);
+const expireInSeconds = 60 * 60;
+const signingKey = process.env.KNOCK_SIGNING_KEY!;
+
+const userToken = signingKey
+  ? jwt.sign(
+      {
+        sub: userId,
+        iat: currentTime,
+        exp: currentTime + expireInSeconds,
+        grants: {
+          [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
+            "slack/channels_read": [{}],
+          },
+          [`https://api.knock.app/v1/objects/${collection}/${objectId}`]: {
+            "channel_data/read": [{}],
+            "channel_data/write": [{}],
+          },
+        },
+      },
+      signingKey,
+      {
+        algorithm: "RS256",
+      },
+    )
+  : "secretOrPrivateKey";
+
+function MyApp({ children }: { children: React.ReactElement }) {
+  return (
+    <>
+      <html>
+        <body className="px-12 py-6">
+          <h1 className="text-2xl font-bold mb-6">SlackKit Demo App</h1>
+          <Providers userToken={userToken} knockUserId={userId} tenant={tenant}>
+            {children}
+          </Providers>
+        </body>
+      </html>
+    </>
+  );
+}
+
+export default MyApp;
+```
+
 ## Authenticating with Slack
 
 On this screen, you can initiate the OAuth flow with Slack. This page uses two SlackKit components to help facilitate this interaction: `SlackAuthButton` and `SlackAuthContainer`.
@@ -188,3 +247,7 @@ Both of these components are client-side components. The `SlackAuthButton` compo
     }
 />
 ```
+
+When this button is clicked, it will create an OAuth flow in a pop-up window where the user can authenticate with Slack and choose a workspace to install the app. Once the flow is complete, the pop-up window should close and the state of the component should update to show it is `Connected` to Slack. Behind the scenes, Knock handles the OAuth callback from Slack and stores an `access_token` on the `tenant` you provided to the `KnockSlackProvider` as [channel data](https://docs.knock.app/managing-recipients/setting-channel-data).
+
+**Note: if the pop-up window does not close, double check that the `redirectUrl` matches your current environment.**
