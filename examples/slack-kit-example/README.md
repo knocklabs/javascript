@@ -119,3 +119,72 @@ This step gives you an opportunity to confirm that you have all of the necessary
 
 If you click `Next` you'll navigate to a screen where you can confirm the Knock resources you'll use to connect your Slack app:
 ![confirm Knock resources screen](./images/confirm-knock-resources.png)
+
+If all of the values in this step look good, you can click `Next` to authenticate with your Slack app and store the `access_token` in Knock.
+
+## Sharing Knock and Slack state
+
+Before we dig into the actual SlackKit UI components and their functionality, let's look at how we share certain values across those components in our application.
+
+In the `@knocklabs/react` package, Knock already exposes a `KnockProvider` component that is meant to provide top-level authenticated and authorization to component farther down in the component tree.
+
+With the SlackKit release, the `@knocklabs/react` package now also contains a Slack-specific provider, called `KnockSlackProvider`. Since these both rely on React context, they are implemented as client-side components in `/app/components/providers.tsx` in the following manner:
+
+```
+"use client";
+
+import { KnockProvider, KnockSlackProvider } from "@knocklabs/react";
+
+export default function Providers({
+  userToken,
+  knockUserId,
+  tenant,
+  children,
+}: {
+  userToken: string;
+  knockUserId: string;
+  tenant: string;
+  children: JSX.Element;
+}) {
+  return (
+    <>
+      <KnockProvider
+        apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
+        userId={knockUserId}
+        host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
+        userToken={userToken}
+      >
+        {/*
+        The KnockProvider handles authentication with Knock, while the KnockSlackProvider
+        provides shared context to all Slack-related components.
+        Both are required for Slack-related apps.
+        */}
+        <KnockSlackProvider
+          knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
+          tenant={tenant}
+        >
+          {children}
+        </KnockSlackProvider>
+      </KnockProvider>
+    </>
+  );
+}
+```
+
+## Authenticating with Slack
+
+On this screen, you can initiate the OAuth flow with Slack. This page uses two SlackKit components to help facilitate this interaction: `SlackAuthButton` and `SlackAuthContainer`.
+![initiate Slack OAuth](./images/initiate-slack-auth.png)
+
+Both of these components are client-side components. The `SlackAuthButton` component takes your `redirectUrl` and `slackClientId` as props:
+
+```
+<SlackAuthContainer
+    actionButton={
+        <SlackAuthButton
+        slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
+        redirectUrl={process.env.NEXT_PUBLIC_REDIRECT_URL}
+        />
+    }
+/>
+```
