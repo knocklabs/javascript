@@ -28,7 +28,7 @@ Add a Slack channel with the `Client Id` and `Client Secret` from the `Basic Inf
 
 #### Create a new workflow
 
-Create a new [workflow](https://docs.knock.app/concepts/workflows) with a Slack channel step pointing to this Slack channel. Take note of this workflow key for use in the following steps.In the message template use the following liquid tag to test your ability to send messages: `A new issue was submitted: {{message}}`
+Create a new [workflow](https://docs.knock.app/concepts/workflows) with a Slack channel step pointing to this Slack channel. Take note of this workflow key for use in the following steps. In the message template use the following liquid tag to test your ability to send messages: `A new issue was submitted: {{message}}`
 
 ### Environment variables
 

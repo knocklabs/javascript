@@ -2,8 +2,6 @@
 
 import { SlackAuthButton, SlackAuthContainer } from "@knocklabs/react";
 
-import { getAppDetails } from "../lib/app-details";
-
 export default function AuthWrapper() {
   return (
     <div>

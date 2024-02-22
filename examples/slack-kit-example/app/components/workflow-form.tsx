@@ -3,8 +3,6 @@
 import { useRef } from "react";
 import { useFormStatus } from "react-dom";
 
-import { triggerWorkflow } from "../lib/knock";
-
 export default function WorkflowForm({
   action,
 }: {
