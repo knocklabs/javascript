@@ -1,4 +1,4 @@
-This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
+SlackKit is a collection of drop-in React components and APIs that radically simplifies the process of adding a Slack integration to a SaaS product. This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
 
 ## Getting started
 
@@ -111,3 +111,11 @@ npm run dev
 //or
 yarn dev
 ```
+
+If you open the app in a browser at `http://localhost:3000` you should see a screen that looks like this:
+![confirm env vars screen](./images/confirm-env-vars.png)
+
+This step gives you an opportunity to confirm that you have all of the necessary environment variables needed to use the application.
+
+If you click `Next` you'll navigate to a screen where you can confirm the Knock resources you'll use to connect your Slack app:
+![confirm Knock resources screen](./images/confirm-knock-resources.png)
