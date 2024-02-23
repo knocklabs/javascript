@@ -309,6 +309,6 @@ In this step, you can see a code sample using the Node SDK of how you'd trigger 
 
 ## Wrapping up
 
-We know this is a long tutorial, but just imagine how long it would be if you had to do all of this without SlackKit components and APIs. If you need help implementing any of the code in this example app, consider joining our [Slack community](https://knock.app/join-slack). We've got over 500 other developers in there learning how to improve their notification experiences with Knock.
+If you need help implementing any of the code in this example app, consider joining our [Slack community](https://knock.app/join-slack). We've got over 500 other developers in there learning how to improve their notification experiences with Knock.
 
 Thanks for reading and Knock on 🤘
