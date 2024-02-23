@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.9
+
+### Patch Changes
+
+- c9faba5: fix esm build issues with mjs files
+- Updated dependencies [c9faba5]
+  - @knocklabs/react-core@0.1.6
+  - @knocklabs/client@0.8.21
+
 ## 0.1.8
 
 ### Patch Changes

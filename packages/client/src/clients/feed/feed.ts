@@ -1,4 +1,4 @@
-import { EventEmitter2 as EventEmitter } from "eventemitter2";
+import EventEmitter from "eventemitter2";
 import { Channel } from "phoenix";
 import { StoreApi } from "zustand";
 

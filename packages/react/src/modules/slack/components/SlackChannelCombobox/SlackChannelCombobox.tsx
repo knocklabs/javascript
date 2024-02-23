@@ -12,8 +12,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFilter } from "react-aria";
 
 import { Spinner, useOutsideClick } from "../../../core";
+import "../../theme.css";
+import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
-import SlackAddChannelInput from "./SlackAddChannelInput";
 import SlackChannelListBox from "./SlackChannelListBox";
 import SlackConnectionError from "./SlackConnectionError";
 import SearchIcon from "./icons/SearchIcon";
@@ -62,7 +63,13 @@ export const SlackChannelCombobox = ({
 
   // Used to close the combobox when clicking outside of it
   const comboboxRef = useRef(null);
-  useOutsideClick({ ref: comboboxRef, fn: () => setComboboxListOpen(false) });
+  useOutsideClick({
+    ref: comboboxRef,
+    fn: () => {
+      setInputValue("");
+      setComboboxListOpen(false);
+    },
+  });
 
   // Gather API data
   const { connectionStatus, errorLabel: connectionErrorLabel } =
@@ -84,6 +91,16 @@ export const SlackChannelCombobox = ({
   >(null);
 
   useEffect(() => {
+    if (comboboxListOpen) {
+      // Timeout to allow for the state to update and the component to re-render
+      // when we change the `comboboxListOpen` state upon focus
+      setTimeout(() => {
+        document.getElementById("slack-channel-search")?.focus();
+      }, 0);
+    }
+  }, [comboboxListOpen]);
+
+  useEffect(() => {
     // Used to make sure we're only showing currently available channels to select from.
     // There are cases where a channel is "connected" in Knock, but it wouldn't be
     // posting to it if the channel is private and the Slackbot doesn't belong to it,
@@ -92,9 +109,10 @@ export const SlackChannelCombobox = ({
       slackChannels.map((channel) => [channel.id, channel]),
     );
 
-    const channels = connectedChannels?.filter((connectedChannel) => {
-      return slackChannelsMap.has(connectedChannel.channel_id);
-    }) || [];
+    const channels =
+      connectedChannels?.filter((connectedChannel) => {
+        return slackChannelsMap.has(connectedChannel.channel_id);
+      }) || [];
 
     setCurrentConnectedChannels(channels);
   }, [connectedChannels, slackChannels]);
@@ -219,7 +237,7 @@ export const SlackChannelCombobox = ({
   }
 
   return (
-    <div ref={comboboxRef}>
+    <div ref={comboboxRef} className="rsk-combobox">
       <Popover.Root
         open={connectionStatus !== "disconnected" ? comboboxListOpen : false}
       >
@@ -227,13 +245,13 @@ export const SlackChannelCombobox = ({
           <label htmlFor="slack-channel-search">Search channels</label>
         </VisuallyHidden.Root>
         <Popover.Trigger asChild>
-          <div className="rnf-trigger-container">
+          <div className="rsk-combobox__searchbar">
             <div
-              className={"rnf-input-icon-container"}
+              className={"rsk-combobox__searchbar__input-container"}
               {...inputContainerProps}
             >
               <div
-                className={`rnf-input-icon ${inErrorState && "rnf-input-icon-error"}`}
+                className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
               >
                 {inLoadingState ? (
                   <Spinner size="15px" thickness={3} />
@@ -241,20 +259,23 @@ export const SlackChannelCombobox = ({
                   <SearchIcon />
                 )}
               </div>
-              <div>
-                <input
-                  className={`rnf-input-with-icon ${inErrorState && "rnf-input-with-icon-error"}`}
-                  tabIndex={-1}
-                  id="slack-channel-search"
-                  type="text"
-                  onFocus={() => setComboboxListOpen(true)}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={searchPlaceholder || ""}
-                  disabled={!!inErrorState}
-                  {...inputProps}
-                />
-              </div>
+
+              <input
+                className={`rsk-combobox__searchbar__input-container__input ${inErrorState ? "rsk-combobox__searchbar__input-container__input--error" : ""}`}
+                tabIndex={-1}
+                id="slack-channel-search"
+                type="text"
+                onFocus={() =>
+                  slackChannels.length > 0 && setComboboxListOpen(true)
+                }
+                onChange={(e) => setInputValue(e.target.value)}
+                value={inputValue}
+                placeholder={searchPlaceholder || ""}
+                disabled={!!inErrorState}
+                {...inputProps}
+              />
             </div>
+
             <SlackConnectionError />
           </div>
         </Popover.Trigger>

@@ -7,12 +7,12 @@ const SlackConnectionError = () => {
 
   if (connectionStatus === "disconnected" || connectionStatus === "error") {
     return (
-      <div className="rnf-disconnected-info-container">
+      <div className="rsk-combobox__error">
         <span>
           <InfoIcon />
         </span>
 
-        <div className="rnf-info-container-text">
+        <div className="rsk-combobox__error__text">
           {connectionStatus === "disconnected"
             ? "There was an error connecting to Slack. Try reconnecting to find and select channels from your workspace."
             : "Try reconnecting to Slack to find and select channels from your workspace."}

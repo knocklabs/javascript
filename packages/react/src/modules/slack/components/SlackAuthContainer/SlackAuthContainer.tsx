@@ -1,5 +1,6 @@
 import { SlackIcon } from "../SlackIcon";
 import "./styles.css";
+import "../../theme.css"
 
 export const SlackAuthContainer = ({
   actionButton,
@@ -7,13 +8,13 @@ export const SlackAuthContainer = ({
   actionButton: React.ReactElement;
 }) => {
   return (
-    <div className="rnf-slack-container-container">
-      <div className="rnf-slack-container-header">
+    <div className="rsk-auth">
+      <div className="rsk-auth__header">
         <SlackIcon height="32px" width="32px" />
         <div>{actionButton}</div>
       </div>
-      <div className="rnf-slack-container-title">Slack</div>
-      <div className="rnf-slack-container-description">
+      <div className="rsk-auth__title">Slack</div>
+      <div className="rsk-auth__description">
         Connect to get notifications in your Slack workspace.
       </div>
     </div>

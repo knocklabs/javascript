@@ -2,7 +2,9 @@ import { SlackChannel, SlackChannelConnection } from "@knocklabs/client";
 import { AriaListBoxOptions } from "@react-aria/listbox";
 
 import SlackChannelOption from "./SlackChannelOption";
+
 import "./styles.css";
+import "../../theme.css"
 
 type Props = AriaListBoxOptions<unknown> & {
   slackChannels: SlackChannel[];
@@ -24,7 +26,7 @@ const SlackChannelListBox = ({
   isUpdating,
 }: Props) => {
   return (
-    <div className="rnf-list-box" {...listBoxProps}>
+    <div className="rsk-combobox__list-box" {...listBoxProps}>
       {slackChannels.map((channel) => {
         return (
           <SlackChannelOption

@@ -1,9 +1,9 @@
 /// <reference types="vitest" />
-import { defineConfig, LibraryFormats, loadEnv } from "vite";
-import { resolve } from "path";
 import react from "@vitejs/plugin-react";
-import noBundlePlugin from "vite-plugin-no-bundle";
+import { resolve } from "path";
+import { LibraryFormats, defineConfig, loadEnv } from "vite";
 import dts from "vite-plugin-dts";
+import noBundlePlugin from "vite-plugin-no-bundle";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -23,7 +23,8 @@ export default defineConfig(({ mode }) => {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
-        entry: resolve(__dirname, "src/index.ts"),
+        entry: resolve(__dirname, "src"),
+        fileName: `[name]`,
         name: "react-core",
         formats,
       },
@@ -32,12 +33,11 @@ export default defineConfig(({ mode }) => {
         external: ["react"],
         output: {
           interop: "compat",
-          format: formats[0],
           globals: {
             react: "React",
           },
           entryFileNames: () => {
-            return "[name].js";
+            return `[name].${CJS ? "js" : "mjs"}`;
           },
         },
       },

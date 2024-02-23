@@ -6,7 +6,9 @@ import { Spinner } from "../../../core";
 import CheckmarkIcon from "./icons/CheckmarkIcon";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
+
 import "./styles.css";
+import "../../theme.css"
 
 type Props = {
   channel: SlackChannel;
@@ -39,7 +41,7 @@ const SlackChannelOption = ({
       return <CheckmarkIcon isConnected={isConnected} />;
     }
 
-    return <div />;
+    return <div className="rsk-combobox__option__text-container__empty-icon"/>;
   };
 
   const handleOptionClick = (channelId: string) => {
@@ -56,7 +58,7 @@ const SlackChannelOption = ({
   return (
     <button
       key={channel.id}
-      className="rnf-channel-option-button"
+      className="rsk-combobox__option__button"
       onClick={() => !isLoading && handleOptionClick(channel.id)}
       disabled={isLoading || isUpdating}
       onMouseEnter={() => setIsHovered(true)}
@@ -64,9 +66,9 @@ const SlackChannelOption = ({
       tabIndex={tabIndex}
       {...channelOptionProps}
     >
-      <div className="rnf-slack-channel-option-text-with-icon">
-        <div className="rnf-connected-status-icon">{icon()}</div>
-        <div className="rnf-icon">
+      <div className="rsk-combobox__option__text-container">
+        <div className="rsk-combobox__option__text-container__connection-icon">{icon()}</div>
+        <div className="rsk-combobox__option__text-container__channel-icon">
           {channel.is_private ? <LockIcon /> : <HashtagIcon />}
         </div>
       </div>

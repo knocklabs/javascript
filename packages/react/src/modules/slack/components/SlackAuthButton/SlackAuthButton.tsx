@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { SlackIcon } from "../SlackIcon";
 
 import "./styles.css";
+import "../../theme.css"
 
 type Props = {
   slackClientId: string;
@@ -82,7 +83,7 @@ export const SlackAuthButton: React.FC<Props> = ({
   // Loading states
   if (connectionStatus === "connecting" || connectionStatus === "disconnecting") {
     return (
-      <div className="rnf-slackConnect-button rnf-slackConnect-button--loading">
+      <div className="rsk-connect__button rsk-connect__button--loading">
         <SlackIcon height="16px" width="16px" />
         <span>
           {connectionStatus === "connecting"
@@ -98,12 +99,12 @@ export const SlackAuthButton: React.FC<Props> = ({
     return (
       <button
         onClick={() => openSlackOauthPopup(buildSlackAuthUrl())}
-        className="rnf-slackConnect-button rnf-slackConnect-button--error"
+        className="rsk-connect__button rsk-connect__button--error"
         onMouseEnter={() => setActionLabel("Reconnect")}
         onMouseLeave={() => setActionLabel("")}
       >
         <SlackIcon height="16px" width="16px" />
-        <span className="rnf-slackConnect-text--error">
+        <span className="rsk-connect__button__text--error">
           {actionLabel || errorLabel || "Error"}
         </span>
       </button>
@@ -115,7 +116,7 @@ export const SlackAuthButton: React.FC<Props> = ({
     return (
       <button
         onClick={() => openSlackOauthPopup(buildSlackAuthUrl())}
-        className="rnf-slackConnect-button rnf-slackConnect-button--disconnected"
+        className="rsk-connect__button rsk-connect__button--disconnected"
       >
         <SlackIcon height="16px" width="16px" />
         <span>Connect to Slack</span>
@@ -127,12 +128,12 @@ export const SlackAuthButton: React.FC<Props> = ({
   return (
     <button
       onClick={disconnectFromSlack}
-      className="rnf-slackConnect-button rnf-slackConnect-button--connected"
+      className="rsk-connect__button rsk-connect__button--connected"
       onMouseEnter={() => setActionLabel("Disconnect")}
       onMouseLeave={() => setActionLabel("")}
     >
       <SlackIcon height="16px" width="16px" />
-      <span className="rnf-slackConnect-text--connected">
+      <span className="rsk-connect__button__text--connected">
         {actionLabel || "Connected"}
       </span>
     </button>

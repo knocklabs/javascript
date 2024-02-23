@@ -1,77 +1,62 @@
 :root {
-  --slack-connect-connected-color: rgba(51, 163, 102, 1); /* Green */
-  --slack-connect-disconnect-border-color: rgba(230, 71, 51, 1); /* Red */
-  --slack-connect-disconnect-background-color: rgba(
-    255,
-    245,
-    245,
-    1
-  ); /* Light red background */
-  --slack-connect-border-color: #dddee1; /* Light grey */
-  --slack-connect-background-color: #fff; /* White */
-  --slack-connect-font-family: Inter, sans-serif;
-  --slack-connect-default-color: #000; /* Black */
-  --slack-connect-disconnected-hover-color: rgba(247, 247, 248, 1);
-  --slack-connect-error-color: rgba(205, 123, 46, 1);
-  --slack-connect-text-loading-color: rgba(158, 160, 170, 1);
-  --slack-connect-border-loading-color: rgba(228, 232, 238, 1);
+  --rsk-connected-color: rgba(51, 163, 102, 1);
+  --rsk-disconnect-border-color: rgba(230, 71, 51, 1);
+  --rsk-disconnect-background-color: rgba(255, 245, 245, 1);
+  --rsk-error-red: rgba(205, 123, 46, 1);
 }
 
-.rnf-slackConnect-button {
-  background-color: var(--slack-connect-background-color);
-  border: 1px solid var(--slack-connect-border-color);
-  border-radius: 6px;
+.rsk-connect__button {
+  background-color: var(--rsk-color-white);
+  border: 1px solid var(--rsk-color-gray-200);
+  border-radius: var(--rsk-button-border-radius);
   box-sizing: border-box;
-  color: var(--slack-connect-default-color);
+  color: var(--rsk-color-black);
   cursor: pointer;
   display: inline-flex;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 4px 8px;
+  font-family: var(--rsk-font-family-sanserif);
+  font-size: var(--rsk-font-size-sm);
+  font-weight: var(--rsk-font-weight-normal);
+  gap: var(--rsk-spacing-2);
+  padding: var(--rsk-spacing-1) var(--rsk-spacing-2);
   text-decoration: none;
-  font-family: var(--slack-connect-font-family);
-  gap: 8px;
-  text-wrap: nowrap;
   text-overflow: ellipsis;
+  text-wrap: nowrap;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-.rnf-slackConnect-button--connected {
-  color: var(--slack-connect-connected-color);
-  border-color: var(--slack-connect-connected-color);
+.rsk-connect__button--connected {
+  border-color: var(--rsk-connected-color);
+  color: var(--rsk-connected-color);
 }
 
-.rnf-slackConnect-button--error {
-  color: var(--slack-connect-error-color);
-  border-color: var(--slack-connect-error-color);
+.rsk-connect__button--error {
+  border-color: var(--rsk-error-red);
+  color: var(--rsk-error-red);
 }
 
-.rnf-slackConnect-button--loading {
-  color: var(--slack-connect-text-loading-color);
-  border-color: var(--slack-connect-border-loading-color);
+.rsk-connect__button--loading {
+  border-color: var(--rsk-color-gray-100);
+  color: var(--rsk-color-gray-400);
   pointer-events: none;
 }
 
-/* Hover state for both the button and text when in connected state*/
-.rnf-slackConnect-button--disconnected:hover {
-  background-color: var(--slack-connect-disconnected-hover-color);
+.rsk-connect__button--disconnected:hover {
+  background-color: var(--rsk-button-hover-color);
 }
 
-/* Hover state for both the button and text when in connected state*/
-.rnf-slackConnect-button--connected:hover,
-.rnf-slackConnect-text--connected:hover {
-  color: var(--slack-connect-disconnect-border-color);
-  border-color: var(--slack-connect-disconnect-border-color);
-  background-color: var(--slack-connect-disconnect-background-color);
+.rsk-connect__button--connected:hover,
+.rsk-connect__button__text--connected:hover {
+  background-color: var(--rsk-disconnect-background-color);
+  border-color: var(--rsk-disconnect-border-color);
+  color: var(--rsk-disconnect-border-color);
 }
 
-/* Hover state for both the button and text when in error state */
-.rnf-slackConnect-button--error:hover,
-.rnf-slackConnect-text--error:hover {
-  color: var(--slack-connect-default-color);
-  border-color: var(--slack-connect-default-color);
+.rsk-connect__button--error:hover,
+.rsk-connect__button__text--error:hover {
+  border-color: var(--rsk-color-black);
+  color: var(--rsk-color-black);
 }
 
-/* Active state for the button */
-.rnf-slackConnect-button:active {
+.rsk-connect__button:active {
   transform: translate(1px, 1px);
 }

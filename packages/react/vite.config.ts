@@ -1,15 +1,16 @@
 /// <reference types="vitest" />
-import { defineConfig, LibraryFormats, loadEnv } from "vite";
-import { resolve } from "path";
 import react from "@vitejs/plugin-react";
-import noBundlePlugin from "vite-plugin-no-bundle";
-import dts from "vite-plugin-dts";
+import { resolve } from "path";
 import execute from "rollup-plugin-execute";
+import { LibraryFormats, defineConfig, loadEnv } from "vite";
+import dts from "vite-plugin-dts";
+import noBundlePlugin from "vite-plugin-no-bundle";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const target = env?.BUILD_TARGET?.toLowerCase() as LibraryFormats;
+  const CJS = env.BUILD_TARGET?.toLocaleLowerCase()?.match("cjs");
+  const formats: LibraryFormats[] = CJS ? ["cjs"] : ["es"];
 
   return {
     plugins: [
@@ -20,12 +21,12 @@ export default defineConfig(({ mode }) => {
       noBundlePlugin({ root: resolve(__dirname, "src") }),
     ],
     build: {
-      outDir: target === "cjs" ? "dist/cjs" : "dist/esm",
+      outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
-        entry: resolve(__dirname, "src/index.ts"),
+        entry: resolve(__dirname, "src"),
         fileName: "[name]",
-        formats: [target],
+        formats,
         name: "react",
       },
       rollupOptions: {
@@ -43,6 +44,9 @@ export default defineConfig(({ mode }) => {
             }
             return assetInfo.name;
           },
+          entryFileNames: () => {
+            return `[name].${CJS ? "js" : "mjs"}`;
+          },
         },
         plugins: [
           execute([
@@ -51,8 +55,8 @@ export default defineConfig(({ mode }) => {
             // Delete extra .css.js files
             `find ./dist -name "*.css.js" -delete`,
             `find ./dist -name "*.css.js.map" -delete`,
-            `find ./dist -name "*.css.esm.js" -delete`,
-            `find ./dist -name "*.css.esm.js.map" -delete`,
+            `find ./dist -name "*.css.mjs" -delete`,
+            `find ./dist -name "*.css.mjs.map" -delete`,
           ]),
           // Remove css imports
           {
