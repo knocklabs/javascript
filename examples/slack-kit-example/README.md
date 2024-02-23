@@ -79,7 +79,7 @@ curl --location --request PUT 'https://api.knock.app/v1/tenants/<tenant-id>' \
 
 #### Create an object
 
-In Knock, [objects](https://docs.knock.app/concepts/objects) are flexible abstractions, and with SlackKit they are used to store channels and act as the recipient of your workflows. You can't create a new object from the dashboard, so you can use this cURL command to create an object by replacing the values for `object-collection`, `object-id`, `KNOCK_API_KEY`, and `object-name`:
+In SlackKit, [objects](https://docs.knock.app/concepts/objects) are used to store channels and act as the recipient of your workflows. You can't create a new object from the dashboard, so you can use this cURL command to create an object by replacing the values for `object-collection`, `object-id`, `KNOCK_API_KEY`, and `object-name`:
 
 ```
 curl --location --request PUT 'https://api.knock.app/v1/objects/<object-collection>/<object-id>' \
