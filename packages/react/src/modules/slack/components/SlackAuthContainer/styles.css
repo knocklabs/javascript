@@ -1,28 +1,28 @@
-.rnf-slack-container-container {
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid var(--Gray-Gray-100, #e4e8ee);
-  background: var(--Gray-White, #fff);
-  font-family: var(--slack-connect-font-family);
-  font-size: 14px;
-  font-weight: 500;
+.rsk-auth {
+	background: var(--rsk-color-white);
+	border: 1px solid var(--rsk-color-gray-100);
+	border-radius: var(--rsk-border-radius-lg);
+	font-family: var(--rsk-font-family-sanserif);
+	font-size: var(--rsk-font-size-sm);
+	font-weight: var(--rsk-font-weight-normal);
+	padding: var(--rsk-spacing-5);
+	}
+
+.rsk-auth__header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
 
-.rnf-slack-container-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.rsk-auth__title {
+	color: rgba(26, 31, 54, 1);
+	font-size: var(--rsk-font-size-md);
+	line-height: var(--rsk-spacing-5);
+	margin-top: var(--rsk-spacing-4);
 }
 
-.rnf-slack-container-title {
-  margin-top: 16px;
-  color: rgba(26, 31, 54, 1);
-  font-size: 16px;
-  line-height: 20px;
-}
-
-.rnf-slack-container-description {
-  color: rgba(81, 86, 105, 1);
-  font-size: 14px;
-  line-height: 20px;
+.rsk-auth__description {
+	color: rgba(81, 86, 105, 1);
+	font-size: var(--rsk-font-size-sm);
+	line-height: var(--rsk-spacing-5);
 }
