@@ -14,21 +14,23 @@ First, visit https://api.slack.com/apps and sign into your account. Then click `
 
 #### Add bot features
 
-Under `Add features and functionality` select `Bots` features. Then, under `OAuth and Permissions`, give it `channels:read` scope. It doesn’t really need any scopes here since we’ll be sending scopes we need from the component, but we need to do this so we can expose the redirect url form.
+Under `Add features and functionality` select `Bots` features. Then, under `OAuth and Permissions`, give it the `channels:read` scope. It doesn’t really need any scopes here since we’ll be sending the scopes we need from the component, but we need to do this so we can expose the redirect url form.
 
 #### Add redirect URL
 
-Also under `OAuth and Permissions`, find the redirect URL section and add this Knock URL to that field: https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you. Finally, Under `Manage distribution`, allow it to be publicly distributed
+Also under `OAuth and Permissions`, find the redirect URL section and add this Knock URL to that field: https://api.knock.app/providers/slack/authenticate. Knock's API endpoint will handle the OAuth callback for you and store a Slack access token. Finally, Under `Manage distribution`, allow it to be publicly distributed
 
 ### Setting up Knock
 
+For this tutorial, you'll need a Knock account. If you don't already have one, you can [sign up on this page](https://dashboard.knock.app/signup).
+
 #### Create a Slack channel
 
-Add a Slack channel with the `Client Id` and `Client Secret` from the `Basic Info` section of your Slack. Take note of this channel id for use in the next step.
+Add [a Slack channel in Knock](https://docs.knock.app/concepts/channels#channel-settings) with the `Client Id` and `Client Secret` from the `Basic Info` section of your Slack. Take note of this channel id for use in the next step.
 
 #### Create a new workflow
 
-Create a new [workflow](https://docs.knock.app/concepts/workflows) with a Slack channel step pointing to this Slack channel. Take note of this workflow key for use in the following steps. In the message template use the following liquid tag to test your ability to send messages: `A new issue was submitted: {{message}}`
+Create a new [workflow](https://docs.knock.app/concepts/workflows) with a [Slack channel step](https://docs.knock.app/designing-workflows/channel-step) pointing to this Slack channel. Take note of this workflow key for use in the following steps. In the [message template](https://docs.knock.app/designing-workflows/template-editor/overview) use the following liquid tag to test your ability to send messages: `A new issue was submitted: {{message}}`
 
 ### Environment variables
 
@@ -41,18 +43,14 @@ All of these values are sourced from environment variables at runtime. The examp
 | KNOCK_SIGNING_KEY                  | This value comes from Knock and is used to sign a JWT on behalf of a user to store channel data for Slack tokens and channel ids. You can generate a signing key under "Developers" > "API keys." Use the PEM encoded version. **This is a secret value and should not be exposed publicly.** |
 | KNOCK_API_KEY                      | This value comes from Knock and is used to authenticate server-side API requests. You can find it listed as the secret key under "Developers" > "API keys." **This is a secret value and should not be exposed publicly.**                                                                    |
 | NEXT_PUBLIC_KNOCK_CLIENT_ID        | This value comes from Knock and is used to authenticate public API requests from the browser. You can find it listed as the public key under "Developers" > "API keys."                                                                                                                       |
-| NEXT_PUBLIC_KNOCK_API_URL          | This value comes from Knock and is used to construct the URL for API endpoints                                                                                                                                                                                                                |
+| NEXT_PUBLIC_KNOCK_API_URL          | This value comes from Knock and is used to construct the URL for API endpoints. You can keep the default value for this.                                                                                                                                                                      |
 | NEXT_PUBLIC_REDIRECT_URL           | This value comes from your application. It is where Knock will redirect your user after the OAuth flow with Slack. The default of `http://localhost:3000` is valid when running this project locally.                                                                                         |
 
 ### Knock resource variables
 
-To make the connection to Slack channels and Knock objects, you'll also need to provide ids for several types of resources in Knock. To do this, you can replace the values in the `getAppDetails` function inside of the `/app/lib/app-details.ts` file. That function looks like this:
+To make the connection between Slack channels and Knock objects, you'll also need to provide details for several types of resources in Knock. To do this, you can replace the values in the `getAppDetails` function inside of the `/app/lib/app-details.ts` file. These values would typically be determined by your application's business logic, but we can hardcode them for this example:
 
 ```
-// TODO:Add your app details
-// This function returns some values that would normally be determined
-// by your application's business logic. We're hardcoding them for convenience
-
 export function getAppDetails() {
   return {
     tenant: "knock-projects",
@@ -68,7 +66,7 @@ You should already have a value for `workflowKey` from a previous step, and you 
 
 #### Create a tenant
 
-In Knock, [tenants](https://docs.knock.app/concepts/tenants) are an important concept, and with SlackKit they are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include it's ID as the value for the `tenant` property in the `getAppDetails` function. You can also use this CURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
+In Knock, [tenants](https://docs.knock.app/concepts/tenants) are an important concept, and with SlackKit they are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include it's ID as the value for the `tenant` property in the `getAppDetails` function. You can also use this cURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
 
 ```
 curl --location --request PUT 'https://api.knock.app/v1/tenants/<tenant-id>' \
@@ -128,7 +126,7 @@ If all of the values in this step look good, you can click `Next` to authenticat
 
 Before we dig into the actual SlackKit UI components and their functionality, let's look at how we share certain values across those components in our application.
 
-In the `@knocklabs/react` package, Knock already exposes a `KnockProvider` component that is meant to provide top-level authenticated and authorization to component farther down in the component tree.
+In the `@knocklabs/react` package, Knock already exposes a `KnockProvider` component that is meant to provide top-level authentication and authorization to components farther down in the component tree.
 
 With the SlackKit release, the `@knocklabs/react` package now also contains a Slack-specific provider, called `KnockSlackProvider`. Since these both rely on React context, they are implemented as client-side components in `/app/components/providers.tsx` in the following manner:
 
@@ -173,7 +171,7 @@ export default function Providers({
 }
 ```
 
-To create some of the necessary authentication data, like `userToken` and `userId` when implement the `Providers` component inside of the root `layout.tsx` file. In this code, we also add some additional grants to the `userToken` JWT to allow the user to interact with the Slack resources stored in Knock. You can read more about these [security and authentication steps in the docs](https://docs.knock.app/in-app-ui/security-and-authentication).
+To create some of the necessary authentication data, like `userToken` and `userId`, we implement the `Providers` component inside of the root `layout.tsx` file. In this code, which runs on the server, we also add some additional grants to the `userToken` JWT to allow the user to interact with the Slack resources stored in Knock. You can read more about these [security and authentication steps in the docs](https://docs.knock.app/in-app-ui/security-and-authentication).
 
 **Note: this is necessary because the user in this context is an end user in your application who does not have access to Knock as a [member of the account](https://docs.knock.app/manage-your-account/managing-members). Therefore, these grants provide them elevated privileges to operate on specific resources using the API.**
 
@@ -251,7 +249,7 @@ Both of these components are client-side components. The `SlackAuthButton` compo
 />
 ```
 
-When this button is clicked, it will create an OAuth flow in a pop-up window where the user can authenticate with Slack and choose a workspace to install the app. Once the flow is complete, the pop-up window should close and the state of the component should update to show it is `Connected` to Slack. Behind the scenes, Knock handles the OAuth callback from Slack and stores an `access_token` on the `tenant` you provided to the `KnockSlackProvider` as [channel data](https://docs.knock.app/managing-recipients/setting-channel-data).
+When this button is clicked, it will initiate an OAuth flow in a pop-up window where the user can authenticate with Slack and choose a workspace to install the app. Once the flow is complete, the pop-up window should close and the state of the component should update to show it is `Connected` to Slack. Behind the scenes, Knock handles the OAuth callback from Slack and stores an `access_token` on the `tenant` you provided to the `KnockSlackProvider` as [channel data](https://docs.knock.app/managing-recipients/setting-channel-data).
 
 **Note: if the pop-up window does not close, double check that the `redirectUrl` matches your current environment.**
 
@@ -297,18 +295,20 @@ At this point, Knock has all of the information it needs to send Slack messages 
 
 ## Examine channel data
 
-In this step, you're not required to take any action, but this route uses the Node SDK to pull channel data for your object recipient and tenant. Hopefully, this gives you an idea of how Knock is storing the data and these two abstractions interact.
+In this step, you're not required to take any action, but this page uses the Node SDK to pull channel data for your object recipient and tenant. Hopefully, this gives you an idea of how Knock is storing the data and these two abstractions interact.
 
-If you select `Previous` and modify your selected channels, you should see the channel ids stored on the object channel data change if you reload this route. If you click `Next` you can test your workflow end-to-end.
+This data is pulled dynamically, so if you make different channel selections or disconnect and reconnect your Slack auth, the value for `access_token` and `connections.channelIds` will change as well.
+
+If you click `Next` you can test your workflow end-to-end.
 
 ## Trigger your workflow
 
-In this step, you can see a code sample using the Node SDK of how you'd trigger your workflow. This is actually the code that gets run in a server action when you submit the form on this page. Go ahead and submit a form to send a Slack message into your designated channels:
+In this step, you can see a code sample using the Node SDK of how you'd trigger your workflow. This is actually the code that runs in a server action when you submit the form on this page. Go ahead and submit a form to send a Slack message into your designated channels:
 
 ![trigger a workflow](./images/trigger-workflow.png)
 
 ## Wrapping up
 
-We know this is a long tutorial, but just imagine how long it would be if you had to do all of this with SlackKit components and APIs. If you need help implementing any of the code in this example app, consider joining our [Slack community](https://knock.app/join-slack). We've got over 500 other developers in there learning how to improve their notification experiences with Knock.
+We know this is a long tutorial, but just imagine how long it would be if you had to do all of this without SlackKit components and APIs. If you need help implementing any of the code in this example app, consider joining our [Slack community](https://knock.app/join-slack). We've got over 500 other developers in there learning how to improve their notification experiences with Knock.
 
 Thanks for reading and Knock on 🤘
