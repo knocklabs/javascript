@@ -1,4 +1,4 @@
-SlackKit is a collection of drop-in React components and APIs that radically simplifies the process of adding a Slack integration to a SaaS product. This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
+SlackKit is a collection of embeddable UI components and APIs that radically simplifies the process of adding a Slack integration to a SaaS product. This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
 
 ## Getting started
 
