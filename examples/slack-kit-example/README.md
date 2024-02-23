@@ -295,7 +295,7 @@ At this point, Knock has all of the information it needs to send Slack messages 
 
 ## Examine channel data
 
-In this step, you're not required to take any action, but this page uses the Node SDK to pull channel data for your object recipient and tenant. Hopefully, this gives you an idea of how Knock is storing the data and these two abstractions interact.
+In this step, you're not required to take any action, but this page uses the Node SDK to pull channel data for your object recipient and tenant. This will give you an idea of how Knock is storing the data and these two abstractions interact.
 
 This data is pulled dynamically, so if you make different channel selections or disconnect and reconnect your Slack auth, the value for `access_token` and `connections.channelIds` will change as well.
 
