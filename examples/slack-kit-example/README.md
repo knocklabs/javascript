@@ -66,7 +66,7 @@ You should already have a value for `workflowKey` from a previous step, and you 
 
 #### Create a tenant
 
-In Knock, [tenants](https://docs.knock.app/concepts/tenants) are an important concept, and with SlackKit they are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include it's ID as the value for the `tenant` property in the `getAppDetails` function. You can also use this cURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
+In SlackKit, [tenants](https://docs.knock.app/concepts/tenants) are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include it's ID as the value for the `tenant` property in the `getAppDetails` function. You can also use this cURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
 
 ```
 curl --location --request PUT 'https://api.knock.app/v1/tenants/<tenant-id>' \
