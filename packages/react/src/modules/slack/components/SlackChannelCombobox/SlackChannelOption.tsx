@@ -2,13 +2,12 @@ import { SlackChannel } from "@knocklabs/client";
 import { useEffect, useState } from "react";
 
 import { Spinner } from "../../../core";
+import "../../theme.css";
 
 import CheckmarkIcon from "./icons/CheckmarkIcon";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
-
 import "./styles.css";
-import "../../theme.css"
 
 type Props = {
   channel: SlackChannel;
@@ -41,7 +40,7 @@ const SlackChannelOption = ({
       return <CheckmarkIcon isConnected={isConnected} />;
     }
 
-    return <div className="rsk-combobox__option__text-container__empty-icon"/>;
+    return <div className="rsk-combobox__option__text-container__empty-icon" />;
   };
 
   const handleOptionClick = (channelId: string) => {
@@ -67,12 +66,14 @@ const SlackChannelOption = ({
       {...channelOptionProps}
     >
       <div className="rsk-combobox__option__text-container">
-        <div className="rsk-combobox__option__text-container__connection-icon">{icon()}</div>
+        <div className="rsk-combobox__option__text-container__connection-icon">
+          {icon()}
+        </div>
         <div className="rsk-combobox__option__text-container__channel-icon">
           {channel.is_private ? <LockIcon /> : <HashtagIcon />}
         </div>
+        <div className="rsk-combobox__option__text-container__text">{channel.name}</div>
       </div>
-      {channel.name}
     </button>
   );
 };

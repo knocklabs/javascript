@@ -111,7 +111,7 @@ export const SlackChannelCombobox = ({
 
     const channels =
       connectedChannels?.filter((connectedChannel) => {
-        return slackChannelsMap.has(connectedChannel.channel_id);
+        return slackChannelsMap.has(connectedChannel.channel_id || "");
       }) || [];
 
     setCurrentConnectedChannels(channels);
@@ -153,6 +153,10 @@ export const SlackChannelCombobox = ({
       );
     }
 
+    if (connectedChannelsError) {
+      return connectedChannelsError;
+    }
+
     const numberConnectedChannels = currentConnectedChannels?.length || 0;
 
     if (currentConnectedChannels && numberConnectedChannels === 0) {
@@ -185,6 +189,7 @@ export const SlackChannelCombobox = ({
     connectionStatus,
     inLoadingState,
     slackChannels,
+    connectedChannelsError,
     currentConnectedChannels,
     inputMessages,
     connectionErrorLabel,
