@@ -67,6 +67,10 @@ export const SlackAuthButton: React.FC<Props> = ({
         if (event.data === "authComplete") {
           setConnectionStatus("connected");
         }
+
+        if (event.data === "authFailed") {
+          setConnectionStatus("error")
+        }
       } catch (error) {
         setConnectionStatus("error");
       }
