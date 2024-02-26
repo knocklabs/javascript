@@ -13,7 +13,7 @@ const de: I18nContent = {
     read: "Gelesen",
     unseen: "Ungesehen",
     slackConnectChannel: "Kanal verbinden",
-    slackChannelID: "Slack Kanal ID",
+    slackChannelId: "Slack Kanal ID",
     slackConnecting: "Verbinden mit Slack...",
     slackDisconnecting: "Trennen der Verbindung...",
     slackConnect: "Mit Slack verbinden",

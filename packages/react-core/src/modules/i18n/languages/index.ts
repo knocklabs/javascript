@@ -13,7 +13,7 @@ export interface Translations {
   readonly read: string;
   readonly unseen: string;
   readonly slackConnectChannel: string;
-  readonly slackChannelID: string;
+  readonly slackChannelId: string;
   readonly slackConnecting: string;
   readonly slackDisconnecting: string;
   readonly slackConnect: string;

@@ -57,7 +57,7 @@ const SlackAddChannelInput = ({
         id="slack-channel-search"
         type="text"
         placeholder={
-          localError || connectedChannelsError || t("slackChannelID")
+          localError || connectedChannelsError || t("slackChannelId")
         }
         onChange={(e) => setValue(e.target.value)}
         value={value || ""}

@@ -12,7 +12,7 @@ const en: I18nContent = {
     read: "Read",
     unseen: "Unseen",
     slackConnectChannel: "Connect channel",
-    slackChannelID: "Slack channel ID",
+    slackChannelId: "Slack channel ID",
     slackConnecting: "Connecting to Slack...",
     slackDisconnecting: "Disconnecting...",
     slackConnect: "Connect to Slack",
