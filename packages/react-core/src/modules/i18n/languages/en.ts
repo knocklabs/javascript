@@ -1,17 +1,17 @@
 import { I18nContent } from ".";
 
 const en: I18nContent = {
-	translations: {
-		archiveNotification: "Archive this notification",
-		markAllAsRead: "Mark all as read",
-		notifications: "Notifications",
-		emptyFeedTitle: "No notifications yet",
-		emptyFeedBody: "We'll let you know when we've got something new for you.",
-		all: "All",
-		unread: "Unread",
-		read: "Read",
-		unseen: "Unseen",
-		slackConnectChannel: "Connect channel",
+  translations: {
+    archiveNotification: "Archive this notification",
+    markAllAsRead: "Mark all as read",
+    notifications: "Notifications",
+    emptyFeedTitle: "No notifications yet",
+    emptyFeedBody: "We'll let you know when we've got something new for you.",
+    all: "All",
+    unread: "Unread",
+    read: "Read",
+    unseen: "Unseen",
+    slackConnectChannel: "Connect channel",
     slackChannelID: "Slack channel ID",
     slackConnecting: "Connecting to Slack...",
     slackDisconnecting: "Disconnecting...",
@@ -32,8 +32,8 @@ const en: I18nContent = {
     slackChannelSetError: "Error setting channel.",
     slackAccessTokenNotSet: "Access token not set.",
     slackReconnect: "Reconnect",
-	},
-	locale: "en",
+  },
+  locale: "en",
 };
 
 export default en;
