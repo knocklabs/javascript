@@ -1,13 +1,13 @@
 import { SlackChannelConnection } from "@knocklabs/client";
+import { useTranslations } from "@knocklabs/react-core";
 import { useState } from "react";
 
+import { Spinner } from "../../../core";
+import "../../theme.css";
+import ConnectionErrorInfoBoxes from "../SlackChannelCombobox/SlackConnectionError";
 import { SlackIcon } from "../SlackIcon";
 
-import ConnectionErrorInfoBoxes from "../SlackChannelCombobox/SlackConnectionError";
-import { Spinner } from "../../../core";
-
 import "./styles.css";
-import "../../theme.css"
 
 const SlackAddChannelInput = ({
   inErrorState,
@@ -22,6 +22,7 @@ const SlackAddChannelInput = ({
   connectedChannelsError: string | null;
   connectedChannelsUpdating: boolean;
 }) => {
+  const { t } = useTranslations();
   const [value, setValue] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -40,7 +41,7 @@ const SlackAddChannelInput = ({
 
     if (alreadyConnected) {
       setValue("");
-      return setLocalError(`"${value}" already connected.`);
+      return setLocalError(t("slackChannelAlreadyConnected") || "");
     }
 
     const channelsToSendToKnock = [...connectedChannels, { channel_id: value }];
@@ -51,11 +52,13 @@ const SlackAddChannelInput = ({
   return (
     <div className="rsk-connect-channel">
       <input
-        className={`rsk-connect-channel__input ${((inErrorState || !!localError) && !value) && "rsk-connect-channel__input--error"}`}
+        className={`rsk-connect-channel__input ${(inErrorState || !!localError) && !value && "rsk-connect-channel__input--error"}`}
         tabIndex={-1}
         id="slack-channel-search"
         type="text"
-        placeholder={localError || connectedChannelsError || "Slack channel ID"}
+        placeholder={
+          localError || connectedChannelsError || t("slackChannelId")
+        }
         onChange={(e) => setValue(e.target.value)}
         value={value || ""}
       />
@@ -65,7 +68,7 @@ const SlackAddChannelInput = ({
         ) : (
           <SlackIcon height="16px" width="16px" />
         )}
-        Connect channel
+        {t("slackConnectChannel")}
       </button>
       <ConnectionErrorInfoBoxes />
     </div>

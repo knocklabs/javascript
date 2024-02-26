@@ -5,6 +5,7 @@ import {
   useConnectedSlackChannels,
   useKnockSlackClient,
   useSlackChannels,
+  useTranslations,
 } from "@knocklabs/react-core";
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
@@ -19,14 +20,6 @@ import SlackChannelListBox from "./SlackChannelListBox";
 import SlackConnectionError from "./SlackConnectionError";
 import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
-
-const DEFAULT_INPUT_MESSAGES = {
-  disconnected: "Slack is not connected.",
-  multipleChannelsConnected: "Multiple channels connected",
-  noChannelsConnected: "Search channels",
-  noSlackChannelsFound: "No slack channels.",
-  channelsError: "Error fetching channels.",
-};
 
 const MAX_ALLOWED_CHANNELS = 1000;
 
@@ -58,6 +51,8 @@ export const SlackChannelCombobox = ({
   channelOptionProps,
   inputMessages,
 }: Props) => {
+  const { t } = useTranslations();
+
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
 
@@ -136,6 +131,14 @@ export const SlackChannelCombobox = ({
 
   // Construct placeholder text
   const searchPlaceholder = useMemo(() => {
+    const DEFAULT_INPUT_MESSAGES = {
+      disconnected: t("slackSearchbarDisconnected"),
+      multipleChannelsConnected: t("slackSearchbarMultipleChannels"),
+      noChannelsConnected: t("slackSearchbarNoChannelsConnected"),
+      noSlackChannelsFound: t("slackSearchbarNoChannelsFound"),
+      channelsError: t("slackSearchbarChannelsError"),
+    };
+
     // Connection status message
     if (connectionStatus === "disconnected") {
       return inputMessages?.disconnected || DEFAULT_INPUT_MESSAGES.disconnected;
@@ -193,6 +196,7 @@ export const SlackChannelCombobox = ({
     currentConnectedChannels,
     inputMessages,
     connectionErrorLabel,
+    t,
   ]);
 
   // Handle channel click
@@ -247,7 +251,9 @@ export const SlackChannelCombobox = ({
         open={connectionStatus !== "disconnected" ? comboboxListOpen : false}
       >
         <VisuallyHidden.Root>
-          <label htmlFor="slack-channel-search">Search channels</label>
+          <label htmlFor="slack-channel-search">
+            {t("slackSearchChannels")}
+          </label>
         </VisuallyHidden.Root>
         <Popover.Trigger asChild>
           <div className="rsk-combobox__searchbar">

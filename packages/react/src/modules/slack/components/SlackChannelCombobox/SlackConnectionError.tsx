@@ -1,8 +1,9 @@
-import { useKnockSlackClient } from "@knocklabs/react-core";
+import { useKnockSlackClient, useTranslations } from "@knocklabs/react-core";
 
 import InfoIcon from "./icons/InfoIcon";
 
 const SlackConnectionError = () => {
+  const { t } = useTranslations();
   const { connectionStatus } = useKnockSlackClient();
 
   if (connectionStatus === "disconnected" || connectionStatus === "error") {
@@ -14,8 +15,8 @@ const SlackConnectionError = () => {
 
         <div className="rsk-combobox__error__text">
           {connectionStatus === "disconnected"
-            ? "There was an error connecting to Slack. Try reconnecting to find and select channels from your workspace."
-            : "Try reconnecting to Slack to find and select channels from your workspace."}
+            ? t("slackConnectionErrorOccurred")
+            : t("slackConnectionErrorExists")}
         </div>
       </div>
     );

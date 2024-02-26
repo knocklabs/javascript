@@ -2,13 +2,14 @@ import {
   useKnockClient,
   useKnockSlackClient,
   useSlackAuth,
+  useTranslations,
 } from "@knocklabs/react-core";
 import { useEffect } from "react";
 
+import "../../theme.css";
 import { SlackIcon } from "../SlackIcon";
 
 import "./styles.css";
-import "../../theme.css"
 
 type Props = {
   slackClientId: string;
@@ -42,6 +43,7 @@ export const SlackAuthButton: React.FC<Props> = ({
   slackClientId,
   redirectUrl,
 }) => {
+  const { t } = useTranslations();
   const knock = useKnockClient();
 
   const {
@@ -85,14 +87,17 @@ export const SlackAuthButton: React.FC<Props> = ({
   }, [knock.host, setConnectionStatus]);
 
   // Loading states
-  if (connectionStatus === "connecting" || connectionStatus === "disconnecting") {
+  if (
+    connectionStatus === "connecting" ||
+    connectionStatus === "disconnecting"
+  ) {
     return (
       <div className="rsk-connect__button rsk-connect__button--loading">
         <SlackIcon height="16px" width="16px" />
         <span>
           {connectionStatus === "connecting"
-            ? "Connecting to Slack..."
-            : "Disconnecting..."}
+            ? t("slackConnecting")
+            : t("slackDisconnecting")}
         </span>
       </div>
     );
@@ -104,12 +109,12 @@ export const SlackAuthButton: React.FC<Props> = ({
       <button
         onClick={() => openSlackOauthPopup(buildSlackAuthUrl())}
         className="rsk-connect__button rsk-connect__button--error"
-        onMouseEnter={() => setActionLabel("Reconnect")}
+        onMouseEnter={() => setActionLabel(t("slackReconnect") || "")}
         onMouseLeave={() => setActionLabel("")}
       >
         <SlackIcon height="16px" width="16px" />
         <span className="rsk-connect__button__text--error">
-          {actionLabel || errorLabel || "Error"}
+          {actionLabel || errorLabel || t("slackError")}
         </span>
       </button>
     );
@@ -123,7 +128,7 @@ export const SlackAuthButton: React.FC<Props> = ({
         className="rsk-connect__button rsk-connect__button--disconnected"
       >
         <SlackIcon height="16px" width="16px" />
-        <span>Connect to Slack</span>
+        <span>{t("slackConnect")}</span>
       </button>
     );
   }
@@ -133,12 +138,12 @@ export const SlackAuthButton: React.FC<Props> = ({
     <button
       onClick={disconnectFromSlack}
       className="rsk-connect__button rsk-connect__button--connected"
-      onMouseEnter={() => setActionLabel("Disconnect")}
+      onMouseEnter={() => setActionLabel(t("slackDisconnect") || "")}
       onMouseLeave={() => setActionLabel("")}
     >
       <SlackIcon height="16px" width="16px" />
       <span className="rsk-connect__button__text--connected">
-        {actionLabel || "Connected"}
+        {actionLabel || t("slackConnected")}
       </span>
     </button>
   );

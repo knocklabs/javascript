@@ -1,6 +1,8 @@
 import Knock from "@knocklabs/client";
 import { useEffect, useState } from "react";
 
+import { useTranslations } from "../../i18n";
+
 export type ConnectionStatus =
   | "connecting"
   | "connected"
@@ -34,6 +36,7 @@ function useSlackConnectionStatus(
   knockSlackChannelId: string,
   tenant: string,
 ): UseSlackConnectionStatusOutput {
+  const { t } = useTranslations();
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("connecting");
   const [errorLabel, setErrorLabel] = useState<string | null>(null);
@@ -59,7 +62,7 @@ function useSlackConnectionStatus(
         // give it a "disconnected" status instead of an error status.
         if (
           authRes.code === "ERR_BAD_REQUEST" &&
-          authRes.response?.data?.message === "Access token not set."
+          authRes.response?.data?.message === t("slackAccessTokenNotSet")
         ) {
           return setConnectionStatus("disconnected");
         }
@@ -81,7 +84,7 @@ function useSlackConnectionStatus(
     };
 
     checkAuthStatus();
-  }, [connectionStatus, tenant, knockSlackChannelId, knock.slack]);
+  }, [connectionStatus, tenant, knockSlackChannelId, knock.slack, t]);
 
   return {
     connectionStatus,

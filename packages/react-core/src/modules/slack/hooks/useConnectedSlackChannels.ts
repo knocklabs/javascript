@@ -3,6 +3,7 @@ import { SlackChannelConnection } from "@knocklabs/client";
 import { useCallback, useEffect, useState } from "react";
 
 import { useKnockClient } from "../../core";
+import { useTranslations } from "../../i18n";
 
 type UseSlackChannelsProps = {
   slackChannelsRecipientObject: ContainerObject;
@@ -21,6 +22,7 @@ type UseSlackChannelOutput = {
 function useConnectedSlackChannels({
   slackChannelsRecipientObject: { objectId, collection },
 }: UseSlackChannelsProps): UseSlackChannelOutput {
+  const { t } = useTranslations();
   const knock = useKnockClient();
   const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
   const [connectedChannels, setConnectedChannels] = useState<
@@ -28,7 +30,7 @@ function useConnectedSlackChannels({
   >(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const fetchAndSetConnectedChannels = useCallback(() => {
     setIsLoading(true);
@@ -50,7 +52,7 @@ function useConnectedSlackChannels({
         setIsLoading(false);
       })
       .catch(() => {
-        setConnectedChannels([])
+        setConnectedChannels([]);
         setError(null);
         setIsLoading(false);
       });
@@ -76,7 +78,7 @@ function useConnectedSlackChannels({
   const updateConnectedChannels = async (
     channelsToSendToKnock: SlackChannelConnection[],
   ) => {
-    setIsUpdating(true)
+    setIsUpdating(true);
     try {
       await knock.objects.setChannelData({
         objectId,
@@ -86,9 +88,9 @@ function useConnectedSlackChannels({
       });
       fetchAndSetConnectedChannels();
     } catch (error) {
-      setError("Error setting channel.");
+      setError(t("slackChannelSetError") || "");
     }
-    setIsUpdating(false)
+    setIsUpdating(false);
   };
 
   return {

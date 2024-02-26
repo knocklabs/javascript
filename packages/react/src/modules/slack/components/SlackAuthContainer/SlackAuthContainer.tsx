@@ -1,12 +1,17 @@
+import { useTranslations } from "@knocklabs/react-core";
+
+import "../../theme.css";
 import { SlackIcon } from "../SlackIcon";
+
 import "./styles.css";
-import "../../theme.css"
 
 export const SlackAuthContainer = ({
   actionButton,
 }: {
   actionButton: React.ReactElement;
 }) => {
+  const { t } = useTranslations();
+
   return (
     <div className="rsk-auth">
       <div className="rsk-auth__header">
@@ -15,7 +20,7 @@ export const SlackAuthContainer = ({
       </div>
       <div className="rsk-auth__title">Slack</div>
       <div className="rsk-auth__description">
-        Connect to get notifications in your Slack workspace.
+        {t("slackConnectContainerDescription")}
       </div>
     </div>
   );
