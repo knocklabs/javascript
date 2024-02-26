@@ -27,6 +27,7 @@
 .rsk-connect__button--connected {
   border-color: var(--rsk-connected-color);
   color: var(--rsk-connected-color);
+  width: 120px;
 }
 
 .rsk-connect__button--error {

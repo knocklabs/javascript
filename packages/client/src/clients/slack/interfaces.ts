@@ -1,6 +1,8 @@
 export type SlackChannelConnection = {
   access_token?: string;
-  channel_id: string;
+  channel_id?: string;
+  incoming_webhook?: string;
+  user_id?: null;
 };
 
 export type GetSlackChannelsInput = {

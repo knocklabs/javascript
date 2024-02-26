@@ -9,8 +9,7 @@ const DEFAULT_SLACK_SCOPES = [
   "chat:write",
   "chat:write.public",
   "channels:read",
-  "groups:read",
-  "groups:write",
+  "groups:read"
 ];
 
 type UseSlackAuthOutput = {
