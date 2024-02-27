@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@knocklabs/node": "^0.6.4",
     "@knocklabs/react": "*",
     "jsonwebtoken": "^9.0.2",
     "next": "14.0.4",
