@@ -26,7 +26,7 @@ function useSlackAuth(
     useKnockSlackClient();
 
   const disconnectFromSlack = useCallback(async () => {
-    setActionLabel("");
+    setActionLabel(null);
     setConnectionStatus("disconnecting");
     try {
       const revoke = await knock.slack.revokeAccessToken({

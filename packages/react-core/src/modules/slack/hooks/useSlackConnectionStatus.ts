@@ -16,7 +16,7 @@ type UseSlackConnectionStatusOutput = {
   errorLabel: string | null;
   setErrorLabel: (errorLabel: string) => void;
   actionLabel: string | null;
-  setActionLabel: (actionLabel: string) => void;
+  setActionLabel: (actionLabel: string | null) => void;
 };
 
 /**
@@ -44,7 +44,6 @@ function useSlackConnectionStatus(
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      setActionLabel("");
       if (connectionStatus !== "connecting") return;
 
       try {
