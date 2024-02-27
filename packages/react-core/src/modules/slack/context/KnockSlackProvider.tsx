@@ -16,7 +16,7 @@ export interface KnockSlackProviderState {
   errorLabel: string | null;
   setErrorLabel: (label: string) => void;
   actionLabel: string | null;
-  setActionLabel: (label: string) => void;
+  setActionLabel: (label: string | null) => void;
 }
 
 const SlackProviderStateContext =

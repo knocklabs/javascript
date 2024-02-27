@@ -86,6 +86,9 @@ export const SlackAuthButton: React.FC<Props> = ({
     };
   }, [knock.host, setConnectionStatus]);
 
+const disconnectLabel = t("slackDisconnect") || null
+const reconnectLabel = t("slackReconnect") || null
+
   // Loading states
   if (
     connectionStatus === "connecting" ||
@@ -109,8 +112,8 @@ export const SlackAuthButton: React.FC<Props> = ({
       <button
         onClick={() => openSlackOauthPopup(buildSlackAuthUrl())}
         className="rsk-connect__button rsk-connect__button--error"
-        onMouseEnter={() => setActionLabel(t("slackReconnect") || "")}
-        onMouseLeave={() => setActionLabel("")}
+        onMouseEnter={() => setActionLabel(reconnectLabel)}
+        onMouseLeave={() => setActionLabel(null)}
       >
         <SlackIcon height="16px" width="16px" />
         <span className="rsk-connect__button__text--error">
@@ -138,8 +141,8 @@ export const SlackAuthButton: React.FC<Props> = ({
     <button
       onClick={disconnectFromSlack}
       className="rsk-connect__button rsk-connect__button--connected"
-      onMouseEnter={() => setActionLabel(t("slackDisconnect") || "")}
-      onMouseLeave={() => setActionLabel("")}
+      onMouseEnter={() => setActionLabel(disconnectLabel)}
+      onMouseLeave={() => setActionLabel(null)}
     >
       <SlackIcon height="16px" width="16px" />
       <span className="rsk-connect__button__text--connected">
