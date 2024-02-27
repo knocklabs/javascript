@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- 627e643: Add SlackKit components, hooks, client JS functions, and example apps.
+
+### Patch Changes
+
+- e076109: Fix hover state for connect button.
+- Updated dependencies [627e643]
+  - @knocklabs/client@0.9.0
+
 ## 0.1.6
 
 ### Patch Changes

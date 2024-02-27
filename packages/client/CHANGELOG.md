@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0
+
+### Minor Changes
+
+- 627e643: Add SlackKit components, hooks, client JS functions, and example apps.
+
 ## 0.8.21
 
 ### Patch Changes
