@@ -1,5 +1,7 @@
 SlackKit is a collection of embeddable UI components and APIs that radically simplifies the process of adding a Slack integration to a SaaS product. This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
 
+![SlackKit overview](./images/slack-kit-overview.png)
+
 ## Getting started
 
 For this project, there are quite a few configuration variables you need before you can get started. Some of these are typical environment variables you would supply to your application, like API keys, tokens, or client ids.
@@ -7,6 +9,8 @@ For this project, there are quite a few configuration variables you need before 
 The other set of values would typically be determined by your product's business logic, but you can hardcode these values for the time being.
 
 ### Setting up a Slack app
+
+You can either follow the setup steps outlined here, or use the official instruction in the [SlackKit docs](https://docs.knock.app/integrations/chat/slack-kit/setup).
 
 #### Create a new app
 
@@ -22,7 +26,7 @@ Also under `OAuth and Permissions`, find the redirect URL section and add this K
 
 ### Setting up Knock
 
-For this tutorial, you'll need a Knock account. If you don't already have one, you can [sign up on this page](https://dashboard.knock.app/signup).
+For this tutorial, you'll need a Knock account. If you don't already have one, you can [sign up on this page](https://dashboard.knock.app/signup). You can also find these steps outlined in the official [SlackKit docs](https://docs.knock.app/integrations/chat/slack-kit/setup#add-slack-app-to-knock-slack-channel).
 
 #### Create a Slack channel
 
@@ -171,13 +175,14 @@ export default function Providers({
 }
 ```
 
-To create some of the necessary authentication data, like `userToken` and `userId`, we implement the `Providers` component inside of the root `layout.tsx` file. In this code, which runs on the server, we also add some additional grants to the `userToken` JWT to allow the user to interact with the Slack resources stored in Knock. You can read more about these [security and authentication steps in the docs](https://docs.knock.app/in-app-ui/security-and-authentication).
+To create some of the necessary authentication data, like `userToken` and `userId`, we implement the `Providers` component inside of the root `layout.tsx` file. In this code, which runs on the server, we also add some additional grants to the `userToken` JWT to allow the user to interact with the Slack resources stored in Knock. You can read more about these [resource access grants in the docs](https://docs.knock.app/integrations/chat/slack-kit/resource-access-grants).
 
 **Note: this is necessary because the user in this context is an end user in your application who does not have access to Knock as a [member of the account](https://docs.knock.app/manage-your-account/managing-members). Therefore, these grants provide them elevated privileges to operate on specific resources using the API.**
 
 ```
+import { Knock } from "@knocklabs/node";
+import { Grants } from "@knocklabs/node/dist/src/common/userTokens";
 import "@knocklabs/react/dist/index.css";
-import jwt from "jsonwebtoken";
 
 import Providers from "./components/providers";
 import "./global.css";
@@ -185,46 +190,36 @@ import { getAppDetails } from "./lib/app-details";
 
 const { userId, tenant, collection, objectId } = getAppDetails();
 
-const currentTime = Math.floor(Date.now() / 1000);
-const expireInSeconds = 60 * 60;
 const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
-const userToken = signingKey
-  ? jwt.sign(
-      {
-        sub: userId,
-        iat: currentTime,
-        exp: currentTime + expireInSeconds,
-        grants: {
-          [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
-            "slack/channels_read": [{}],
-          },
-          [`https://api.knock.app/v1/objects/${collection}/${objectId}`]: {
-            "channel_data/read": [{}],
-            "channel_data/write": [{}],
-          },
-        },
-      },
-      signingKey,
-      {
-        algorithm: "RS256",
-      },
-    )
-  : "secretOrPrivateKey";
+async function MyApp({ children }: { children: React.ReactElement }) {
 
-function MyApp({ children }: { children: React.ReactElement }) {
-  return (
-    <>
-      <html>
-        <body className="px-12 py-6">
-          <h1 className="text-2xl font-bold mb-6">SlackKit Demo App</h1>
-          <Providers userToken={userToken} knockUserId={userId} tenant={tenant}>
-            {children}
-          </Providers>
-        </body>
-      </html>
-    </>
-  );
+	const userToken = signingKey
+		? await Knock.signUserToken(userId, {
+				grants: [
+					Knock.buildUserTokenGrant({ type: "tenant", id: tenant }, [
+						Grants.SlackChannelsRead,
+					]),
+					Knock.buildUserTokenGrant(
+						{ type: "object", id: objectId, collection: collection },
+						[Grants.ChannelDataRead, Grants.ChannelDataWrite],
+					),
+				],
+			})
+		: "secretOrPrivateKey";
+
+	return (
+		<>
+			<html>
+				<body className="px-12 py-6">
+					<h1 className="text-2xl font-bold mb-6">SlackKit Demo App</h1>
+					<Providers userToken={userToken} knockUserId={userId} tenant={tenant}>
+						{children}
+					</Providers>
+				</body>
+			</html>
+		</>
+	);
 }
 
 export default MyApp;
