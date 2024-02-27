@@ -1,5 +1,7 @@
 SlackKit is a collection of embeddable UI components and APIs that radically simplifies the process of adding a Slack integration to a SaaS product. This is an example app meant to help you get started using the SlackKit components and APIs provided by Knock.
 
+![SlackKit overview](./images/slack-kit-overview.png)
+
 ## Getting started
 
 For this project, there are quite a few configuration variables you need before you can get started. Some of these are typical environment variables you would supply to your application, like API keys, tokens, or client ids.
