@@ -4895,6 +4895,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@knocklabs/node@npm:^0.6.4":
+  version: 0.6.4
+  resolution: "@knocklabs/node@npm:0.6.4"
+  dependencies:
+    jose: "npm:^5.2.0"
+  checksum: 10c0/d3bd907f0412ba5ea0e48b635a7a05b2a1cfc9c118a91968e75cf6fb61fbd744a6131a43ade880009ee2201e08884c951914dc582338b03e584ea7af60883ff1
+  languageName: node
+  linkType: hard
+
 "@knocklabs/prettier-config@workspace:^, @knocklabs/prettier-config@workspace:packages/prettier-config":
   version: 0.0.0-use.local
   resolution: "@knocklabs/prettier-config@workspace:packages/prettier-config"
@@ -22641,6 +22650,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "slack-kit-example@workspace:examples/slack-kit-example"
   dependencies:
+    "@knocklabs/node": "npm:^0.6.4"
     "@knocklabs/react": "npm:*"
     "@types/node": "npm:^20"
     "@types/react": "npm:^18.2.37"
