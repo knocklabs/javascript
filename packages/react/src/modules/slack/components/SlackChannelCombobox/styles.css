@@ -20,16 +20,16 @@
 /* Searchbar */
 .rsk-combobox__searchbar__input-container {
   align-items: center;
+  color: var(--rsk-color-gray-200);
   display: flex;
   position: relative;
-  color: var(--rsk-color-gray-200);
 }
 
 .rsk-combobox__searchbar__input-container__icon,
 .rsk-combobox__searchbar__input-container__icon--error {
   left: var(--rsk-spacing-3);
-  top: 0.65rem;
   position: absolute;
+  top: 0.65rem;
   z-index: 10;
 }
 
@@ -65,8 +65,7 @@
 /* List box */
 .rsk-combobox__list-box {
   border-radius: var(--rsk-border-radius-sm);
-  box-shadow:
-    0px 1px 2px rgba(0, 0, 0, 0.06),
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.06),
     0px 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -105,8 +104,8 @@
 }
 
 .rsk-combobox__option__text-container__channel-icon {
-  display: flex;
   align-items: center;
+  display: flex;
   justify-content: center;
 }
 
@@ -117,17 +116,65 @@
 /* Error */
 .rsk-combobox__error {
   align-items: flex-start;
+  background-color: var(--rsk-color-gray-100);
   border-radius: var(--rsk-border-radius-md);
   display: flex;
   gap: var(--rsk-spacing-1);
   justify-content: center;
   margin-top: var(--rsk-spacing-1);
   padding: var(--rsk-spacing-2);
-  background-color: var(--rsk-color-gray-100);
 }
 
 .rsk-combobox__error__text {
   color: var(--rsk-color-gray-700);
   font-size: var(--rsk-font-size-xs);
   line-height: normal;
+}
+
+/* Tag */
+.rsk-combobox__connected_channel_tag_list {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rsk-spacing-2);
+  margin-top: var(--rsk-spacing-2);
+  width: 286px;
+  font-size: var(--rsk-font-size-sm);
+  font-family: var(--rsk-font-family-sanserif);
+  color: var(--rsk-color-gray-800)
+}
+
+.rsk-combobox__connected_channel_tag {
+  align-items: center;
+  background-color: var(--rsk-color-gray-100);
+  border-radius: var(--rsk-border-radius-md);
+  display: flex;
+  gap: var(--rsk-spacing-1);
+  max-width: 286px;
+  padding: var(--rsk-spacing-1) var(--rsk-spacing-2) var(--rsk-spacing-1) var(--rsk-spacing-2);
+  height: 16px;
+}
+
+.rsk-combobox__connected_channel_tag__delete_button,
+.rsk-combobox__connected_channel_tag__channel_type_icon,
+.rsk-combobox__connected_channel_tag__text {
+  display: flex;
+}
+
+.rsk-combobox__connected_channel_tag__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rsk-combobox__connected_channel_tag__delete_button {
+  background-color: unset;
+  border-style: none;
+  cursor: pointer;
+  padding: 0.05rem 0rem 0rem 0rem;
+}
+
+.rsk-combobox__connected_channel_tag__delete_button:hover {
+  background-color: var(--rsk-color-gray-200);
+  border-radius: var(--rsk-border-radius-md);
 }

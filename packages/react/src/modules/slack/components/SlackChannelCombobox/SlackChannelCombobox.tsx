@@ -17,6 +17,7 @@ import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
 import SlackChannelListBox from "./SlackChannelListBox";
+import SlackConnectedChannelTagList from "./SlackConnectedChannelTagList";
 import SlackConnectionError from "./SlackConnectionError";
 import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
@@ -40,6 +41,7 @@ type Props = {
   listBoxProps?: React.HTMLAttributes<HTMLDivElement>;
   channelOptionProps?: React.HtmlHTMLAttributes<HTMLButtonElement>;
   inputMessages?: SlackChannelComboboxInputMessages;
+  showConnectedChannelTags?: boolean;
 };
 
 export const SlackChannelCombobox = ({
@@ -50,6 +52,7 @@ export const SlackChannelCombobox = ({
   listBoxProps,
   channelOptionProps,
   inputMessages,
+  showConnectedChannelTags = false,
 }: Props) => {
   const { t } = useTranslations();
 
@@ -303,6 +306,13 @@ export const SlackChannelCombobox = ({
           />
         </Popover.Content>
       </Popover.Root>
+      {showConnectedChannelTags && (
+        <SlackConnectedChannelTagList
+          connectedChannels={currentConnectedChannels}
+          slackChannels={slackChannels}
+          updateConnectedChannels={handleOptionClick}
+        />
+      )}
     </div>
   );
 };
