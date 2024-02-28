@@ -3,6 +3,8 @@ import { AppProps } from "next/app";
 
 import "@knocklabs/react/dist/index.css";
 
+import "../components/toggleSwitchStyles.css";
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
