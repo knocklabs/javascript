@@ -1,8 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Toggle component */
 .slk-connect__toggle_switch {
 	position: relative;
 	display: inline-block;

@@ -152,7 +152,6 @@
   gap: var(--rsk-spacing-1);
   max-width: 286px;
   padding: var(--rsk-spacing-1) var(--rsk-spacing-2) var(--rsk-spacing-1) var(--rsk-spacing-2);
-  height: 16px;
 }
 
 .rsk-combobox__connected_channel_tag__delete_button,

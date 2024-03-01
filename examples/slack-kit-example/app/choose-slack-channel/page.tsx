@@ -30,6 +30,13 @@ export default async function Page() {
         </a>{" "}
         in the docs.
       </p>
+      <p className="mb-4">
+        Use the toggle to optionally show the currently connected Slack channels
+        below the combobox (sets the{" "}
+        <code className="text-[#E95744]">showConnectedChannelTags</code> prop to{" "}
+        <code className="text-[#E95744]">true</code> for the{" "}
+        <code className="text-[#E95744]">SlackChannelCombobox</code>).
+      </p>
       <SlackChannelWrapper
         className="my-6"
         collection={collection}

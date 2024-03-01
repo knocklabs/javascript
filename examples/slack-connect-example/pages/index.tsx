@@ -5,10 +5,13 @@ import {
   SlackAuthContainer,
   SlackChannelCombobox,
 } from "@knocklabs/react";
+import { useState } from "react";
 
+import { ToggleSwitch } from "../components";
 import { useSetToken } from "../hooks";
 
 export default function Home() {
+  const [showConnectedChannels, setShowConnectedChannels] = useState(false);
   const tenant = process.env.NEXT_PUBLIC_TENANT!;
   const user = {
     id: "123",
@@ -74,8 +77,16 @@ export default function Home() {
               >
                 Slack Channel Picker
               </div>
+              <ToggleSwitch
+                label="Show connected channels"
+                isToggled={!!showConnectedChannels}
+                setIsToggled={setShowConnectedChannels}
+              />
               <div style={{ margin: "10px", padding: "10px" }}>
-                <SlackChannelCombobox slackChannelsRecipientObject={slackChannelsRecipientObject} />
+                <SlackChannelCombobox
+                  slackChannelsRecipientObject={slackChannelsRecipientObject}
+                  showConnectedChannelTags={showConnectedChannels}
+                />
               </div>
             </div>
             <div>
