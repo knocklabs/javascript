@@ -61,10 +61,6 @@ function App() {
 
 	const { loading, items, pageInfo } = feedStore((state) => state);
 
-	function markAsArchived(event) {
-		console.log(event);
-	}
-
 	return (
 		<div className="App">
 			<h1>Feed items</h1>
