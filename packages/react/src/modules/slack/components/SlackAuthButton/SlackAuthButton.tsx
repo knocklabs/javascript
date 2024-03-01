@@ -14,6 +14,7 @@ import "./styles.css";
 type Props = {
   slackClientId: string;
   redirectUrl?: string;
+  onAuthenticationComplete?: (authenticationResp: string) => void;
 };
 
 const openSlackOauthPopup = (url: string) => {
@@ -42,6 +43,7 @@ const openSlackOauthPopup = (url: string) => {
 export const SlackAuthButton: React.FC<Props> = ({
   slackClientId,
   redirectUrl,
+  onAuthenticationComplete,
 }) => {
   const { t } = useTranslations();
   const knock = useKnockClient();
@@ -71,7 +73,11 @@ export const SlackAuthButton: React.FC<Props> = ({
         }
 
         if (event.data === "authFailed") {
-          setConnectionStatus("error")
+          setConnectionStatus("error");
+        }
+
+        if (onAuthenticationComplete) {
+          onAuthenticationComplete(event.data);
         }
       } catch (error) {
         setConnectionStatus("error");
@@ -84,10 +90,10 @@ export const SlackAuthButton: React.FC<Props> = ({
     return () => {
       window.removeEventListener("message", receiveMessage);
     };
-  }, [knock.host, setConnectionStatus]);
+  }, [knock.host, onAuthenticationComplete, setConnectionStatus]);
 
-const disconnectLabel = t("slackDisconnect") || null
-const reconnectLabel = t("slackReconnect") || null
+  const disconnectLabel = t("slackDisconnect") || null;
+  const reconnectLabel = t("slackReconnect") || null;
 
   // Loading states
   if (

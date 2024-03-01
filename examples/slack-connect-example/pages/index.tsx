@@ -29,6 +29,10 @@ export default function Home() {
     collection: process.env.NEXT_PUBLIC_CONNECTIONS_COLLECTION!,
   };
 
+  const onAuthComplete = (result: string) => {
+    console.log("Result from Slack authentication:", result)
+  }
+
   const { isLoading, isError } = useSetToken({
     tenant,
     user,
@@ -118,6 +122,7 @@ export default function Home() {
                   <SlackAuthButton
                     slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                     redirectUrl={redirectUrl}
+                    onAuthenticationComplete={onAuthComplete}
                   />
                 </div>
               </div>
