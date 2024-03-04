@@ -618,11 +618,11 @@ class Feed {
 
     // Emit the event that these items had their statuses changed
     // Note: we do this after the update to ensure that the server event actually completed
-    this.broadcaster.emit(`items:${type}`, { items });
-
-    // Add this additional event emission to keep event formatting externally consistent
-    // We should make plans to eventually depreated the inconsistent formatting, e.g. items:archived
     this.broadcaster.emit(`items.${type}`, { items });
+
+    // Note: `items.type` format is being deprecated in favor over the `items:type` format, 
+    // but emit both formats to make it backward compatible for now.
+    this.broadcaster.emit(`items:${type}`, { items });
     this.broadcastOverChannel(`items:${type}`, { items });
 
     return result;
