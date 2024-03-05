@@ -15,6 +15,7 @@ export type FeedStoreState = {
   metadata: FeedMetadata;
   loading: boolean;
   networkStatus: NetworkStatus;
+  isRequestInFlight: boolean;
   setResult: (response: FeedResponse, opts?: StoreFeedResultOptions) => void;
   setMetadata: (metadata: FeedMetadata) => void;
   setNetworkStatus: (networkStatus: NetworkStatus) => void;
