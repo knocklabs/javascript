@@ -39,11 +39,15 @@ export default function createStore() {
     // The network status indicates what's happening with the request
     networkStatus: NetworkStatus.ready,
     loading: false,
+    isRequestInFlight: false,
 
     setNetworkStatus: (networkStatus: NetworkStatus) =>
       set(() => ({
         networkStatus,
         loading: networkStatus === NetworkStatus.loading,
+        isRequestInFlight:
+          networkStatus === NetworkStatus.loading ||
+          networkStatus === NetworkStatus.fetchMore,
       })),
 
     setResult: (
@@ -61,6 +65,7 @@ export default function createStore() {
           metadata: meta,
           pageInfo: options.shouldSetPage ? page_info : state.pageInfo,
           loading: false,
+          isRequestInFlight: false,
           networkStatus: NetworkStatus.ready,
         };
       }),
