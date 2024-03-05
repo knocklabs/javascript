@@ -11,9 +11,3 @@ export enum NetworkStatus {
   // The last operation failed with an error
   error = "error",
 }
-
-export function isRequestInFlight(networkStatus: NetworkStatus): boolean {
-  return [NetworkStatus.loading, NetworkStatus.fetchMore].includes(
-    networkStatus,
-  );
-}
