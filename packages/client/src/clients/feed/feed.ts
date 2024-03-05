@@ -3,7 +3,7 @@ import { Channel } from "phoenix";
 import { StoreApi } from "zustand";
 
 import Knock from "../../knock";
-import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
+import { NetworkStatus } from "../../networkStatus";
 
 import {
   FeedClientOptions,
@@ -436,10 +436,10 @@ class Feed {
   /* Fetches the feed content, appending it to the store */
   async fetch(options: FetchFeedOptions = {}) {
     const { setState, getState } = this.store;
-    const { networkStatus } = getState();
+    const { isRequestInFlight } = getState();
 
     // If there's an existing request in flight, then do nothing
-    if (isRequestInFlight(networkStatus)) {
+    if (isRequestInFlight) {
       return;
     }
 
@@ -620,7 +620,7 @@ class Feed {
     // Note: we do this after the update to ensure that the server event actually completed
     this.broadcaster.emit(`items.${type}`, { items });
 
-    // Note: `items.type` format is being deprecated in favor over the `items:type` format, 
+    // Note: `items.type` format is being deprecated in favor over the `items:type` format,
     // but emit both formats to make it backward compatible for now.
     this.broadcaster.emit(`items:${type}`, { items });
     this.broadcastOverChannel(`items:${type}`, { items });

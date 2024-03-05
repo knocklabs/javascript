@@ -1,4 +1,11 @@
-import { FeedItem, isRequestInFlight, NetworkStatus } from "@knocklabs/client";
+import { FeedItem, NetworkStatus } from "@knocklabs/client";
+import {
+  ColorMode,
+  FilterStatus,
+  useFeedSettings,
+  useKnockFeed,
+  useTranslations,
+} from "@knocklabs/react-core";
 import React, {
   ReactElement,
   ReactNode,
@@ -7,23 +14,17 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { EmptyFeed } from "../EmptyFeed";
-import {
-  useKnockFeed,
-  useFeedSettings,
-  ColorMode,
-  FilterStatus,
-  useTranslations,
-} from "@knocklabs/react-core";
+
 import { Spinner } from "../../../core/components/Spinner";
+import useOnBottomScroll from "../../../core/hooks/useOnBottomScroll";
+import { EmptyFeed } from "../EmptyFeed";
 import { NotificationCell } from "../NotificationCell";
+
 import {
   NotificationFeedHeader,
   NotificationFeedHeaderProps,
 } from "./NotificationFeedHeader";
-
 import "./styles.css";
-import useOnBottomScroll from "../../../core/hooks/useOnBottomScroll";
 
 export type OnNotificationClick = (item: FeedItem) => void;
 export type RenderItem = ({ item }: RenderItemProps) => ReactNode;
@@ -80,7 +81,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   const { settings } = useFeedSettings(feedClient);
   const { t } = useTranslations();
 
-  const { pageInfo, items, networkStatus } = useFeedStore();
+  const { pageInfo, items, networkStatus, isRequestInFlight } = useFeedStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,7 +94,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   }, [feedClient, status]);
 
   const noItems = items.length === 0;
-  const requestInFlight = isRequestInFlight(networkStatus);
+  const requestInFlight = isRequestInFlight;
 
   // Handle fetching more once we reach the bottom of the list
   const onBottomCallback = useCallback(() => {
