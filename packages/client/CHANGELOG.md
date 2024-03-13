@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+### Patch Changes
+
+- f37d680: Update event format for client status updates
+
 ## 0.9.0
 
 ### Minor Changes
