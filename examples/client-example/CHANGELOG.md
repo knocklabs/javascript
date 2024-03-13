@@ -1,5 +1,13 @@
 # client-example
 
+## 0.1.6
+
+### Patch Changes
+
+- f37d680: Update event format for client status updates
+- Updated dependencies [f37d680]
+  - @knocklabs/client@0.9.1
+
 ## 0.1.5
 
 ### Patch Changes

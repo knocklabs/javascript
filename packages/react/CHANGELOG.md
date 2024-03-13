@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- 16ff6b4: Adds an onAuthenticationComplete callback to the SlackAuthButton component and to the example apps.
+- 05826b3: Add optional connected channel list to SlackChannelCombobox + to example apps.
+- 094fb39: Make the SlackCombobox background opaque so that elements underneath aren't visible when it's popped out.
+- Updated dependencies [f37d680]
+  - @knocklabs/client@0.9.1
+  - @knocklabs/react-core@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
