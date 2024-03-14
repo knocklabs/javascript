@@ -1,19 +1,31 @@
-import React, { ReactNode, useMemo } from "react";
-import { ContentBlock, FeedItem } from "@knocklabs/client";
-import { Avatar } from "./Avatar";
-import { ArchiveButton } from "./ArchiveButton";
 import {
-  useKnockFeed,
-  useTranslations,
+  ButtonBlock,
+  ButtonSetContentBlock,
+  ContentBlock,
+  FeedItem,
+  MarkdownContentBlock,
+  TextContentBlock,
+} from "@knocklabs/client";
+import {
   formatTimestamp,
   renderNodeOrFallback,
+  useKnockFeed,
+  useTranslations,
 } from "@knocklabs/react-core";
+import React, { ReactNode, useMemo } from "react";
 
+import { Button, ButtonGroup } from "../../../core";
+
+import { ArchiveButton } from "./ArchiveButton";
+import { Avatar } from "./Avatar";
 import "./styles.css";
 
 export interface NotificationCellProps {
   item: FeedItem;
+  // Invoked when the outer container is clicked
   onItemClick?: (item: FeedItem) => void;
+  // Invoked when a button in the notification cell is clicked
+  onButtonClick?: (item: FeedItem, action: ButtonBlock) => void;
   avatar?: ReactNode;
   children?: ReactNode;
   archiveButton?: ReactNode;
@@ -23,91 +35,127 @@ type BlockByName = {
   [name: string]: ContentBlock;
 };
 
+function maybeNavigateToUrlWithDelay(url?: string) {
+  if (url && url !== "") {
+    setTimeout(() => window.location.assign(url), 200);
+  }
+}
+
 export const NotificationCell = React.forwardRef<
   HTMLDivElement,
   NotificationCellProps
->(({ item, onItemClick, avatar, children, archiveButton }, ref) => {
-  const { feedClient, colorMode } = useKnockFeed();
-  const { locale } = useTranslations();
+>(
+  (
+    { item, onItemClick, onButtonClick, avatar, children, archiveButton },
+    ref,
+  ) => {
+    const { feedClient, colorMode } = useKnockFeed();
+    const { locale } = useTranslations();
 
-  const blocksByName: BlockByName = useMemo(() => {
-    return item.blocks.reduce((acc, block) => {
-      return { ...acc, [block.name]: block };
-    }, {});
-  }, [item]);
+    const blocksByName: BlockByName = useMemo(() => {
+      return item.blocks.reduce((acc, block) => {
+        return { ...acc, [block.name]: block };
+      }, {});
+    }, [item]);
 
-  const actionUrl = blocksByName.action_url && blocksByName.action_url.rendered;
+    const actionUrl = (blocksByName.action_url as TextContentBlock)?.rendered;
+    const actions = blocksByName.actions as ButtonSetContentBlock;
 
-  const onClick = React.useCallback(() => {
-    // Mark as interacted + read once we click the item
-    feedClient.markAsInteracted(item);
+    const onContainerClickHandler = React.useCallback(() => {
+      // Mark as interacted + read once we click the item
+      feedClient.markAsInteracted(item);
 
-    if (onItemClick) return onItemClick(item);
+      if (onItemClick) return onItemClick(item);
 
-    // Delay when we navigate, until we've actually issued our API call.
-    setTimeout(() => {
-      if (actionUrl && actionUrl !== "") {
-        window.location.assign(actionUrl);
-      }
-    }, 200);
-  }, [item]);
+      return maybeNavigateToUrlWithDelay(actionUrl);
+    }, [item, actionUrl, onItemClick, feedClient]);
 
-  const onKeyDown = React.useCallback(
-    (ev: React.KeyboardEvent<HTMLDivElement>) => {
-      switch (ev.key) {
-        case "Enter": {
-          ev.stopPropagation();
-          onClick();
-          break;
+    const onButtonClickHandler = React.useCallback(
+      (e: React.MouseEvent, button: ButtonBlock) => {
+        feedClient.markAsInteracted(item);
+
+        if (onButtonClick) return onButtonClick(item, button);
+
+        return maybeNavigateToUrlWithDelay(button.action);
+      },
+      [onButtonClick, feedClient, item],
+    );
+
+    const onKeyDown = React.useCallback(
+      (ev: React.KeyboardEvent<HTMLDivElement>) => {
+        switch (ev.key) {
+          case "Enter": {
+            ev.stopPropagation();
+            onContainerClickHandler();
+            break;
+          }
+          default:
+            break;
         }
-        default:
-          break;
-      }
-    },
-    [onClick],
-  );
+      },
+      [onContainerClickHandler],
+    );
 
-  const actor = item.actors[0];
+    const actor = item.actors[0];
 
-  return (
-    <div
-      ref={ref}
-      className={`rnf-notification-cell rnf-notification-cell--${colorMode}`}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      tabIndex={0}
-    >
-      <div className="rnf-notification-cell__inner">
-        {!item.read_at && <div className="rnf-notification-cell__unread-dot" />}
-
-        {renderNodeOrFallback(
-          avatar,
-          actor && "name" in actor && actor.name && (
-            <Avatar name={actor.name} src={actor.avatar} />
-          ),
-        )}
-
-        <div className="rnf-notification-cell__content-outer">
-          {blocksByName.body && (
-            <div
-              className="rnf-notification-cell__content"
-              dangerouslySetInnerHTML={{ __html: blocksByName.body.rendered }}
-            />
+    return (
+      <div
+        ref={ref}
+        className={`rnf-notification-cell rnf-notification-cell--${colorMode}`}
+        onClick={onContainerClickHandler}
+        onKeyDown={onKeyDown}
+        tabIndex={0}
+      >
+        <div className="rnf-notification-cell__inner">
+          {!item.read_at && (
+            <div className="rnf-notification-cell__unread-dot" />
           )}
 
-          {children && (
-            <div className="rnf-notification-cell__child-content">
-              {children}
-            </div>
+          {renderNodeOrFallback(
+            avatar,
+            actor && "name" in actor && actor.name && (
+              <Avatar name={actor.name} src={actor.avatar} />
+            ),
           )}
 
-          <span className="rnf-notification-cell__timestamp">
-            {formatTimestamp(item.inserted_at, { locale })}
-          </span>
+          <div className="rnf-notification-cell__content-outer">
+            {blocksByName.body && (
+              <div
+                className="rnf-notification-cell__content"
+                dangerouslySetInnerHTML={{
+                  __html: (blocksByName.body as MarkdownContentBlock).rendered,
+                }}
+              />
+            )}
+
+            {actions && (
+              <ButtonGroup>
+                {actions.actions.map((button, i) => (
+                  <Button
+                    variant={i === 0 ? "primary" : "secondary"}
+                    key={button.name}
+                    onClick={(e) => onButtonClickHandler(e, button)}
+                  >
+                    {button.label}
+                  </Button>
+                ))}
+              </ButtonGroup>
+            )}
+
+            {children && (
+              <div className="rnf-notification-cell__child-content">
+                {children}
+              </div>
+            )}
+
+            <span className="rnf-notification-cell__timestamp">
+              {formatTimestamp(item.inserted_at, { locale })}
+            </span>
+          </div>
+
+          {renderNodeOrFallback(archiveButton, <ArchiveButton item={item} />)}
         </div>
-
-        {renderNodeOrFallback(archiveButton, <ArchiveButton item={item} />)}
       </div>
-    </div>
-  );
-});
+    );
+  },
+);

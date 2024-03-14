@@ -1,4 +1,5 @@
 import { GenericData, PageInfo } from "@knocklabs/types";
+
 import { Activity, Recipient } from "../../interfaces";
 import { NetworkStatus } from "../../networkStatus";
 
@@ -35,17 +36,43 @@ export type FetchFeedOptions = {
   __fetchSource?: "socket" | "http";
 } & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
 
-export interface ContentBlock {
-  content: string;
-  rendered: string;
-  type: "markdown" | "text";
+export interface ContentBlockBase {
   name: string;
+  type: "markdown" | "text" | "button_set";
+}
+
+export interface ButtonBlock {
+  name: string;
+  label: string;
+  action: string;
+}
+
+export interface ButtonSetContentBlock extends ContentBlockBase {
+  type: "button_set";
+  actions: ButtonBlock[];
+}
+
+export interface TextContentBlock extends ContentBlockBase {
+  type: "text";
+  rendered: string;
+  content: string;
+}
+
+export interface MarkdownContentBlock extends ContentBlockBase {
+  type: "markdown";
+  rendered: string;
+  content: string;
 }
 
 export interface NotificationSource {
   key: string;
   version_id: string;
 }
+
+export type ContentBlock =
+  | MarkdownContentBlock
+  | TextContentBlock
+  | ButtonSetContentBlock;
 
 export interface FeedItem<T = GenericData> {
   __cursor: string;
