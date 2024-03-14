@@ -49,7 +49,7 @@ export interface ButtonBlock {
 
 export interface ButtonSetContentBlock extends ContentBlockBase {
   type: "button_set";
-  actions: ButtonBlock[];
+  buttons: ButtonBlock[];
 }
 
 export interface TextContentBlock extends ContentBlockBase {

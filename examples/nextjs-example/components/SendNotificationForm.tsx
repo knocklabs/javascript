@@ -3,9 +3,11 @@ import {
   Checkbox,
   FormControl,
   FormLabel,
+  Select,
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
+
 import { notify } from "../lib/api";
 
 interface Props {
@@ -13,15 +15,22 @@ interface Props {
   tenant: any;
 }
 
+enum TemplateType {
+  Standard = "standard",
+  SingleAction = "single-action",
+  MultiAction = "multi-action",
+}
+
 const SendNotificationForm = ({ userId, tenant }: Props) => {
   const [message, setMessage] = useState("");
   const [showToast, setShowToast] = useState(true);
+  const [templateType, setTemplateType] = useState(TemplateType.Standard);
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    await notify({ message, showToast, userId, tenant });
+    await notify({ message, showToast, userId, tenant, templateType });
     setIsLoading(false);
 
     e.target.reset();
@@ -40,6 +49,19 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
           size="sm"
           onChange={(e) => setMessage(e.target.value)}
         />
+      </FormControl>
+      <FormControl mb={4}>
+        <FormLabel fontSize={14}>Template type</FormLabel>
+        <Select
+          mr={3}
+          size="sm"
+          value={templateType}
+          onChange={(e) => setTemplateType(e.target.value as TemplateType)}
+        >
+          <option value={TemplateType.Standard}>Standard</option>
+          <option value={TemplateType.SingleAction}>Single-action</option>
+          <option value={TemplateType.MultiAction}>Multi-action</option>
+        </Select>
       </FormControl>
       <FormControl mb={4}>
         <FormLabel fontSize={14} display="flex" alignItems="center">

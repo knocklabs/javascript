@@ -59,7 +59,7 @@ export const NotificationCell = React.forwardRef<
     }, [item]);
 
     const actionUrl = (blocksByName.action_url as TextContentBlock)?.rendered;
-    const actions = blocksByName.actions as ButtonSetContentBlock;
+    const buttonSet = blocksByName.actions as ButtonSetContentBlock;
 
     const onContainerClickHandler = React.useCallback(() => {
       // Mark as interacted + read once we click the item
@@ -128,18 +128,20 @@ export const NotificationCell = React.forwardRef<
               />
             )}
 
-            {actions && (
-              <ButtonGroup>
-                {actions.actions.map((button, i) => (
-                  <Button
-                    variant={i === 0 ? "primary" : "secondary"}
-                    key={button.name}
-                    onClick={(e) => onButtonClickHandler(e, button)}
-                  >
-                    {button.label}
-                  </Button>
-                ))}
-              </ButtonGroup>
+            {buttonSet && (
+              <div className="rnf-notification-cell__button-group">
+                <ButtonGroup>
+                  {buttonSet.buttons.map((button, i) => (
+                    <Button
+                      variant={i === 0 ? "primary" : "secondary"}
+                      key={button.name}
+                      onClick={(e) => onButtonClickHandler(e, button)}
+                    >
+                      {button.label}
+                    </Button>
+                  ))}
+                </ButtonGroup>
+              </div>
             )}
 
             {children && (
