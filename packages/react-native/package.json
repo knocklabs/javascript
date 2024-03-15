@@ -7,15 +7,18 @@
   "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
+  "react-native": "./src/index.ts",
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts",
+      "react-native": "./src/index.ts",
       "default": "./dist/esm/index.mjs"
     }
   },
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -53,7 +56,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "react": "^18.2.0",
-    "react-native": "^0.73.2",
+    "react-native": "^0.73.4",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
