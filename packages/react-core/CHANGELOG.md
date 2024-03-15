@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+### Patch Changes
+
+- 282d005: Handle auth disconnected status.
+
 ## 0.2.1
 
 ### Patch Changes
