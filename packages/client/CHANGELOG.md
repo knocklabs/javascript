@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2
+
+### Patch Changes
+
+- fed0f8c: add support for actions in notification feed cells
+
 ## 0.9.1
 
 ### Patch Changes
