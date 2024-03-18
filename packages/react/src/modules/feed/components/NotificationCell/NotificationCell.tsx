@@ -1,5 +1,5 @@
 import {
-  ButtonBlock,
+  ActionButton,
   ButtonSetContentBlock,
   ContentBlock,
   FeedItem,
@@ -25,7 +25,7 @@ export interface NotificationCellProps {
   // Invoked when the outer container is clicked
   onItemClick?: (item: FeedItem) => void;
   // Invoked when a button in the notification cell is clicked
-  onButtonClick?: (item: FeedItem, action: ButtonBlock) => void;
+  onButtonClick?: (item: FeedItem, action: ActionButton) => void;
   avatar?: ReactNode;
   children?: ReactNode;
   archiveButton?: ReactNode;
@@ -71,7 +71,7 @@ export const NotificationCell = React.forwardRef<
     }, [item, actionUrl, onItemClick, feedClient]);
 
     const onButtonClickHandler = React.useCallback(
-      (e: React.MouseEvent, button: ButtonBlock) => {
+      (e: React.MouseEvent, button: ActionButton) => {
         feedClient.markAsInteracted(item);
 
         if (onButtonClick) return onButtonClick(item, button);

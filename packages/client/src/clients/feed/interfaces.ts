@@ -41,7 +41,7 @@ export interface ContentBlockBase {
   type: "markdown" | "text" | "button_set";
 }
 
-export interface ButtonBlock {
+export interface ActionButton {
   name: string;
   label: string;
   action: string;
@@ -49,7 +49,7 @@ export interface ButtonBlock {
 
 export interface ButtonSetContentBlock extends ContentBlockBase {
   type: "button_set";
-  buttons: ButtonBlock[];
+  buttons: ActionButton[];
 }
 
 export interface TextContentBlock extends ContentBlockBase {
