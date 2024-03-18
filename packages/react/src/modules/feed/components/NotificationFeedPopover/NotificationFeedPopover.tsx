@@ -1,12 +1,13 @@
+import { Feed, FeedStoreState } from "@knocklabs/client";
+import { useKnockFeed } from "@knocklabs/react-core";
+import { Placement } from "@popperjs/core";
 import React, { RefObject, useEffect } from "react";
 import { usePopper } from "react-popper";
-import { Placement } from "@popperjs/core";
-import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
+
 import useComponentVisible from "../../../core/hooks/useComponentVisible";
+import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
 
 import "./styles.css";
-import { useKnockFeed } from "@knocklabs/react-core";
-import { Feed, FeedStoreState } from "@knocklabs/client";
 
 type OnOpenOptions = {
   store: FeedStoreState;
@@ -69,7 +70,7 @@ export const NotificationFeedPopover: React.FC<
     if (isVisible && onOpen) {
       onOpen({ store, feedClient });
     }
-  }, [isVisible]);
+  }, [isVisible, onOpen, store, feedClient]);
 
   return (
     <div
@@ -77,6 +78,7 @@ export const NotificationFeedPopover: React.FC<
       style={{
         ...styles.popper,
         visibility: isVisible ? "visible" : "hidden",
+        opacity: isVisible ? 1 : 0,
       }}
       ref={popperRef}
       {...attributes.popper}
