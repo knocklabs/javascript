@@ -9,16 +9,19 @@
   "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
+  "react-native": "./src/index.ts",
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
       "import": "./dist/esm/index.mjs",
       "types": "./dist/types/index.d.ts",
+      "react-native": "./src/index.ts",
       "default": "./dist/esm/index.mjs"
     }
   },
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "repository": {
