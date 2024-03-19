@@ -1,4 +1,11 @@
-import { FeedItem, isRequestInFlight, NetworkStatus } from "@knocklabs/client";
+import { FeedItem, NetworkStatus, isRequestInFlight } from "@knocklabs/client";
+import {
+  ColorMode,
+  FilterStatus,
+  useFeedSettings,
+  useKnockFeed,
+  useTranslations,
+} from "@knocklabs/react-core";
 import React, {
   ReactElement,
   ReactNode,
@@ -7,30 +14,25 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { EmptyFeed } from "../EmptyFeed";
-import {
-  useKnockFeed,
-  useFeedSettings,
-  ColorMode,
-  FilterStatus,
-  useTranslations,
-} from "@knocklabs/react-core";
+
 import { Spinner } from "../../../core/components/Spinner";
-import { NotificationCell } from "../NotificationCell";
+import useOnBottomScroll from "../../../core/hooks/useOnBottomScroll";
+import { EmptyFeed } from "../EmptyFeed";
+import { NotificationCell, NotificationCellProps } from "../NotificationCell";
+
 import {
   NotificationFeedHeader,
   NotificationFeedHeaderProps,
 } from "./NotificationFeedHeader";
-
 import "./styles.css";
-import useOnBottomScroll from "../../../core/hooks/useOnBottomScroll";
 
-export type OnNotificationClick = (item: FeedItem) => void;
-export type RenderItem = ({ item }: RenderItemProps) => ReactNode;
 export type RenderItemProps = {
   item: FeedItem;
-  onItemClick?: OnNotificationClick;
+  onItemClick?: NotificationCellProps["onItemClick"];
+  onButtonClick?: NotificationCellProps["onButtonClick"];
 };
+
+export type RenderItem = (props: RenderItemProps) => ReactNode;
 
 export interface NotificationFeedProps {
   EmptyComponent?: ReactNode;
@@ -40,7 +42,8 @@ export interface NotificationFeedProps {
   header?: ReactElement<any>;
   renderItem?: RenderItem;
   renderHeader?: (props: NotificationFeedHeaderProps) => ReactNode;
-  onNotificationClick?: OnNotificationClick;
+  onNotificationClick?: NotificationCellProps["onItemClick"];
+  onNotificationButtonClick?: NotificationCellProps["onButtonClick"];
   onMarkAllAsReadClick?: (e: React.MouseEvent, unreadItems: FeedItem[]) => void;
   initialFilterStatus?: FilterStatus;
 }
@@ -70,6 +73,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   EmptyComponent = <EmptyFeed />,
   renderItem = defaultRenderItem,
   onNotificationClick,
+  onNotificationButtonClick,
   onMarkAllAsReadClick,
   initialFilterStatus = FilterStatus.All,
   header,
@@ -129,7 +133,11 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         <div className="rnf-notification-feed__feed-items-container">
           {networkStatus !== NetworkStatus.loading &&
             items.map((item: FeedItem) =>
-              renderItem({ item, onItemClick: onNotificationClick }),
+              renderItem({
+                item,
+                onItemClick: onNotificationClick,
+                onButtonClick: onNotificationButtonClick,
+              }),
             )}
         </div>
 

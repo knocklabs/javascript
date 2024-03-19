@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [fed0f8c]
+  - @knocklabs/client@0.9.2
+
+## 0.2.2
+
+### Patch Changes
+
+- 282d005: Handle auth disconnected status.
+
 ## 0.2.1
 
 ### Patch Changes
