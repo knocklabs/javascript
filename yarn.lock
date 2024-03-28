@@ -10653,14 +10653,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bundle-test@workspace:examples/bundle-test":
-  version: 0.0.0-use.local
-  resolution: "bundle-test@workspace:examples/bundle-test"
-  dependencies:
-    "@knocklabs/react": "workspace:^"
-  languageName: unknown
-  linkType: soft
-
 "busboy@npm:1.6.0":
   version: 1.6.0
   resolution: "busboy@npm:1.6.0"
