@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5
+
+### Patch Changes
+
+- 10b5646: Include src files for react-core
+
 ## 0.2.4
 
 ### Patch Changes
