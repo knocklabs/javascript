@@ -1,5 +1,13 @@
 # @knocklabs/react-native-example
 
+## 1.0.9
+
+### Patch Changes
+
+- bc69618: Add react-native to package.json files to fix a bug in our React Native SDK
+- Updated dependencies [bc69618]
+  - @knocklabs/react-native@0.1.9
+
 ## 1.0.8
 
 ### Patch Changes
