@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.4
+
+### Patch Changes
+
+- bc69618: Add react-native to package.json files to fix a bug in our React Native SDK
+- Updated dependencies [bc69618]
+  - @knocklabs/client@0.9.3
+
 ## 0.2.3
 
 ### Patch Changes
