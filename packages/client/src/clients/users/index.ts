@@ -1,5 +1,5 @@
 import { ApiResponse } from "../../api";
-import { ChannelData } from "../../interfaces";
+import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
 import {
   GetPreferencesOptions,
@@ -7,6 +7,7 @@ import {
   PreferenceSet,
   SetPreferencesProperties,
 } from "../preferences/interfaces";
+
 import { GetChannelDataInput, SetChannelDataInput } from "./interfaces";
 
 const DEFAULT_PREFERENCE_SET_ID = "default";
@@ -16,6 +17,25 @@ class UserClient {
 
   constructor(instance: Knock) {
     this.instance = instance;
+  }
+
+  async get() {
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `/v1/users/${this.instance.userId}`,
+    });
+
+    return this.handleResponse<User>(result);
+  }
+
+  async identify(props: Record<string, any> = {}) {
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `/v1/users/${this.instance.userId}`,
+      params: props,
+    });
+
+    return this.handleResponse<User>(result);
   }
 
   async getAllPreferences() {
