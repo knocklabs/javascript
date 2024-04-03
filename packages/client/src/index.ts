@@ -10,6 +10,7 @@ export * from "./clients/preferences/interfaces";
 export * from "./clients/slack";
 export * from "./clients/slack/interfaces";
 export * from "./clients/users";
+export * from "./clients/messages";
 export * from "./networkStatus";
 
 export default Knock;

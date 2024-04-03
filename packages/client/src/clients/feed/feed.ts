@@ -610,17 +610,19 @@ class Feed {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const itemIds = items.map((item) => item.id);
 
-    const result = await this.knock.client().makeRequest({
-      method: "POST",
-      url: `/v1/messages/batch/${type}`,
-      data: { message_ids: itemIds },
-    });
+    // const result = await this.knock.client().makeRequest({
+    //   method: "POST",
+    //   url: `/v1/messages/batch/${type}`,
+    //   data: { message_ids: itemIds },
+    // });
+
+    const result = await this.knock.messages.batchUpdateStatuses(itemIds, type);
 
     // Emit the event that these items had their statuses changed
     // Note: we do this after the update to ensure that the server event actually completed
     this.broadcaster.emit(`items.${type}`, { items });
 
-    // Note: `items.type` format is being deprecated in favor over the `items:type` format, 
+    // Note: `items.type` format is being deprecated in favor over the `items:type` format,
     // but emit both formats to make it backward compatible for now.
     this.broadcaster.emit(`items:${type}`, { items });
     this.broadcastOverChannel(`items:${type}`, { items });
@@ -646,11 +648,11 @@ class Feed {
         : undefined,
     };
 
-    return await this.knock.client().makeRequest({
-      method: "POST",
-      url: `/v1/channels/${this.feedId}/messages/bulk/${type}`,
-      data: options,
-    });
+    return await this.knock.messages.batchUpdateAllStatusesInChannel(
+      this.feedId,
+      type,
+      options,
+    );
   }
 
   private setupBroadcastChannel() {
