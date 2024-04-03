@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.4
+
+### Patch Changes
+
+- f58371c: Added user get and identify methods
+
 ## 0.9.3
 
 ### Patch Changes
