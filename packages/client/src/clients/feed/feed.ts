@@ -610,12 +610,6 @@ class Feed {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const itemIds = items.map((item) => item.id);
 
-    // const result = await this.knock.client().makeRequest({
-    //   method: "POST",
-    //   url: `/v1/messages/batch/${type}`,
-    //   data: { message_ids: itemIds },
-    // });
-
     const result = await this.knock.messages.batchUpdateStatuses(itemIds, type);
 
     // Emit the event that these items had their statuses changed
