@@ -1,6 +1,12 @@
 import { ApiResponse } from "../../api";
+import { BulkOperation } from "../../interfaces";
 import Knock from "../../knock";
-import { Status } from "../feed/feed";
+
+import {
+  BulkUpdateMessagesInChannelProperties,
+  Message,
+  MessageEngagementStatus,
+} from "./interfaces";
 
 class MessageClient {
   private knock: Knock;
@@ -9,58 +15,67 @@ class MessageClient {
     this.knock = knock;
   }
 
-  async getMessage(messageId: string) {
+  async get(messageId: string): Promise<Message> {
     const result = await this.knock.client().makeRequest({
       method: "GET",
       url: `/v1/messages/${messageId}`,
     });
 
-    return this.handleResponse(result);
+    return this.handleResponse<Message>(result);
   }
 
-  async updateMessageStatus(messageId: string, status: Status) {
+  async updateStatus(
+    messageId: string,
+    status: MessageEngagementStatus,
+  ): Promise<Message> {
     const result = await this.knock.client().makeRequest({
       method: "PUT",
       url: `/v1/messages/${messageId}/${status}`,
     });
 
-    return this.handleResponse(result);
+    return this.handleResponse<Message>(result);
   }
 
-  async deleteMessageStatus(messageId: string, status: Status) {
+  async removeStatus(
+    messageId: string,
+    status: Exclude<MessageEngagementStatus, "interacted">,
+  ): Promise<Message> {
     const result = await this.knock.client().makeRequest({
       method: "DELETE",
       url: `/v1/messages/${messageId}/${status}`,
     });
 
-    return this.handleResponse(result);
+    return this.handleResponse<Message>(result);
   }
 
-  async batchUpdateStatuses(messageIds: string[], status: Status) {
+  async batchUpdateStatuses(
+    messageIds: string[],
+    status: MessageEngagementStatus | "unseen" | "unread" | "unarchived",
+  ): Promise<Message[]> {
     const result = await this.knock.client().makeRequest({
       method: "POST",
       url: `/v1/messages/batch/${status}`,
       data: { message_ids: messageIds },
     });
 
-    return this.handleResponse(result);
+    return this.handleResponse<Message[]>(result);
   }
 
-  async batchUpdateAllStatusesInChannel(
-    channelId: string,
-    status: "seen" | "read" | "archive",
-    options: any,
-  ) {
+  async bulkUpdateAllStatusesInChannel({
+    channelId,
+    status,
+    options,
+  }: BulkUpdateMessagesInChannelProperties): Promise<BulkOperation> {
     const result = await this.knock.client().makeRequest({
       method: "POST",
       url: `/v1/channels/${channelId}/messages/bulk/${status}`,
       data: options,
     });
 
-    return this.handleResponse(result);
+    return this.handleResponse<BulkOperation>(result);
   }
 
-  private handleResponse(response: ApiResponse) {
+  private handleResponse<T = any>(response: ApiResponse) {
     if (response.statusCode === "error") {
       if (response.error?.response?.status < 500) {
         return response.error || response.body;
@@ -68,7 +83,7 @@ class MessageClient {
       throw new Error(response.error || response.body);
     }
 
-    return response.body;
+    return response.body as T;
   }
 }
 

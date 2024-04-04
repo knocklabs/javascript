@@ -4,6 +4,10 @@ import { StoreApi } from "zustand";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
+import {
+  BulkUpdateMessagesInChannelProperties,
+  MessageEngagementStatus,
+} from "../messages/interfaces";
 
 import {
   FeedClientOptions,
@@ -23,15 +27,6 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
-
-export type Status =
-  | "seen"
-  | "read"
-  | "interacted"
-  | "archived"
-  | "unseen"
-  | "unread"
-  | "unarchived";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -556,7 +551,7 @@ class Feed {
 
   private optimisticallyPerformStatusUpdate(
     itemOrItems: FeedItemOrItems,
-    type: Status,
+    type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
     attrs: object,
     badgeCountAttr?: "unread_count" | "unseen_count",
   ) {
@@ -605,7 +600,10 @@ class Feed {
     setState((store) => store.setItemAttrs(itemIds, attrs));
   }
 
-  private async makeStatusUpdate(itemOrItems: FeedItemOrItems, type: Status) {
+  private async makeStatusUpdate(
+    itemOrItems: FeedItemOrItems,
+    type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
+  ) {
     // Always treat items as a batch to use the corresponding batch endpoint
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const itemIds = items.map((item) => item.id);
@@ -624,13 +622,15 @@ class Feed {
     return result;
   }
 
-  private async makeBulkStatusUpdate(type: "seen" | "read" | "archive") {
+  private async makeBulkStatusUpdate(
+    status: BulkUpdateMessagesInChannelProperties["status"],
+  ) {
     // The base scope for the call should take into account all of the options currently
     // set on the feed, as well as being scoped for the current user. We do this so that
     // we ONLY make changes to the messages that are currently in view on this feed, and not
     // all messages that exist.
     const options = {
-      user_ids: [this.knock.userId],
+      user_ids: [this.knock.userId!],
       engagement_status:
         this.defaultOptions.status !== "all"
           ? this.defaultOptions.status
@@ -642,11 +642,11 @@ class Feed {
         : undefined,
     };
 
-    return await this.knock.messages.batchUpdateAllStatusesInChannel(
-      this.feedId,
-      type,
+    return await this.knock.messages.bulkUpdateAllStatusesInChannel({
+      channelId: this.feedId,
+      status,
       options,
-    );
+    });
   }
 
   private setupBroadcastChannel() {

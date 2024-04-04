@@ -2,6 +2,7 @@ import { GenericData, PageInfo } from "@knocklabs/types";
 
 import { Activity, Recipient } from "../../interfaces";
 import { NetworkStatus } from "../../networkStatus";
+import { NotificationSource } from "../messages/interfaces";
 
 // Specific feed interfaces
 
@@ -62,11 +63,6 @@ export interface MarkdownContentBlock extends ContentBlockBase {
   type: "markdown";
   rendered: string;
   content: string;
-}
-
-export interface NotificationSource {
-  key: string;
-  version_id: string;
 }
 
 export type ContentBlock =
