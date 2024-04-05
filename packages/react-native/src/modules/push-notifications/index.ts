@@ -1,1 +1,1 @@
-export * from "./PushNotificationProvider";
+export * from "./ExpoPushNotificationProvider";
