@@ -40,6 +40,10 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
+    "expo": "~50.0.14",
+    "expo-constants": "^15.4.0",
+    "expo-device": "^5.9.3",
+    "expo-notifications": "^0.27.6",
     "react": ">=16.8.0",
     "react-native": ">=0.60.0"
   },
