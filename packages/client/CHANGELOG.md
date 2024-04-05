@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.0
+
+### Minor Changes
+
+- 8bdc75b: Added a new MessageClient to access message api's independently from the Feed.
+
 ## 0.9.4
 
 ### Patch Changes
