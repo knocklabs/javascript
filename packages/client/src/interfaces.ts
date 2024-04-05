@@ -27,6 +27,8 @@ export interface User extends GenericData {
 
 export type Recipient = User | KnockObject;
 
+export type RecipientRef = string | { collection: string; id: string };
+
 export interface Activity<T = GenericData> {
   id: string;
   inserted_at: string;
@@ -49,4 +51,17 @@ export type UserTokenExpiringCallback = (
 export interface AuthenticateOptions {
   onUserTokenExpiring?: UserTokenExpiringCallback;
   timeBeforeExpirationInMs?: number;
+}
+
+export interface BulkOperation {
+  id: string;
+  name: string;
+  status: "queued" | "processing" | "completed" | "failed";
+  processed_rows: number;
+  estimated_total_rows: number;
+  started_at?: string;
+  completed_at?: string;
+  failed_at?: string;
+  inserted_at: string;
+  updated_at: string;
 }
