@@ -1,5 +1,9 @@
 // PushNotificationContext.tsx
-import { Message, MessageEngagementStatus } from "@knocklabs/client";
+import {
+  ChannelData,
+  Message,
+  MessageEngagementStatus,
+} from "@knocklabs/client";
 import { useKnockClient } from "@knocklabs/react-core";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
@@ -17,22 +21,24 @@ export interface ExpoPushNotificationContextType {
   ) => void;
 }
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => {
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    };
+  },
+});
+
 const ExpoPushNotificationContext = createContext<
   ExpoPushNotificationContextType | undefined
 >(undefined);
 
 export interface ExpoPushNotificationProviderProps {
+  knockExpoChannelId: string;
   children?: React.ReactElement;
-  customNotificationHandler?: (
-    notification: Notifications.Notification,
-  ) => Promise<Notifications.NotificationBehavior>;
 }
-
-const defaultNotificationHandler = async () => ({
-  shouldShowAlert: true,
-  shouldPlaySound: true,
-  shouldSetBadge: true,
-});
 
 async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPushToken | null> {
   // Check for device support
@@ -77,7 +83,7 @@ async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPus
 
 export const ExpoPushNotificationProvider: React.FC<
   ExpoPushNotificationProviderProps
-> = ({ children, customNotificationHandler }) => {
+> = ({ knockExpoChannelId, children }) => {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const knockClient = useKnockClient();
   const [notificationReceivedHandler, setNotificationReceivedHandler] =
@@ -125,28 +131,55 @@ export const ExpoPushNotificationProvider: React.FC<
       });
   }
 
+  async function registerNewTokenDataOnServer(
+    tokens: string[],
+    channelId: string,
+  ): Promise<ChannelData> {
+    return knockClient.user.setChannelData({
+      channelId: channelId,
+      channelData: { tokens: tokens },
+    });
+  }
+
+  async function registerPushTokenToChannel(
+    token: string,
+    channelId: string,
+  ): Promise<void> {
+    knockClient.user
+      .getChannelData({ channelId: channelId })
+      .then((result: ChannelData) => {
+        console.log("setDeviceTokenToChannel success", result);
+        const tokens: string[] = result.data["tokens"];
+        if (!tokens.includes(token)) {
+          tokens.push(token);
+          return registerNewTokenDataOnServer(tokens, channelId);
+        }
+      })
+      .catch(() => {
+        // No data registered on that channel for that user, we'll create a new record
+        return registerNewTokenDataOnServer([token], channelId);
+      });
+  }
+
   useEffect(() => {
     registerForPushNotifications()
       .then(() => {
         if (expoPushToken) {
-          return knockClient.user.setChannelData({
-            channelId: process.env.EXPO_PUBLIC_KNOCK_PUSH_CHANNEL_ID!,
-            channelData: { tokens: [expoPushToken] },
-          });
+          registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
+            .then((result) => {
+              console.log("setChannelData success");
+            })
+            .catch((error: any) => {
+              console.error(
+                "Error in setting push token or channel data",
+                error,
+              );
+            });
         }
-      })
-      .then((result) => {
-        console.log("setChannelData success", result);
       })
       .catch((error: any) => {
         console.error("Error in setting push token or channel data", error);
       });
-
-    Notifications.setNotificationHandler(
-      customNotificationHandler
-        ? customNotificationHandler
-        : defaultNotificationHandler,
-    );
 
     const notificationReceivedSubscription =
       Notifications.addNotificationReceivedListener((notification) => {
