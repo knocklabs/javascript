@@ -13,6 +13,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 export interface ExpoPushNotificationContextType {
   expoPushToken: string | null;
   registerForPushNotifications: () => Promise<void>;
+  registerPushTokenToChannel(tokens: string, channelId: string): Promise<void>;
+  unregisterPushTokenFromChannel(
+    token: string,
+    channelId: string,
+  ): Promise<void>;
   onNotificationReceived: (
     handler: (notification: Notifications.Notification) => void,
   ) => void;
@@ -148,16 +153,32 @@ export const ExpoPushNotificationProvider: React.FC<
     knockClient.user
       .getChannelData({ channelId: channelId })
       .then((result: ChannelData) => {
-        console.log("setDeviceTokenToChannel success", result);
         const tokens: string[] = result.data["tokens"];
         if (!tokens.includes(token)) {
           tokens.push(token);
           return registerNewTokenDataOnServer(tokens, channelId);
         }
+        console.log("registerPushTokenToChannel success", result);
       })
       .catch(() => {
         // No data registered on that channel for that user, we'll create a new record
         return registerNewTokenDataOnServer([token], channelId);
+      });
+  }
+
+  async function unregisterPushTokenFromChannel(
+    token: string,
+    channelId: string,
+  ): Promise<void> {
+    knockClient.user
+      .getChannelData({ channelId: channelId })
+      .then((result: ChannelData) => {
+        const tokens: string[] = result.data["tokens"];
+        const updatedTokens = tokens.filter(
+          (channelToken) => channelToken !== token,
+        );
+        console.log("unregisterPushTokenFromChannel success", result);
+        return registerNewTokenDataOnServer(updatedTokens, channelId);
       });
   }
 
@@ -216,6 +237,8 @@ export const ExpoPushNotificationProvider: React.FC<
       value={{
         expoPushToken,
         registerForPushNotifications,
+        registerPushTokenToChannel,
+        unregisterPushTokenFromChannel,
         onNotificationReceived,
         onNotificationTapped,
       }}
