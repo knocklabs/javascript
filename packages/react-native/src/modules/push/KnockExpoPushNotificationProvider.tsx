@@ -10,7 +10,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export interface ExpoPushNotificationContextType {
+export interface KnockExpoPushNotificationContextType {
   expoPushToken: string | null;
   registerForPushNotifications: () => Promise<void>;
   registerPushTokenToChannel(tokens: string, channelId: string): Promise<void>;
@@ -36,37 +36,42 @@ Notifications.setNotificationHandler({
   },
 });
 
-const ExpoPushNotificationContext = createContext<
-  ExpoPushNotificationContextType | undefined
+const defaultNotificationHandler = async (
+  notification: Notifications.Notification,
+): Promise<Notifications.NotificationBehavior> => {
+  // Your default logic here
+  return {
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  };
+};
+
+const KnockExpoPushNotificationContext = createContext<
+  KnockExpoPushNotificationContextType | undefined
 >(undefined);
 
-export interface ExpoPushNotificationProviderProps {
+export interface KnockExpoPushNotificationProviderProps {
   knockExpoChannelId: string;
+  customNotificationHandler?: (
+    notification: Notifications.Notification,
+  ) => Promise<Notifications.NotificationBehavior>;
   children?: React.ReactElement;
 }
 
-async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPushToken | null> {
-  // Check for device support
-  if (!Device.isDevice) {
-    console.log("Must use physical device for Push Notifications");
-    return null;
-  }
-
-  // Check for permissions
+async function requestPushPermissionIfNeeded(): Promise<string> {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
+
   if (existingStatus !== "granted") {
     const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
 
-  if (finalStatus !== "granted") {
-    console.log(
-      "Failed to get push token for push notification! User has not granted push notification permissions on device.",
-    );
-    return null;
-  }
+  return finalStatus;
+}
 
+async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
   try {
     if (
       !Constants.expoConfig ||
@@ -86,9 +91,28 @@ async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPus
   }
 }
 
-export const ExpoPushNotificationProvider: React.FC<
-  ExpoPushNotificationProviderProps
-> = ({ knockExpoChannelId, children }) => {
+async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPushToken | null> {
+  // Check for device support
+  if (!Device.isDevice) {
+    console.log("Must use physical device for Push Notifications");
+    return null;
+  }
+
+  const permissionStatus = await requestPushPermissionIfNeeded();
+
+  if (permissionStatus !== "granted") {
+    console.log(
+      "Failed to get push token for push notification! User has not granted push notification permissions on device.",
+    );
+    return null;
+  }
+
+  return getExpoPushToken();
+}
+
+export const KnockExpoPushNotificationProvider: React.FC<
+  KnockExpoPushNotificationProviderProps
+> = ({ knockExpoChannelId, customNotificationHandler, children }) => {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const knockClient = useKnockClient();
   const [notificationReceivedHandler, setNotificationReceivedHandler] =
@@ -183,6 +207,11 @@ export const ExpoPushNotificationProvider: React.FC<
   }
 
   useEffect(() => {
+    Notifications.setNotificationHandler({
+      handleNotification:
+        customNotificationHandler ?? defaultNotificationHandler,
+    });
+
     registerForPushNotifications()
       .then(() => {
         if (expoPushToken) {
@@ -233,7 +262,7 @@ export const ExpoPushNotificationProvider: React.FC<
   }, [notificationReceivedHandler, notificationTappedHandler]);
 
   return (
-    <ExpoPushNotificationContext.Provider
+    <KnockExpoPushNotificationContext.Provider
       value={{
         expoPushToken,
         registerForPushNotifications,
@@ -244,16 +273,17 @@ export const ExpoPushNotificationProvider: React.FC<
       }}
     >
       {children}
-    </ExpoPushNotificationContext.Provider>
+    </KnockExpoPushNotificationContext.Provider>
   );
 };
 
-export const usePushNotifications = (): ExpoPushNotificationContextType => {
-  const context = useContext(ExpoPushNotificationContext);
-  if (context === undefined) {
-    throw new Error(
-      "usePushNotifications must be used within a PushNotificationProvider",
-    );
-  }
-  return context;
-};
+export const usePushNotifications =
+  (): KnockExpoPushNotificationContextType => {
+    const context = useContext(KnockExpoPushNotificationContext);
+    if (context === undefined) {
+      throw new Error(
+        "usePushNotifications must be used within a PushNotificationProvider",
+      );
+    }
+    return context;
+  };
