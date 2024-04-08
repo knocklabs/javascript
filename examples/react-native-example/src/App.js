@@ -1,5 +1,5 @@
 import {
-  ExpoPushNotificationProvider,
+  KnockExpoPushNotificationProvider,
   KnockFeedProvider,
   KnockProvider,
 } from "@knocklabs/react-native";
@@ -15,7 +15,7 @@ export default function App() {
       host={process.env.EXPO_PUBLIC_KNOCK_HOST}
       userId={process.env.EXPO_PUBLIC_KNOCK_USER_ID}
     >
-      <ExpoPushNotificationProvider
+      <KnockExpoPushNotificationProvider
         knockExpoChannelId={process.env.EXPO_PUBLIC_KNOCK_PUSH_CHANNEL_ID}
       >
         <KnockFeedProvider
@@ -26,7 +26,7 @@ export default function App() {
             <NotificationFeed />
           </View>
         </KnockFeedProvider>
-      </ExpoPushNotificationProvider>
+      </KnockExpoPushNotificationProvider>
     </KnockProvider>
   );
 }
