@@ -68,7 +68,7 @@ export default function Home() {
     >
       <KnockFeedProvider
         feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
-        defaultFeedOptions={{ tenant, auto_manage_socket_connection: true }}
+        defaultFeedOptions={{ tenant }}
       >
         <NotificationFeedContainer>
           <Box maxW="520px" mx="auto" py={12}>
