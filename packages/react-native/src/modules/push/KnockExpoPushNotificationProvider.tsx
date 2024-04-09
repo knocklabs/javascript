@@ -13,7 +13,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 export interface KnockExpoPushNotificationContextType {
   expoPushToken: string | null;
   registerForPushNotifications: () => Promise<void>;
-  registerPushTokenToChannel(tokens: string, channelId: string): Promise<void>;
+  registerPushTokenToChannel(token: string, channelId: string): Promise<void>;
   unregisterPushTokenFromChannel(
     token: string,
     channelId: string,
@@ -78,7 +78,7 @@ async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
       !Constants.expoConfig.extra ||
       !Constants.expoConfig.extra.eas
     ) {
-      console.error("Project ID is not defined in the app configuration.");
+      console.error("Expo Project ID is not defined in the app configuration.");
       return null;
     }
     const token = await Notifications.getExpoPushTokenAsync({
@@ -86,7 +86,6 @@ async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
     });
     return token;
   } catch (error) {
-    console.error("Error getting a push token", error);
     return null;
   }
 }
@@ -94,16 +93,13 @@ async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
 async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPushToken | null> {
   // Check for device support
   if (!Device.isDevice) {
-    console.log("Must use physical device for Push Notifications");
+    console.warn("Must use physical device for Push Notifications");
     return null;
   }
 
   const permissionStatus = await requestPushPermissionIfNeeded();
 
   if (permissionStatus !== "granted") {
-    console.log(
-      "Failed to get push token for push notification! User has not granted push notification permissions on device.",
-    );
     return null;
   }
 
@@ -153,10 +149,10 @@ export const KnockExpoPushNotificationProvider: React.FC<
     knockClient.messages
       .updateStatus(messageId, status)
       .then((result: Message) => {
-        console.log("updateKnockMessageStatus success", result);
+        knockClient.log("updateKnockMessageStatus success");
       })
       .catch((error: any) => {
-        console.error("updateKnockMessageStatus failed", error);
+        knockClient.log("updateKnockMessageStatus failed");
       });
   }
 
@@ -182,7 +178,7 @@ export const KnockExpoPushNotificationProvider: React.FC<
           tokens.push(token);
           return registerNewTokenDataOnServer(tokens, channelId);
         }
-        console.log("registerPushTokenToChannel success", result);
+        knockClient.log("registerPushTokenToChannel success");
       })
       .catch(() => {
         // No data registered on that channel for that user, we'll create a new record
@@ -201,7 +197,7 @@ export const KnockExpoPushNotificationProvider: React.FC<
         const updatedTokens = tokens.filter(
           (channelToken) => channelToken !== token,
         );
-        console.log("unregisterPushTokenFromChannel success", result);
+        knockClient.log("unregisterPushTokenFromChannel success");
         return registerNewTokenDataOnServer(updatedTokens, channelId);
       });
   }
@@ -217,33 +213,27 @@ export const KnockExpoPushNotificationProvider: React.FC<
         if (expoPushToken) {
           registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
             .then((result) => {
-              console.log("setChannelData success");
+              knockClient.log("setChannelData success");
             })
             .catch((error: any) => {
-              console.error(
-                "Error in setting push token or channel data",
-                error,
-              );
+              knockClient.log("Error in setting push token or channel data");
             });
         }
       })
       .catch((error: any) => {
-        console.error("Error in setting push token or channel data", error);
+        knockClient.log("Error in setting push token or channel data");
       });
 
     const notificationReceivedSubscription =
       Notifications.addNotificationReceivedListener((notification) => {
-        console.log(
-          "Expo Push Notification received in foreground:",
-          notification,
-        );
+        knockClient.log("Expo Push Notification received in foreground:");
         updateKnockMessageStatusFromNotification(notification, "interacted");
         notificationReceivedHandler(notification);
       });
 
     const notificationResponseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("Expo Push Notification was interacted with:", response);
+        knockClient.log("Expo Push Notification was interacted with");
         updateKnockMessageStatusFromNotification(
           response.notification,
           "interacted",
@@ -259,7 +249,11 @@ export const KnockExpoPushNotificationProvider: React.FC<
         notificationResponseSubscription,
       );
     };
-  }, [notificationReceivedHandler, notificationTappedHandler]);
+  }, [
+    notificationReceivedHandler,
+    notificationTappedHandler,
+    customNotificationHandler,
+  ]);
 
   return (
     <KnockExpoPushNotificationContext.Provider
