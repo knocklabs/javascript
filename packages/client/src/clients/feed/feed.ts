@@ -64,8 +64,6 @@ class Feed {
     // Attempt to setup a realtime connection (does not join)
     this.initializeRealtimeConnection();
 
-    this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
-
     this.setupBroadcastChannel();
   }
 
@@ -741,6 +739,7 @@ class Feed {
    * or reconnect the socket after a delay
    */
   private setupAutoSocketManager() {
+    this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
     document.addEventListener("visibilitychange", this.visibilityChangeHandler);
   }
 
