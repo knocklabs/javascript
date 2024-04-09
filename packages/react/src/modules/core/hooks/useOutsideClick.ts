@@ -18,9 +18,11 @@ const useOutsideClick = ({
   };
 
   useEffect(() => {
+    console.log("Use outside click");
     document.addEventListener("click", handleClick);
 
     return () => {
+      console.log("remove event listener");
       document.removeEventListener("click", handleClick);
     };
   });

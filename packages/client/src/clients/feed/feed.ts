@@ -43,6 +43,7 @@ class Feed {
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: Boolean = false;
+  private visibilityChangeHandler: () => void;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -62,6 +63,8 @@ class Feed {
 
     // Attempt to setup a realtime connection (does not join)
     this.initializeRealtimeConnection();
+
+    this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
 
     this.setupBroadcastChannel();
   }
@@ -91,6 +94,8 @@ class Feed {
       this.channel.leave();
       this.channel.off("new-message");
     }
+
+    this.teardownAutoSocketManager();
 
     if (this.disconnectTimer) {
       clearTimeout(this.disconnectTimer);
@@ -720,9 +725,7 @@ class Feed {
     this.channel.on("new-message", (resp) => this.onNewMessageReceived(resp));
 
     if (this.defaultOptions.auto_manage_socket_connection) {
-      this.setupAutoSocketManager(
-        this.defaultOptions.auto_manage_socket_connection_delay,
-      );
+      this.setupAutoSocketManager();
     }
 
     // If we're initializing but they have previously opted to listen to real-time updates
@@ -737,33 +740,43 @@ class Feed {
    * Listen for changes to document visibility and automatically disconnect
    * or reconnect the socket after a delay
    */
-  private setupAutoSocketManager(autoManageSocketConnectionDelay?: number) {
+  private setupAutoSocketManager() {
+    document.addEventListener("visibilitychange", this.visibilityChangeHandler);
+  }
+
+  private teardownAutoSocketManager() {
+    document.removeEventListener(
+      "visibilitychange",
+      this.visibilityChangeHandler,
+    );
+  }
+
+  private handleVisibilityChange() {
     const disconnectDelay =
-      autoManageSocketConnectionDelay ?? DEFAULT_DISCONNECT_DELAY;
+      this.defaultOptions.auto_manage_socket_connection_delay ??
+      DEFAULT_DISCONNECT_DELAY;
 
-    document.addEventListener("visibilitychange", () => {
-      const client = this.knock.client();
+    const client = this.knock.client();
 
-      if (document.visibilityState === "hidden") {
-        // When the tab is hidden, clean up the socket connection after a delay
-        this.disconnectTimer = setTimeout(() => {
-          client.socket?.disconnect();
-          this.disconnectTimer = null;
-        }, disconnectDelay);
-      } else if (document.visibilityState === "visible") {
-        // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
-        // This handles cases where the tab is only briefly hidden to avoid unnecessary disconnects
-        if (this.disconnectTimer) {
-          clearTimeout(this.disconnectTimer);
-          this.disconnectTimer = null;
-        }
-
-        // If the socket is not connected, try to reconnect
-        if (!client.socket?.isConnected()) {
-          this.initializeRealtimeConnection();
-        }
+    if (document.visibilityState === "hidden") {
+      // When the tab is hidden, clean up the socket connection after a delay
+      this.disconnectTimer = setTimeout(() => {
+        client.socket?.disconnect();
+        this.disconnectTimer = null;
+      }, disconnectDelay);
+    } else if (document.visibilityState === "visible") {
+      // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
+      // This handles cases where the tab is only briefly hidden to avoid unnecessary disconnects
+      if (this.disconnectTimer) {
+        clearTimeout(this.disconnectTimer);
+        this.disconnectTimer = null;
       }
-    });
+
+      // If the socket is not connected, try to reconnect
+      if (!client.socket?.isConnected()) {
+        this.initializeRealtimeConnection();
+      }
+    }
   }
 }
 
