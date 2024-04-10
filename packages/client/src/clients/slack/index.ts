@@ -4,6 +4,7 @@ import Knock from "../../knock";
 import {
   AuthCheckInput,
   GetSlackChannelsInput,
+  GetSlackChannelsResponse,
   RevokeAccessTokenInput,
 } from "./interfaces";
 
@@ -32,7 +33,9 @@ class SlackClient {
     return this.handleResponse(result);
   }
 
-  async getChannels(input: GetSlackChannelsInput) {
+  async getChannels(
+    input: GetSlackChannelsInput,
+  ): Promise<GetSlackChannelsResponse> {
     const { knockChannelId, tenant } = input;
     const queryOptions = input.queryOptions || {};
 

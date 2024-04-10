@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.8
+
+### Patch Changes
+
+- 3c277cb: fix: remove react-query and replace with swr for react 16+ support
+- 0e4bd20: fix: remove unused dependencies
+- Updated dependencies [3c277cb]
+- Updated dependencies [567e24f]
+  - @knocklabs/react-core@0.2.8
+  - @knocklabs/client@0.10.1
+
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [8bdc75b]
+  - @knocklabs/client@0.10.0
+  - @knocklabs/react-core@0.2.7
+
 ## 0.2.6
 
 ### Patch Changes
