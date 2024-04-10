@@ -1,13 +1,15 @@
 import { SlackChannelQueryOptions, useKnockSlackClient } from "..";
-import { SlackChannel } from "@knocklabs/client";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { GetSlackChannelsResponse, SlackChannel } from "@knocklabs/client";
 import { useEffect, useMemo } from "react";
+import useSWRInfinite from "swr/infinite";
 
 import { useKnockClient } from "../../core";
 
 const MAX_COUNT = 1000;
 const LIMIT_PER_PAGE = 200;
 const CHANNEL_TYPES = "private_channel,public_channel";
+
+const QUERY_KEY = "SLACK_CHANNELS";
 
 type UseSlackChannelsProps = {
   queryOptions?: SlackChannelQueryOptions;
@@ -19,6 +21,26 @@ type UseSlackChannelOutput = {
   refetch: () => void;
 };
 
+type QueryKey = [key: string, cursor: string] | null;
+
+function getQueryKey(
+  pageIndex: number,
+  previousPageData: GetSlackChannelsResponse,
+): QueryKey {
+  // First page so just pass empty
+  if (pageIndex === 0) {
+    return [QUERY_KEY, ""];
+  }
+
+  // If there's no more data then return an empty next cursor
+  if (previousPageData && ["", null].includes(previousPageData.next_cursor)) {
+    return null;
+  }
+
+  // Next cursor exists so pass it
+  return [QUERY_KEY, previousPageData.next_cursor];
+}
+
 function useSlackChannels({
   queryOptions,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
@@ -26,42 +48,39 @@ function useSlackChannels({
   const { knockSlackChannelId, tenant, connectionStatus } =
     useKnockSlackClient();
 
-  const fetchChannels = ({ pageParam }: { pageParam: string }) => {
+  const fetchChannels = (queryKey: QueryKey) => {
     return knock.slack.getChannels({
       tenant,
       knockChannelId: knockSlackChannelId,
       queryOptions: {
         ...queryOptions,
-        cursor: pageParam,
+        cursor: queryKey ? queryKey[1] : "",
         limit: queryOptions?.limitPerPage || LIMIT_PER_PAGE,
         types: queryOptions?.types || CHANNEL_TYPES,
       },
     });
   };
 
-  const {
-    data,
-    isLoading,
-    isFetching,
-    fetchNextPage,
-    hasNextPage,
-    refetch,
-    error,
-  } = useInfiniteQuery({
-    queryKey: ["slackChannels"],
-    queryFn: fetchChannels,
-    initialPageParam: "",
-    getNextPageParam: (lastPage) =>
-      lastPage?.next_cursor === "" ? null : lastPage?.next_cursor,
-  });
+  const { data, error, isLoading, isValidating, size, setSize, mutate } =
+    useSWRInfinite<GetSlackChannelsResponse>(getQueryKey, fetchChannels, {
+      initialSize: 0,
+    });
 
-  const slackChannels = useMemo(() => {
-    return (
-      data?.pages
-        ?.flatMap((page) => page?.slack_channels)
-        .filter((channel) => !!channel) || []
-    );
-  }, [data?.pages]);
+  const currentPage = data?.length || 0;
+
+  const hasNextPage =
+    currentPage === 0 ||
+    (data &&
+      data[currentPage]?.next_cursor &&
+      data[currentPage]?.next_cursor !== "");
+
+  const slackChannels: SlackChannel[] = useMemo(
+    () =>
+      (data ?? [])
+        .flatMap((page) => page?.slack_channels)
+        .filter((channel) => !!channel),
+    [data],
+  );
 
   const maxCount = queryOptions?.maxCount || MAX_COUNT;
 
@@ -70,22 +89,31 @@ function useSlackChannels({
       connectionStatus === "connected" &&
       !error &&
       hasNextPage &&
-      !isFetching &&
-      slackChannels?.length < maxCount
+      !isLoading &&
+      !isValidating &&
+      slackChannels.length < maxCount
     ) {
-      fetchNextPage();
+      // Fetch a page at a time until we have nothing else left to fetch
+      // or we've already hit the max amount of channels to fetch
+      setSize(size + 1);
     }
   }, [
-    slackChannels?.length,
-    fetchNextPage,
+    slackChannels.length,
+    setSize,
+    size,
     hasNextPage,
-    isFetching,
+    isLoading,
+    isValidating,
     maxCount,
     error,
     connectionStatus,
   ]);
 
-  return { data: slackChannels, isLoading, refetch };
+  return {
+    data: slackChannels,
+    isLoading: isLoading || isValidating,
+    refetch: () => mutate(),
+  };
 }
 
 export default useSlackChannels;

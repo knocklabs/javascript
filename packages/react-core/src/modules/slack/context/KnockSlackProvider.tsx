@@ -1,12 +1,9 @@
 import { useSlackConnectionStatus } from "..";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 
 import { slackProviderKey } from "../../core";
 import { useKnockClient } from "../../core";
 import { ConnectionStatus } from "../hooks/useSlackConnectionStatus";
-
-const queryClient = new QueryClient();
 
 export interface KnockSlackProviderState {
   knockSlackChannelId: string;
@@ -63,7 +60,7 @@ export const KnockSlackProvider: React.FC<KnockSlackProviderProps> = ({
         tenant,
       }}
     >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      {children}
     </SlackProviderStateContext.Provider>
   );
 };
