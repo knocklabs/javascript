@@ -4843,6 +4843,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
+    babel-plugin-react-require: "npm:^4.0.2"
     date-fns: "npm:^3.3.1"
     eslint: "npm:^8.53.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
@@ -4918,6 +4919,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
+    babel-plugin-react-require: "npm:^4.0.2"
     eslint: "npm:^8.53.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
@@ -8703,6 +8705,13 @@ __metadata:
   version: 0.18.12
   resolution: "babel-plugin-react-native-web@npm:0.18.12"
   checksum: 10c0/f04df9a822c207c00b7b66560e6a33a17c922b96471b7da07ca66003a70599f739b4ef6ad9018bc85205783282b85f7fc193b38d85306cc4158e66d328b6f3c4
+  languageName: node
+  linkType: hard
+
+"babel-plugin-react-require@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "babel-plugin-react-require@npm:4.0.2"
+  checksum: 10c0/b3d205f201cf0433ffab3f4d92f5701c577e52184463a42c388bff2bac39d97356f4aab7fd50cac4541d0829eda17cc9cd963076627cae09f691abbabf4dad1d
   languageName: node
   linkType: hard
 
