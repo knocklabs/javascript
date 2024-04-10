@@ -1,12 +1,11 @@
 import { SlackChannel, SlackChannelConnection } from "@knocklabs/client";
-import { AriaListBoxOptions } from "@react-aria/listbox";
+
+import "../../theme.css";
 
 import SlackChannelOption from "./SlackChannelOption";
-
 import "./styles.css";
-import "../../theme.css"
 
-type Props = AriaListBoxOptions<unknown> & {
+type Props = {
   slackChannels: SlackChannel[];
   isLoading: boolean;
   connectedChannels: SlackChannelConnection[] | null;
