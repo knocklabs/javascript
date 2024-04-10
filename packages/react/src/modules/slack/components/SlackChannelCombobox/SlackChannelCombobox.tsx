@@ -10,7 +10,6 @@ import {
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useFilter } from "react-aria";
 
 import { Spinner, useOutsideClick } from "../../../core";
 import "../../theme.css";
@@ -19,6 +18,7 @@ import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 import SlackChannelListBox from "./SlackChannelListBox";
 import SlackConnectedChannelTagList from "./SlackConnectedChannelTagList";
 import SlackConnectionError from "./SlackConnectionError";
+import { strContains } from "./helpers";
 import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
@@ -231,9 +231,8 @@ export const SlackChannelCombobox = ({
   };
 
   // Handle channel search
-  const { contains } = useFilter({ sensitivity: "base" });
   const matchedChannels = slackChannels.filter((slackChannel) =>
-    contains(slackChannel.name, inputValue),
+    strContains(slackChannel.name, inputValue),
   );
 
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
