@@ -27,6 +27,11 @@ export type RevokeAccessTokenInput = {
   knockChannelId: string;
 };
 
+export type GetSlackChannelsResponse = {
+  slack_channels: SlackChannel[];
+  next_cursor: string | null;
+};
+
 export type SlackChannel = {
   name: string;
   id: string;

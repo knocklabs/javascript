@@ -4838,7 +4838,6 @@ __metadata:
   resolution: "@knocklabs/react-core@workspace:packages/react-core"
   dependencies:
     "@knocklabs/client": "workspace:^"
-    "@tanstack/react-query": "npm:^5.18.1"
     "@testing-library/react": "npm:^14.2.0"
     "@types/react": "npm:^18.2.37"
     "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
@@ -4852,6 +4851,7 @@ __metadata:
     react: "npm:^18.2.0"
     rimraf: "npm:^5.0.5"
     rollup-plugin-execute: "npm:^1.1.1"
+    swr: "npm:^2.2.5"
     typescript: "npm:^5.2.2"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
@@ -4859,7 +4859,7 @@ __metadata:
     vitest: "npm:^1.2.2"
     zustand: "npm:^3.7.2"
   peerDependencies:
-    react: ">=16.8.0"
+    react: ^16.11.0 || ^17.0.0 || ^18.0.0
   languageName: unknown
   linkType: soft
 
@@ -4911,8 +4911,6 @@ __metadata:
     "@popperjs/core": "npm:^2.11.8"
     "@radix-ui/react-popover": "npm:^1.0.7"
     "@radix-ui/react-visually-hidden": "npm:^1.0.3"
-    "@tanstack/react-query": "npm:^5.18.1"
-    "@tanstack/react-query-devtools": "npm:^5.20.1"
     "@testing-library/react": "npm:^14.2.0"
     "@types/lodash.debounce": "npm:^4.0.9"
     "@types/react": "npm:^18.2.37"
@@ -4937,8 +4935,8 @@ __metadata:
     vite-plugin-no-bundle: "npm:^3.0.0"
     vitest: "npm:^1.2.2"
   peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
+    react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.11.0 || ^17.0.0 || ^18.0.0
   languageName: unknown
   linkType: soft
 
@@ -6579,43 +6577,6 @@ __metadata:
   dependencies:
     defer-to-connect: "npm:^2.0.1"
   checksum: 10c0/4629d2fbb2ea67c2e9dc03af235c0991c79ebdddcbc19aed5d5732fb29ce01c13331e9b1a491584b9069bd6ecde6581dcbf871f11b7eefdebbab34de6cf2197e
-  languageName: node
-  linkType: hard
-
-"@tanstack/query-core@npm:5.28.2":
-  version: 5.28.2
-  resolution: "@tanstack/query-core@npm:5.28.2"
-  checksum: 10c0/4e93c7be19195f0e404c3486d92b8e19cf1605eadf863f442a1be3dae302b67c617781f47e74a5f5c1f9771fb0dd0f2fa2b3dd56f78bc32e70294cf0f6968ed0
-  languageName: node
-  linkType: hard
-
-"@tanstack/query-devtools@npm:5.27.8":
-  version: 5.27.8
-  resolution: "@tanstack/query-devtools@npm:5.27.8"
-  checksum: 10c0/6be9cb45f114b04a567aee142e30db366ea75a14746ee1005d06014c55f65c780a8ebeeb9a7622763374a9038ec2765b930b8f930c6e7da4613273302e70cf5d
-  languageName: node
-  linkType: hard
-
-"@tanstack/react-query-devtools@npm:^5.20.1":
-  version: 5.28.2
-  resolution: "@tanstack/react-query-devtools@npm:5.28.2"
-  dependencies:
-    "@tanstack/query-devtools": "npm:5.27.8"
-  peerDependencies:
-    "@tanstack/react-query": ^5.28.2
-    react: ^18.0.0
-  checksum: 10c0/6ebcb79bb8e9818cf76cec618d054d83147be33948c0f5e755f18db90b55a90a1b8bd7e73b9f703b8de9e0fde16b680ddcfa6f7462aab7507acdf0bcc948b171
-  languageName: node
-  linkType: hard
-
-"@tanstack/react-query@npm:^5.18.1":
-  version: 5.28.2
-  resolution: "@tanstack/react-query@npm:5.28.2"
-  dependencies:
-    "@tanstack/query-core": "npm:5.28.2"
-  peerDependencies:
-    react: ^18.0.0
-  checksum: 10c0/204e90d43a2919298efc5e189456a15b6b6990282f9d6ff4f295e03f0e6506334c2e6f17141bcb67a8daabc4c78dc649bf7334f3d6ec943fd40584be57c9c7f5
   languageName: node
   linkType: hard
 
@@ -21971,7 +21932,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swr@npm:^2.2.4":
+"swr@npm:^2.2.4, swr@npm:^2.2.5":
   version: 2.2.5
   resolution: "swr@npm:2.2.5"
   dependencies:
