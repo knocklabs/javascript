@@ -4335,43 +4335,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@internationalized/date@npm:^3.5.2":
-  version: 3.5.2
-  resolution: "@internationalized/date@npm:3.5.2"
-  dependencies:
-    "@swc/helpers": "npm:^0.5.0"
-  checksum: 10c0/abfca0dbaf4187713761e97b39c44b0766e40304bfaa1c4ce9f9ef051d9fdb0d4607a46bb0a9c5b22136bea806d46ef6ffa6262593a9e540ebd2ebd2b372ca6e
-  languageName: node
-  linkType: hard
-
-"@internationalized/message@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "@internationalized/message@npm:3.1.2"
-  dependencies:
-    "@swc/helpers": "npm:^0.5.0"
-    intl-messageformat: "npm:^10.1.0"
-  checksum: 10c0/e634e3ae2d800710e80a3b7c67b684a88905703e6617e037897a0fc53b384083e58d9fd42b2c8edf7a3b59f55491bb013a6e53d9f9788bf00de3697416f8b77a
-  languageName: node
-  linkType: hard
-
-"@internationalized/number@npm:^3.5.1":
-  version: 3.5.1
-  resolution: "@internationalized/number@npm:3.5.1"
-  dependencies:
-    "@swc/helpers": "npm:^0.5.0"
-  checksum: 10c0/14427e675f84b51a6f951840bc28bf6bc03a7401cdf38f917e17fbbd70a736f83c001a44387212def6ce5d6301c4b4227df350aa39018eac1922bfcd8e7a7813
-  languageName: node
-  linkType: hard
-
-"@internationalized/string@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "@internationalized/string@npm:3.2.1"
-  dependencies:
-    "@swc/helpers": "npm:^0.5.0"
-  checksum: 10c0/6323a703a2e547cc86557ba3a189c17e6bf1668087a234436eecea7e21cb21aea84a9bb5ddecc71828af34010d89f8d327ef01ce55a4809ad5e75663d93af539
-  languageName: node
-  linkType: hard
-
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
