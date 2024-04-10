@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.1
+
+### Patch Changes
+
+- 3c277cb: fix: remove react-query and replace with swr for react 16+ support
+- 567e24f: fix: clean up visibility change event listener on feed teardown
+
 ## 0.10.0
 
 ### Minor Changes
