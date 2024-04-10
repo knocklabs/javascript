@@ -17247,7 +17247,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-icons: "npm:^4.12.0"
-    swr: "npm:^2.2.4"
+    swr: "npm:^2.2.5"
     typescript: "npm:^5.2.2"
     uuid: "npm:^9.0.1"
   languageName: unknown
@@ -21932,7 +21932,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swr@npm:^2.2.4, swr@npm:^2.2.5":
+"swr@npm:^2.2.5":
   version: 2.2.5
   resolution: "swr@npm:2.2.5"
   dependencies:
