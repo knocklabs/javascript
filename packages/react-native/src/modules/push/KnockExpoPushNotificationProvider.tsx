@@ -271,12 +271,12 @@ export const KnockExpoPushNotificationProvider: React.FC<
   );
 };
 
-export const usePushNotifications =
+export const useExpoPushNotifications =
   (): KnockExpoPushNotificationContextType => {
     const context = useContext(KnockExpoPushNotificationContext);
     if (context === undefined) {
       throw new Error(
-        "usePushNotifications must be used within a PushNotificationProvider",
+        "useExpoPushNotifications must be used within a PushNotificationProvider",
       );
     }
     return context;
