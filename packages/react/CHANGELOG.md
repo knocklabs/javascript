@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.9
+
+### Patch Changes
+
+- 354dd1a: fix: move away from jsx runtime to support react 16 + 17
+- Updated dependencies [354dd1a]
+  - @knocklabs/react-core@0.2.9
+
 ## 0.2.8
 
 ### Patch Changes
