@@ -16,7 +16,12 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
-      react(),
+      react({
+        jsxRuntime: "classic",
+        babel: {
+          plugins: ["react-require"],
+        },
+      }),
       noBundlePlugin({ root: "./src" }),
     ],
     build: {
