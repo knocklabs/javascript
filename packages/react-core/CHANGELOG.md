@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.9
+
+### Patch Changes
+
+- 354dd1a: fix: move away from jsx runtime to support react 16 + 17
+
 ## 0.2.8
 
 ### Patch Changes
