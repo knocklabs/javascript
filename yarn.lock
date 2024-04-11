@@ -4881,8 +4881,8 @@ __metadata:
     expo-device: "npm:^5.9.3"
     expo-notifications: "npm:^0.27.6"
     expo-status-bar: "npm:~1.11.1"
-    react: "npm:18.2.0"
-    react-native: "npm:0.73.6"
+    react: "npm:^18.2.0"
+    react-native: "npm:^0.73.4"
   languageName: unknown
   linkType: soft
 
@@ -19694,7 +19694,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:0.73.6, react-native@npm:^0.73.4":
+"react-native@npm:^0.73.4":
   version: 0.73.6
   resolution: "react-native@npm:0.73.6"
   dependencies:
@@ -19936,7 +19936,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:18.2.0, react@npm:^18.2.0":
+"react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:
