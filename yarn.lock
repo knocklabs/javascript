@@ -4899,6 +4899,10 @@ __metadata:
     eslint: "npm:^8.53.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
+    expo: "npm:~50.0.14"
+    expo-constants: "npm:^15.4.0"
+    expo-device: "npm:^5.9.3"
+    expo-notifications: "npm:^0.27.6"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
     rimraf: "npm:^5.0.5"
@@ -4911,8 +4915,8 @@ __metadata:
     expo-constants: ^15.4.0
     expo-device: ^5.9.3
     expo-notifications: ^0.27.6
-    react: ">=16.8.0"
-    react-native: ">=0.60.0"
+    react: ^18.2.0
+    react-native: ^0.73.4
   languageName: unknown
   linkType: soft
 
@@ -12301,7 +12305,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-constants@npm:~15.4.0":
+"expo-constants@npm:^15.4.0, expo-constants@npm:~15.4.0":
   version: 15.4.5
   resolution: "expo-constants@npm:15.4.5"
   dependencies:
