@@ -26,8 +26,8 @@ import {
 } from "./NotificationFeedHeader";
 import "./styles.css";
 
-export type RenderItemProps = {
-  item: FeedItem;
+export type RenderItemProps<T = any> = {
+  item: FeedItem<T>;
   onItemClick?: NotificationCellProps["onItemClick"];
   onButtonClick?: NotificationCellProps["onButtonClick"];
 };
