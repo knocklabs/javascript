@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10
+
+### Patch Changes
+
+- 3288352: chore: add generic type to RenderItemProps to pass to FeedItem
+
 ## 0.2.9
 
 ### Patch Changes
