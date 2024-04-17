@@ -17194,7 +17194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-seo@npm:^6.4.0":
+"next-seo@npm:^6.4.0, next-seo@npm:^6.5.0":
   version: 6.5.0
   resolution: "next-seo@npm:6.5.0"
   peerDependencies:
@@ -21096,6 +21096,7 @@ __metadata:
     eslint-config-next: "npm:14.0.4"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:14.0.4"
+    next-seo: "npm:^6.5.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     typescript: "npm:^5.2.2"
