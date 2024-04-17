@@ -14,14 +14,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      dts({
-        outDir: "dist/types",
-      }),
       react({
         jsxRuntime: "classic",
         babel: {
           plugins: ["react-require"],
         },
+      }),
+      dts({
+        outDir: "dist/types",
       }),
       noBundlePlugin({ root: resolve(__dirname, "src") }),
     ],
@@ -36,7 +36,15 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         // External packages that should not be bundled
-        external: ["react", "react-dom"],
+        external: [
+          "react",
+          "react-dom",
+          // These packages were getting bundled into our build (?)
+          /@radix-ui/,
+          /@floating-ui/,
+          "react-popper",
+          "react-popper-tooltip",
+        ],
         output: {
           interop: "compat",
           globals: {

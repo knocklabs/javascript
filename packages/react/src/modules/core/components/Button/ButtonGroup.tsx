@@ -1,7 +1,7 @@
-import React, { PropsWithChildren } from "react";
+import React from "react";
 
 import "./styles.css";
 
-export const ButtonGroup: React.FC<PropsWithChildren> = ({ children }) => (
-  <div className="rnf-button-group">{children}</div>
-);
+export const ButtonGroup: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => <div className="rnf-button-group">{children}</div>;
