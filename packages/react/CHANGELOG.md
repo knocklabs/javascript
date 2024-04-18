@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.11
+
+### Patch Changes
+
+- 42ba22c: fix: improve typing for react < 18
+- Updated dependencies [42ba22c]
+  - @knocklabs/react-core@0.2.10
+  - @knocklabs/client@0.10.2
+
 ## 0.2.10
 
 ### Patch Changes
