@@ -1,8 +1,9 @@
-import React from "react";
-import { useTranslations, useKnockFeed } from "@knocklabs/react-core";
+import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
+import { FunctionComponent } from "react";
+
 import "./styles.css";
 
-export const EmptyFeed: React.FC = () => {
+export const EmptyFeed: FunctionComponent = () => {
   const { colorMode } = useKnockFeed();
   const { t } = useTranslations();
 

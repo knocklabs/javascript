@@ -1,5 +1,6 @@
 import { useSlackConnectionStatus } from "..";
 import * as React from "react";
+import { PropsWithChildren } from "react";
 
 import { slackProviderKey } from "../../core";
 import { useKnockClient } from "../../core";
@@ -22,14 +23,11 @@ const SlackProviderStateContext =
 export interface KnockSlackProviderProps {
   knockSlackChannelId: string;
   tenant: string;
-  children?: React.ReactElement;
 }
 
-export const KnockSlackProvider: React.FC<KnockSlackProviderProps> = ({
-  knockSlackChannelId,
-  tenant,
-  children,
-}) => {
+export const KnockSlackProvider: React.FC<
+  PropsWithChildren<KnockSlackProviderProps>
+> = ({ knockSlackChannelId, tenant, children }) => {
   const knock = useKnockClient();
 
   const {

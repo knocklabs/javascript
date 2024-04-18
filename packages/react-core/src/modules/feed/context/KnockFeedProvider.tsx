@@ -4,6 +4,7 @@ import Knock, {
   FeedStoreState,
 } from "@knocklabs/client";
 import * as React from "react";
+import { PropsWithChildren } from "react";
 import create, { UseBoundStore } from "zustand";
 
 import { useKnockClient } from "../../core";
@@ -27,19 +28,15 @@ export interface KnockFeedProviderProps {
   feedId: string;
 
   // Extra options
-  children?: React.ReactElement;
   colorMode?: ColorMode;
 
   // Feed client options
   defaultFeedOptions?: FeedClientOptions;
 }
 
-export const KnockFeedProvider: React.FC<KnockFeedProviderProps> = ({
-  feedId,
-  children,
-  defaultFeedOptions = {},
-  colorMode = "light",
-}) => {
+export const KnockFeedProvider: React.FC<
+  PropsWithChildren<KnockFeedProviderProps>
+> = ({ feedId, children, defaultFeedOptions = {}, colorMode = "light" }) => {
   const knock = useKnockClient();
   const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
   const useFeedStore = create<FeedStoreState>(feedClient.store);
