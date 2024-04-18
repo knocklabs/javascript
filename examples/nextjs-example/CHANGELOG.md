@@ -1,5 +1,12 @@
 # nextjs-example
 
+## 1.0.20
+
+### Patch Changes
+
+- Updated dependencies [b8b3fc9]
+  - @knocklabs/react@0.2.12
+
 ## 1.0.19
 
 ### Patch Changes

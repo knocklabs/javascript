@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.16
+
+### Patch Changes
+
+- b8b3fc9: fix: don't use propswithchildren w/o props
+
 ## 0.1.15
 
 ### Patch Changes
