@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.2
+
+### Patch Changes
+
+- 42ba22c: fix: improve typing for react < 18
+
 ## 0.10.1
 
 ### Patch Changes
