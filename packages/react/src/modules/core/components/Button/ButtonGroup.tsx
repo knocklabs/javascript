@@ -1,7 +1,7 @@
-import { FunctionComponent, PropsWithChildren } from "react";
+import { FunctionComponent, ReactNode } from "react";
 
 import "./styles.css";
 
-export const ButtonGroup: FunctionComponent<PropsWithChildren> = ({
-  children,
-}) => <div className="rnf-button-group">{children}</div>;
+export const ButtonGroup: FunctionComponent<{
+  children?: ReactNode | undefined;
+}> = ({ children }) => <div className="rnf-button-group">{children}</div>;
