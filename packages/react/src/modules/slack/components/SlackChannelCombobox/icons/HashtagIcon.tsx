@@ -1,4 +1,6 @@
-const HashtagIcon = () => (
+import { FunctionComponent } from "react";
+
+const HashtagIcon: FunctionComponent = () => (
   <svg
     width="12"
     height="13"

@@ -1,4 +1,6 @@
-const LockIcon = () => (
+import { FunctionComponent } from "react";
+
+const LockIcon: FunctionComponent = () => (
   <svg
     width="12"
     height="13"

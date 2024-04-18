@@ -1,6 +1,7 @@
 import { SlackChannelConnection } from "@knocklabs/client";
 import { useTranslations } from "@knocklabs/react-core";
 import { useState } from "react";
+import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
 import "../../theme.css";
@@ -9,18 +10,20 @@ import { SlackIcon } from "../SlackIcon";
 
 import "./styles.css";
 
-const SlackAddChannelInput = ({
-  inErrorState,
-  connectedChannels = [],
-  updateConnectedChannels,
-  connectedChannelsError,
-  connectedChannelsUpdating,
-}: {
+export interface SlackAddChannelInputProps {
   inErrorState: boolean;
   connectedChannels: SlackChannelConnection[];
   updateConnectedChannels: (channels: SlackChannelConnection[]) => void;
   connectedChannelsError: string | null;
   connectedChannelsUpdating: boolean;
+}
+
+const SlackAddChannelInput: FunctionComponent<SlackAddChannelInputProps> = ({
+  inErrorState,
+  connectedChannels = [],
+  updateConnectedChannels,
+  connectedChannelsError,
+  connectedChannelsUpdating,
 }) => {
   const { t } = useTranslations();
   const [value, setValue] = useState<string | null>(null);

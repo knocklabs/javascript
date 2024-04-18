@@ -1,5 +1,7 @@
-const SearchIcon = () => (
-   <svg
+import { FunctionComponent } from "react";
+
+const SearchIcon: FunctionComponent = () => (
+  <svg
     width="14"
     height="15"
     viewBox="0 0 14 15"
@@ -12,4 +14,4 @@ const SearchIcon = () => (
   </svg>
 );
 
-export default SearchIcon
+export default SearchIcon;

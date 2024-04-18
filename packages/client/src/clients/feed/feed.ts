@@ -43,7 +43,7 @@ class Feed {
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: Boolean = false;
-  private visibilityChangeHandler: () => void;
+  private visibilityChangeHandler: () => void = () => {};
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;

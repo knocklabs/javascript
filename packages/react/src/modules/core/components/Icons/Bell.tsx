@@ -1,4 +1,14 @@
-function BellIcon({ width = 24, height = 24 }) {
+import { FunctionComponent } from "react";
+
+type BellIconProps = {
+  width?: number;
+  height?: number;
+};
+
+const BellIcon: FunctionComponent<BellIconProps> = ({
+  width = 24,
+  height = 24,
+}) => {
   return (
     <svg width={width} viewBox="0 0 24 24" fill="none" height={height}>
       <path
@@ -17,6 +27,6 @@ function BellIcon({ width = 24, height = 24 }) {
       />
     </svg>
   );
-}
+};
 
 export { BellIcon };

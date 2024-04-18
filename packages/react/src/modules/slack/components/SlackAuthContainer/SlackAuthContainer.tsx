@@ -1,14 +1,17 @@
 import { useTranslations } from "@knocklabs/react-core";
+import { FunctionComponent } from "react";
 
 import "../../theme.css";
 import { SlackIcon } from "../SlackIcon";
 
 import "./styles.css";
 
-export const SlackAuthContainer = ({
-  actionButton,
-}: {
+export interface SlackAuthContainerProps {
   actionButton: React.ReactElement;
+}
+
+export const SlackAuthContainer: FunctionComponent<SlackAuthContainerProps> = ({
+  actionButton,
 }) => {
   const { t } = useTranslations();
 
