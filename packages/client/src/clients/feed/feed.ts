@@ -751,7 +751,8 @@ class Feed {
     items: FeedItem[],
   ) {
     // Handle both `items.` and `items:` format for events for compatibility reasons
-    this.broadcaster.emit([`items.${type}`, `items:${type}`], { items });
+    this.broadcaster.emit(`items.${type}`, { items });
+    this.broadcaster.emit(`items:${type}`, { items });
     // Internal events only need `items:`
     this.broadcastOverChannel(`items:${type}`, { items });
   }
