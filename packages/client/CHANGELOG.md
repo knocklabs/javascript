@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.3
+
+### Patch Changes
+
+- a71ce51: fix: event types to use items. and fix types
+
 ## 0.10.2
 
 ### Patch Changes
