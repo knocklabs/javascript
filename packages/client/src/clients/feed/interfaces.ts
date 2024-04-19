@@ -94,8 +94,8 @@ export interface FeedMetadata {
   unseen_count: number;
 }
 
-export interface FeedResponse {
-  entries: FeedItem[];
+export interface FeedResponse<T = any> {
+  entries: FeedItem<T>[];
   meta: FeedMetadata;
   page_info: PageInfo;
 }
