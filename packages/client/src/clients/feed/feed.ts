@@ -206,9 +206,7 @@ class Feed {
 
     // Issue the API request to the bulk status change API
     const result = await this.makeBulkStatusUpdate("seen");
-
-    this.broadcaster.emit(`items:all_seen`, { items });
-    this.broadcastOverChannel(`items:all_seen`, { items });
+    this.emitEvent("all_seen", items);
 
     return result;
   }
@@ -276,9 +274,7 @@ class Feed {
 
     // Issue the API request to the bulk status change API
     const result = await this.makeBulkStatusUpdate("read");
-
-    this.broadcaster.emit(`items:all_read`, { items });
-    this.broadcastOverChannel(`items:all_read`, { items });
+    this.emitEvent("all_read", items);
 
     return result;
   }
@@ -416,9 +412,7 @@ class Feed {
 
     // Issue the API request to the bulk status change API
     const result = await this.makeBulkStatusUpdate("archive");
-
-    this.broadcaster.emit(`items:all_archived`, { items });
-    this.broadcastOverChannel(`items:all_archived`, { items });
+    this.emitEvent("all_archived", items);
 
     return result;
   }
@@ -615,12 +609,7 @@ class Feed {
 
     // Emit the event that these items had their statuses changed
     // Note: we do this after the update to ensure that the server event actually completed
-    this.broadcaster.emit(`items.${type}`, { items });
-
-    // Note: `items.type` format is being deprecated in favor over the `items:type` format,
-    // but emit both formats to make it backward compatible for now.
-    this.broadcaster.emit(`items:${type}`, { items });
-    this.broadcastOverChannel(`items:${type}`, { items });
+    this.emitEvent(type, items);
 
     return result;
   }
@@ -748,6 +737,24 @@ class Feed {
       "visibilitychange",
       this.visibilityChangeHandler,
     );
+  }
+
+  private emitEvent(
+    type:
+      | MessageEngagementStatus
+      | "all_read"
+      | "all_seen"
+      | "all_archived"
+      | "unread"
+      | "unseen"
+      | "unarchived",
+    items: FeedItem[],
+  ) {
+    // Handle both `items.` and `items:` format for events for compatibility reasons
+    this.broadcaster.emit(`items.${type}`, { items });
+    this.broadcaster.emit(`items:${type}`, { items });
+    // Internal events only need `items:`
+    this.broadcastOverChannel(`items:${type}`, { items });
   }
 
   private handleVisibilityChange() {
