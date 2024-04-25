@@ -44,6 +44,7 @@ class Feed {
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: Boolean = false;
   private visibilityChangeHandler: () => void = () => {};
+  private visibilityChangeListenerConnected: Boolean = false;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -728,7 +729,10 @@ class Feed {
    * or reconnect the socket after a delay
    */
   private setupAutoSocketManager() {
+    if (this.visibilityChangeListenerConnected) return;
+
     this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
+    this.visibilityChangeListenerConnected = true;
     document.addEventListener("visibilitychange", this.visibilityChangeHandler);
   }
 
@@ -737,6 +741,7 @@ class Feed {
       "visibilitychange",
       this.visibilityChangeHandler,
     );
+    this.visibilityChangeListenerConnected = false;
   }
 
   private emitEvent(
