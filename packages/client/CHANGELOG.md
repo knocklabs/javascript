@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.5
+
+### Patch Changes
+
+- 044eb0f: fix: check if document is defined before setting up auto socket manager
+
 ## 0.10.4
 
 ### Patch Changes
