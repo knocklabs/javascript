@@ -729,7 +729,12 @@ class Feed {
    * or reconnect the socket after a delay
    */
   private setupAutoSocketManager() {
-    if (this.visibilityChangeListenerConnected) return;
+    if (
+      typeof document === "undefined" ||
+      this.visibilityChangeListenerConnected
+    ) {
+      return;
+    }
 
     this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
     this.visibilityChangeListenerConnected = true;
@@ -737,6 +742,8 @@ class Feed {
   }
 
   private teardownAutoSocketManager() {
+    if (typeof document === "undefined") return;
+
     document.removeEventListener(
       "visibilitychange",
       this.visibilityChangeHandler,
