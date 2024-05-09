@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.14
+
+### Patch Changes
+
+- 5fe3063: Fixes issue where notification data was not updating in react strict mode
+
 ## 0.2.13
 
 ### Patch Changes
