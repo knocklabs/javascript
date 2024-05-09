@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native-example",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "main": "src/index.js",
   "scripts": {
     "start": "expo start",
