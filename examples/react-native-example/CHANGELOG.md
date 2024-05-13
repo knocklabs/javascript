@@ -1,5 +1,16 @@
 # @knocklabs/react-native-example
 
+## 1.1.0
+
+### Minor Changes
+
+- b29a47a: Add KnockExpoPushNotificationProvider to react-native sdk
+
+### Patch Changes
+
+- Updated dependencies [b29a47a]
+  - @knocklabs/react-native@0.2.0
+
 ## 1.0.20
 
 ### Patch Changes
