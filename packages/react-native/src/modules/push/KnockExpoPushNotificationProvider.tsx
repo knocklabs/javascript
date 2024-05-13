@@ -61,14 +61,13 @@ export interface KnockExpoPushNotificationProviderProps {
 
 async function requestPushPermissionIfNeeded(): Promise<string> {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
 
   if (existingStatus !== "granted") {
     const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
+    return status;
   }
 
-  return finalStatus;
+  return existingStatus;
 }
 
 async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
@@ -144,16 +143,9 @@ export const KnockExpoPushNotificationProvider: React.FC<
   async function updateKnockMessageStatusFromNotification(
     notification: Notifications.Notification,
     status: MessageEngagementStatus,
-  ) {
+  ): Promise<Message> {
     const messageId = notification.request.content.data["knock_message_id"];
-    knockClient.messages
-      .updateStatus(messageId, status)
-      .then((result: Message) => {
-        knockClient.log("updateKnockMessageStatus success");
-      })
-      .catch((error: any) => {
-        knockClient.log("updateKnockMessageStatus failed");
-      });
+    return knockClient.messages.updateStatus(messageId, status);
   }
 
   async function registerNewTokenDataOnServer(
