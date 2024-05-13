@@ -9,7 +9,7 @@ export type StoreFeedResultOptions = {
   shouldAppend?: boolean;
 };
 
-export type FeedStoreState = {
+export interface FeedStoreState {
   items: FeedItem[];
   pageInfo: PageInfo;
   metadata: FeedMetadata;
@@ -20,11 +20,11 @@ export type FeedStoreState = {
   setNetworkStatus: (networkStatus: NetworkStatus) => void;
   setItemAttrs: (itemIds: string[], attrs: object) => void;
   resetStore: (metadata?: FeedMetadata) => void;
-};
+}
 
-export type FeedMessagesReceivedPayload = {
+export interface FeedMessagesReceivedPayload {
   metadata: FeedMetadata;
-};
+}
 
 /*
 Event types:
@@ -51,11 +51,11 @@ export type FeedEvent =
 // Because we can bind to wild card feed events, this is here to accomodate whatever can be bound to
 export type BindableFeedEvent = FeedEvent | "items.received.*" | "items.*";
 
-export type FeedEventPayload = {
+export interface FeedEventPayload<T = any> {
   event: Omit<FeedEvent, "messages.new">;
-  items: FeedItem[];
+  items: FeedItem<T>[];
   metadata: FeedMetadata;
-};
+}
 
 export type FeedRealTimeCallback = (resp: FeedResponse) => void;
 

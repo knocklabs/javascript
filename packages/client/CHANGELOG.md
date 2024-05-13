@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.5
+
+### Patch Changes
+
+- 044eb0f: fix: check if document is defined before setting up auto socket manager
+
+## 0.10.4
+
+### Patch Changes
+
+- 5a7c56e: fix: avoid adding duplicate visibiliy change event listeners
+
+## 0.10.3
+
+### Patch Changes
+
+- a71ce51: fix: event types to use items. and fix types
+
+## 0.10.2
+
+### Patch Changes
+
+- 42ba22c: fix: improve typing for react < 18
+
 ## 0.10.1
 
 ### Patch Changes

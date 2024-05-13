@@ -38,7 +38,7 @@ function getQueryKey(
   }
 
   // Next cursor exists so pass it
-  return [QUERY_KEY, previousPageData.next_cursor];
+  return [QUERY_KEY, previousPageData.next_cursor ?? ""];
 }
 
 function useSlackChannels({

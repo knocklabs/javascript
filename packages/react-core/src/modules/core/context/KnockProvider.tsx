@@ -1,5 +1,6 @@
 import Knock, { AuthenticateOptions, LogLevel } from "@knocklabs/client";
 import * as React from "react";
+import { PropsWithChildren } from "react";
 
 import { I18nContent, KnockI18nProvider } from "../../i18n";
 import { useAuthenticatedKnockClient } from "../hooks";
@@ -22,16 +23,13 @@ export interface KnockProviderProps {
   onUserTokenExpiring?: AuthenticateOptions["onUserTokenExpiring"];
   timeBeforeExpirationInMs?: AuthenticateOptions["timeBeforeExpirationInMs"];
 
-  // Extra options
-  children?: React.ReactElement;
-
   // i18n translations
   i18n?: I18nContent;
 
   logLevel?: LogLevel;
 }
 
-export const KnockProvider: React.FC<KnockProviderProps> = ({
+export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   apiKey,
   host,
   logLevel,

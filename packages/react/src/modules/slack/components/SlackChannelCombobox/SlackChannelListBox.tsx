@@ -1,11 +1,12 @@
 import { SlackChannel, SlackChannelConnection } from "@knocklabs/client";
+import { FunctionComponent } from "react";
 
 import "../../theme.css";
 
 import SlackChannelOption from "./SlackChannelOption";
 import "./styles.css";
 
-type Props = {
+export interface SlackChannelListBoxProps {
   slackChannels: SlackChannel[];
   isLoading: boolean;
   connectedChannels: SlackChannelConnection[] | null;
@@ -13,9 +14,9 @@ type Props = {
   listBoxProps?: React.HTMLAttributes<HTMLDivElement>;
   channelOptionProps?: React.HtmlHTMLAttributes<HTMLButtonElement>;
   isUpdating: boolean;
-};
+}
 
-const SlackChannelListBox = ({
+const SlackChannelListBox: FunctionComponent<SlackChannelListBoxProps> = ({
   slackChannels,
   isLoading,
   connectedChannels,
@@ -23,7 +24,7 @@ const SlackChannelListBox = ({
   listBoxProps,
   channelOptionProps,
   isUpdating,
-}: Props) => {
+}) => {
   return (
     <div className="rsk-combobox__list-box" {...listBoxProps}>
       {slackChannels.map((channel) => {

@@ -1,9 +1,13 @@
-export const SlackIcon = ({
-  height,
-  width,
-}: {
+import { FunctionComponent } from "react";
+
+export interface SlackIconProps {
   height: string;
   width: string;
+}
+
+export const SlackIcon: FunctionComponent<SlackIconProps> = ({
+  height,
+  width,
 }) => {
   return (
     <svg

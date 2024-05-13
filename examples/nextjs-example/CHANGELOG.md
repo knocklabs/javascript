@@ -1,5 +1,50 @@
 # nextjs-example
 
+## 1.0.24
+
+### Patch Changes
+
+- @knocklabs/react@0.2.16
+
+## 1.0.23
+
+### Patch Changes
+
+- @knocklabs/react@0.2.15
+
+## 1.0.22
+
+### Patch Changes
+
+- @knocklabs/react@0.2.14
+
+## 1.0.21
+
+### Patch Changes
+
+- @knocklabs/react@0.2.13
+
+## 1.0.20
+
+### Patch Changes
+
+- Updated dependencies [b8b3fc9]
+  - @knocklabs/react@0.2.12
+
+## 1.0.19
+
+### Patch Changes
+
+- Updated dependencies [42ba22c]
+  - @knocklabs/react@0.2.11
+
+## 1.0.18
+
+### Patch Changes
+
+- Updated dependencies [3288352]
+  - @knocklabs/react@0.2.10
+
 ## 1.0.17
 
 ### Patch Changes

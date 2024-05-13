@@ -10,6 +10,7 @@ import {
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FunctionComponent } from "react";
 
 import { Spinner, useOutsideClick } from "../../../core";
 import "../../theme.css";
@@ -24,7 +25,7 @@ import "./styles.css";
 
 const MAX_ALLOWED_CHANNELS = 1000;
 
-type SlackChannelComboboxInputMessages = {
+export type SlackChannelComboboxInputMessages = {
   disconnected: string;
   error: string;
   singleChannelConnected: string;
@@ -33,7 +34,7 @@ type SlackChannelComboboxInputMessages = {
   noSlackChannelsFound: string;
 };
 
-type Props = {
+export interface SlackChannelComboboxProps {
   slackChannelsRecipientObject: ContainerObject;
   queryOptions?: SlackChannelQueryOptions;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
@@ -42,9 +43,11 @@ type Props = {
   channelOptionProps?: React.HtmlHTMLAttributes<HTMLButtonElement>;
   inputMessages?: SlackChannelComboboxInputMessages;
   showConnectedChannelTags?: boolean;
-};
+}
 
-export const SlackChannelCombobox = ({
+export const SlackChannelCombobox: FunctionComponent<
+  SlackChannelComboboxProps
+> = ({
   slackChannelsRecipientObject,
   queryOptions,
   inputProps,
@@ -53,7 +56,7 @@ export const SlackChannelCombobox = ({
   channelOptionProps,
   inputMessages,
   showConnectedChannelTags = false,
-}: Props) => {
+}) => {
   const { t } = useTranslations();
 
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);

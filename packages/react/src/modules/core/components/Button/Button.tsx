@@ -1,7 +1,8 @@
-import React, { PropsWithChildren } from "react";
 import { useKnockFeed } from "@knocklabs/react-core";
-import { ButtonSpinner } from "./ButtonSpinner";
+import React, { PropsWithChildren } from "react";
+import { FunctionComponent } from "react";
 
+import { ButtonSpinner } from "./ButtonSpinner";
 import "./styles.css";
 
 export type ButtonProps = {
@@ -13,7 +14,7 @@ export type ButtonProps = {
   onClick: (e: React.MouseEvent) => void;
 };
 
-export const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
+export const Button: FunctionComponent<PropsWithChildren<ButtonProps>> = ({
   variant = "primary",
   loadingText,
   isLoading = false,

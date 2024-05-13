@@ -1,12 +1,8 @@
-import {
-  Button,
-  ButtonGroup,
-  KnockFeedProvider,
-  KnockProvider,
-} from ".";
+import { Button, ButtonGroup, KnockFeedProvider, KnockProvider } from ".";
+import { FunctionComponent } from "react";
 
 // Test out components here by running yarn dev:local in the package
-function App() {
+const App: FunctionComponent = () => {
   return (
     <KnockProvider apiKey={""} userId={""}>
       <KnockFeedProvider feedId={""}>
@@ -34,6 +30,6 @@ function App() {
       </KnockFeedProvider>
     </KnockProvider>
   );
-}
+};
 
 export default App;

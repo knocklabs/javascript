@@ -4,6 +4,7 @@ import {
   useSlackAuth,
   useTranslations,
 } from "@knocklabs/react-core";
+import { FunctionComponent } from "react";
 import { useEffect } from "react";
 
 import "../../theme.css";
@@ -11,11 +12,11 @@ import { SlackIcon } from "../SlackIcon";
 
 import "./styles.css";
 
-type Props = {
+export interface SlackAuthButtonProps {
   slackClientId: string;
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
-};
+}
 
 const openSlackOauthPopup = (url: string) => {
   const width = 600;
@@ -40,7 +41,7 @@ const openSlackOauthPopup = (url: string) => {
   window.open(url, "Slack OAuth", features);
 };
 
-export const SlackAuthButton: React.FC<Props> = ({
+export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   slackClientId,
   redirectUrl,
   onAuthenticationComplete,

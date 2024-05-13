@@ -1,5 +1,6 @@
 import { SlackChannel } from "@knocklabs/client";
 import { useEffect, useState } from "react";
+import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
 import "../../theme.css";
@@ -9,7 +10,7 @@ import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
 import "./styles.css";
 
-type Props = {
+export interface SlackChannelOptionProps {
   channel: SlackChannel;
   isLoading: boolean;
   isConnected: boolean;
@@ -17,9 +18,9 @@ type Props = {
   tabIndex: number;
   channelOptionProps?: React.HtmlHTMLAttributes<HTMLButtonElement>;
   isUpdating: boolean;
-};
+}
 
-const SlackChannelOption = ({
+const SlackChannelOption: FunctionComponent<SlackChannelOptionProps> = ({
   channel,
   isLoading,
   isConnected,
@@ -27,7 +28,7 @@ const SlackChannelOption = ({
   tabIndex,
   channelOptionProps,
   isUpdating,
-}: Props) => {
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
@@ -72,7 +73,9 @@ const SlackChannelOption = ({
         <div className="rsk-combobox__option__text-container__channel-icon">
           {channel.is_private ? <LockIcon /> : <HashtagIcon />}
         </div>
-        <div className="rsk-combobox__option__text-container__text">{channel.name}</div>
+        <div className="rsk-combobox__option__text-container__text">
+          {channel.name}
+        </div>
       </div>
     </button>
   );

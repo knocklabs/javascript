@@ -1,5 +1,33 @@
 # client-example
 
+## 0.1.15
+
+### Patch Changes
+
+- Updated dependencies [044eb0f]
+  - @knocklabs/client@0.10.5
+
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [5a7c56e]
+  - @knocklabs/client@0.10.4
+
+## 0.1.13
+
+### Patch Changes
+
+- Updated dependencies [a71ce51]
+  - @knocklabs/client@0.10.3
+
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies [42ba22c]
+  - @knocklabs/client@0.10.2
+
 ## 0.1.11
 
 ### Patch Changes

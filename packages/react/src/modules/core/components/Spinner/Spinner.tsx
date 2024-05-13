@@ -1,4 +1,4 @@
-import React from "react";
+import { FunctionComponent } from "react";
 
 type Speed = "fast" | "slow" | "medium";
 
@@ -16,7 +16,7 @@ export interface SpinnerProps {
   size?: string;
 }
 
-export const Spinner: React.FC<SpinnerProps> = ({
+export const Spinner: FunctionComponent<SpinnerProps> = ({
   color = "rgba(0,0,0,0.4)",
   speed = "medium",
   gap = 4,

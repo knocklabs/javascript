@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.2.14
+
+### Patch Changes
+
+- 5fe3063: Fixes issue where notification data was not updating in react strict mode
+
+## 0.2.13
+
+### Patch Changes
+
+- Updated dependencies [044eb0f]
+  - @knocklabs/client@0.10.5
+
+## 0.2.12
+
+### Patch Changes
+
+- Updated dependencies [5a7c56e]
+  - @knocklabs/client@0.10.4
+
+## 0.2.11
+
+### Patch Changes
+
+- Updated dependencies [a71ce51]
+  - @knocklabs/client@0.10.3
+
+## 0.2.10
+
+### Patch Changes
+
+- 42ba22c: fix: improve typing for react < 18
+- Updated dependencies [42ba22c]
+  - @knocklabs/client@0.10.2
+
 ## 0.2.9
 
 ### Patch Changes

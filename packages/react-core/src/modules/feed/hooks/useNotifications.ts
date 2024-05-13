@@ -1,5 +1,5 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef  } from "react";
 
 function useNotifications(
   knock: Knock,
@@ -13,12 +13,13 @@ function useNotifications(
       feedClientRef.current.dispose();
     }
 
-    const feedClient = knock.feeds.initialize(feedChannelId, options);
+    feedClientRef.current = knock.feeds.initialize(feedChannelId, options);
+    feedClientRef.current.listenForUpdates();
+    feedClientRef.current.store.subscribe((t) =>
+      feedClientRef?.current?.store.setState(t),
+    );
 
-    feedClient.listenForUpdates();
-    feedClientRef.current = feedClient;
-
-    return feedClient;
+    return feedClientRef.current;
   }, [
     knock,
     feedChannelId,

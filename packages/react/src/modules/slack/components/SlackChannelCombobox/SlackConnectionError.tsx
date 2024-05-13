@@ -1,8 +1,9 @@
 import { useKnockSlackClient, useTranslations } from "@knocklabs/react-core";
+import { FunctionComponent } from "react";
 
 import InfoIcon from "./icons/InfoIcon";
 
-const SlackConnectionError = () => {
+const SlackConnectionError: FunctionComponent = () => {
   const { t } = useTranslations();
   const { connectionStatus } = useKnockSlackClient();
 

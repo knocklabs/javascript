@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.1.20
+
+### Patch Changes
+
+- Updated dependencies [5fe3063]
+  - @knocklabs/react-core@0.2.14
+
+## 0.1.19
+
+### Patch Changes
+
+- Updated dependencies [044eb0f]
+  - @knocklabs/client@0.10.5
+  - @knocklabs/react-core@0.2.13
+
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies [5a7c56e]
+  - @knocklabs/client@0.10.4
+  - @knocklabs/react-core@0.2.12
+
+## 0.1.17
+
+### Patch Changes
+
+- Updated dependencies [a71ce51]
+  - @knocklabs/client@0.10.3
+  - @knocklabs/react-core@0.2.11
+
+## 0.1.16
+
+### Patch Changes
+
+- b8b3fc9: fix: don't use propswithchildren w/o props
+
+## 0.1.15
+
+### Patch Changes
+
+- Updated dependencies [42ba22c]
+  - @knocklabs/react-core@0.2.10
+  - @knocklabs/client@0.10.2
+
 ## 0.1.14
 
 ### Patch Changes
