@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.17
+
+### Patch Changes
+
+- b29a47a: Add KnockExpoPushNotificationProvider to react-native sdk
+- Updated dependencies [b29a47a]
+  - @knocklabs/react-core@0.2.15
+  - @knocklabs/client@0.10.6
+
 ## 0.2.16
 
 ### Patch Changes

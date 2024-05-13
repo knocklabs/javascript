@@ -1,5 +1,13 @@
 # client-example
 
+## 0.1.16
+
+### Patch Changes
+
+- b29a47a: Add KnockExpoPushNotificationProvider to react-native sdk
+- Updated dependencies [b29a47a]
+  - @knocklabs/client@0.10.6
+
 ## 0.1.15
 
 ### Patch Changes

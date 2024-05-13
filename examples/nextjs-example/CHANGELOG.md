@@ -1,5 +1,13 @@
 # nextjs-example
 
+## 1.0.25
+
+### Patch Changes
+
+- b29a47a: Add KnockExpoPushNotificationProvider to react-native sdk
+- Updated dependencies [b29a47a]
+  - @knocklabs/react@0.2.17
+
 ## 1.0.24
 
 ### Patch Changes
