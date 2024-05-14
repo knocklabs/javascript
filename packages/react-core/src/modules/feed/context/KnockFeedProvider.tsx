@@ -37,9 +37,31 @@ export interface KnockFeedProviderProps {
 export const KnockFeedProvider: React.FC<
   PropsWithChildren<KnockFeedProviderProps>
 > = ({ feedId, children, defaultFeedOptions = {}, colorMode = "light" }) => {
+  console.log("Provider");
   const knock = useKnockClient();
   const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
   const useFeedStore = create<FeedStoreState>(feedClient.store);
+
+  const onNotificationsReceived = () => {
+    setTimeout(() => {
+      console.log("on notif received ");
+      console.log(feedClient.store.getState());
+    }, 2000);
+  };
+
+  React.useEffect(() => {
+    console.log("Set up listeners");
+    // Receive all real-time notifications on our feed
+    feedClient.on("items.received.realtime", onNotificationsReceived);
+
+    // Cleanup
+    return () =>
+      feedClient.off("items.received.realtime", onNotificationsReceived);
+  }, [feedClient, onNotificationsReceived]);
+
+  React.useEffect(() => {
+    console.log("Feed client updated");
+  }, [feedClient]);
 
   return (
     <FeedStateContext.Provider

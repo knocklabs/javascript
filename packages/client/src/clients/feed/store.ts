@@ -51,10 +51,12 @@ export default function createStore() {
       options = defaultSetResultOptions,
     ) =>
       set((state) => {
+        console.log("🔴 Set result");
         // We resort the list on set, so concating everything is fine (if a bit suboptimal)
         const items = options.shouldAppend
           ? processItems(state.items.concat(entries))
           : entries;
+        console.log({ items });
 
         return {
           items,

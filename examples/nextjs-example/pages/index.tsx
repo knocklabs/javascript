@@ -11,12 +11,14 @@ import {
 import {
   KnockFeedProvider,
   KnockProvider,
+  NotificationCell,
+  NotificationFeed,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IoDocument, IoLogoGithub } from "react-icons/io5";
 
-import NotificationFeed from "../components/NotificationFeed";
+import NextNotificationFeed from "../components/NotificationFeed";
 import NotificationToasts from "../components/NotificationToasts";
 import SendNotificationForm from "../components/SendNotificationForm";
 import useIdentify from "../hooks/useIdentify";
@@ -33,7 +35,12 @@ const TenantLabels = {
 
 export default function Home() {
   const { userId, isLoading, userToken } = useIdentify();
+  const [uid, setUid] = useState(userId);
   const [tenant, setTenant] = useState(Tenants.TeamA);
+
+  console.log({ userId });
+
+  const notifRef = useRef(null);
 
   const tokenRefreshHandler = useCallback(async () => {
     // Refresh the user token 1s before it expires
@@ -42,6 +49,12 @@ export default function Home() {
 
     return json.userToken;
   }, [userId]);
+
+  useEffect(() => {
+    setUid(userId);
+  }, [userId]);
+
+  const [show, setShow] = useState(false);
 
   if (isLoading || !userToken) {
     return (
@@ -57,102 +70,148 @@ export default function Home() {
   }
 
   return (
-    <KnockProvider
-      userId={userId}
-      userToken={userToken}
-      apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
-      host={process.env.NEXT_PUBLIC_KNOCK_HOST}
-      onUserTokenExpiring={tokenRefreshHandler}
-      timeBeforeExpirationInMs={5000}
-      logLevel="debug"
-    >
-      <KnockFeedProvider
-        feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
-        defaultFeedOptions={{ tenant }}
+    <>
+      <button
+        onClick={() => {
+          if (uid === userId) {
+            setUid(null);
+          } else {
+            setUid(userId);
+          }
+        }}
       >
-        <NotificationFeedContainer>
-          <Box maxW="520px" mx="auto" py={12}>
-            <Flex mb={8}>
-              <Box>
-                <Heading size="md" mb={2}>
-                  React in-app notifications example
-                </Heading>
+        Toggle - {uid}
+      </button>
+      {true ? (
+        <KnockProvider
+          userId={uid}
+          userToken={userToken}
+          apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
+          host={process.env.NEXT_PUBLIC_KNOCK_HOST}
+          // onUserTokenExpiring={tokenRefreshHandler}
+          // timeBeforeExpirationInMs={5000}
+          logLevel="debug"
+        >
+          <KnockFeedProvider
+            feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
+            defaultFeedOptions={{ tenant }}
+          >
+            <NotificationFeedContainer>
+              <Box maxW="520px" mx="auto" py={12}>
+                <Flex mb={8}>
+                  <Box>
+                    <Heading size="md" mb={2}>
+                      React in-app notifications example
+                    </Heading>
 
-                <Text>
-                  This is an example application to show in-app notifications{" "}
+                    <Text>
+                      This is an example application to show in-app
+                      notifications{" "}
+                      <Link
+                        href="https://knock.app"
+                        color="blue.600"
+                        fontWeight="semibold"
+                      >
+                        powered by Knock
+                      </Link>
+                      .
+                    </Text>
+                  </Box>
+                </Flex>
+
+                <Flex>
+                  <Heading size="sm" mb={3}>
+                    Send an in-app notification
+                  </Heading>
+
+                  <Flex ml="auto" alignItems="center">
+                    <Select
+                      mr={3}
+                      size="sm"
+                      value={tenant}
+                      onChange={(e) => setTenant(e.target.value)}
+                    >
+                      {Object.values(Tenants).map((tenant) => (
+                        <option key={tenant} value={tenant}>
+                          {TenantLabels[tenant]}
+                        </option>
+                      ))}
+                    </Select>
+
+                    <NextNotificationFeed />
+                  </Flex>
+                </Flex>
+                <NotificationFeed
+                  // @ts-ignore
+                  buttonRef={notifRef}
+                  renderItem={({ item, ...props }: any) => {
+                    const { vendorDomain, vendorName } = item.data;
+                    return (
+                      <NotificationCell
+                        {...props}
+                        item={item}
+                        // You can use any properties available on the `actor` for the name and avatar
+                        // avatar={
+                        //   vendorDomain && vendorName ? (
+                        //     <Avatar
+                        //       src={getFaviconSrc(vendorDomain)}
+                        //       alt={vendorName}
+                        //       sx={{ maxWidth: "45px", maxHeight: "45px" }}
+                        //     />
+                        //   ) : (
+                        //     <></>
+                        //   )
+                        // }
+                      />
+                    );
+                  }}
+                />
+
+                <SendNotificationForm
+                  userId={userId as unknown as string}
+                  tenant={tenant}
+                />
+                <NotificationToasts />
+
+                <Flex
+                  mt={6}
+                  borderTopWidth={1}
+                  borderTopColor="gray.100"
+                  py={2}
+                >
+                  <Link
+                    href="https://github.com/knocklabs/in-app-notifications-example-nextjs"
+                    fontSize={14}
+                    color="gray.600"
+                    mr={3}
+                  >
+                    <Icon as={IoLogoGithub} mr={1} />
+                    Github repo
+                  </Link>
+
+                  <Link
+                    href="https://docs.knock.app/in-app-ui/react/overview"
+                    fontSize={14}
+                    color="gray.600"
+                  >
+                    <Icon as={IoDocument} mr={1} />
+                    Documentation
+                  </Link>
+
                   <Link
                     href="https://knock.app"
-                    color="blue.600"
-                    fontWeight="semibold"
+                    fontSize={14}
+                    color="gray.600"
+                    ml="auto"
                   >
-                    powered by Knock
+                    Powered by Knock
                   </Link>
-                  .
-                </Text>
+                </Flex>
               </Box>
-            </Flex>
-
-            <Flex>
-              <Heading size="sm" mb={3}>
-                Send an in-app notification
-              </Heading>
-
-              <Flex ml="auto" alignItems="center">
-                <Select
-                  mr={3}
-                  size="sm"
-                  value={tenant}
-                  onChange={(e) => setTenant(e.target.value)}
-                >
-                  {Object.values(Tenants).map((tenant) => (
-                    <option key={tenant} value={tenant}>
-                      {TenantLabels[tenant]}
-                    </option>
-                  ))}
-                </Select>
-
-                <NotificationFeed />
-              </Flex>
-            </Flex>
-
-            <SendNotificationForm
-              userId={userId as unknown as string}
-              tenant={tenant}
-            />
-            <NotificationToasts />
-
-            <Flex mt={6} borderTopWidth={1} borderTopColor="gray.100" py={2}>
-              <Link
-                href="https://github.com/knocklabs/in-app-notifications-example-nextjs"
-                fontSize={14}
-                color="gray.600"
-                mr={3}
-              >
-                <Icon as={IoLogoGithub} mr={1} />
-                Github repo
-              </Link>
-
-              <Link
-                href="https://docs.knock.app/in-app-ui/react/overview"
-                fontSize={14}
-                color="gray.600"
-              >
-                <Icon as={IoDocument} mr={1} />
-                Documentation
-              </Link>
-
-              <Link
-                href="https://knock.app"
-                fontSize={14}
-                color="gray.600"
-                ml="auto"
-              >
-                Powered by Knock
-              </Link>
-            </Flex>
-          </Box>
-        </NotificationFeedContainer>
-      </KnockFeedProvider>
-    </KnockProvider>
+            </NotificationFeedContainer>
+          </KnockFeedProvider>
+        </KnockProvider>
+      ) : null}
+    </>
   );
 }

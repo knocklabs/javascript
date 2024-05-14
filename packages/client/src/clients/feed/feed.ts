@@ -428,6 +428,7 @@ class Feed {
 
   /* Fetches the feed content, appending it to the store */
   async fetch(options: FetchFeedOptions = {}) {
+    console.log("🟡 Fetching");
     const { setState, getState } = this.store;
     const { networkStatus } = getState();
 
@@ -458,6 +459,7 @@ class Feed {
       url: `/v1/users/${this.knock.userId}/feeds/${this.feedId}`,
       params: queryParams,
     });
+    console.log({ result, options });
 
     if (result.statusCode === "error" || !result.body) {
       setState((store) => store.setNetworkStatus(NetworkStatus.error));
@@ -476,13 +478,22 @@ class Feed {
 
     if (options.before) {
       const opts = { shouldSetPage: false, shouldAppend: true };
-      setState((state) => state.setResult(response, opts));
+      setState((state) => {
+        state.setResult(response, opts);
+      });
     } else if (options.after) {
       const opts = { shouldSetPage: true, shouldAppend: true };
-      setState((state) => state.setResult(response, opts));
+      setState((state) => {
+        state.setResult(response, opts);
+      });
     } else {
-      setState((state) => state.setResult(response));
+      setState((state) => {
+        console.log({ state });
+
+        state.setResult(response);
+      });
     }
+    console.log({ after: this.store.getState() });
 
     // Legacy `messages.new` event, should be removed in a future version
     this.broadcast("messages.new", response);
