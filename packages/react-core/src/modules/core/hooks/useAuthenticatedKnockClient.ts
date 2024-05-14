@@ -1,5 +1,6 @@
 import Knock, { AuthenticateOptions, KnockOptions } from "@knocklabs/client";
-import React, { useMemo } from "react";
+import React from "react";
+import shallow from "zustand/shallow";
 
 function authenticateWithOptions(
   knock: Knock,
@@ -13,15 +14,26 @@ function authenticateWithOptions(
   });
 }
 
+export type AuthenticatedKnockClientOptions = KnockOptions &
+  AuthenticateOptions;
+
 function useAuthenticatedKnockClient(
   apiKey: string,
   userId: string,
   userToken?: string,
-  options: KnockOptions & AuthenticateOptions = {},
+  options: AuthenticatedKnockClientOptions = {},
 ) {
-  const knockRef = React.useRef<Knock | null>();
+  const knockRef = React.useRef<Knock | undefined>();
+  const optionsRef = React.useRef<AuthenticatedKnockClientOptions>();
 
-  return useMemo(() => {
+  // Shallow compare options so that we ensure that we have a stable
+  // set of options between re-renders.
+  const stableOptions = React.useMemo(() => {
+    const currentOptions = optionsRef.current || {};
+    return shallow(options, currentOptions) ? currentOptions : options;
+  }, [options]);
+
+  return React.useMemo(() => {
     const currentKnock = knockRef.current;
 
     // If the userId and the userToken changes then just reauth
@@ -30,7 +42,7 @@ function useAuthenticatedKnockClient(
       currentKnock.isAuthenticated() &&
       (currentKnock.userId !== userId || currentKnock.userToken !== userToken)
     ) {
-      authenticateWithOptions(currentKnock, userId, userToken, options);
+      authenticateWithOptions(currentKnock, userId, userToken, stableOptions);
       return currentKnock;
     }
 
@@ -39,12 +51,16 @@ function useAuthenticatedKnockClient(
     }
 
     // Otherwise instantiate a new Knock client
-    const knock = new Knock(apiKey, options);
-    authenticateWithOptions(knock, userId, userToken, options);
+    const knock = new Knock(apiKey, {
+      host: stableOptions.host,
+      logLevel: stableOptions.logLevel,
+    });
+
+    authenticateWithOptions(knock, userId, userToken, stableOptions);
     knockRef.current = knock;
 
     return knock;
-  }, [apiKey, userId, userToken, options]);
+  }, [apiKey, userId, userToken, stableOptions]);
 }
 
 export default useAuthenticatedKnockClient;

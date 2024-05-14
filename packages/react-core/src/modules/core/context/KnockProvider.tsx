@@ -41,8 +41,6 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   i18n,
 }) => {
   // We memoize the options here so that we don't create a new object on every re-render
-  // TODO: we probably need to put this optimization into the `useAuthenticatedKnockClient`
-  // hook itself to fix this
   const authenticateOptions = React.useMemo(
     () => ({
       host,
