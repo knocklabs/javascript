@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.16
+
+### Patch Changes
+
+- 5d2ddab: fix: ensure options are memoized in useAuthenticatedKnockClient
+
 ## 0.2.15
 
 ### Patch Changes
