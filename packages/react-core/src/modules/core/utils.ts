@@ -39,11 +39,13 @@ export function renderNodeOrFallback(node: ReactNode, fallback: ReactNode) {
   to trigger a re-render of the context when a key property changes.
 */
 export function feedProviderKey(
-  userFeedId: string,
+  userId: string | undefined,
+  feedId: string,
   options: FeedClientOptions = {},
 ) {
   return [
-    userFeedId,
+    userId,
+    feedId,
     options.source,
     options.tenant,
     options.has_tenant,

@@ -30,7 +30,13 @@ function useAuthenticatedKnockClient(
   // set of options between re-renders.
   const stableOptions = React.useMemo(() => {
     const currentOptions = optionsRef.current || {};
-    return shallow(options, currentOptions) ? currentOptions : options;
+
+    if (shallow(options, currentOptions)) {
+      return currentOptions;
+    }
+
+    optionsRef.current = options;
+    return options;
   }, [options]);
 
   return React.useMemo(() => {

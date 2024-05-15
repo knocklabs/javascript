@@ -112,6 +112,7 @@ class Feed {
     this.teardown();
     this.broadcaster.removeAllListeners();
     this.knock.feeds.removeInstance(this);
+    this.store.destroy();
   }
 
   /*
