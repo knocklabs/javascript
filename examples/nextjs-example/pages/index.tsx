@@ -56,7 +56,7 @@ export default function Home() {
 
   const [show, setShow] = useState(false);
 
-  if (isLoading || !userToken) {
+  if (isLoading) {
     return (
       <Flex
         alignItems="center"

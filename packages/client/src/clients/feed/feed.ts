@@ -72,6 +72,8 @@ class Feed {
    * Used to reinitialize a current feed instance, which is useful when reauthenticating users
    */
   reinitialize() {
+    this.knock.log("[Feed] Re-initializing feed instance");
+
     // Reinitialize the user feed id incase the userId changed
     this.userFeedId = this.buildUserFeedId();
 
@@ -110,6 +112,8 @@ class Feed {
   dispose() {
     this.knock.log("[Feed] Disposing of feed instance");
     this.teardown();
+    this.store.destroy();
+
     this.broadcaster.removeAllListeners();
     this.knock.feeds.removeInstance(this);
   }
@@ -459,7 +463,6 @@ class Feed {
       url: `/v1/users/${this.knock.userId}/feeds/${this.feedId}`,
       params: queryParams,
     });
-    console.log({ result, options });
 
     if (result.statusCode === "error" || !result.body) {
       setState((store) => store.setNetworkStatus(NetworkStatus.error));
@@ -488,12 +491,9 @@ class Feed {
       });
     } else {
       setState((state) => {
-        console.log({ state });
-
         state.setResult(response);
       });
     }
-    console.log({ after: this.store.getState() });
 
     // Legacy `messages.new` event, should be removed in a future version
     this.broadcast("messages.new", response);

@@ -19,7 +19,9 @@ class FeedClient {
   }
 
   removeInstance(feed: Feed) {
+    console.log(this.feedInstances);
     this.feedInstances = this.feedInstances.filter((f) => f !== feed);
+    console.log(this.feedInstances);
   }
 
   teardownInstances() {

@@ -56,7 +56,6 @@ export default function createStore() {
         const items = options.shouldAppend
           ? processItems(state.items.concat(entries))
           : entries;
-        console.log({ items });
 
         return {
           items,
