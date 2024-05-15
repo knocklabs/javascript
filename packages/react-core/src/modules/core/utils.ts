@@ -44,7 +44,7 @@ export function feedProviderKey(
   options: FeedClientOptions = {},
 ) {
   return [
-    userId ?? "",
+    userId,
     feedId,
     options.source,
     options.tenant,
