@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.17
+
+### Patch Changes
+
+- f25b112: fix: ensure feed store reference re-renders after changes to user
+- Updated dependencies [f25b112]
+  - @knocklabs/client@0.10.7
+
 ## 0.2.16
 
 ### Patch Changes

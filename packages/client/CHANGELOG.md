@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.7
+
+### Patch Changes
+
+- f25b112: fix: ensure feed store reference re-renders after changes to user
+
 ## 0.10.6
 
 ### Patch Changes
