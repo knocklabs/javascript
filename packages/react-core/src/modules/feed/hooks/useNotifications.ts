@@ -23,12 +23,6 @@ function useNotifications(
 
     feedClientRef.current.listenForUpdates();
 
-    // CB: I don't know that we definitely need this anymore given our
-    // state re-render improvements in the hook.
-    feedClientRef.current.store.subscribe((t) =>
-      feedClientRef?.current?.store.setState(t),
-    );
-
     return feedClientRef.current;
   }, [knock, feedChannelId, stableOptions]);
 }

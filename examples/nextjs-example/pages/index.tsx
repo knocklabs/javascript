@@ -13,7 +13,7 @@ import {
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { IoDocument, IoLogoGithub } from "react-icons/io5";
 
 import NotificationFeed from "../components/NotificationFeed";
@@ -34,7 +34,6 @@ const TenantLabels = {
 export default function Home() {
   const { userId, isLoading, userToken } = useIdentify();
   const [tenant, setTenant] = useState(Tenants.TeamA);
-  const [uid, setUid] = useState(userId);
 
   const tokenRefreshHandler = useCallback(async () => {
     // Refresh the user token 1s before it expires
@@ -42,10 +41,6 @@ export default function Home() {
     const json = await res.json();
 
     return json.userToken;
-  }, [userId]);
-
-  useEffect(() => {
-    setUid(userId);
   }, [userId]);
 
   if (isLoading) {
@@ -63,7 +58,7 @@ export default function Home() {
 
   return (
     <KnockProvider
-      userId={uid}
+      userId={userId}
       userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
@@ -71,17 +66,6 @@ export default function Home() {
       timeBeforeExpirationInMs={5000}
       logLevel="debug"
     >
-      <button
-        onClick={() => {
-          if (uid === userId) {
-            setUid(null);
-          } else {
-            setUid(userId);
-          }
-        }}
-      >
-        Toggle - {uid}
-      </button>
       <KnockFeedProvider
         feedId={process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!}
         defaultFeedOptions={{ tenant }}
