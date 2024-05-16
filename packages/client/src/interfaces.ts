@@ -46,7 +46,8 @@ export interface ChannelData<T = any> {
 
 export type UserTokenExpiringCallback = (
   currentToken: string,
-  decodedToken: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  decodedToken: any,
 ) => Promise<string | void>;
 
 export interface AuthenticateOptions {

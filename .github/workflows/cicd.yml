@@ -26,6 +26,9 @@ jobs:
       - name: Build packages
         run: yarn build:packages
 
+      - name: Run type check
+        run: yarn type:check
+
       - name: Run Lint
         run: yarn lint
 
