@@ -5,10 +5,10 @@ export default function useStableOptions<T>(options: T): T {
   const optionsRef = useRef<T>();
 
   return useMemo(() => {
-    const currentOptions = optionsRef.current || {};
+    const currentOptions = optionsRef.current;
 
-    if (shallow(options, currentOptions)) {
-      return currentOptions as T;
+    if (currentOptions && shallow(options, currentOptions)) {
+      return currentOptions;
     }
 
     optionsRef.current = options;

@@ -1,6 +1,7 @@
-import React from "react";
-import { describe, test, expect } from "vitest";
 import { render } from "@testing-library/react";
+import React from "react";
+import { afterEach, describe, expect, test, vi } from "vitest";
+
 import { KnockFeedProvider, KnockProvider, useKnockFeed } from "../../src";
 
 describe("KnockFeedProvider", () => {
@@ -10,6 +11,7 @@ describe("KnockFeedProvider", () => {
 
       return <div data-testid="consumer-msg">Color Mode: {colorMode}</div>;
     };
+
     const { getByTestId } = render(
       <KnockProvider apiKey="test_api_key" userId="test_user_id">
         <KnockFeedProvider feedId="feedId" colorMode="dark">

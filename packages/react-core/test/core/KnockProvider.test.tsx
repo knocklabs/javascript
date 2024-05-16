@@ -1,6 +1,7 @@
-import React from "react";
-import { describe, test, expect } from "vitest";
 import { render } from "@testing-library/react";
+import React from "react";
+import { describe, expect, test } from "vitest";
+
 import { KnockProvider, useKnockClient } from "../../src";
 
 describe("KnockProvider", () => {

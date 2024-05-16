@@ -1,32 +1,31 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
-import { useEffect, useLayoutEffect, useMemo, useReducer } from "react";
+import * as React from "react";
 import type { DispatchWithoutAction } from "react";
 import create, { StateSelector } from "zustand";
 
-// For server-side rendering: https://github.com/pmndrs/zustand/pull/34
-// Deno support: https://github.com/pmndrs/zustand/issues/347
-const isSSR =
-  typeof window === "undefined" ||
-  !window.navigator ||
-  /ServerSideRendering|^Deno\//.test(window.navigator.userAgent);
-
-const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect;
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
 
 // A hook designed to create a `UseBoundStore` instance
 function useCreateNotificationStore(feedClient: Feed) {
-  const useStore = useMemo(
+  const useStore = React.useMemo(
     () => create<FeedStoreState>(feedClient.store),
     [feedClient],
   );
 
   // Warning: this is a hack that will cause any components downstream to re-render
   // as a result of the store updating.
-  const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
+  const [, forceUpdate] = React.useReducer((c) => c + 1, 0) as [
+    never,
+    () => void,
+  ];
 
   useIsomorphicLayoutEffect(() => {
     const rerender = forceUpdate as DispatchWithoutAction;
     const unsubscribe = feedClient.store.subscribe(rerender);
+
     rerender();
+
     return unsubscribe;
   }, [feedClient]);
 

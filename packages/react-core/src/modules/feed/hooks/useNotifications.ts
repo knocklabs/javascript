@@ -8,7 +8,7 @@ function useNotifications(
   feedChannelId: string,
   options: FeedClientOptions = {},
 ) {
-  const feedClientRef = useRef<Feed | null>();
+  const feedClientRef = useRef<Feed>();
   const stableOptions = useStableOptions(options);
 
   return useMemo(() => {
