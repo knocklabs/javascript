@@ -1,6 +1,11 @@
-import * as React from "react";
 import { FeedItem } from "@knocklabs/client";
-import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
+import {
+  useKnockFeed,
+  useNotificationStore,
+  useTranslations,
+} from "@knocklabs/react-core";
+import * as React from "react";
+
 import { CheckmarkCircle } from "../../../core/components/Icons";
 
 import "./styles.css";
@@ -10,14 +15,17 @@ export type MarkAsReadProps = {
 };
 
 export const MarkAsRead: React.FC<MarkAsReadProps> = ({ onClick }) => {
-  const { useFeedStore, feedClient, colorMode } = useKnockFeed();
+  const { feedClient, colorMode } = useKnockFeed();
   const { t } = useTranslations();
 
-  const unreadItems = useFeedStore((state) =>
+  const unreadItems = useNotificationStore(feedClient, (state) =>
     state.items.filter((item) => !item.read_at),
   );
 
-  const unreadCount = useFeedStore((state) => state.metadata.unread_count);
+  const unreadCount = useNotificationStore(
+    feedClient,
+    (state) => state.metadata.unread_count,
+  );
 
   const onClickHandler = React.useCallback(
     (e: React.MouseEvent) => {

@@ -180,8 +180,7 @@ class Feed {
     //
     // Note: here we optimistically handle the case whereby the feed is scoped to show only `unseen`
     // items by removing everything from view.
-    const { getState, setState } = this.store;
-    const { metadata, items } = getState();
+    const { metadata, items, ...state } = this.store.getState();
 
     const isViewingOnlyUnseen = this.defaultOptions.status === "unseen";
 
@@ -189,21 +188,19 @@ class Feed {
     // from the store given that nothing should be visible. We do this by resetting the store state
     // and setting the current metadata counts to 0
     if (isViewingOnlyUnseen) {
-      setState((store) =>
-        store.resetStore({
-          ...metadata,
-          total_count: 0,
-          unseen_count: 0,
-        }),
-      );
+      state.resetStore({
+        ...metadata,
+        total_count: 0,
+        unseen_count: 0,
+      });
     } else {
       // Otherwise we want to update the metadata and mark all of the items in the store as seen
-      setState((store) => store.setMetadata({ ...metadata, unseen_count: 0 }));
+      state.setMetadata({ ...metadata, unseen_count: 0 });
 
       const attrs = { seen_at: new Date().toISOString() };
       const itemIds = items.map((item) => item.id);
 
-      setState((store) => store.setItemAttrs(itemIds, attrs));
+      state.setItemAttrs(itemIds, attrs);
     }
 
     // Issue the API request to the bulk status change API
@@ -248,8 +245,7 @@ class Feed {
     //
     // Note: here we optimistically handle the case whereby the feed is scoped to show only `unread`
     // items by removing everything from view.
-    const { getState, setState } = this.store;
-    const { metadata, items } = getState();
+    const { metadata, items, ...state } = this.store.getState();
 
     const isViewingOnlyUnread = this.defaultOptions.status === "unread";
 
@@ -257,21 +253,19 @@ class Feed {
     // from the store given that nothing should be visible. We do this by resetting the store state
     // and setting the current metadata counts to 0
     if (isViewingOnlyUnread) {
-      setState((store) =>
-        store.resetStore({
-          ...metadata,
-          total_count: 0,
-          unread_count: 0,
-        }),
-      );
+      state.resetStore({
+        ...metadata,
+        total_count: 0,
+        unread_count: 0,
+      });
     } else {
       // Otherwise we want to update the metadata and mark all of the items in the store as seen
-      setState((store) => store.setMetadata({ ...metadata, unread_count: 0 }));
+      state.setMetadata({ ...metadata, unread_count: 0 });
 
       const attrs = { read_at: new Date().toISOString() };
       const itemIds = items.map((item) => item.id);
 
-      setState((store) => store.setItemAttrs(itemIds, attrs));
+      state.setItemAttrs(itemIds, attrs);
     }
 
     // Issue the API request to the bulk status change API
@@ -316,8 +310,7 @@ class Feed {
   TODO: how do we handle rollbacks?
   */
   async markAsArchived(itemOrItems: FeedItemOrItems) {
-    const { getState, setState } = this.store;
-    const state = getState();
+    const state = this.store.getState();
 
     const shouldOptimisticallyRemoveItems =
       this.defaultOptions.archived === "exclude";
@@ -374,13 +367,11 @@ class Feed {
         (item) => !itemIds.includes(item.id),
       );
 
-      setState((state) =>
-        state.setResult({
-          entries: entriesToSet,
-          meta: updatedMetadata,
-          page_info: state.pageInfo,
-        }),
-      );
+      state.setResult({
+        entries: entriesToSet,
+        meta: updatedMetadata,
+        page_info: state.pageInfo,
+      });
     } else {
       // Mark all the entries being updated as archived either way so the state is correct
       state.setItemAttrs(itemIds, { archived_at: new Date().toISOString() });
@@ -393,8 +384,7 @@ class Feed {
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
-    const { setState, getState } = this.store;
-    const { items } = getState();
+    const { items, ...state } = this.store.getState();
 
     // Here if we're looking at a feed that excludes all of the archived items by default then we
     // will want to optimistically remove all of the items from the feed as they are now all excluded
@@ -403,13 +393,11 @@ class Feed {
 
     if (shouldOptimisticallyRemoveItems) {
       // Reset the store to clear out all of items and reset the badge count
-      setState((store) => store.resetStore());
+      state.resetStore();
     } else {
       // Mark all the entries being updated as archived either way so the state is correct
-      setState((store) => {
-        const itemIds = items.map((i) => i.id);
-        store.setItemAttrs(itemIds, { archived_at: new Date().toISOString() });
-      });
+      const itemIds = items.map((i) => i.id);
+      state.setItemAttrs(itemIds, { archived_at: new Date().toISOString() });
     }
 
     // Issue the API request to the bulk status change API
@@ -429,8 +417,7 @@ class Feed {
 
   /* Fetches the feed content, appending it to the store */
   async fetch(options: FetchFeedOptions = {}) {
-    const { setState, getState } = this.store;
-    const { networkStatus } = getState();
+    const { networkStatus, ...state } = this.store.getState();
 
     // If there's an existing request in flight, then do nothing
     if (isRequestInFlight(networkStatus)) {
@@ -438,9 +425,7 @@ class Feed {
     }
 
     // Set the loading type based on the request type it is
-    setState((store) =>
-      store.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading),
-    );
+    state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
     // Always include the default params, if they have been set
     const queryParams = {
@@ -461,7 +446,7 @@ class Feed {
     });
 
     if (result.statusCode === "error" || !result.body) {
-      setState((store) => store.setNetworkStatus(NetworkStatus.error));
+      state.setNetworkStatus(NetworkStatus.error);
 
       return {
         status: result.statusCode,
@@ -477,12 +462,12 @@ class Feed {
 
     if (options.before) {
       const opts = { shouldSetPage: false, shouldAppend: true };
-      setState((state) => state.setResult(response, opts));
+      state.setResult(response, opts);
     } else if (options.after) {
       const opts = { shouldSetPage: true, shouldAppend: true };
-      setState((state) => state.setResult(response, opts));
+      state.setResult(response, opts);
     } else {
-      setState((state) => state.setResult(response));
+      state.setResult(response);
     }
 
     // Legacy `messages.new` event, should be removed in a future version
@@ -507,8 +492,7 @@ class Feed {
 
   async fetchNextPage() {
     // Attempts to fetch the next page of results (if we have any)
-    const { getState } = this.store;
-    const { pageInfo } = getState();
+    const { pageInfo } = this.store.getState();
 
     if (!pageInfo.after) {
       // Nothing more to fetch
@@ -535,11 +519,10 @@ class Feed {
     this.knock.log("[Feed] Received new real-time message");
 
     // Handle the new message coming in
-    const { getState, setState } = this.store;
-    const { items } = getState();
+    const { items, ...state } = this.store.getState();
     const currentHead: FeedItem | undefined = items[0];
     // Optimistically set the badge counts
-    setState((state) => state.setMetadata(metadata));
+    state.setMetadata(metadata);
     // Fetch the items before the current head (if it exists)
     this.fetch({ before: currentHead?.__cursor, __fetchSource: "socket" });
   }
@@ -554,14 +537,14 @@ class Feed {
     attrs: object,
     badgeCountAttr?: "unread_count" | "unseen_count",
   ) {
-    const { getState, setState } = this.store;
+    const state = this.store.getState();
     const normalizedItems = Array.isArray(itemOrItems)
       ? itemOrItems
       : [itemOrItems];
     const itemIds = normalizedItems.map((item) => item.id);
 
     if (badgeCountAttr) {
-      const { metadata } = getState();
+      const { metadata } = state;
 
       // We only want to update the counts of items that have not already been counted towards the
       // badge count total to avoid updating the badge count unnecessarily.
@@ -587,16 +570,14 @@ class Feed {
         ? itemsToUpdate.length
         : -itemsToUpdate.length;
 
-      setState((store) =>
-        store.setMetadata({
-          ...metadata,
-          [badgeCountAttr]: Math.max(0, metadata[badgeCountAttr] + direction),
-        }),
-      );
+      state.setMetadata({
+        ...metadata,
+        [badgeCountAttr]: Math.max(0, metadata[badgeCountAttr] + direction),
+      });
     }
 
     // Update the items with the given attributes
-    setState((store) => store.setItemAttrs(itemIds, attrs));
+    state.setItemAttrs(itemIds, attrs);
   }
 
   private async makeStatusUpdate(
