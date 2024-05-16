@@ -6,10 +6,11 @@
   "license": "MIT",
   "types": "./src/index.d.ts",
   "scripts": {
-    "lint": "eslint src/"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "devDependencies": {
-    "typescript": "^5.2.2"
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.3"
   },
   "publishConfig": {
     "access": "public"

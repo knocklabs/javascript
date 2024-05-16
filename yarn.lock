@@ -4779,7 +4779,7 @@ __metadata:
     axios-retry: "npm:^3.1.9"
     cross-env: "npm:^7.0.3"
     crypto: "npm:^1.0.1"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     eventemitter2: "npm:^6.4.5"
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
@@ -4787,7 +4787,7 @@ __metadata:
     prettier: "npm:^3.1.0"
     rimraf: "npm:^5.0.5"
     rollup: "npm:^2.46.0"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
     vite: "npm:^5.0.0"
     vitest: "npm:^1.2.2"
     zustand: "npm:^3.7.2"
@@ -4798,13 +4798,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@knocklabs/eslint-config@workspace:packages/eslint-config"
   dependencies:
-    "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
-    "@typescript-eslint/parser": "npm:^6.10.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.20.0"
+    "@typescript-eslint/parser": "npm:^6.20.0"
     "@vercel/style-guide": "npm:^5.1.0"
     eslint-config-prettier: "npm:^9.0.0"
     eslint-config-turbo: "npm:^1.10.12"
     eslint-plugin-only-warn: "npm:^1.1.0"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
 
@@ -4852,7 +4852,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.2.0"
     babel-plugin-react-require: "npm:^4.0.2"
     date-fns: "npm:^3.3.1"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
     jsdom: "npm:^24.0.0"
@@ -4860,7 +4860,7 @@ __metadata:
     rimraf: "npm:^5.0.5"
     rollup-plugin-execute: "npm:^1.1.1"
     swr: "npm:^2.2.5"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^3.0.0"
@@ -4896,7 +4896,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
     expo: "npm:~50.0.14"
@@ -4906,7 +4906,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
     rimraf: "npm:^5.0.5"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^3.0.0"
@@ -4937,7 +4937,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
     babel-plugin-react-require: "npm:^4.0.2"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
     jsdom: "npm:^24.0.0"
@@ -4948,7 +4948,7 @@ __metadata:
     react-popper-tooltip: "npm:^4.4.2"
     rimraf: "npm:^5.0.5"
     rollup-plugin-execute: "npm:^1.1.1"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^3.0.0"
@@ -4963,7 +4963,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@knocklabs/types@workspace:packages/types"
   dependencies:
-    typescript: "npm:^5.2.2"
+    eslint: "npm:^8.57.0"
+    typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
 
@@ -7259,7 +7260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^6.10.0, @typescript-eslint/eslint-plugin@npm:^6.5.0":
+"@typescript-eslint/eslint-plugin@npm:^6.10.0, @typescript-eslint/eslint-plugin@npm:^6.20.0, @typescript-eslint/eslint-plugin@npm:^6.5.0":
   version: 6.21.0
   resolution: "@typescript-eslint/eslint-plugin@npm:6.21.0"
   dependencies:
@@ -7295,7 +7296,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.4.2 || ^6.0.0, @typescript-eslint/parser@npm:^6.10.0, @typescript-eslint/parser@npm:^6.5.0":
+"@typescript-eslint/parser@npm:^5.4.2 || ^6.0.0, @typescript-eslint/parser@npm:^6.10.0, @typescript-eslint/parser@npm:^6.20.0, @typescript-eslint/parser@npm:^6.5.0":
   version: 6.21.0
   resolution: "@typescript-eslint/parser@npm:6.21.0"
   dependencies:
@@ -12018,7 +12019,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.3.0, eslint@npm:^8.53.0":
+"eslint@npm:^8.3.0, eslint@npm:^8.56.0, eslint@npm:^8.57.0":
   version: 8.57.0
   resolution: "eslint@npm:8.57.0"
   dependencies:
@@ -17334,7 +17335,7 @@ __metadata:
     "@types/react": "npm:^18.2.37"
     "@types/react-dom": "npm:^18.2.15"
     "@types/uuid": "npm:^9.0.7"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     framer-motion: "npm:^10.16.5"
     next: "npm:14.0.4"
     next-seo: "npm:^6.4.0"
@@ -17342,7 +17343,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-icons: "npm:^4.12.0"
     swr: "npm:^2.2.5"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
     uuid: "npm:^9.0.1"
   languageName: unknown
   linkType: soft
@@ -21147,13 +21148,13 @@ __metadata:
     "@types/node": "npm:^20"
     "@types/react": "npm:^18.2.37"
     "@types/react-dom": "npm:^18.2.15"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     eslint-config-next: "npm:14.0.4"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:14.0.4"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
 
@@ -21167,7 +21168,7 @@ __metadata:
     "@types/react": "npm:^18.2.37"
     "@types/react-dom": "npm:^18.2.15"
     autoprefixer: "npm:^10.0.1"
-    eslint: "npm:^8.53.0"
+    eslint: "npm:^8.56.0"
     eslint-config-next: "npm:14.0.4"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:14.0.4"
@@ -21175,7 +21176,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     tailwindcss: "npm:^3.3.0"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
 
@@ -22753,13 +22754,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.2.2":
-  version: 5.4.2
-  resolution: "typescript@npm:5.4.2"
+"typescript@npm:^5.3.3":
+  version: 5.4.5
+  resolution: "typescript@npm:5.4.5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/583ff68cafb0c076695f72d61df6feee71689568179fb0d3a4834dac343df6b6ed7cf7b6f6c801fa52d43cd1d324e2f2d8ae4497b09f9e6cfe3d80a6d6c9ca52
+  checksum: 10c0/2954022ada340fd3d6a9e2b8e534f65d57c92d5f3989a263754a78aba549f7e6529acc1921913560a4b816c46dce7df4a4d29f9f11a3dc0d4213bb76d043251e
   languageName: node
   linkType: hard
 
@@ -22773,13 +22774,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>":
-  version: 5.4.2
-  resolution: "typescript@patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"
+"typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>":
+  version: 5.4.5
+  resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/22e2f213c3ffe5960c5eaec6c95c04e01858fed57a94be250746f540b935b2c18c3c3fc80d3ab65d28c0aba1eb76284557ba3bf521d28caee811c44ba2b648f9
+  checksum: 10c0/9cf4c053893bcf327d101b6c024a55baf05430dc30263f9adb1bf354aeffc11306fe1f23ba2f9a0209674359f16219b5b7d229e923477b94831d07d5a33a4217
   languageName: node
   linkType: hard
 
