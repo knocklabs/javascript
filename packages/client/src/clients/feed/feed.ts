@@ -42,9 +42,9 @@ class Feed {
   private defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private hasSubscribedToRealTimeUpdates: Boolean = false;
+  private hasSubscribedToRealTimeUpdates: boolean = false;
   private visibilityChangeHandler: () => void = () => {};
-  private visibilityChangeListenerConnected: Boolean = false;
+  private visibilityChangeListenerConnected: boolean = false;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -659,6 +659,7 @@ class Feed {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private broadcastOverChannel(type: string, payload: any) {
     // The broadcastChannel may not be available in non-browser environments
     if (!this.broadcastChannel) {

@@ -51,7 +51,7 @@ export type FeedEvent =
 // Because we can bind to wild card feed events, this is here to accomodate whatever can be bound to
 export type BindableFeedEvent = FeedEvent | "items.received.*" | "items.*";
 
-export interface FeedEventPayload<T = any> {
+export interface FeedEventPayload<T = unknown> {
   event: Omit<FeedEvent, "messages.new">;
   items: FeedItem<T>[];
   metadata: FeedMetadata;

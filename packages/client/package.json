@@ -33,7 +33,7 @@
   },
   "scripts": {
     "dev": "tsc && vite build --watch --emptyOutDir false",
-    "lint": "eslint \"src/**/*.+(ts|js|tsx)\"",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
     "test": "vitest run",

@@ -28,6 +28,7 @@ class UserClient {
     return this.handleResponse<User>(result);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async identify(props: Record<string, any> = {}) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
@@ -76,7 +77,7 @@ class UserClient {
     return this.handleResponse<PreferenceSet>(result);
   }
 
-  async getChannelData<T = any>(params: GetChannelDataInput) {
+  async getChannelData<T = unknown>(params: GetChannelDataInput) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.instance.userId}/channel_data/${params.channelId}`,
@@ -85,7 +86,7 @@ class UserClient {
     return this.handleResponse<ChannelData<T>>(result);
   }
 
-  async setChannelData<T = any>({
+  async setChannelData<T = unknown>({
     channelId,
     channelData,
   }: SetChannelDataInput) {

@@ -12,6 +12,7 @@ type SetChannelDataInput = {
   objectId: string;
   collection: string;
   channelId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 };
 
@@ -21,7 +22,7 @@ class ObjectClient {
   constructor(instance: Knock) {
     this.instance = instance;
   }
-  async getChannelData<T = any>({
+  async getChannelData<T = unknown>({
     collection,
     objectId,
     channelId,
