@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.8
+
+### Patch Changes
+
+- 29e3942: fix: introduce new useNotificationStore hook to prevent issues that prevent state updates
+
 ## 0.10.7
 
 ### Patch Changes

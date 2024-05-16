@@ -1,5 +1,13 @@
 # nextjs-example
 
+## 1.0.28
+
+### Patch Changes
+
+- 29e3942: fix: introduce new useNotificationStore hook to prevent issues that prevent state updates
+- Updated dependencies [29e3942]
+  - @knocklabs/react@0.2.20
+
 ## 1.0.27
 
 ### Patch Changes
