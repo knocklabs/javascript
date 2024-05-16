@@ -5,11 +5,12 @@ import Knock, {
 } from "@knocklabs/client";
 import * as React from "react";
 import { PropsWithChildren } from "react";
-import create, { UseBoundStore } from "zustand";
+import { UseBoundStore } from "zustand";
 
 import { useKnockClient } from "../../core";
 import { ColorMode } from "../../core/constants";
 import { feedProviderKey } from "../../core/utils";
+import { useCreateNotificationStore } from "../hooks";
 import useNotifications from "../hooks/useNotifications";
 
 export interface KnockFeedProviderState {
@@ -39,11 +40,7 @@ export const KnockFeedProvider: React.FC<
 > = ({ feedId, children, defaultFeedOptions = {}, colorMode = "light" }) => {
   const knock = useKnockClient();
   const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
-
-  const useFeedStore = React.useMemo(
-    () => create<FeedStoreState>(feedClient.store),
-    [feedClient],
-  );
+  const useFeedStore = useCreateNotificationStore(feedClient);
 
   return (
     <FeedStateContext.Provider

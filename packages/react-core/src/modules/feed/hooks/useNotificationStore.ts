@@ -1,12 +1,7 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
 import { useEffect, useLayoutEffect, useMemo, useReducer } from "react";
-import type { DispatchWithoutAction, Reducer } from "react";
-import type {
-  EqualityChecker,
-  StateSelector,
-  StoreApi,
-  UseBoundStore,
-} from "zustand";
+import type { DispatchWithoutAction } from "react";
+import create, { StateSelector } from "zustand";
 
 // For server-side rendering: https://github.com/pmndrs/zustand/pull/34
 // Deno support: https://github.com/pmndrs/zustand/issues/347
@@ -17,59 +12,35 @@ const isSSR =
 
 const useIsomorphicLayoutEffect = isSSR ? useEffect : useLayoutEffect;
 
-function useNotificationStore<TState extends FeedStoreState>(
-  feedClient: Feed,
-  selector: StateSelector<TState, StateSlice> = feedClient.getState as any,
-): UseBoundStore<FeedStoreState, StoreApi<FeedStoreState>> {
-  const { store } = feedClient;
+// A hook designed to create a `UseBoundStore` instance
+function useCreateNotificationStore(feedClient: Feed) {
+  const useStore = useMemo(
+    () => create<FeedStoreState>(feedClient.store),
+    [feedClient],
+  );
 
-  const useStore: any = <StateSlice>(
-    selector: StateSelector<TState, StateSlice>,
-    equalityFn: EqualityChecker<StateSlice> = Object.is,
-  ) => {
-    const state = store.getState();
+  // Warning: this is a hack that will cause any components downstream to re-render
+  // as a result of the store updating.
+  const [, forceUpdate] = useReducer((c) => c + 1, 0) as [never, () => void];
 
-    const slice = useMemo(() => selector(state), [state, selector]);
-    const [[sliceFromReducer, storeFromReducer], rerender] = useReducer<
-      Reducer<
-        readonly [StateSlice, StoreApi<FeedStoreState>],
-        boolean | undefined
-      >,
-      undefined
-    >(
-      (prev, fromSelf?: boolean) => {
-        if (fromSelf) {
-          return [slice, store];
-        }
-        const nextState = store.getState();
-        if (Object.is(state, nextState) && prev[1] === store) {
-          return prev;
-        }
-        const nextSlice = selector(nextState);
-        if (areEqual(prev[0], nextSlice) && prev[1] === store) {
-          return prev;
-        }
-        return [nextSlice, store];
-      },
-      undefined,
-      () => [slice, store],
-    );
-
-    useIsomorphicLayoutEffect(() => {
-      const unsubscribe = store.subscribe(rerender as DispatchWithoutAction);
-      (rerender as DispatchWithoutAction)();
-      return unsubscribe;
-    }, [store]);
-
-    if (storeFromReducer !== store) {
-      rerender(true);
-      return slice as any;
-    }
-
-    return sliceFromReducer as any;
-  };
+  useIsomorphicLayoutEffect(() => {
+    const rerender = forceUpdate as DispatchWithoutAction;
+    const unsubscribe = feedClient.store.subscribe(rerender);
+    rerender();
+    return unsubscribe;
+  }, [feedClient]);
 
   return useStore;
 }
 
+// A hook used to access content *within* the notification store
+function useNotificationStore(
+  feedClient: Feed,
+  selector?: StateSelector<FeedStoreState, FeedStoreState>,
+) {
+  const useStore = useCreateNotificationStore(feedClient);
+  return useStore<FeedStoreState>(selector || feedClient.store.getState);
+}
+
+export { useCreateNotificationStore };
 export default useNotificationStore;

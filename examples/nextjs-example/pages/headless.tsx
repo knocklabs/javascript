@@ -29,7 +29,6 @@ const HeadlessFeed = ({
   userId: string;
   userToken?: string;
 }) => {
-  const [key, setKey] = useState(uuidv4());
   const [tenant, setTenant] = useState(Tenants.TeamA);
 
   const knockClient = useAuthenticatedKnockClient(
@@ -51,8 +50,6 @@ const HeadlessFeed = ({
   useEffect(() => {
     feedClient.fetch();
   }, [feedClient]);
-
-  console.log({ key });
 
   return (
     <div className="notifications">
