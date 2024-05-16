@@ -1,12 +1,13 @@
-import React, { PropsWithChildren } from "react";
-import { ChevronDown } from "../../../core/components/Icons";
 import { useKnockFeed } from "@knocklabs/react-core";
+import React, { PropsWithChildren } from "react";
+
+import { ChevronDown } from "../../../core/components/Icons";
 
 import "./styles.css";
 
 export type DropdownProps = {
   value: string;
-  onChange: (e: any) => void;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
 export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
