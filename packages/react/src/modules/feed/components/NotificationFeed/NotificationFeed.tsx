@@ -25,7 +25,8 @@ import {
 } from "./NotificationFeedHeader";
 import "./styles.css";
 
-export type RenderItemProps<T = unknown> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RenderItemProps<T = any> = {
   item: FeedItem<T>;
   onItemClick?: NotificationCellProps["onItemClick"];
   onButtonClick?: NotificationCellProps["onButtonClick"];

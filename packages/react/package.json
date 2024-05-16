@@ -35,6 +35,7 @@
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
     "test": "vitest run",
     "test:watch": "vitest",
+    "type:check": "tsc --noEmit",
     "coverage": "vitest run --coverage",
     "preview": "vite preview"
   },
