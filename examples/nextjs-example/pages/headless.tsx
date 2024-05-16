@@ -43,7 +43,6 @@ const HeadlessFeed = ({
     process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!,
     { tenant },
   );
-  8900;
 
   const { items, metadata } = useNotificationStore(feedClient);
 
