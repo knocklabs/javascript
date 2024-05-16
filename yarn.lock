@@ -4773,7 +4773,7 @@ __metadata:
     "@knocklabs/types": "workspace:^"
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/phoenix": "npm:^1.5.4"
-    "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.20.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     axios: "npm:^1.6.0"
     axios-retry: "npm:^3.1.9"
@@ -4847,7 +4847,7 @@ __metadata:
     "@knocklabs/client": "workspace:^"
     "@testing-library/react": "npm:^14.2.0"
     "@types/react": "npm:^18.2.37"
-    "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.20.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
     babel-plugin-react-require: "npm:^4.0.2"
@@ -4893,7 +4893,7 @@ __metadata:
     "@knocklabs/client": "workspace:^"
     "@knocklabs/react-core": "workspace:^"
     "@types/react": "npm:^18.2.37"
-    "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.20.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
     eslint: "npm:^8.56.0"
@@ -4933,7 +4933,7 @@ __metadata:
     "@types/lodash.debounce": "npm:^4.0.9"
     "@types/react": "npm:^18.2.37"
     "@types/react-dom": "npm:^18.2.15"
-    "@typescript-eslint/eslint-plugin": "npm:^6.10.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.20.0"
     "@typescript-eslint/parser": "npm:^6.10.0"
     "@vitejs/plugin-react": "npm:^4.2.0"
     babel-plugin-react-require: "npm:^4.0.2"
@@ -7260,7 +7260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^6.10.0, @typescript-eslint/eslint-plugin@npm:^6.20.0, @typescript-eslint/eslint-plugin@npm:^6.5.0":
+"@typescript-eslint/eslint-plugin@npm:^6.20.0, @typescript-eslint/eslint-plugin@npm:^6.5.0":
   version: 6.21.0
   resolution: "@typescript-eslint/eslint-plugin@npm:6.21.0"
   dependencies:

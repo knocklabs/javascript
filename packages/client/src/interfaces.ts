@@ -38,7 +38,8 @@ export interface Activity<T = GenericData> {
   data: T | null;
 }
 
-export interface ChannelData<T = unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ChannelData<T = any> {
   channel_id: string;
   data: T;
 }
