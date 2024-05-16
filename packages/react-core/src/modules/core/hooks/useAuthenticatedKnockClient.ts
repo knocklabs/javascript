@@ -1,6 +1,7 @@
 import Knock, { AuthenticateOptions, KnockOptions } from "@knocklabs/client";
 import React from "react";
-import shallow from "zustand/shallow";
+
+import { useStableOptions } from "../../core";
 
 function authenticateWithOptions(
   knock: Knock,
@@ -24,20 +25,7 @@ function useAuthenticatedKnockClient(
   options: AuthenticatedKnockClientOptions = {},
 ) {
   const knockRef = React.useRef<Knock | undefined>();
-  const optionsRef = React.useRef<AuthenticatedKnockClientOptions>();
-
-  // Shallow compare options so that we ensure that we have a stable
-  // set of options between re-renders.
-  const stableOptions = React.useMemo(() => {
-    const currentOptions = optionsRef.current || {};
-
-    if (shallow(options, currentOptions)) {
-      return currentOptions;
-    }
-
-    optionsRef.current = options;
-    return options;
-  }, [options]);
+  const stableOptions = useStableOptions(options);
 
   return React.useMemo(() => {
     const currentKnock = knockRef.current;

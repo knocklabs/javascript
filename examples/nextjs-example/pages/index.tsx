@@ -43,7 +43,7 @@ export default function Home() {
     return json.userToken;
   }, [userId]);
 
-  if (isLoading || !userToken) {
+  if (isLoading) {
     return (
       <Flex
         alignItems="center"
