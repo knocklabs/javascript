@@ -16,6 +16,7 @@ export async function identify(params = {}) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function notify(params: any) {
   try {
     const resp = await fetch("/api/notify", {

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useToast } from "@chakra-ui/react";
 import { useKnockFeed } from "@knocklabs/react";
 import { useCallback, useEffect } from "react";
+
 import Toast from "./Toast";
 
 const NotificationToasts = () => {
@@ -16,7 +18,7 @@ const NotificationToasts = () => {
 
         toast({
           render: (props) => (
-            // @ts-ignore
+            // @ts-expect-error - difference in status type
             <Toast
               {...props}
               title={"New notification received"}
