@@ -4,7 +4,6 @@ import {
   FilterStatus,
   useFeedSettings,
   useKnockFeed,
-  useNotificationStore,
   useTranslations,
 } from "@knocklabs/react-core";
 import React, {
@@ -81,11 +80,11 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   renderHeader = defaultRenderHeader,
 }) => {
   const [status, setStatus] = useState(initialFilterStatus);
-  const { feedClient, colorMode } = useKnockFeed();
+  const { feedClient, useFeedStore, colorMode } = useKnockFeed();
   const { settings } = useFeedSettings(feedClient);
   const { t } = useTranslations();
 
-  const { pageInfo, items, networkStatus } = useNotificationStore(feedClient);
+  const { pageInfo, items, networkStatus } = useFeedStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
