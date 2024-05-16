@@ -6,7 +6,8 @@
   "license": "MIT",
   "types": "./src/index.d.ts",
   "scripts": {
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type:check": "tsc --noEmit"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

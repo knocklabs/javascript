@@ -30,6 +30,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
+    "type:check": "tsc --noEmit",
     "preview": "vite preview"
   },
   "repository": {
