@@ -51,7 +51,6 @@ export default function createStore() {
       { entries, meta, page_info },
       options = defaultSetResultOptions,
     ) =>
-      // @ts-expect-error Issue with generic types
       set((state) => {
         // We resort the list on set, so concating everything is fine (if a bit suboptimal)
         const items = options.shouldAppend

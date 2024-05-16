@@ -22,7 +22,8 @@ class ObjectClient {
   constructor(instance: Knock) {
     this.instance = instance;
   }
-  async getChannelData<T = unknown>({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getChannelData<T = any>({
     collection,
     objectId,
     channelId,

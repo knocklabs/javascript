@@ -20,7 +20,8 @@ export type MessageEngagementStatus =
   | "interacted"
   | "archived";
 
-export interface Message<T = unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Message<T = any> {
   id: string;
   channel_id: string;
   recipient: RecipientRef;

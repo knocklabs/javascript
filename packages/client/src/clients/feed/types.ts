@@ -51,7 +51,8 @@ export type FeedEvent =
 // Because we can bind to wild card feed events, this is here to accomodate whatever can be bound to
 export type BindableFeedEvent = FeedEvent | "items.received.*" | "items.*";
 
-export interface FeedEventPayload<T = unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface FeedEventPayload<T = any> {
   event: Omit<FeedEvent, "messages.new">;
   items: FeedItem<T>[];
   metadata: FeedMetadata;
