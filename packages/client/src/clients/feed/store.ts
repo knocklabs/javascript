@@ -33,6 +33,8 @@ const initialStoreState = {
 };
 
 export default function createStore() {
+  console.log("create feed store");
+
   return create<FeedStoreState>((set) => ({
     // Keeps track of all of the items loaded
     ...initialStoreState,
