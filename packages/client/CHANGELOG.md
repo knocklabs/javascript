@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.9
+
+### Patch Changes
+
+- d0adb14: fix: don't destroy the store, ever
+
 ## 0.10.8
 
 ### Patch Changes
