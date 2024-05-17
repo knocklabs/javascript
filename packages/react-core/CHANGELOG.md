@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.19
+
+### Patch Changes
+
+- 1e60c19: fix: re-introduce subscribe/setstate call for useNotifications
+
 ## 0.2.18
 
 ### Patch Changes
