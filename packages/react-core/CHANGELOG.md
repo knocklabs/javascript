@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.20
+
+### Patch Changes
+
+- Updated dependencies [d0adb14]
+  - @knocklabs/client@0.10.9
+
 ## 0.2.19
 
 ### Patch Changes
