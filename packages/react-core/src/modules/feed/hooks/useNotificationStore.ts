@@ -8,7 +8,10 @@ const useIsomorphicLayoutEffect =
 
 // A hook designed to create a `UseBoundStore` instance
 function useCreateNotificationStore(feedClient: Feed) {
-  const useStore = create<FeedStoreState>(feedClient.store);
+  const useStore = React.useMemo(
+    () => create<FeedStoreState>(feedClient.store),
+    [feedClient],
+  );
 
   // Warning: this is a hack that will cause any components downstream to re-render
   // as a result of the store updating.

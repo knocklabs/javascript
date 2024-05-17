@@ -22,6 +22,7 @@ function useNotifications(
     );
 
     // In development, we need to introduce this extra set state to force a render
+    // for Zustand as otherwise the state doesn't get reflected correctly
     feedClientRef.current.store.subscribe((t) =>
       feedClientRef?.current?.store.setState(t),
     );
