@@ -10,17 +10,31 @@ export default function NotificationFeed() {
   const { loading, items, pageInfo } = useFeedStore((state) => state);
 
   useEffect(() => {
-    const teardown = feedClient.listenForUpdates();
+    feedClient.fetch();
 
-    feedClient.on("messages.new", (data) => {
+    const teardown = feedClient.listenForUpdates?.();
+
+    const handleNewMessage = (data) => {
       console.log(data);
-    });
+    };
 
-    feedClient.on("items.received.*", (data) => {
+    const handleItemsReceived = (data) => {
       console.log(data);
-    });
+    };
 
-    return () => teardown();
+    feedClient.on("messages.new", handleNewMessage);
+    feedClient.on("items.received.*", handleItemsReceived);
+
+    return () => {
+      // Unsubscribe from events
+      feedClient.off("messages.new", handleNewMessage);
+      feedClient.off("items.received.*", handleItemsReceived);
+
+      // Call teardown if it is a function
+      if (typeof teardown === "function") {
+        teardown();
+      }
+    };
   }, [feedClient]);
 
   return (
