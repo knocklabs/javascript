@@ -23,11 +23,11 @@ export default function SlackChannelWrapper({
   return (
     <div className={className}>
       <div className="mb-3">
-      <ToggleSwitch
-        label="Show connected channels"
-        isToggled={showConnectedChannels}
-        setIsToggled={setShowConnectedChannels}
-      />
+        <ToggleSwitch
+          label="Show connected channels"
+          isToggled={showConnectedChannels}
+          setIsToggled={setShowConnectedChannels}
+        />
       </div>
       <SlackChannelCombobox
         slackChannelsRecipientObject={slackChannelsRecipientObject}

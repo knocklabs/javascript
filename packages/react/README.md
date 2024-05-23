@@ -40,12 +40,11 @@ You can integrate Knock into your app as follows:
 
 ```jsx
 import {
-  KnockProvider,
   KnockFeedProvider,
-  NotificationIconButton,
+  KnockProvider,
   NotificationFeedPopover,
+  NotificationIconButton,
 } from "@knocklabs/react";
-
 // Required CSS import, unless you're overriding the styling
 import "@knocklabs/react/dist/index.css";
 

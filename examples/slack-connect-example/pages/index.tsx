@@ -30,8 +30,8 @@ export default function Home() {
   };
 
   const onAuthComplete = (result: string) => {
-    console.log("Result from Slack authentication:", result)
-  }
+    console.log("Result from Slack authentication:", result);
+  };
 
   const { isLoading, isError } = useSetToken({
     tenant,

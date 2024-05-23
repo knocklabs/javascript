@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-import useLocalStorage from "./useLocalStorage";
 import { identify } from "../lib/api";
+
+import useLocalStorage from "./useLocalStorage";
 
 const useIdentify = () => {
   const [userId, setUserId] = useLocalStorage("demo-user-id", undefined);

@@ -1,1 +1,1 @@
-export * from "./SlackChannelCombobox"
+export * from "./SlackChannelCombobox";
