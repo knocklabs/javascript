@@ -23,5 +23,14 @@ jobs:
       - name: Install dependencies
         run: yarn --immutable
 
+      - name: Build packages
+        run: yarn build:packages
+
+      - name: Run type check
+        run: yarn type:check
+
+      - name: Run Lint
+        run: yarn lint
+
       - name: Run tests
         run: yarn test

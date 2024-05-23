@@ -4,10 +4,7 @@ import {
   useNotificationStore,
   useNotifications,
 } from "@knocklabs/react";
-import { randomUUID } from "crypto";
-import { useEffect, useMemo, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import create from "zustand";
+import { useEffect, useState } from "react";
 
 import { MarkdownContentBlock } from "../../../packages/client/dist/types/clients/feed/interfaces";
 import useIdentify from "../hooks/useIdentify";
