@@ -1,4 +1,4 @@
-import { PageInfo } from "@knocklabs/types";
+import { GenericData, PageInfo } from "@knocklabs/types";
 
 import { NetworkStatus } from "../../networkStatus";
 
@@ -51,8 +51,7 @@ export type FeedEvent =
 // Because we can bind to wild card feed events, this is here to accomodate whatever can be bound to
 export type BindableFeedEvent = FeedEvent | "items.received.*" | "items.*";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface FeedEventPayload<T = any> {
+export interface FeedEventPayload<T = GenericData> {
   event: Omit<FeedEvent, "messages.new">;
   items: FeedItem<T>[];
   metadata: FeedMetadata;

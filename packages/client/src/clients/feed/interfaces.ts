@@ -94,8 +94,7 @@ export interface FeedMetadata {
   unseen_count: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface FeedResponse<T = any> {
+export interface FeedResponse<T = GenericData> {
   entries: FeedItem<T>[];
   meta: FeedMetadata;
   page_info: PageInfo;

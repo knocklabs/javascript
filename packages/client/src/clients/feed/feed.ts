@@ -1,3 +1,4 @@
+import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
 import { Channel } from "phoenix";
 import { StoreApi } from "zustand";
@@ -659,8 +660,7 @@ class Feed {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private broadcastOverChannel(type: string, payload: any) {
+  private broadcastOverChannel(type: string, payload: GenericData) {
     // The broadcastChannel may not be available in non-browser environments
     if (!this.broadcastChannel) {
       return;

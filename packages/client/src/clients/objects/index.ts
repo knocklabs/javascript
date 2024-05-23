@@ -1,3 +1,5 @@
+import { GenericData } from "@knocklabs/types";
+
 import { ApiResponse } from "../../api";
 import { ChannelData } from "../../interfaces";
 import Knock from "../../knock";
@@ -12,8 +14,7 @@ type SetChannelDataInput = {
   objectId: string;
   collection: string;
   channelId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: GenericData;
 };
 
 class ObjectClient {
@@ -22,8 +23,7 @@ class ObjectClient {
   constructor(instance: Knock) {
     this.instance = instance;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getChannelData<T = any>({
+  async getChannelData<T = GenericData>({
     collection,
     objectId,
     channelId,

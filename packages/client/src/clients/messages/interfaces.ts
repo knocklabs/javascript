@@ -1,3 +1,5 @@
+import { GenericData } from "@knocklabs/types";
+
 import { RecipientRef } from "../..";
 
 export type MessageDeliveryStatus =
@@ -20,8 +22,7 @@ export type MessageEngagementStatus =
   | "interacted"
   | "archived";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface Message<T = any> {
+export interface Message<T = GenericData> {
   id: string;
   channel_id: string;
   recipient: RecipientRef;
