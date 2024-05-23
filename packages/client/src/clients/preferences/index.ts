@@ -1,13 +1,15 @@
 import { ChannelType } from "@knocklabs/types";
+
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
+
 import {
   ChannelTypePreferences,
   PreferenceOptions,
+  PreferenceSet,
   SetPreferencesProperties,
   WorkflowPreferenceSetting,
   WorkflowPreferences,
-  PreferenceSet,
 } from "./interfaces";
 
 const DEFAULT_PREFERENCE_SET_ID = "default";

@@ -1,10 +1,11 @@
-import React from "react";
 import { render as rtlRender } from "@testing-library/react";
+import React from "react";
+
 import {
-  KnockProvider,
   KnockFeedProvider,
-  KnockProviderProps,
   KnockFeedProviderProps,
+  KnockProvider,
+  KnockProviderProps,
 } from "../src";
 
 const defaultKnockProviderProps: KnockProviderProps = {

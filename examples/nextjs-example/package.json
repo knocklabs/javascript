@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier \"**/*.{js,ts,tsx}\" --write",
+    "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
