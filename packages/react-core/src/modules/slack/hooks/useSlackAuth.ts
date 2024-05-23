@@ -9,7 +9,7 @@ const DEFAULT_SLACK_SCOPES = [
   "chat:write",
   "chat:write.public",
   "channels:read",
-  "groups:read"
+  "groups:read",
 ];
 
 type UseSlackAuthOutput = {
@@ -20,10 +20,16 @@ type UseSlackAuthOutput = {
 function useSlackAuth(
   slackClientId: string,
   redirectUrl?: string,
+  additionalScopes?: string[],
 ): UseSlackAuthOutput {
   const knock = useKnockClient();
   const { setConnectionStatus, knockSlackChannelId, tenant, setActionLabel } =
     useKnockSlackClient();
+
+  const combinedScopes =
+    additionalScopes && additionalScopes.length > 0
+      ? DEFAULT_SLACK_SCOPES.concat(additionalScopes)
+      : DEFAULT_SLACK_SCOPES;
 
   const disconnectFromSlack = useCallback(async () => {
     setActionLabel(null);
@@ -63,7 +69,7 @@ function useSlackAuth(
         user_token: knock.userToken,
       }),
       client_id: slackClientId,
-      scope: DEFAULT_SLACK_SCOPES.join(","),
+      scope: combinedScopes.join(","),
     };
     return `${SLACK_AUTHORIZE_URL}?${new URLSearchParams(rawParams)}`;
   }, [
