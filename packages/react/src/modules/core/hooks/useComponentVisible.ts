@@ -27,7 +27,6 @@ export default function useComponentVisible(
       options.closeOnClickOutside &&
       !contains(ref.current, event.target as HTMLElement)
     ) {
-      event.stopPropagation();
       onClose(event);
     }
   };
