@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.6
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+- Updated dependencies [a4d520c]
+  - @knocklabs/react-core@0.2.21
+  - @knocklabs/client@0.10.10
+
 ## 0.2.5
 
 ### Patch Changes

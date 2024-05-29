@@ -1,5 +1,11 @@
 # @knocklabs/types
 
+## 0.1.4
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+
 ## 0.1.3
 
 ### Patch Changes

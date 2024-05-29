@@ -1,5 +1,14 @@
 # slack-kit-example
 
+## 0.2.2
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+- Updated dependencies [a4d520c]
+- Updated dependencies [e88c1c0]
+  - @knocklabs/react@0.2.23
+
 ## 0.2.1
 
 ### Patch Changes

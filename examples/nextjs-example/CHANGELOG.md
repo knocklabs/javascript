@@ -1,5 +1,14 @@
 # nextjs-example
 
+## 1.0.31
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+- Updated dependencies [a4d520c]
+- Updated dependencies [e88c1c0]
+  - @knocklabs/react@0.2.23
+
 ## 1.0.30
 
 ### Patch Changes
