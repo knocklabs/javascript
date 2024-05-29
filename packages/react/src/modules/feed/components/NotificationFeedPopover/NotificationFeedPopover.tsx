@@ -1,7 +1,7 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
 import { useKnockFeed } from "@knocklabs/react-core";
 import { Placement } from "@popperjs/core";
-import React, { RefObject, useEffect } from "react";
+import React, { RefObject, useEffect, useRef } from "react";
 import { usePopper } from "react-popper";
 
 import useComponentVisible from "../../../core/hooks/useComponentVisible";
@@ -42,10 +42,9 @@ export const NotificationFeedPopover: React.FC<
 }) => {
   const { colorMode, feedClient, useFeedStore } = useKnockFeed();
   const store = useFeedStore();
+  const popperRef = useRef<HTMLDivElement>(null);
 
-  const { ref: popperRef } = useComponentVisible(isVisible, onClose, {
-    closeOnClickOutside,
-  });
+  useComponentVisible(popperRef, isVisible, onClose, { closeOnClickOutside });
 
   const { styles, attributes } = usePopper(
     buttonRef.current,

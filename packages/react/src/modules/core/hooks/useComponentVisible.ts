@@ -1,50 +1,54 @@
-import { useEffect, useRef } from "react";
+import { RefObject, useCallback, useEffect } from "react";
 
-function contains(parent: HTMLElement | null, child: HTMLElement) {
-  if (!parent) return false;
-  return parent === child || parent.contains(child);
-}
-
-type Options = {
+export type UseComponentVisibleOptions = {
   closeOnClickOutside: boolean;
 };
 
-export default function useComponentVisible(
+export default function useComponentVisible<
+  T extends HTMLElement = HTMLElement,
+>(
+  ref: RefObject<T>,
   isVisible: boolean,
   onClose: (event: Event) => void,
-  options: Options,
+  options: UseComponentVisibleOptions,
 ) {
-  const ref = useRef<HTMLDivElement>(null);
+  const handleKeydown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose(event);
+      }
+    },
+    [onClose],
+  );
 
-  const handleKeydown = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      onClose(event);
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: Event) => {
+      const target = event.target as Node;
 
-  const handleClickOutside = (event: Event) => {
-    if (
-      options.closeOnClickOutside &&
-      !contains(ref.current, event.target as HTMLElement)
-    ) {
-      event.stopPropagation();
-      onClose(event);
-    }
-  };
+      if (!target || !target.isConnected) {
+        return;
+      }
+
+      if (
+        options.closeOnClickOutside &&
+        ref.current &&
+        ref.current.contains(target)
+      ) {
+        onClose(event);
+      }
+    },
+    [ref, options.closeOnClickOutside, onClose],
+  );
 
   useEffect(() => {
     if (isVisible) {
-      document.addEventListener("keydown", handleKeydown, true);
-      document.addEventListener("click", handleClickOutside, true);
+      window.addEventListener("keydown", handleKeydown);
+      window.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("keydown", handleKeydown, true);
-      document.removeEventListener("click", handleClickOutside, true);
+      window.removeEventListener("keydown", handleKeydown);
+      window.removeEventListener("click", handleClickOutside);
     };
-    // TODO: Check if we can remove this disable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible]);
-
-  return { ref };
+  }, [isVisible, handleKeydown, handleClickOutside]);
 }
