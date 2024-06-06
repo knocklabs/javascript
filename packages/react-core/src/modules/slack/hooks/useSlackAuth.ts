@@ -28,7 +28,7 @@ function useSlackAuth(
 
   const combinedScopes =
     additionalScopes && additionalScopes.length > 0
-      ? DEFAULT_SLACK_SCOPES.concat(additionalScopes)
+      ? Array.from(new Set(DEFAULT_SLACK_SCOPES.concat(additionalScopes)))
       : DEFAULT_SLACK_SCOPES;
 
   const disconnectFromSlack = useCallback(async () => {
@@ -54,6 +54,7 @@ function useSlackAuth(
     tenant,
     knockSlackChannelId,
     setActionLabel,
+    combinedScopes,
   ]);
 
   const buildSlackAuthUrl = useCallback(() => {
