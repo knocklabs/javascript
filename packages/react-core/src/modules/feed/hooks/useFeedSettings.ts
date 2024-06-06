@@ -36,6 +36,8 @@ function useFeedSettings(feedClient: Feed): {
     }
 
     getSettings();
+    // TODO: Check if we can remove this disable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { settings, loading: isLoading };

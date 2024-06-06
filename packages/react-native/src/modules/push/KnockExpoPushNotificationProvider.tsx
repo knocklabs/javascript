@@ -1,4 +1,3 @@
-// PushNotificationContext.tsx
 import {
   ChannelData,
   Message,
@@ -37,7 +36,7 @@ Notifications.setNotificationHandler({
 });
 
 const defaultNotificationHandler = async (
-  notification: Notifications.Notification,
+  _notification: Notifications.Notification,
 ): Promise<Notifications.NotificationBehavior> => {
   // Your default logic here
   return {
@@ -204,15 +203,15 @@ export const KnockExpoPushNotificationProvider: React.FC<
       .then(() => {
         if (expoPushToken) {
           registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
-            .then((result) => {
+            .then((_result) => {
               knockClient.log("setChannelData success");
             })
-            .catch((error: any) => {
+            .catch((_error) => {
               knockClient.log("Error in setting push token or channel data");
             });
         }
       })
-      .catch((error: any) => {
+      .catch((_error) => {
         knockClient.log("Error in setting push token or channel data");
       });
 
@@ -241,6 +240,9 @@ export const KnockExpoPushNotificationProvider: React.FC<
         notificationResponseSubscription,
       );
     };
+
+    // TODO: Remove when possible and ensure dependency array is correct
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     notificationReceivedHandler,
     notificationTappedHandler,

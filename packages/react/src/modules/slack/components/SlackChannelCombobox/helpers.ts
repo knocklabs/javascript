@@ -13,9 +13,9 @@ export function strContains(string: string, substr: string) {
   substr = substr.normalize("NFC");
 
   let scan = 0;
-  let sliceLen = substr.length;
+  const sliceLen = substr.length;
   for (; scan + sliceLen <= string.length; scan++) {
-    let slice = string.slice(scan, scan + sliceLen);
+    const slice = string.slice(scan, scan + sliceLen);
     if (collator.compare(substr, slice) === 0) {
       return true;
     }

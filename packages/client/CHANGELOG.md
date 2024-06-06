@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.10
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+- Updated dependencies [a4d520c]
+  - @knocklabs/types@0.1.4
+
 ## 0.10.9
 
 ### Patch Changes

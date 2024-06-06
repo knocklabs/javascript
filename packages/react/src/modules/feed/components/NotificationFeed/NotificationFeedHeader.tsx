@@ -1,7 +1,7 @@
-import React, { SetStateAction } from "react";
 import { FeedItem } from "@knocklabs/client";
-
 import { FilterStatus, useTranslations } from "@knocklabs/react-core";
+import React, { SetStateAction } from "react";
+
 import { Dropdown } from "./Dropdown";
 import { MarkAsRead } from "./MarkAsRead";
 
@@ -32,7 +32,7 @@ export const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
         </span>
         <Dropdown
           value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
+          onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
         >
           {OrderedFilterStatuses.map((filterStatus) => (
             <option key={filterStatus} value={filterStatus}>

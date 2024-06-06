@@ -1,8 +1,9 @@
 // @vitest-environment node
-import { vi, beforeEach, afterEach, describe, expect, test } from "vitest";
-import jwt from "jsonwebtoken";
-import Knock from "../src/knock";
 import { generateKeyPairSync } from "crypto";
+import jwt from "jsonwebtoken";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+import Knock from "../src/knock";
 
 describe("it can create a Knock client", () => {
   test("it sets configuration values", () => {
@@ -65,7 +66,7 @@ describe("it handles authentication correctly", () => {
     const knock = new Knock("pk_test_12345");
     const mockToken = generateMockToken(userId, 2);
 
-    const onUserTokenExpiring = vi.fn((_prevToken, _decodedToken) => {
+    const onUserTokenExpiring = vi.fn(async (_prevToken, _decodedToken) => {
       const newToken = generateMockToken(userId, 3);
       return newToken;
     });

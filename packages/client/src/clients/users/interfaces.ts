@@ -1,6 +1,8 @@
+import { GenericData } from "@knocklabs/types";
+
 export interface SetChannelDataInput {
   channelId: string;
-  channelData: Record<string, any>;
+  channelData: GenericData;
 }
 
 export interface GetChannelDataInput {

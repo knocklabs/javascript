@@ -1,6 +1,6 @@
 {
   "name": "client-example",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "private": true,
   "dependencies": {
     "@knocklabs/client": "workspace:^",
@@ -16,7 +16,9 @@
   "scripts": {
     "dev": "PORT=3001 BROWSER=none react-scripts start",
     "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
+    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check"
   },
   "eslintConfig": {
     "extends": [

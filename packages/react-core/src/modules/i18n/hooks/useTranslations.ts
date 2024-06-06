@@ -1,6 +1,7 @@
 import { useContext } from "react";
-import { I18nContent, locales } from "../languages";
+
 import { I18nContext } from "../context/KnockI18nProvider";
+import { I18nContent, locales } from "../languages";
 
 export function useTranslations() {
   const { translations, locale } = useContext<I18nContent>(I18nContext);

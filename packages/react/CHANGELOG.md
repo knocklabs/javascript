@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.23
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+- e88c1c0: remove stop propogation from useComponentVisible hook to prevent page reloads with react-router-dom
+- Updated dependencies [a4d520c]
+  - @knocklabs/react-core@0.2.21
+  - @knocklabs/client@0.10.10
+
 ## 0.2.22
 
 ### Patch Changes

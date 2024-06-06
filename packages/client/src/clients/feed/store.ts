@@ -1,3 +1,4 @@
+import { GenericData } from "@knocklabs/types";
 import create from "zustand/vanilla";
 
 import { NetworkStatus } from "../../networkStatus";
@@ -53,7 +54,7 @@ export default function createStore() {
       set((state) => {
         // We resort the list on set, so concating everything is fine (if a bit suboptimal)
         const items = options.shouldAppend
-          ? processItems(state.items.concat(entries))
+          ? processItems(state.items.concat(entries as FeedItem<GenericData>[]))
           : entries;
 
         return {

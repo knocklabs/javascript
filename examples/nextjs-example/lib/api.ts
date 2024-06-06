@@ -1,3 +1,5 @@
+import { GenericData } from "@knocklabs/types";
+
 const headers = { "Content-Type": "application/json" };
 
 export async function identify(params = {}) {
@@ -16,7 +18,7 @@ export async function identify(params = {}) {
   }
 }
 
-export async function notify(params: any) {
+export async function notify(params: GenericData) {
   try {
     const resp = await fetch("/api/notify", {
       method: "POST",

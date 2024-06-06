@@ -1,7 +1,8 @@
 import { FeedItem } from "@knocklabs/client";
+import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
 import React, { MouseEvent, useCallback } from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
-import { useTranslations, useKnockFeed } from "@knocklabs/react-core";
+
 import { CloseCircle } from "../../../core/components/Icons";
 
 export interface ArchiveButtonProps {
@@ -19,6 +20,8 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
 
       feedClient.markAsArchived(item);
     },
+    // TODO: Check if we can remove this disable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [item],
   );
 

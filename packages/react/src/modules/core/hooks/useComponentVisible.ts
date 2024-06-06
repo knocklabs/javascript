@@ -12,7 +12,7 @@ type Options = {
 export default function useComponentVisible(
   isVisible: boolean,
   onClose: (event: Event) => void,
-  options: Options
+  options: Options,
 ) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,7 +27,6 @@ export default function useComponentVisible(
       options.closeOnClickOutside &&
       !contains(ref.current, event.target as HTMLElement)
     ) {
-      event.stopPropagation();
       onClose(event);
     }
   };
@@ -42,6 +41,8 @@ export default function useComponentVisible(
       document.removeEventListener("keydown", handleKeydown, true);
       document.removeEventListener("click", handleClickOutside, true);
     };
+    // TODO: Check if we can remove this disable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);
 
   return { ref };

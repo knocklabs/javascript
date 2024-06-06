@@ -75,7 +75,7 @@ class MessageClient {
     return this.handleResponse<BulkOperation>(result);
   }
 
-  private handleResponse<T = any>(response: ApiResponse) {
+  private handleResponse<T = unknown>(response: ApiResponse) {
     if (response.statusCode === "error") {
       if (response.error?.response?.status < 500) {
         return response.error || response.body;
