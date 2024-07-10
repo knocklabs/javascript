@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.11
+
+### Patch Changes
+
+- 395f0ca: fix: check type of zustand default import and fix cjs build
+
 ## 0.10.10
 
 ### Patch Changes
