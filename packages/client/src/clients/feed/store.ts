@@ -1,11 +1,17 @@
 import { GenericData } from "@knocklabs/types";
-import create from "zustand/vanilla";
+import zustand from "zustand/vanilla";
 
 import { NetworkStatus } from "../../networkStatus";
 
 import { FeedItem } from "./interfaces";
 import { FeedStoreState } from "./types";
 import { deduplicateItems, sortItems } from "./utils";
+
+// Get the correct Zustand function. Caused by some issues in v3 exports
+// https://github.com/pmndrs/zustand/issues/334
+const create: typeof zustand =
+  // @ts-expect-error workaround for issue above
+  typeof zustand === "function" ? zustand : zustand.default;
 
 function processItems(items: FeedItem[]) {
   const deduped = deduplicateItems(items);
