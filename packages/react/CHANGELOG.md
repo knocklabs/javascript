@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.25
+
+### Patch Changes
+
+- c97661a: fix: wrap long, unbroken text in notification cell
+
 ## 0.2.24
 
 ### Patch Changes
