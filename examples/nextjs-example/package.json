@@ -1,12 +1,14 @@
 {
   "name": "nextjs-example",
-  "version": "1.0.30",
+  "version": "1.0.33",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier \"**/*.{js,ts,tsx}\" --write",
+    "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
@@ -33,7 +35,7 @@
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@types/uuid": "^9.0.7",
-    "eslint": "^8.53.0",
-    "typescript": "^5.2.2"
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
   }
 }

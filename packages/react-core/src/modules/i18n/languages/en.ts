@@ -17,15 +17,18 @@ const en: I18nContent = {
     slackDisconnecting: "Disconnecting...",
     slackConnect: "Connect to Slack",
     slackConnected: "Connected",
-    slackConnectContainerDescription: "Connect to get notifications in your Slack workspace.",
+    slackConnectContainerDescription:
+      "Connect to get notifications in your Slack workspace.",
     slackSearchbarDisconnected: "Slack is not connected.",
-    slackSearchbarMultipleChannels:  "Multiple channels connected",
+    slackSearchbarMultipleChannels: "Multiple channels connected",
     slackSearchbarNoChannelsConnected: "Search channels",
     slackSearchbarNoChannelsFound: "No slack channels.",
     slackSearchbarChannelsError: "Error fetching channels.",
     slackSearchChannels: "Search channels",
-    slackConnectionErrorExists: "Try reconnecting to Slack to find and select channels from your workspace.",
-    slackConnectionErrorOccurred: "There was an error connecting to Slack. Try reconnecting to find and select channels from your workspace.",
+    slackConnectionErrorExists:
+      "Try reconnecting to Slack to find and select channels from your workspace.",
+    slackConnectionErrorOccurred:
+      "There was an error connecting to Slack. Try reconnecting to find and select channels from your workspace.",
     slackChannelAlreadyConnected: "Error: already connected",
     slackError: "Error",
     slackDisconnect: "Disconnect",

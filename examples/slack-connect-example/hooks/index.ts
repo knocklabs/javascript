@@ -1,1 +1,1 @@
-export {default as useSetToken} from "./useSetToken"
+export { default as useSetToken } from "./useSetToken";

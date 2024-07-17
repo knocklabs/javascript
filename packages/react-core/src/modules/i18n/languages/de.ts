@@ -18,15 +18,18 @@ const de: I18nContent = {
     slackDisconnecting: "Trennen der Verbindung...",
     slackConnect: "Mit Slack verbinden",
     slackConnected: "Verbunden",
-    slackConnectContainerDescription: "Verbinden, um Benachrichtigungen in Ihrem Slack-Arbeitsbereich zu erhalten.",
+    slackConnectContainerDescription:
+      "Verbinden, um Benachrichtigungen in Ihrem Slack-Arbeitsbereich zu erhalten.",
     slackSearchbarDisconnected: "Slack ist nicht verbunden.",
-    slackSearchbarMultipleChannels:  "Mehrere Kanäle verbunden",
+    slackSearchbarMultipleChannels: "Mehrere Kanäle verbunden",
     slackSearchbarNoChannelsConnected: "Suchkanäle",
     slackSearchbarNoChannelsFound: "Keine schlaffen Kanäle.",
     slackSearchbarChannelsError: "Fehler beim Abrufen von Kanälen.",
     slackSearchChannels: "Suchkanäle",
-    slackConnectionErrorExists: "Versuchen Sie, sich erneut mit Slack zu verbinden, um Kanäle in Ihrem Arbeitsbereich zu finden und auszuwählen.",
-    slackConnectionErrorOccurred: "Es ist ein Fehler beim Verbinden mit Slack aufgetreten. Versuchen Sie, sich erneut zu verbinden, um Kanäle in Ihrem Arbeitsbereich zu finden und auszuwählen.",
+    slackConnectionErrorExists:
+      "Versuchen Sie, sich erneut mit Slack zu verbinden, um Kanäle in Ihrem Arbeitsbereich zu finden und auszuwählen.",
+    slackConnectionErrorOccurred:
+      "Es ist ein Fehler beim Verbinden mit Slack aufgetreten. Versuchen Sie, sich erneut zu verbinden, um Kanäle in Ihrem Arbeitsbereich zu finden und auszuwählen.",
     slackChannelAlreadyConnected: "Fehler: bereits verbunden",
     slackError: "Fehler",
     slackDisconnect: "Trennen Sie die Verbindung.",

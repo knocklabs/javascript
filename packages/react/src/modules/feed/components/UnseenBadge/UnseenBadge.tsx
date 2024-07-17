@@ -1,8 +1,8 @@
+import { FeedMetadata } from "@knocklabs/client";
+import { formatBadgeCount, useKnockFeed } from "@knocklabs/react-core";
 import React from "react";
-import { useKnockFeed, formatBadgeCount } from "@knocklabs/react-core";
 
 import "./styles.css";
-import { FeedMetadata } from "@knocklabs/client";
 
 export type BadgeCountType = "unseen" | "unread" | "all";
 

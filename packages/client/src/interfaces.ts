@@ -1,4 +1,5 @@
 import { GenericData } from "@knocklabs/types";
+import { JwtPayload } from "jwt-decode";
 
 export type LogLevel = "debug";
 
@@ -38,14 +39,14 @@ export interface Activity<T = GenericData> {
   data: T | null;
 }
 
-export interface ChannelData<T = any> {
+export interface ChannelData<T = GenericData> {
   channel_id: string;
   data: T;
 }
 
 export type UserTokenExpiringCallback = (
   currentToken: string,
-  decodedToken: any,
+  decodedToken: JwtPayload,
 ) => Promise<string | void>;
 
 export interface AuthenticateOptions {

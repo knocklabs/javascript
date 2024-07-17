@@ -1,12 +1,13 @@
 import {
   MockInstance,
+  afterEach,
+  beforeEach,
   describe,
   expect,
   test,
   vi,
-  beforeEach,
-  afterEach,
 } from "vitest";
+
 import Knock from "../src/knock";
 
 describe("it can create a feed client", () => {

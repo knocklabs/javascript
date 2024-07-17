@@ -6,8 +6,8 @@ import {
   useKnockFeed,
   useTranslations,
 } from "@knocklabs/react-core";
+import { GenericData } from "@knocklabs/types";
 import React, {
-  ReactElement,
   ReactNode,
   useCallback,
   useEffect,
@@ -26,7 +26,7 @@ import {
 } from "./NotificationFeedHeader";
 import "./styles.css";
 
-export type RenderItemProps<T = any> = {
+export type RenderItemProps<T = GenericData> = {
   item: FeedItem<T>;
   onItemClick?: NotificationCellProps["onItemClick"];
   onButtonClick?: NotificationCellProps["onButtonClick"];
@@ -39,7 +39,7 @@ export interface NotificationFeedProps {
   /**
    * @deprecated Use `renderHeader` instead to accept `NotificationFeedHeaderProps`
    */
-  header?: ReactElement<any>;
+  header?: ReactNode;
   renderItem?: RenderItem;
   renderHeader?: (props: NotificationFeedHeaderProps) => ReactNode;
   onNotificationClick?: NotificationCellProps["onItemClick"];

@@ -2,8 +2,7 @@ import {
   NotificationFeedPopover,
   NotificationIconButton,
 } from "@knocklabs/react";
-
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 
 const NotificationFeed = () => {
   const [isVisible, setIsVisible] = useState(false);

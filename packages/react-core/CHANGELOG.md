@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.22
+
+### Patch Changes
+
+- Updated dependencies [395f0ca]
+  - @knocklabs/client@0.10.11
+
+## 0.2.21
+
+### Patch Changes
+
+- a4d520c: chore: update generic types
+- Updated dependencies [a4d520c]
+  - @knocklabs/client@0.10.10
+
 ## 0.2.20
 
 ### Patch Changes

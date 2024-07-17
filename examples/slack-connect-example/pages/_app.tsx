@@ -1,7 +1,6 @@
+import "@knocklabs/react/dist/index.css";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
-
-import "@knocklabs/react/dist/index.css";
 
 import "../components/toggleSwitchStyles.css";
 

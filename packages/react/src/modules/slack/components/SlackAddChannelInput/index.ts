@@ -1,1 +1,1 @@
-export * from "./SlackAddChannelInput"
+export * from "./SlackAddChannelInput";

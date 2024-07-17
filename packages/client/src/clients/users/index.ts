@@ -1,3 +1,5 @@
+import { GenericData } from "@knocklabs/types";
+
 import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
@@ -28,7 +30,7 @@ class UserClient {
     return this.handleResponse<User>(result);
   }
 
-  async identify(props: Record<string, any> = {}) {
+  async identify(props: GenericData = {}) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/users/${this.instance.userId}`,
@@ -76,7 +78,7 @@ class UserClient {
     return this.handleResponse<PreferenceSet>(result);
   }
 
-  async getChannelData<T = any>(params: GetChannelDataInput) {
+  async getChannelData<T = GenericData>(params: GetChannelDataInput) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.instance.userId}/channel_data/${params.channelId}`,
@@ -85,7 +87,7 @@ class UserClient {
     return this.handleResponse<ChannelData<T>>(result);
   }
 
-  async setChannelData<T = any>({
+  async setChannelData<T = GenericData>({
     channelId,
     channelData,
   }: SetChannelDataInput) {

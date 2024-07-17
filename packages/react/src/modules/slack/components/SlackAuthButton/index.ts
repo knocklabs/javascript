@@ -1,1 +1,1 @@
-export * from "./SlackAuthButton"
+export * from "./SlackAuthButton";
