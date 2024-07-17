@@ -1,5 +1,5 @@
-import { RefObject, useCallback, useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
+import { RefObject, useCallback, useEffect, useMemo } from "react";
 
 type OnBottomScrollOptions = {
   ref: RefObject<HTMLDivElement | undefined>;
@@ -28,18 +28,24 @@ function useOnBottomScroll(options: OnBottomScrollOptions) {
         debouncedCallback();
       }
     }
+    // TODO: Check if we can remove this disable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedCallback]);
 
   useEffect(() => {
+    let element: HTMLElement | undefined;
     if (ref.current) {
+      element = ref.current;
       ref.current.addEventListener("scroll", handleOnScroll);
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.removeEventListener("scroll", handleOnScroll);
+      if (element) {
+        element.removeEventListener("scroll", handleOnScroll);
       }
     };
+    // TODO: Check if we can remove this disable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleOnScroll]);
 }
 

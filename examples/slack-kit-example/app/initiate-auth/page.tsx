@@ -24,10 +24,12 @@ export default async function Page() {
       </p>
       <p className="mb-4">
         You can use the optional{" "}
-        <code className="text-[#E95744]">onAuthenticationComplete</code> callback{" "}
-        to pass a custom function to the <code className="text-[#E95744]">SlackAuthButton</code> {" "}
-        that will run when it finishes a successful or failed authentication. In this code, we've passed
-        a custom function that will console.log the authentication result.
+        <code className="text-[#E95744]">onAuthenticationComplete</code>{" "}
+        callback to pass a custom function to the{" "}
+        <code className="text-[#E95744]">SlackAuthButton</code> that will run
+        when it finishes a successful or failed authentication. In this code,
+        we've passed a custom function that will console.log the authentication
+        result.
       </p>
       <AuthWrapper></AuthWrapper>
       <Link

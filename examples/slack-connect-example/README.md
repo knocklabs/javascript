@@ -22,24 +22,27 @@ You'll also see how to create a user token with the proper access grants in `/se
 Note: you don't have to pre-create the tenant or connections object in Knock for this to work.
 
 ### Knock keys
+
 NEXT_PUBLIC_KNOCK_API_URL=https://api.knock.app - should stay the same
 NEXT_PUBLIC_KNOCK_CLIENT_ID: the public key under "Developers" > "API keys"
 KNOCK_API_KEY: the secret key under "Developers" > "API keys"
 KNOCK_SIGNING_KEY: generate a signing key under "Developers" > "API keys"
 
 # Knock entities
+
 NEXT_PUBLIC_TENANT: the ID of the tenant you want to use for holding the Slack access token
 NEXT_PUBLIC_SLACK_CHANNELS_RECIPIENT_COLLECTION: the collection of the object that will store the slack channel connections (i.e. "projects")
 NEXT_PUBLIC_SLACK_CHANNELS_RECIPIENT_OBJECT_ID: the id of the object that will store the slack channel connections (i.e. "projects")
 
 # Slack notification configuration
+
 NEXT_PUBLIC_SLACK_CLIENT_ID: in your Slack app under "basic info"
 NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID: in the Knock dashboard on the Slack channel
-
 
 ## Running this application
 
 1. Run the development server:
+
 ```bash
 yarn dev
 ```
@@ -52,14 +55,15 @@ yarn dev
 7. Trigger your workflow you set up with this Slack channel step with the connections object as the recipient and the tenant you set up. You should see the channel(s) you selected populate with a slack message.
 
 Example payload:
+
 ```json
 {
-	"recipients": [
-		{
-			"id": "connections-object",
-			"collection": "projects"
-		}
-	],
-	"tenant": "testing-tenant"
+  "recipients": [
+    {
+      "id": "connections-object",
+      "collection": "projects"
+    }
+  ],
+  "tenant": "testing-tenant"
 }
 ```

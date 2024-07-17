@@ -1,4 +1,5 @@
-import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
 import { formatBadgeCount, formatTimestamp } from "../../src";
 
 describe("formatBadgeCount", () => {

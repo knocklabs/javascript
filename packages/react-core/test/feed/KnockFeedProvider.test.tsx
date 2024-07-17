@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import React from "react";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { KnockFeedProvider, KnockProvider, useKnockFeed } from "../../src";
 

@@ -2,14 +2,18 @@
   "name": "@knocklabs/types",
   "description": "Type definitions for Knock libraries",
   "author": "@knocklabs",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "license": "MIT",
   "types": "./src/index.d.ts",
   "scripts": {
-    "lint": "eslint src/"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type:check": "tsc --noEmit",
+    "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
+    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check"
   },
   "devDependencies": {
-    "typescript": "^5.2.2"
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
   },
   "publishConfig": {
     "access": "public"

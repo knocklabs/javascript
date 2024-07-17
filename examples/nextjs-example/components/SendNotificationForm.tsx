@@ -6,13 +6,13 @@ import {
   Select,
   Textarea,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 import { notify } from "../lib/api";
 
 interface Props {
   userId: string;
-  tenant: any;
+  tenant: string;
 }
 
 enum TemplateType {
@@ -27,13 +27,13 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
   const [templateType, setTemplateType] = useState(TemplateType.Standard);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     await notify({ message, showToast, userId, tenant, templateType });
     setIsLoading(false);
 
-    e.target.reset();
+    (e.target as HTMLFormElement).reset();
   };
 
   return (
