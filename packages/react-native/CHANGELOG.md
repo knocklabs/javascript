@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.8
+
+### Patch Changes
+
+- 10e7199: Updating expo dependencies
+
 ## 0.2.7
 
 ### Patch Changes

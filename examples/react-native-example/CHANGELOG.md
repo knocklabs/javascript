@@ -1,5 +1,13 @@
 # @knocklabs/react-native-example
 
+## 1.1.8
+
+### Patch Changes
+
+- 10e7199: Updating expo dependencies
+- Updated dependencies [10e7199]
+  - @knocklabs/react-native@0.2.8
+
 ## 1.1.7
 
 ### Patch Changes
