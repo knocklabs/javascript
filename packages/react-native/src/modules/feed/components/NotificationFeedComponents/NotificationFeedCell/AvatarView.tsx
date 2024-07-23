@@ -8,12 +8,12 @@ import {
   ViewStyle,
 } from "react-native";
 
-import theme from "../../../../theme";
+import { useTheme } from "../../../../../theme/useTheme";
 
 export interface AvatarViewProps {
   name?: string | null;
   src?: string | null;
-  style?: AvatarViewStyle;
+  styleOverride?: AvatarViewStyle;
 }
 
 export interface AvatarViewStyle {
@@ -22,38 +22,42 @@ export interface AvatarViewStyle {
   text?: TextStyle;
 }
 
-const defaultStyle: AvatarViewStyle = {
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 32,
-    height: 32,
-    backgroundColor: theme.colors.gray5,
-    borderRadius: 32 / 2,
-  },
-  image: {
-    resizeMode: "cover",
-    width: 32,
-    height: 32,
-    borderRadius: 32 / 2,
-  },
-  text: {
-    fontWeight: "500",
-    color: theme.colors.gray11,
-    fontSize: theme.fontSizes.knock3,
-    fontFamily: theme.fontFamily.sanserif,
-  },
-};
-
 export const AvatarView: React.FC<AvatarViewProps> = ({
   name,
   src,
-  style = {},
+  styleOverride = {},
 }) => {
+  const { colors, fontSizes, fontFamily } = useTheme();
+
+  const defaultStyle: AvatarViewStyle = {
+    container: {
+      justifyContent: "center",
+      alignItems: "center",
+      width: 32,
+      height: 32,
+      backgroundColor: colors.gray5,
+      borderRadius: 32 / 2,
+    },
+    image: {
+      resizeMode: "cover",
+      width: 32,
+      height: 32,
+      borderRadius: 32 / 2,
+    },
+    text: {
+      fontWeight: "500",
+      color: colors.gray11,
+      fontSize: fontSizes.knock3,
+      fontFamily: fontFamily.sanserif,
+    },
+  };
+
   const renderInitialsView = () => {
     const initials = generateInitials();
     if (initials) {
-      return <Text style={[defaultStyle.text, style.text]}>{initials}</Text>;
+      return (
+        <Text style={[defaultStyle.text, styleOverride.text]}>{initials}</Text>
+      );
     } else {
       return null;
     }
@@ -69,11 +73,11 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
   };
 
   return (
-    <View style={[defaultStyle.container, style.container]}>
+    <View style={[defaultStyle.container, styleOverride.container]}>
       {src ? (
         <Image
           source={{ uri: src }}
-          style={[defaultStyle.image, style.image]}
+          style={[defaultStyle.image, styleOverride.image]}
           onError={() => renderInitialsView()}
         />
       ) : name ? (
