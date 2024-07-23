@@ -1,4 +1,18 @@
-const theme = {
+type FontWeight =
+  | "normal"
+  | "bold"
+  | "100"
+  | "200"
+  | "300"
+  | "400"
+  | "500"
+  | "600"
+  | "700"
+  | "800"
+  | "900"
+  | undefined;
+
+const lightTheme = {
   // Font sizes
   fontSizes: {
     knock0: 11,
@@ -12,7 +26,6 @@ const theme = {
     knock8: 36,
     knock9: 48,
   },
-
   // Spacing
   spacing: {
     0: 0,
@@ -27,10 +40,10 @@ const theme = {
   },
   // Font weights
   fontWeights: {
-    normal: "400",
-    medium: "500",
-    semibold: "600",
-    bold: "700",
+    normal: "normal" as FontWeight,
+    medium: "500" as FontWeight,
+    semibold: "600" as FontWeight,
+    bold: "bold" as FontWeight,
   },
   // Font family
   fontFamily: {
@@ -77,4 +90,24 @@ const theme = {
   },
 };
 
-export default theme;
+const darkTheme = {
+  ...lightTheme,
+  colors: {
+    gray3: "#212225",
+    gray4: "#272a2d",
+    gray5: "#2e3135",
+    gray6: "#363a3f",
+    gray9: "#696e77",
+    gray11: "#b0b4ba",
+    gray12: "#edeef0",
+    accent3: "#391714",
+    accent9: "#e54d2e",
+    accent11: "#ff977d",
+    surface1: "#18191b",
+    blue9: "#3e63dd",
+    green9: "#29a383",
+    white: "#ffffff",
+  },
+};
+
+export { lightTheme, darkTheme };

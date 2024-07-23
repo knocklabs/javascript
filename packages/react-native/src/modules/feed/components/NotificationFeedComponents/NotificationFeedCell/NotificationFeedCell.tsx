@@ -5,22 +5,49 @@ import {
   Recipient,
   User,
 } from "@knocklabs/client";
+import { ActionButton as ActionButtonModel } from "@knocklabs/client";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ImageStyle,
+  StyleSheet,
+  Text,
+  TextProps,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 import HTMLView from "react-native-htmlview";
 
-import { ActionButton, ActionButtonType } from "../ActionButton";
-
-import AvatarView from "./AvatarView";
+import { useTheme } from "../../../../../theme/useTheme";
 import {
-  NotificationFeedCellStyle,
-  defaultStyle,
-} from "./NotificationFeedCellStyle";
+  ActionButton,
+  ActionButtonStyle,
+  ActionButtonType,
+} from "../../ActionButton";
+import DividerView from "../../Divider";
+
+import AvatarView, { AvatarViewStyle } from "./AvatarView";
+
+export interface NotificationFeedCellStyle {
+  unreadNotificationCircleColor: string;
+  showAvatarView: boolean;
+  avatarViewStyle: AvatarViewStyle;
+  primaryActionButtonStyle: ActionButtonStyle;
+  secondaryActionButtonStyle: ActionButtonStyle;
+  tertiaryActionButtonStyle: ActionButtonStyle;
+  sentAtDateFormatter: Intl.DateTimeFormat;
+  sentAtDateTextStyle: TextStyle;
+  htmlStyles?: { [key: string]: TextStyle | ViewStyle | ImageStyle };
+}
 
 export interface NotificationFeedCellProps {
   item: FeedItem;
   styleOverride?: NotificationFeedCellStyle;
-  buttonTapAction: (action: string) => void;
+  onCellActionButtonTap?: (params: {
+    button: ActionButtonModel;
+    item: FeedItem;
+  }) => void;
   onRowTap?: (item: FeedItem) => void;
 }
 
@@ -31,14 +58,15 @@ function isUser(recipient: Recipient): recipient is User {
 export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = ({
   item,
   styleOverride = {},
-  buttonTapAction,
+  onCellActionButtonTap = () => {},
   onRowTap = () => {},
 }) => {
   const isRead = item.read_at !== null;
   const actor = item.actors[0];
+  const theme = useTheme();
 
   const renderMarkdownContent = (block: MarkdownContentBlock) => (
-    <HTMLView value={block.rendered} />
+    <HTMLView value={block.rendered} stylesheet={defaultStyle.htmlStyles} />
   );
 
   const renderActionButtonsContent = (block: ButtonSetContentBlock) => (
@@ -52,11 +80,43 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = ({
               ? ActionButtonType.PRIMARY
               : ActionButtonType.SECONDARY
           }
-          action={() => buttonTapAction(button.action)}
+          action={() => onCellActionButtonTap({ button, item })}
         />
       ))}
     </View>
   );
+
+  const defaultStyle: NotificationFeedCellStyle = {
+    unreadNotificationCircleColor: theme.colors.blue9,
+    showAvatarView: true,
+    avatarViewStyle: {},
+    primaryActionButtonStyle: {},
+    secondaryActionButtonStyle: {},
+    tertiaryActionButtonStyle: {},
+    sentAtDateFormatter: new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+    sentAtDateTextStyle: {
+      fontSize: theme.fontSizes.knock2,
+      color: theme.colors.gray9,
+      fontWeight: theme.fontWeights.medium,
+    },
+    htmlStyles: {
+      p: {
+        fontSize: theme.fontSizes.knock2,
+      },
+      blockquote: {
+        color: theme.colors.gray11,
+        paddingLeft: 8,
+        borderLeftWidth: 4,
+        borderLeftColor: theme.colors.gray9,
+        // borderBlockEndColor: theme.colors.gray9,
+        marginTop: -16,
+      },
+    },
+  };
 
   return (
     <TouchableOpacity onPress={() => onRowTap(item)}>
@@ -103,7 +163,7 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = ({
             )}
           </View>
         </View>
-        <View style={layoutStyles.divider} />
+        <DividerView />
       </View>
     </TouchableOpacity>
   );
@@ -142,10 +202,5 @@ const layoutStyles = StyleSheet.create({
   },
   dateText: {
     marginTop: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#d9d9d9",
-    marginTop: 12,
   },
 });

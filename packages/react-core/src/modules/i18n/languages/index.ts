@@ -2,6 +2,7 @@ import de from "./de";
 import en from "./en";
 
 export interface Translations {
+  readonly archiveRead: string;
   readonly emptyFeedTitle: string;
   readonly emptyFeedBody: string;
   readonly notifications: string;
