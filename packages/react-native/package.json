@@ -66,7 +66,7 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "react-native-gesture-handler": "^2.1.0",
-    "react-native-htmlview": "^0.16.0"
+    "react-native-render-html": "^6.3.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

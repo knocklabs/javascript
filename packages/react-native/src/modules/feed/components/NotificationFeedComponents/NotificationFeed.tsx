@@ -1,12 +1,16 @@
 import { FeedItem } from "@knocklabs/client";
-import { ActionButton as ActionButtonModel } from "@knocklabs/client";
+import {
+  ActionButton as ActionButtonModel,
+  NetworkStatus,
+  isRequestInFlight,
+} from "@knocklabs/client";
 import {
   FilterStatus,
   useFeedSettings,
   useKnockFeed,
   useTranslations,
 } from "@knocklabs/react-core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import React from "react";
 import {
   ActivityIndicator,
@@ -40,7 +44,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
 }) => {
   const { feedClient, useFeedStore } = useKnockFeed();
   const { settings } = useFeedSettings(feedClient);
-  const { loading, items, pageInfo } = useFeedStore();
+  const { pageInfo, items, networkStatus } = useFeedStore();
   const [status, setStatus] = useState(initialFilterStatus);
   const { colors, fontSizes } = useTheme();
   const { t } = useTranslations();
@@ -51,12 +55,19 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
 
   useEffect(() => {
     feedClient.fetch({ status });
-    const teardown = feedClient.listenForUpdates?.();
   }, [feedClient, status]);
 
   const onActionButtonTap = (action: TopHeaderAction) => {
     console.log(action);
   };
+
+  const requestInFlight = isRequestInFlight(networkStatus);
+
+  const onEndReached = useCallback(() => {
+    if (!requestInFlight && pageInfo.after) {
+      feedClient.fetchNextPage();
+    }
+  }, [requestInFlight, pageInfo, feedClient]);
 
   const renderNotificationCell = ({ item }: { item: FeedItem }) => (
     <NotificationFeedCell
@@ -68,7 +79,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
 
   const renderFooter = () => (
     <View style={styles.footer}>
-      <ActivityIndicator size="large" color="#0000ff" />
+      <ActivityIndicator />
     </View>
   );
 
@@ -85,11 +96,24 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         data={items}
         renderItem={renderNotificationCell}
         keyExtractor={(item: FeedItem) => item.id}
-        ListEmptyComponent={<Text>No notifications found</Text>}
-        ListFooterComponent={renderFooter}
-        refreshControl={<RefreshControl refreshing={loading} />}
+        ListEmptyComponent={
+          !requestInFlight ? <Text>No notifications found</Text> : null
+        }
+        ListFooterComponent={
+          networkStatus == NetworkStatus.fetchMore ? renderFooter : null
+        }
+        refreshControl={
+          <RefreshControl
+            onRefresh={() => {
+              feedClient.fetch({ status });
+            }}
+            refreshing={networkStatus === NetworkStatus.loading}
+          />
+        }
         contentContainerStyle={styles.list}
         style={styles.listContainer}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
       />
       {settings?.features.branding_required && (
         <View style={styles.branding}>
@@ -121,7 +145,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   footer: {
-    paddingVertical: 20,
+    paddingTop: 20,
     alignItems: "center",
     justifyContent: "center",
   },

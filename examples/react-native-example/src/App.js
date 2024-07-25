@@ -2,11 +2,10 @@ import {
   KnockExpoPushNotificationProvider,
   KnockFeedProvider,
   KnockProvider,
+  NotificationFeed,
 } from "@knocklabs/react-native";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-
-import NotificationFeed from "./components/NotificationFeed";
 
 export default function App() {
   return (
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 64,
-    paddingHorizontal: 8,
+    paddingTop: 64,
+    paddingHorizontal: 0,
   },
 });
