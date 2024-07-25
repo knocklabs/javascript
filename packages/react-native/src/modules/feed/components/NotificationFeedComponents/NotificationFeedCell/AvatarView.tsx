@@ -27,7 +27,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
   src,
   styleOverride = {},
 }) => {
-  const { colors, fontSizes, fontFamily } = useTheme();
+  const theme = useTheme();
 
   const defaultStyle: AvatarViewStyle = {
     container: {
@@ -35,7 +35,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
       alignItems: "center",
       width: 32,
       height: 32,
-      backgroundColor: colors.gray5,
+      backgroundColor: theme.colors.gray5,
       borderRadius: 32 / 2,
     },
     image: {
@@ -45,10 +45,10 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
       borderRadius: 32 / 2,
     },
     text: {
-      fontWeight: "500",
-      color: colors.gray11,
-      fontSize: fontSizes.knock3,
-      fontFamily: fontFamily.sanserif,
+      fontWeight: theme.fontWeights.medium,
+      color: theme.colors.gray11,
+      fontSize: theme.fontSizes.knock3,
+      fontFamily: theme.fontFamily.sanserif,
     },
   };
 

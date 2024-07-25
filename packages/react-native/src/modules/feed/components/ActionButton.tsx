@@ -1,5 +1,6 @@
 // ActionButton.tsx
 import React from "react";
+import { useMemo } from "react";
 import {
   StyleSheet,
   Text,
@@ -37,70 +38,76 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 }) => {
   const theme = useTheme();
 
-  const defaultStyles: {
-    [key in ActionButtonType]: ActionButtonStyle;
-  } = {
-    [ActionButtonType.PRIMARY]: {
-      button: {
-        backgroundColor: theme.colors.accent9,
-        borderWidth: 0,
-        borderColor: "transparent",
+  const defaultStyles = useMemo(
+    () => ({
+      baseButton: {
         borderRadius: 4,
+        borderWidth: 1,
+        borderColor: theme.colors.gray6,
+        backgroundColor: "transparent",
       },
-      text: {
+      baseText: {
         fontFamily: theme.fontFamily.sanserif,
         fontSize: theme.fontSizes.knock2,
         fontWeight: theme.fontWeights.medium,
-        color: theme.colors.white,
-      },
-      fillAvailableSpace: false,
-    },
-    [ActionButtonType.SECONDARY]: {
-      button: {
-        backgroundColor: "transparent",
-        borderWidth: 1,
-        borderColor: theme.colors.gray6,
-        borderRadius: 4,
-      },
-      text: {
-        fontSize: theme.fontSizes.knock2,
-        fontWeight: "500",
         color: theme.colors.gray12,
       },
-      fillAvailableSpace: false,
-    },
-    [ActionButtonType.TERTIARY]: {
-      button: {
-        backgroundColor: "transparent",
-        borderWidth: 1,
-        borderColor: theme.colors.gray6,
-        borderRadius: 4,
-        flex: 1,
+      [ActionButtonType.PRIMARY]: {
+        button: {
+          backgroundColor: theme.colors.accent9,
+          borderWidth: 0,
+        },
+        text: {
+          color: theme.colors.white,
+        },
+        fillAvailableSpace: false,
       },
-      text: {
-        fontSize: theme.fontSizes.knock2,
-        fontWeight: "500",
-        color: theme.colors.gray12,
+      [ActionButtonType.SECONDARY]: {
+        button: {},
+        text: {},
+        fillAvailableSpace: false,
       },
-      fillAvailableSpace: true,
-    },
-  };
+      [ActionButtonType.TERTIARY]: {
+        button: {
+          flex: 1,
+        },
+        text: {},
+        fillAvailableSpace: true,
+      },
+    }),
+    [theme],
+  );
+
   const buttonTypeStyle = defaultStyles[type];
+
+  const resolvedStyle = useMemo(
+    () => ({
+      button: {
+        ...defaultStyles.baseButton,
+        ...buttonTypeStyle.button,
+        ...styleOverride.button,
+      },
+      text: {
+        ...defaultStyles.baseText,
+        ...buttonTypeStyle.text,
+        ...styleOverride.text,
+      },
+      fillAvailableSpace:
+        styleOverride.fillAvailableSpace ?? buttonTypeStyle.fillAvailableSpace,
+    }),
+    [buttonTypeStyle, styleOverride, defaultStyles],
+  );
 
   return (
     <TouchableOpacity
       onPress={action}
       style={[
         layoutStyles.button,
-        buttonTypeStyle.button,
-        styleOverride.button,
+        resolvedStyle.button,
+        resolvedStyle.fillAvailableSpace ? { flex: 1 } : {},
       ]}
     >
-      <Text
-        style={[layoutStyles.text, buttonTypeStyle.text, styleOverride.text]}
-      >
-        {title}
-      </Text>
+      <Text style={[layoutStyles.text, resolvedStyle.text]}>{title}</Text>
     </TouchableOpacity>
   );
 };

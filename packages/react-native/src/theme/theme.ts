@@ -50,27 +50,7 @@ const lightTheme = {
     sanserif:
       'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif',
   },
-  // Border radius
-  borderRadius: {
-    sm: 2,
-    md: 4,
-    lg: 8,
-  },
-  // Shadows
-  shadows: {
-    sm: {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 5 },
-      shadowOpacity: 0.12,
-      shadowRadius: 10,
-    },
-    md: {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.24,
-      shadowRadius: 30,
-    },
-  },
+
   // Colors
   colors: {
     gray3: "#f0f0f3",
