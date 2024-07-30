@@ -154,7 +154,7 @@ export const KnockExpoPushNotificationProvider: React.FC<
     } catch (error) {
       console.error(`[Knock] Error registering for push notifications:`, error);
     }
-  }, []);
+  }, [knockClient]);
 
   const updateKnockMessageStatusFromNotification = useCallback(
     async (
