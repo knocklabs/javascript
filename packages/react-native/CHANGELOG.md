@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.9
+
+### Patch Changes
+
+- b11aed5: Fixed an issue in KnockExpoPushNotificationProvider that prevented auto device token registration from working
+
 ## 0.2.8
 
 ### Patch Changes
