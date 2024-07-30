@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "@matgar26/expo-test",
-    "slug": "@matgar26/expo-test",
+    "name": "@knocklabs/react-native-example",
+    "slug": "@knocklabs/react-native-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,7 +26,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "78fdf908-5839-405f-95cb-0221fe359dd7"
+        "projectId": "YOUR_EAS_PROJECT_ID"
       }
     }
   }
