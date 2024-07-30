@@ -13,6 +13,7 @@ export default function App() {
       apiKey={process.env.EXPO_PUBLIC_KNOCK_PUBLIC_API_KEY}
       host={process.env.EXPO_PUBLIC_KNOCK_HOST}
       userId={process.env.EXPO_PUBLIC_KNOCK_USER_ID}
+      logLevel="debug"
     >
       <KnockExpoPushNotificationProvider
         knockExpoChannelId={process.env.EXPO_PUBLIC_KNOCK_PUSH_CHANNEL_ID}

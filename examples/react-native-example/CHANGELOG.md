@@ -1,5 +1,21 @@
 # @knocklabs/react-native-example
 
+## 1.1.9
+
+### Patch Changes
+
+- b11aed5: Fixed an issue in KnockExpoPushNotificationProvider that prevented auto device token registration from working
+- Updated dependencies [b11aed5]
+  - @knocklabs/react-native@0.2.9
+
+## 1.1.8
+
+### Patch Changes
+
+- 10e7199: Updating expo dependencies
+- Updated dependencies [10e7199]
+  - @knocklabs/react-native@0.2.8
+
 ## 1.1.7
 
 ### Patch Changes
