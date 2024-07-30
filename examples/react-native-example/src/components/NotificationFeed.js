@@ -10,8 +10,7 @@ export default function NotificationFeed() {
   const { loading, items, pageInfo } = useFeedStore((state) => state);
 
   useEffect(() => {
-    const teardown = feedClient.listenForUpdates();
-
+    feedClient.fetch();
     feedClient.on("messages.new", (data) => {
       console.log(data);
     });
@@ -19,8 +18,6 @@ export default function NotificationFeed() {
     feedClient.on("items.received.*", (data) => {
       console.log(data);
     });
-
-    return () => teardown();
   }, [feedClient]);
 
   return (
