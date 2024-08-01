@@ -6,7 +6,7 @@ import {
   User,
 } from "@knocklabs/client";
 import { ActionButton as ActionButtonModel } from "@knocklabs/client";
-import React, { memo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import {
   ImageStyle,
   StyleSheet,
@@ -20,7 +20,6 @@ import {
 import { RenderHTML } from "react-native-render-html";
 
 import { useTheme } from "../../../../../theme/useTheme";
-import deepMerge from "../../../../../utils/deepMerge";
 import {
   ActionButton,
   ActionButtonStyle,
@@ -31,14 +30,14 @@ import DividerView from "../../Divider";
 import AvatarView, { AvatarViewStyle } from "./AvatarView";
 
 export interface NotificationFeedCellStyle {
-  unreadNotificationCircleColor: string;
-  showAvatarView: boolean;
-  avatarViewStyle: AvatarViewStyle;
-  primaryActionButtonStyle: ActionButtonStyle;
-  secondaryActionButtonStyle: ActionButtonStyle;
-  tertiaryActionButtonStyle: ActionButtonStyle;
-  sentAtDateFormatter: Intl.DateTimeFormat;
-  sentAtDateTextStyle: TextStyle;
+  unreadNotificationCircleColor?: string;
+  showAvatarView?: boolean;
+  avatarViewStyle?: AvatarViewStyle;
+  primaryActionButtonStyle?: ActionButtonStyle;
+  secondaryActionButtonStyle?: ActionButtonStyle;
+  tertiaryActionButtonStyle?: ActionButtonStyle;
+  sentAtDateFormatter?: Intl.DateTimeFormat;
+  sentAtDateTextStyle?: TextStyle;
   htmlStyles?: { [key: string]: TextStyle | ViewStyle | ImageStyle };
 }
 
@@ -67,67 +66,80 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
     const actor = item.actors[0];
     const theme = useTheme();
 
-    const defaultStyle: NotificationFeedCellStyle = {
-      unreadNotificationCircleColor: theme.colors.blue9,
-      showAvatarView: true,
-      avatarViewStyle: {},
-      primaryActionButtonStyle: {},
-      secondaryActionButtonStyle: {},
-      tertiaryActionButtonStyle: {},
-      sentAtDateFormatter: new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      sentAtDateTextStyle: {
-        fontSize: theme.fontSizes.knock2,
-        color: theme.colors.gray9,
-        fontWeight: theme.fontWeights.medium,
-      },
-      htmlStyles: {
-        p: {
+    const resolvedStyle = useMemo<NotificationFeedCellStyle>(
+      () => ({
+        unreadNotificationCircleColor:
+          styleOverride?.unreadNotificationCircleColor ?? theme.colors.blue9,
+        showAvatarView: styleOverride?.showAvatarView ?? true,
+        avatarViewStyle: styleOverride?.avatarViewStyle ?? {},
+        primaryActionButtonStyle: styleOverride?.primaryActionButtonStyle ?? {},
+        secondaryActionButtonStyle:
+          styleOverride?.secondaryActionButtonStyle ?? {},
+        tertiaryActionButtonStyle:
+          styleOverride?.tertiaryActionButtonStyle ?? {},
+        sentAtDateFormatter:
+          styleOverride?.sentAtDateFormatter ??
+          new Intl.DateTimeFormat("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        sentAtDateTextStyle: styleOverride?.sentAtDateTextStyle ?? {
           fontSize: theme.fontSizes.knock2,
-          fontFamily: theme.fontFamily.sanserif,
-          margin: 0,
+          color: theme.colors.gray9,
+          fontWeight: theme.fontWeights.medium,
         },
-        blockquote: {
-          color: theme.colors.gray11,
-          borderLeftWidth: 4,
-          borderLeftColor: theme.colors.gray6,
-          paddingLeft: 12,
-          paddingVertical: 4,
-          margin: 0,
-          marginTop: 12,
+        htmlStyles: styleOverride?.htmlStyles ?? {
+          p: {
+            fontSize: theme.fontSizes.knock2,
+            fontFamily: theme.fontFamily.sanserif,
+            margin: 0,
+          },
+          blockquote: {
+            color: theme.colors.gray11,
+            borderLeftWidth: 4,
+            borderLeftColor: theme.colors.gray6,
+            paddingLeft: 12,
+            paddingVertical: 4,
+            margin: 0,
+            marginTop: 12,
+          },
         },
-      },
-    };
-
-    const resolvedStyle = deepMerge(defaultStyle, styleOverride);
-    const { width } = useWindowDimensions();
-
-    const renderMarkdownContent = (block: MarkdownContentBlock) => (
-      <RenderHTML
-        contentWidth={width}
-        source={{ html: block.rendered }}
-        tagsStyles={resolvedStyle.htmlStyles}
-      />
+      }),
+      [theme, styleOverride],
     );
 
-    const renderActionButtonsContent = (block: ButtonSetContentBlock) => (
-      <View style={layoutStyles.buttonContainer}>
-        {block.buttons.map((button, index) => (
-          <ActionButton
-            key={`button-${index}`}
-            title={button.label}
-            type={
-              button.name === "primary"
-                ? ActionButtonType.PRIMARY
-                : ActionButtonType.SECONDARY
-            }
-            action={() => onCellActionButtonTap({ button, item })}
-          />
-        ))}
-      </View>
+    const { width } = useWindowDimensions();
+
+    const renderMarkdownContent = useCallback(
+      (block: MarkdownContentBlock) => (
+        <RenderHTML
+          contentWidth={width}
+          source={{ html: block.rendered }}
+          tagsStyles={resolvedStyle.htmlStyles as any}
+        />
+      ),
+      [width, resolvedStyle.htmlStyles],
+    );
+
+    const renderActionButtonsContent = useCallback(
+      (block: ButtonSetContentBlock) => (
+        <View style={layoutStyles.buttonContainer}>
+          {block.buttons.map((button, index) => (
+            <ActionButton
+              key={`button-${index}`}
+              title={button.label}
+              type={
+                button.name === "primary"
+                  ? ActionButtonType.PRIMARY
+                  : ActionButtonType.SECONDARY
+              }
+              action={() => onCellActionButtonTap({ button, item })}
+            />
+          ))}
+        </View>
+      ),
+      [onCellActionButtonTap, item],
     );
 
     return (
@@ -179,7 +191,7 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
                     resolvedStyle.sentAtDateTextStyle,
                   ]}
                 >
-                  {resolvedStyle.sentAtDateFormatter.format(
+                  {resolvedStyle.sentAtDateFormatter!.format(
                     new Date(item.inserted_at),
                   )}
                 </Text>

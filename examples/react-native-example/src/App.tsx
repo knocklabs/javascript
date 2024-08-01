@@ -2,12 +2,20 @@ import {
   KnockExpoPushNotificationProvider,
   KnockFeedProvider,
   KnockProvider,
-  NotificationFeed,
+  NotificationIconButton,
 } from "@knocklabs/react-native";
 import { StatusBar } from "expo-status-bar";
+import React, { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-export default function App() {
+import NotificationFeedContainer from "./NotificationFeedContainer";
+
+const App: React.FC = () => {
+  const [isNotificationFeedOpen, setIsNotificationFeedOpen] = useState(false);
+  const onTopActionButtonTap = useCallback(() => {
+    setIsNotificationFeedOpen(!isNotificationFeedOpen);
+  }, [isNotificationFeedOpen]);
+
   return (
     <KnockProvider
       apiKey={process.env.EXPO_PUBLIC_KNOCK_PUBLIC_API_KEY}
@@ -23,13 +31,19 @@ export default function App() {
         >
           <View style={styles.container}>
             <StatusBar style="auto" />
-            <NotificationFeed />
+            <NotificationIconButton
+              onClick={onTopActionButtonTap}
+              badgeCountType={"unread"}
+            />
+            {isNotificationFeedOpen && <NotificationFeedContainer />}
           </View>
         </KnockFeedProvider>
       </KnockExpoPushNotificationProvider>
     </KnockProvider>
   );
-}
+};
+
+export default App;
 
 const styles = StyleSheet.create({
   container: {
