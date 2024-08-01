@@ -3,7 +3,7 @@ import {
   Translations,
   useTranslations,
 } from "@knocklabs/react-core";
-import React, { SetStateAction } from "react";
+import React, { SetStateAction, useCallback, useMemo } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -18,15 +18,15 @@ import { ActionButton, ActionButtonType } from "../ActionButton";
 import DividerView from "../Divider";
 
 interface NotificationFeedHeaderProps {
-  topHeaderActions?: TopHeaderAction[] | null;
   filters?: FilterStatus[];
   selectedFilter?: FilterStatus;
+  topHeaderActions?: TopHeaderAction[];
+  styleOverride?: NotificationFeedHeaderStyle;
   setFilterStatus: React.Dispatch<SetStateAction<FilterStatus>>;
-  styleOverride?: NotificationFeedHeaderTheme;
-  onActionButtonTap: (action: TopHeaderAction) => void;
+  onTopActionButtonTap: (action: TopHeaderAction) => void;
 }
 
-interface NotificationFeedHeaderTheme {
+export interface NotificationFeedHeaderStyle {
   textStyle: TextStyle;
   selectedColor: string;
   unselectedColor: string;
@@ -38,79 +38,83 @@ export enum TopHeaderAction {
 }
 
 const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
+  filters = [FilterStatus.All, FilterStatus.Unread, FilterStatus.Unseen],
+  selectedFilter = FilterStatus.All,
   topHeaderActions = [
     TopHeaderAction.MARK_ALL_AS_READ,
     TopHeaderAction.ARCHIVE_READ,
   ],
-  filters = [FilterStatus.All, FilterStatus.Unread, FilterStatus.Unseen],
-  selectedFilter = FilterStatus.All,
+  styleOverride = null,
   setFilterStatus,
-  styleOverride,
-  onActionButtonTap,
+  onTopActionButtonTap,
 }) => {
   const { t } = useTranslations();
   const theme = useTheme();
 
-  const resolvedStyle = styleOverride || {
-    textStyle: {
-      fontFamily: theme.fontFamily.sanserif,
-      fontSize: theme.fontSizes.knock2,
-      fontWeight: theme.fontWeights.medium,
-    },
-    selectedColor: theme.colors.accent11,
-    unselectedColor: theme.colors.gray11,
-  };
+  const resolvedStyle = useMemo(
+    () => ({
+      textStyle: {
+        fontFamily:
+          styleOverride?.textStyle.fontFamily ?? theme.fontFamily.sanserif,
+        fontSize: styleOverride?.textStyle.fontSize ?? theme.fontSizes.knock2,
+        fontWeight:
+          styleOverride?.textStyle.fontWeight ?? theme.fontWeights.medium,
+      },
+      selectedColor: theme.colors.accent11,
+      unselectedColor: theme.colors.gray11,
+    }),
+    [styleOverride, theme],
+  );
 
-  const renderTopActionButtons = ({
-    actions,
-  }: {
-    actions: TopHeaderAction[];
-  }) => {
-    if (actions.length > 1) {
+  const renderTopActionButtons = useCallback(() => {
+    if (topHeaderActions && topHeaderActions.length > 1) {
       return (
         <View style={styles.actionButtons}>
-          {actions.map((action, index) => (
+          {topHeaderActions.map((action, index) => (
             <ActionButton
               key={index}
               title={t(action as keyof Translations) ?? ""}
               type={ActionButtonType.TERTIARY}
-              action={() => onActionButtonTap(action)}
+              action={() => onTopActionButtonTap(action)}
             />
           ))}
         </View>
       );
     }
     return null;
-  };
+  }, [t, onTopActionButtonTap, topHeaderActions]);
 
-  const renderFilter = ({ item }: { item: FilterStatus }) => (
-    <TouchableOpacity
-      onPress={() => setFilterStatus(item)}
-      style={styles.filterButton}
-    >
-      <Text
-        style={[
-          styles.filterText,
-          resolvedStyle.textStyle,
-          {
-            color:
-              item === selectedFilter
-                ? resolvedStyle.selectedColor
-                : resolvedStyle.unselectedColor,
-          },
-        ]}
+  const renderFilter = useCallback(
+    ({ item }: { item: FilterStatus }) => (
+      <TouchableOpacity
+        onPress={() => setFilterStatus(item)}
+        style={styles.filterButton}
       >
-        {t(item)}
-      </Text>
-      {item === selectedFilter && (
-        <View
+        <Text
           style={[
-            styles.selectedIndicator,
-            { backgroundColor: resolvedStyle.selectedColor },
+            styles.filterText,
+            resolvedStyle.textStyle,
+            {
+              color:
+                item === selectedFilter
+                  ? resolvedStyle.selectedColor
+                  : resolvedStyle.unselectedColor,
+            },
           ]}
-        />
-      )}
-    </TouchableOpacity>
+        >
+          {t(item)}
+        </Text>
+        {item === selectedFilter && (
+          <View
+            style={[
+              styles.selectedIndicator,
+              { backgroundColor: resolvedStyle.selectedColor },
+            ]}
+          />
+        )}
+      </TouchableOpacity>
+    ),
+    [resolvedStyle, selectedFilter, setFilterStatus, t],
   );
 
   return (
@@ -127,7 +131,7 @@ const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
       )}
       {filters.length > 1 && <DividerView />}
 
-      {renderTopActionButtons({ actions: topHeaderActions ?? [] })}
+      {renderTopActionButtons()}
       <DividerView />
     </View>
   );

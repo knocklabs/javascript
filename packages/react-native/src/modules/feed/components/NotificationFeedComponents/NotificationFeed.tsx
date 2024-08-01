@@ -1,6 +1,6 @@
 import { FeedItem } from "@knocklabs/client";
 import {
-  ActionButton as ActionButtonModel,
+  ActionButton,
   NetworkStatus,
   isRequestInFlight,
 } from "@knocklabs/client";
@@ -8,30 +8,39 @@ import {
   FilterStatus,
   useFeedSettings,
   useKnockFeed,
-  useTranslations,
 } from "@knocklabs/react-core";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import React from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 
 import { useTheme } from "../../../../theme/useTheme";
 
-import { NotificationFeedCell } from "./NotificationFeedCell";
+import EmptyNotificationFeed, {
+  EmptyNotificationFeedStyle,
+} from "./EmptyNotificationFeed";
+import {
+  NotificationFeedCell,
+  NotificationFeedCellStyle,
+} from "./NotificationFeedCell";
 import NotificationFeedHeader, {
+  NotificationFeedHeaderStyle,
   TopHeaderAction,
 } from "./NotificationFeedHeader";
 
 export interface NotificationFeedProps {
   initialFilterStatus?: FilterStatus;
-  onCellActionButtonTap: (params: {
-    button: ActionButtonModel;
+  notificationRowStyle?: NotificationFeedCellStyle;
+  headerStyle?: NotificationFeedHeaderStyle;
+  emptyFeedStyle?: EmptyNotificationFeedStyle;
+  onCellActionButtonTap?: (params: {
+    button: ActionButton;
     item: FeedItem;
   }) => void;
   onRowTap?: (item: FeedItem) => void;
@@ -39,29 +48,37 @@ export interface NotificationFeedProps {
 
 export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   initialFilterStatus = FilterStatus.All,
-  onCellActionButtonTap,
-  onRowTap,
+  notificationRowStyle = undefined,
+  headerStyle = undefined,
+  onCellActionButtonTap = () => {},
+  onRowTap = () => {},
 }) => {
   const { feedClient, useFeedStore } = useKnockFeed();
   const { settings } = useFeedSettings(feedClient);
-  const { pageInfo, items, networkStatus } = useFeedStore();
+  const { pageInfo, items, networkStatus, metadata } = useFeedStore();
   const [status, setStatus] = useState(initialFilterStatus);
-  const { colors, fontSizes } = useTheme();
-  const { t } = useTranslations();
 
-  useEffect(() => {
-    setStatus(initialFilterStatus);
-  }, [initialFilterStatus]);
+  const onTopActionButtonTap = useCallback(
+    (action: TopHeaderAction) => {
+      if (action === TopHeaderAction.MARK_ALL_AS_READ) {
+        feedClient.markAllAsRead();
+      } else {
+        feedClient.markAllAsArchived();
+      }
+    },
+    [feedClient],
+  );
 
-  useEffect(() => {
-    feedClient.fetch({ status });
-  }, [feedClient, status]);
+  const onViewOpen = useCallback(() => {
+    if (metadata.unseen_count > 0) {
+      feedClient.markAllAsSeen();
+    }
+  }, [metadata.unseen_count, feedClient]);
 
-  const onActionButtonTap = (action: TopHeaderAction) => {
-    console.log(action);
-  };
-
-  const requestInFlight = isRequestInFlight(networkStatus);
+  const requestInFlight = useMemo(
+    () => isRequestInFlight(networkStatus),
+    [networkStatus],
+  );
 
   const onEndReached = useCallback(() => {
     if (!requestInFlight && pageInfo.after) {
@@ -69,38 +86,57 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
     }
   }, [requestInFlight, pageInfo, feedClient]);
 
-  const renderNotificationCell = ({ item }: { item: FeedItem }) => (
-    <NotificationFeedCell
-      item={item}
-      onCellActionButtonTap={onCellActionButtonTap}
-      onRowTap={onRowTap}
-    />
+  const renderNotificationCell = useCallback(
+    ({ item }: { item: FeedItem }) => (
+      <NotificationFeedCell
+        item={item}
+        styleOverride={notificationRowStyle}
+        onCellActionButtonTap={onCellActionButtonTap}
+        onRowTap={onRowTap}
+      />
+    ),
+    [notificationRowStyle, onCellActionButtonTap, onRowTap],
   );
 
-  const renderFooter = () => (
-    <View style={styles.footer}>
-      <ActivityIndicator />
-    </View>
+  const renderFooter = useCallback(
+    () => (
+      <View style={styles.footer}>
+        <ActivityIndicator />
+      </View>
+    ),
+    [],
   );
+
+  useEffect(() => {
+    feedClient.fetch({ status });
+  }, [feedClient, status]);
+
+  useEffect(() => {
+    onViewOpen();
+  });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topSection}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: useTheme().colors.surface1 },
+      ]}
+    >
+      <View>
         <NotificationFeedHeader
           selectedFilter={status}
+          styleOverride={headerStyle}
           setFilterStatus={setStatus}
-          onActionButtonTap={onActionButtonTap}
+          onTopActionButtonTap={onTopActionButtonTap}
         />
       </View>
       <FlatList
         data={items}
         renderItem={renderNotificationCell}
         keyExtractor={(item: FeedItem) => item.id}
-        ListEmptyComponent={
-          !requestInFlight ? <Text>No notifications found</Text> : null
-        }
+        ListEmptyComponent={!requestInFlight ? EmptyNotificationFeed : null}
         ListFooterComponent={
-          networkStatus == NetworkStatus.fetchMore ? renderFooter : null
+          networkStatus === NetworkStatus.fetchMore ? renderFooter : null
         }
         refreshControl={
           <RefreshControl
@@ -115,11 +151,19 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
       />
-      {settings?.features.branding_required && (
-        <View style={styles.branding}>
-          <Text>{t("poweredBy")}</Text>
-        </View>
-      )}
+      {/* {settings?.features.branding_required && ( */}
+      <View style={styles.branding}>
+        {/* <Image
+          source={useTheme().imageRefs.poweredByKnock}
+          // source={require("../../../../../assets/inbox.jpg")}
+          style={[
+            styles.branding,
+            { resizeMode: "contain", objectFit: "contain" },
+          ]}
+          onError={(error) => console.error("Image Load Error:", error)}
+        /> */}
+      </View>
+      {/* )} */}
     </View>
   );
 };
@@ -150,19 +194,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   branding: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    opacity: 0.7,
+    alignItems: "center",
+    marginBottom: 10,
   },
   list: {
     flexGrow: 1,
   },
   listContainer: {
     paddingHorizontal: 0,
-  },
-  topSection: {
-    width: "100%",
   },
   title: {
     marginBottom: 12,

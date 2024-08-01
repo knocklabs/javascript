@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   Image,
   ImageStyle,
@@ -29,48 +29,52 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
 }) => {
   const theme = useTheme();
 
-  const defaultStyle: AvatarViewStyle = {
-    container: {
-      justifyContent: "center",
-      alignItems: "center",
-      width: 32,
-      height: 32,
-      backgroundColor: theme.colors.gray5,
-      borderRadius: 32 / 2,
-    },
-    image: {
-      resizeMode: "cover",
-      width: 32,
-      height: 32,
-      borderRadius: 32 / 2,
-    },
-    text: {
-      fontWeight: theme.fontWeights.medium,
-      color: theme.colors.gray11,
-      fontSize: theme.fontSizes.knock3,
-      fontFamily: theme.fontFamily.sanserif,
-    },
-  };
+  const defaultStyle = useMemo<AvatarViewStyle>(
+    () => ({
+      container: {
+        justifyContent: "center",
+        alignItems: "center",
+        width: 32,
+        height: 32,
+        backgroundColor: theme.colors.gray5,
+        borderRadius: 32 / 2,
+      },
+      image: {
+        resizeMode: "cover",
+        width: 32,
+        height: 32,
+        borderRadius: 32 / 2,
+      },
+      text: {
+        fontWeight: theme.fontWeights.medium,
+        color: theme.colors.gray11,
+        fontSize: theme.fontSizes.knock3,
+        fontFamily: theme.fontFamily.sanserif,
+      },
+    }),
+    [theme],
+  );
 
-  const renderInitialsView = () => {
-    const initials = generateInitials();
-    if (initials) {
-      return (
-        <Text style={[defaultStyle.text, styleOverride.text]}>{initials}</Text>
-      );
-    } else {
-      return null;
-    }
-  };
-
-  const generateInitials = () => {
+  const generateInitials = useMemo(() => {
     if (!name) return null;
     const nameComponents = name.split(" ");
     const initials = nameComponents
       .map((comp) => comp.charAt(0).toUpperCase())
       .join("");
     return initials;
-  };
+  }, [name]);
+
+  const renderInitialsView = useCallback(() => {
+    if (generateInitials) {
+      return (
+        <Text style={[defaultStyle.text, styleOverride.text]}>
+          {generateInitials}
+        </Text>
+      );
+    } else {
+      return null;
+    }
+  }, [generateInitials, styleOverride.text, defaultStyle.text]);
 
   return (
     <View style={[defaultStyle.container, styleOverride.container]}>
