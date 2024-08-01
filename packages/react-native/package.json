@@ -80,7 +80,7 @@
     "expo-notifications": ">=0.27.6",
     "react": "^18.2.0",
     "react-native": "^0.73.4",
-    "rimraf": "^5.0.5",
+    "rimraf": "^6.0.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
