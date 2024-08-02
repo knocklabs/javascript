@@ -31,24 +31,24 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
   textStyle = {},
 }) => {
   const { useFeedStore } = useKnockFeed();
+  const theme = useTheme();
   const badgeCountValue = useFeedStore((state) =>
     selectBadgeCount(badgeCountType, state.metadata),
   );
 
-  return badgeCountValue !== 0 ? (
+  if (badgeCountValue === 0) return null;
+
+  return (
     <View
-      style={[
-        styles.badgeContainer,
-        { backgroundColor: useTheme().colors.accent9 },
-      ]}
+      style={[styles.badgeContainer, { backgroundColor: theme.colors.accent9 }]}
     >
       <Text
         style={[
           styles.badgeCount,
           {
-            fontSize: useTheme().fontSizes.knock0,
-            fontFamily: useTheme().fontFamily.sanserif,
-            fontWeight: useTheme().fontWeights.medium,
+            fontSize: theme.fontSizes.knock0,
+            fontFamily: theme.fontFamily.sanserif,
+            fontWeight: theme.fontWeights.medium,
           },
           textStyle,
         ]}
@@ -57,7 +57,7 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
         {formatBadgeCount(badgeCountValue)}
       </Text>
     </View>
-  ) : null;
+  );
 };
 
 const styles = StyleSheet.create({
