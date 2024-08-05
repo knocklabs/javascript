@@ -45,8 +45,8 @@
     "expo-constants": ">=15.4.0",
     "expo-device": ">=5.9.3",
     "expo-notifications": ">=0.27.6",
-    "react": "^18.3.1",
-    "react-native": "^0.74.4"
+    "react": "^18.2.0 || ^18.3.0",
+    "react-native": "^0.73.4 || ^0.74.4"
   },
   "peerDependenciesMeta": {
     "expo": {
@@ -71,19 +71,19 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
-    "@types/react-native-htmlview": "^0.16.0",
+    "@types/react-native-htmlview": "^0.16.5",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "@vitejs/plugin-react": "^4.2.0",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
-    "expo": ">=50.0.14",
-    "expo-constants": ">=15.4.0",
-    "expo-device": ">=5.9.3",
-    "expo-notifications": ">=0.27.6",
+    "expo": ">=51.0.24",
+    "expo-constants": ">=16.0.2",
+    "expo-device": ">=6.0.2",
+    "expo-notifications": ">=0.28.14",
     "react": "^18.2.0",
-    "react-native": "^0.73.4",
+    "react-native": "^0.74.4",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",

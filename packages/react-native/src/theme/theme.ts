@@ -68,11 +68,6 @@ const lightTheme = {
     green9: "#29a383",
     white: "#ffffff",
   },
-
-  imageRefs: {
-    // poweredByKnock: require("../assets/PoweredByKnock.png"),
-    // inbox: require("../assets/inbox.png"),
-  },
 };
 
 const darkTheme = {
@@ -92,11 +87,6 @@ const darkTheme = {
     blue9: "#3e63dd",
     green9: "#29a383",
     white: "#ffffff",
-  },
-
-  imageRefs: {
-    // poweredByKnock: require("../assets/PoweredByKnock.png"),
-    // inbox: require("../assets/inbox.png"),
   },
 };
 

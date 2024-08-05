@@ -14,12 +14,12 @@ import React from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   RefreshControl,
   StyleSheet,
   View,
 } from "react-native";
 
+import { PoweredByKnockIcon } from "../../../../assets/PoweredByKnockIcon";
 import { useTheme } from "../../../../theme/useTheme";
 
 import EmptyNotificationFeed, {
@@ -151,19 +151,11 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
       />
-      {/* {settings?.features.branding_required && ( */}
-      <View style={styles.branding}>
-        {/* <Image
-          source={useTheme().imageRefs.poweredByKnock}
-          // source={require("../../../../../assets/inbox.jpg")}
-          style={[
-            styles.branding,
-            { resizeMode: "contain", objectFit: "contain" },
-          ]}
-          onError={(error) => console.error("Image Load Error:", error)}
-        /> */}
-      </View>
-      {/* )} */}
+      {settings?.features.branding_required && (
+        <View style={styles.branding}>
+          <PoweredByKnockIcon />
+        </View>
+      )}
     </View>
   );
 };
@@ -195,7 +187,7 @@ const styles = StyleSheet.create({
   },
   branding: {
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   list: {
     flexGrow: 1,
