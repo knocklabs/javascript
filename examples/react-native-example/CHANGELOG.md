@@ -1,5 +1,13 @@
 # @knocklabs/react-native-example
 
+## 1.1.10
+
+### Patch Changes
+
+- 57f0c34: Updating React Native and Expo peer dependencies
+- Updated dependencies [57f0c34]
+  - @knocklabs/react-native@0.2.10
+
 ## 1.1.9
 
 ### Patch Changes
