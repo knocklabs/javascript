@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10
+
+### Patch Changes
+
+- 57f0c34: Updating React Native and Expo peer dependencies
+
 ## 0.2.9
 
 ### Patch Changes

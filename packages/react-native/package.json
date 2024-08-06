@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -41,12 +41,12 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
-    "expo": ">=50.0.14",
-    "expo-constants": ">=15.4.0",
-    "expo-device": ">=5.9.3",
-    "expo-notifications": ">=0.27.6",
-    "react": "^18.2.0 || ^18.3.0",
-    "react-native": "^0.73.4 || ^0.74.4"
+    "expo": "*",
+    "expo-constants": "*",
+    "expo-device": "*",
+    "expo-notifications": "*",
+    "react": "*",
+    "react-native": "*"
   },
   "peerDependenciesMeta": {
     "expo": {
@@ -83,8 +83,8 @@
     "expo-device": ">=6.0.2",
     "expo-notifications": ">=0.28.14",
     "react": "^18.2.0",
-    "react-native": "^0.74.4",
-    "rimraf": "^5.0.5",
+    "react-native": "^0.73.4",
+    "rimraf": "^6.0.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
