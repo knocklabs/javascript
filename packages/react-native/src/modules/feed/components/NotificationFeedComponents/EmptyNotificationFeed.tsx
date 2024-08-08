@@ -1,13 +1,6 @@
 import { useTranslations } from "@knocklabs/react-core";
 import React, { useMemo } from "react";
-import {
-  Image,
-  ImageStyle,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TextStyle, View } from "react-native";
 
 import { useTheme } from "../../../../theme/useTheme";
 
@@ -20,8 +13,6 @@ export interface EmptyNotificationFeedStyle {
   subtitleString?: string;
   titleStyle?: TextStyle;
   subtitleStyle?: TextStyle;
-  iconStyle?: ImageStyle;
-  icon?: string; // URL or local path to the image
 }
 
 const EmptyNotificationFeed: React.FC<EmptyFeedViewProps> = ({
@@ -42,19 +33,14 @@ const EmptyNotificationFeed: React.FC<EmptyFeedViewProps> = ({
         color: theme.colors.gray11,
         fontWeight: theme.fontWeights.normal,
       },
-      iconStyle: styleOverride?.iconStyle,
       titleString: styleOverride?.titleString ?? t("emptyFeedTitle"),
       subtitleString: styleOverride?.subtitleString ?? t("emptyFeedBody"),
-      icon: styleOverride?.icon,
     }),
     [theme, styleOverride, t],
   );
 
   return (
     <View style={styles.container}>
-      {resolvedStyle.icon && (
-        <Image source={{ uri: resolvedStyle.icon }} style={styles.icon} />
-      )}
       {resolvedStyle.titleString && (
         <Text style={[styles.title, resolvedStyle.titleStyle]}>
           {resolvedStyle.titleString}

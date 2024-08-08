@@ -31,11 +31,19 @@ const App: React.FC = () => {
         >
           <View style={styles.container}>
             <StatusBar style="auto" />
-            <NotificationIconButton
-              onClick={onTopActionButtonTap}
-              badgeCountType={"unread"}
-            />
-            {isNotificationFeedOpen && <NotificationFeedContainer />}
+            {!isNotificationFeedOpen && (
+              <NotificationIconButton
+                onClick={onTopActionButtonTap}
+                badgeCountType={"unread"}
+              />
+            )}
+            {isNotificationFeedOpen && (
+              <NotificationFeedContainer
+                handleClose={() =>
+                  setIsNotificationFeedOpen(!isNotificationFeedOpen)
+                }
+              />
+            )}
           </View>
         </KnockFeedProvider>
       </KnockExpoPushNotificationProvider>

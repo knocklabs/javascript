@@ -17,19 +17,19 @@ import { useTheme } from "../../../../theme/useTheme";
 import { ActionButton, ActionButtonType } from "../ActionButton";
 import DividerView from "../Divider";
 
-interface NotificationFeedHeaderProps {
-  filters?: FilterStatus[];
+export interface NotificationFeedHeaderProps {
   selectedFilter?: FilterStatus;
-  topHeaderActions?: TopHeaderAction[];
-  styleOverride?: NotificationFeedHeaderStyle;
+  config?: NotificationFeedHeaderConfig;
   setFilterStatus: React.Dispatch<SetStateAction<FilterStatus>>;
   onTopActionButtonTap: (action: TopHeaderAction) => void;
 }
 
-export interface NotificationFeedHeaderStyle {
-  textStyle: TextStyle;
-  selectedColor: string;
-  unselectedColor: string;
+export interface NotificationFeedHeaderConfig {
+  filters?: FilterStatus[];
+  topHeaderActions?: TopHeaderAction[];
+  textStyle?: TextStyle;
+  selectedColor?: string;
+  unselectedColor?: string;
 }
 
 export enum TopHeaderAction {
@@ -38,13 +38,14 @@ export enum TopHeaderAction {
 }
 
 const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
-  filters = [FilterStatus.All, FilterStatus.Unread, FilterStatus.Unseen],
   selectedFilter = FilterStatus.All,
-  topHeaderActions = [
-    TopHeaderAction.MARK_ALL_AS_READ,
-    TopHeaderAction.ARCHIVE_READ,
-  ],
-  styleOverride = null,
+  config = {
+    filters: [FilterStatus.All, FilterStatus.Unread, FilterStatus.Unseen],
+    topHeaderActions: [
+      TopHeaderAction.MARK_ALL_AS_READ,
+      TopHeaderAction.ARCHIVE_READ,
+    ],
+  },
   setFilterStatus,
   onTopActionButtonTap,
 }) => {
@@ -54,23 +55,21 @@ const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
   const resolvedStyle = useMemo(
     () => ({
       textStyle: {
-        fontFamily:
-          styleOverride?.textStyle.fontFamily ?? theme.fontFamily.sanserif,
-        fontSize: styleOverride?.textStyle.fontSize ?? theme.fontSizes.knock2,
-        fontWeight:
-          styleOverride?.textStyle.fontWeight ?? theme.fontWeights.medium,
+        fontFamily: config.textStyle?.fontFamily ?? theme.fontFamily.sanserif,
+        fontSize: config.textStyle?.fontSize ?? theme.fontSizes.knock2,
+        fontWeight: config.textStyle?.fontWeight ?? theme.fontWeights.medium,
       },
-      selectedColor: theme.colors.accent11,
+      selectedColor: config.selectedColor ?? theme.colors.accent11,
       unselectedColor: theme.colors.gray11,
     }),
-    [styleOverride, theme],
+    [config, theme],
   );
 
   const renderTopActionButtons = useCallback(() => {
-    if (topHeaderActions && topHeaderActions.length > 1) {
+    if (config.topHeaderActions) {
       return (
         <View style={styles.actionButtons}>
-          {topHeaderActions.map((action, index) => (
+          {config.topHeaderActions.map((action, index) => (
             <ActionButton
               key={index}
               title={t(action as keyof Translations) ?? ""}
@@ -82,7 +81,7 @@ const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
       );
     }
     return null;
-  }, [t, onTopActionButtonTap, topHeaderActions]);
+  }, [t, onTopActionButtonTap, config.topHeaderActions]);
 
   const renderFilter = useCallback(
     ({ item }: { item: FilterStatus }) => (
@@ -119,9 +118,9 @@ const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
 
   return (
     <View>
-      {filters.length > 1 && (
+      {config.filters && config.filters.length > 1 && (
         <FlatList
-          data={filters}
+          data={config.filters}
           renderItem={renderFilter}
           keyExtractor={(item) => item}
           horizontal
@@ -129,7 +128,7 @@ const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
           style={styles.filterButtonRow}
         />
       )}
-      {filters.length > 1 && <DividerView />}
+      {config.filters && config.filters.length > 1 && <DividerView />}
 
       {renderTopActionButtons()}
       <DividerView />

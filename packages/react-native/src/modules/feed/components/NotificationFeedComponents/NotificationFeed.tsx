@@ -30,14 +30,13 @@ import {
   NotificationFeedCellStyle,
 } from "./NotificationFeedCell";
 import NotificationFeedHeader, {
-  NotificationFeedHeaderStyle,
+  NotificationFeedHeaderConfig,
   TopHeaderAction,
 } from "./NotificationFeedHeader";
 
 export interface NotificationFeedProps {
-  initialFilterStatus?: FilterStatus;
-  notificationRowStyle?: NotificationFeedCellStyle;
-  headerStyle?: NotificationFeedHeaderStyle;
+  notificationRowStyle?: NotificationFeedCellStyle; // Customize style of the NotificationRows
+  headerConfig?: NotificationFeedHeaderConfig; // Customize the top filters and buttons
   emptyFeedStyle?: EmptyNotificationFeedStyle;
   onCellActionButtonTap?: (params: {
     button: ActionButton;
@@ -47,23 +46,25 @@ export interface NotificationFeedProps {
 }
 
 export const NotificationFeed: React.FC<NotificationFeedProps> = ({
-  initialFilterStatus = FilterStatus.All,
   notificationRowStyle = undefined,
-  headerStyle = undefined,
+  headerConfig = undefined,
+  emptyFeedStyle = undefined,
   onCellActionButtonTap = () => {},
   onRowTap = () => {},
 }) => {
   const { feedClient, useFeedStore } = useKnockFeed();
   const { settings } = useFeedSettings(feedClient);
   const { pageInfo, items, networkStatus, metadata } = useFeedStore();
-  const [status, setStatus] = useState(initialFilterStatus);
+  const [status, setStatus] = useState(
+    headerConfig?.filters?.[0] ?? FilterStatus.All,
+  );
 
   const onTopActionButtonTap = useCallback(
     (action: TopHeaderAction) => {
       if (action === TopHeaderAction.MARK_ALL_AS_READ) {
         feedClient.markAllAsRead();
       } else {
-        feedClient.markAllAsArchived();
+        feedClient.markAllReadAsArchived();
       }
     },
     [feedClient],
@@ -125,7 +126,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
       <View>
         <NotificationFeedHeader
           selectedFilter={status}
-          styleOverride={headerStyle}
+          config={headerConfig}
           setFilterStatus={setStatus}
           onTopActionButtonTap={onTopActionButtonTap}
         />
@@ -134,7 +135,11 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         data={items}
         renderItem={renderNotificationCell}
         keyExtractor={(item: FeedItem) => item.id}
-        ListEmptyComponent={!requestInFlight ? EmptyNotificationFeed : null}
+        ListEmptyComponent={
+          !requestInFlight ? (
+            <EmptyNotificationFeed styleOverride={emptyFeedStyle} />
+          ) : null
+        }
         ListFooterComponent={
           networkStatus === NetworkStatus.fetchMore ? renderFooter : null
         }
@@ -187,7 +192,8 @@ const styles = StyleSheet.create({
   },
   branding: {
     alignItems: "center",
-    marginBottom: 20,
+    paddingBottom: 20,
+    zIndex: 1,
   },
   list: {
     flexGrow: 1,

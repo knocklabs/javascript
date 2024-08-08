@@ -35,7 +35,6 @@ export interface NotificationFeedCellStyle {
   avatarViewStyle?: AvatarViewStyle;
   primaryActionButtonStyle?: ActionButtonStyle;
   secondaryActionButtonStyle?: ActionButtonStyle;
-  tertiaryActionButtonStyle?: ActionButtonStyle;
   sentAtDateFormatter?: Intl.DateTimeFormat;
   sentAtDateTextStyle?: TextStyle;
   htmlStyles?: { [key: string]: TextStyle | ViewStyle | ImageStyle };
@@ -75,8 +74,6 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
         primaryActionButtonStyle: styleOverride?.primaryActionButtonStyle ?? {},
         secondaryActionButtonStyle:
           styleOverride?.secondaryActionButtonStyle ?? {},
-        tertiaryActionButtonStyle:
-          styleOverride?.tertiaryActionButtonStyle ?? {},
         sentAtDateFormatter:
           styleOverride?.sentAtDateFormatter ??
           new Intl.DateTimeFormat("en-US", {
@@ -94,6 +91,7 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
             fontSize: theme.fontSizes.knock2,
             fontFamily: theme.fontFamily.sanserif,
             margin: 0,
+            color: theme.colors.gray12,
           },
           blockquote: {
             color: theme.colors.gray11,
@@ -133,6 +131,11 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
                 button.name === "primary"
                   ? ActionButtonType.PRIMARY
                   : ActionButtonType.SECONDARY
+              }
+              styleOverride={
+                button.name === "primary"
+                  ? resolvedStyle.primaryActionButtonStyle
+                  : resolvedStyle.secondaryActionButtonStyle
               }
               action={() => onCellActionButtonTap({ button, item })}
             />
