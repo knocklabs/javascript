@@ -3,6 +3,7 @@ import { I18nContent } from ".";
 const de: I18nContent = {
   translations: {
     archiveNotification: "Benachrichtigung archivieren",
+    archiveRead: "Gelesenes Archivieren",
     markAllAsRead: "Alle als gelesen markieren",
     notifications: "Benachrichtigungen",
     emptyFeedTitle: "Noch keine Benachrichtigungen",
