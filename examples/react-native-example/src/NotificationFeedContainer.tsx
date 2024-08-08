@@ -1,41 +1,32 @@
 import { ActionButton, FeedItem } from "@knocklabs/client";
-import { CloseCircle, NotificationFeed } from "@knocklabs/react-native";
+import { NotificationFeed } from "@knocklabs/react-native";
 import React, { useCallback } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-// const onCellActionButtonTap = useCallback(
-//   (params: { button: ActionButton; item: FeedItem }) => {
-//     console.log(params);
-//   },
-//   [],
-// );
+export interface NotificationFeedContainerProps {
+  handleClose: () => void;
+}
 
-// const onRowTap = useCallback((item: FeedItem) => {
-//   console.log(item);
-// }, []);
-
-const onCellActionButtonTap = (params: {
-  button: ActionButton;
-  item: FeedItem;
+const NotificationFeedContainer: React.FC<NotificationFeedContainerProps> = ({
+  handleClose,
 }) => {
-  console.log(params);
-};
+  const onCellActionButtonTap = useCallback(
+    (params: { button: ActionButton; item: FeedItem }) => {
+      console.log(params);
+    },
+    [],
+  );
 
-const onRowTap = (item: FeedItem) => {
-  console.log(item);
-};
+  const onRowTap = useCallback((item: FeedItem) => {
+    console.log(item);
+  }, []);
 
-const handleClose = () => {
-  // Add logic for closing the view
-  console.log("Close button pressed");
-};
-const NotificationFeedContainer: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Notifications</Text>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-          {/* <Text style={styles.closeButtonText}>X</Text> */}
+          <Text style={styles.closeButtonText}>X</Text>
         </TouchableOpacity>
       </View>
       <NotificationFeed

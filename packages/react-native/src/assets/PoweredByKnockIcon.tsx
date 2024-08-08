@@ -2,8 +2,6 @@ import React from "react";
 import { ViewStyle, useColorScheme } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
-import { useTheme } from "../theme/useTheme";
-
 type PoweredByKnockIconProps = {
   width?: number;
   height?: number;
@@ -15,7 +13,6 @@ const PoweredByKnockIcon: React.FC<PoweredByKnockIconProps> = ({
   height = 28,
   style,
 }) => {
-  const theme = useTheme();
   const colorScheme = useColorScheme();
 
   if (colorScheme === "dark") {
@@ -116,13 +113,3 @@ const PoweredByKnockIcon: React.FC<PoweredByKnockIconProps> = ({
 };
 
 export { PoweredByKnockIcon };
-
-{
-  /* <svg
-  width="152"
-  height="28"
-  viewBox="0 0 152 28"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-> */
-}
