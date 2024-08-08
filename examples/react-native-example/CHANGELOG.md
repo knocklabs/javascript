@@ -1,5 +1,12 @@
 # @knocklabs/react-native-example
 
+## 1.1.11
+
+### Patch Changes
+
+- Updated dependencies [671c510]
+  - @knocklabs/react-native@0.2.11
+
 ## 1.1.10
 
 ### Patch Changes
