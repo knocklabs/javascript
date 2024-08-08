@@ -61,6 +61,7 @@ export interface KnockExpoPushNotificationProviderProps {
     notification: Notifications.Notification,
   ) => Promise<Notifications.NotificationBehavior>;
   children?: React.ReactElement;
+  autoRegister?: boolean;
 }
 
 async function requestPushPermissionIfNeeded(): Promise<string> {
@@ -115,7 +116,12 @@ async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPus
 
 export const KnockExpoPushNotificationProvider: React.FC<
   KnockExpoPushNotificationProviderProps
-> = ({ knockExpoChannelId, customNotificationHandler, children }) => {
+> = ({
+  knockExpoChannelId,
+  customNotificationHandler,
+  children,
+  autoRegister = true,
+}) => {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const knockClient = useKnockClient();
 
@@ -225,27 +231,29 @@ export const KnockExpoPushNotificationProvider: React.FC<
         customNotificationHandler ?? defaultNotificationHandler,
     });
 
-    registerForPushNotifications()
-      .then(() => {
-        if (expoPushToken) {
-          registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
-            .then((_result) => {
-              knockClient.log("[Knock] setChannelData success");
-            })
-            .catch((_error) => {
-              console.error(
-                "[Knock] Error in setting push token or channel data",
-                _error,
-              );
-            });
-        }
-      })
-      .catch((_error) => {
-        console.error(
-          "[Knock] Error in setting push token or channel data",
-          _error,
-        );
-      });
+    if (autoRegister) {
+      registerForPushNotifications()
+        .then(() => {
+          if (expoPushToken) {
+            registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
+              .then((_result) => {
+                knockClient.log("[Knock] setChannelData success");
+              })
+              .catch((_error) => {
+                console.error(
+                  "[Knock] Error in setting push token or channel data",
+                  _error,
+                );
+              });
+          }
+        })
+        .catch((_error) => {
+          console.error(
+            "[Knock] Error in setting push token or channel data",
+            _error,
+          );
+        });
+    }
 
     const notificationReceivedSubscription =
       Notifications.addNotificationReceivedListener((notification) => {
