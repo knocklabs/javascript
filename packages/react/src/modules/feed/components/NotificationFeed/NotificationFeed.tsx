@@ -151,7 +151,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
       {settings?.features.branding_required && (
         <div className="rnf-notification-feed__knock-branding">
           <a href={poweredByKnockUrl} target="_blank">
-            {t("poweredBy")}
+            {t("poweredBy") || "Powered by Knock"}
           </a>
         </div>
       )}

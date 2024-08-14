@@ -19,7 +19,7 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
 
   return (
     <div className={`rnf-dropdown rnf-dropdown--${colorMode}`}>
-      <select value={value} onChange={onChange}>
+      <select aria-label="Select Notification Filter" value={value} onChange={onChange}>
         {children}
       </select>
       <ChevronDown />
