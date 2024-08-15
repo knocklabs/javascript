@@ -286,7 +286,10 @@ class Feed {
     return this.makeStatusUpdate(itemOrItems, "unread");
   }
 
-  async markAsInteracted(itemOrItems: FeedItemOrItems) {
+  async markAsInteracted(
+    itemOrItems: FeedItemOrItems,
+    metadata?: Record<string, string>,
+  ) {
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -298,7 +301,7 @@ class Feed {
       "unread_count",
     );
 
-    return this.makeStatusUpdate(itemOrItems, "interacted");
+    return this.makeStatusUpdate(itemOrItems, "interacted", metadata);
   }
 
   /*
@@ -583,12 +586,17 @@ class Feed {
   private async makeStatusUpdate(
     itemOrItems: FeedItemOrItems,
     type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
+    metadata?: Record<string, string>,
   ) {
     // Always treat items as a batch to use the corresponding batch endpoint
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const itemIds = items.map((item) => item.id);
 
-    const result = await this.knock.messages.batchUpdateStatuses(itemIds, type);
+    const result = await this.knock.messages.batchUpdateStatuses(
+      itemIds,
+      type,
+      metadata,
+    );
 
     // Emit the event that these items had their statuses changed
     // Note: we do this after the update to ensure that the server event actually completed
