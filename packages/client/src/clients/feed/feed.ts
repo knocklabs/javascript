@@ -595,7 +595,7 @@ class Feed {
     const result = await this.knock.messages.batchUpdateStatuses(
       itemIds,
       type,
-      metadata,
+      { metadata },
     );
 
     // Emit the event that these items had their statuses changed

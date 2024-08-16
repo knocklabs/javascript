@@ -6,6 +6,7 @@ import {
   BulkUpdateMessagesInChannelProperties,
   Message,
   MessageEngagementStatus,
+  UpdateMessageStatusOptions,
 } from "./interfaces";
 
 class MessageClient {
@@ -27,10 +28,13 @@ class MessageClient {
   async updateStatus(
     messageId: string,
     status: MessageEngagementStatus,
-    metadata?: Record<string, string>,
+    options?: UpdateMessageStatusOptions,
   ): Promise<Message> {
     // Metadata is only required for the "interacted" status
-    const payload = status === "interacted" ? { metadata } : undefined;
+    const payload =
+      status === "interacted" && options
+        ? { metadata: options.metadata }
+        : undefined;
 
     const result = await this.knock.client().makeRequest({
       method: "PUT",
@@ -56,10 +60,11 @@ class MessageClient {
   async batchUpdateStatuses(
     messageIds: string[],
     status: MessageEngagementStatus | "unseen" | "unread" | "unarchived",
-    metadata?: Record<string, string>,
+    options?: UpdateMessageStatusOptions,
   ): Promise<Message[]> {
     // Metadata is only required for the "interacted" status
-    const additionalPayload = status === "interacted" ? { metadata } : {};
+    const additionalPayload =
+      status === "interacted" && options ? { metadata: options.metadata } : {};
 
     const result = await this.knock.client().makeRequest({
       method: "POST",
