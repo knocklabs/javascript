@@ -4956,7 +4956,7 @@ __metadata:
     expo-constants: "npm:>=15.4.0"
     expo-device: "npm:>=5.9.3"
     expo-notifications: "npm:>=0.27.6"
-    expo-status-bar: "npm:~1.11.1"
+    expo-status-bar: "npm:~1.12.1"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
   languageName: unknown
@@ -12537,10 +12537,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-status-bar@npm:~1.11.1":
-  version: 1.11.1
-  resolution: "expo-status-bar@npm:1.11.1"
-  checksum: 10c0/2566beeb69c0c58ae189d124822139d53f8cd01cdaba2ae1ed0622d87868edb82479f7b15e2f3617da7a36e2b7c3e83dafb6ee15b49f6dab06d0e4bb0158b57e
+"expo-status-bar@npm:~1.12.1":
+  version: 1.12.1
+  resolution: "expo-status-bar@npm:1.12.1"
+  checksum: 10c0/fecd1c1843ef1fadf3007f54e1c778d06cbbe396c9ba7cbbfde88a1eb215847ab39e68b1f32d0d46a906a1abcb8821aa33eefed66d0c4a858a5faf6b6e556416
   languageName: node
   linkType: hard
 
