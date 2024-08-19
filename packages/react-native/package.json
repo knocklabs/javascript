@@ -84,6 +84,6 @@
     "typescript": "^5.5.4",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
-    "vite-plugin-no-bundle": "^3.0.0"
+    "vite-plugin-no-bundle": "^4.0.0"
   }
 }
