@@ -4947,7 +4947,7 @@ __metadata:
     typescript: "npm:^5.5.4"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
-    vite-plugin-no-bundle: "npm:^3.0.0"
+    vite-plugin-no-bundle: "npm:^4.0.0"
     vitest: "npm:^2.0.5"
     zustand: "npm:^3.7.2"
   peerDependencies:
@@ -4994,7 +4994,7 @@ __metadata:
     typescript: "npm:^5.5.4"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
-    vite-plugin-no-bundle: "npm:^3.0.0"
+    vite-plugin-no-bundle: "npm:^4.0.0"
   peerDependencies:
     expo: "*"
     expo-constants: "*"
@@ -5045,7 +5045,7 @@ __metadata:
     typescript: "npm:^5.5.4"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
-    vite-plugin-no-bundle: "npm:^3.0.0"
+    vite-plugin-no-bundle: "npm:^4.0.0"
     vitest: "npm:^2.0.5"
   peerDependencies:
     react: ^16.11.0 || ^17.0.0 || ^18.0.0
@@ -12649,7 +12649,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0, fast-glob@npm:^3.3.1, fast-glob@npm:^3.3.2":
+"fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0, fast-glob@npm:^3.3.1, fast-glob@npm:^3.3.2":
   version: 3.3.2
   resolution: "fast-glob@npm:3.3.2"
   dependencies:
@@ -23256,13 +23256,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-plugin-no-bundle@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "vite-plugin-no-bundle@npm:3.0.0"
+"vite-plugin-no-bundle@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "vite-plugin-no-bundle@npm:4.0.0"
   dependencies:
-    fast-glob: "npm:^3.2.12"
+    fast-glob: "npm:^3.3.2"
     micromatch: "npm:^4.0.5"
-  checksum: 10c0/cf3721a1e27fe62a5d98e69f844dbbd06f07fcd6229d52be149823b968a03dadbf0e176f53b9eaea82b4634aec968b772fd4698c2ddc6eb8dd1139c2356a73d3
+  checksum: 10c0/59d519dfa226d5c11542bdc8a9e204c2bc09a35e6a78a0d16ba262799538d016f60b739db9791cfbd111e9f2001a9315eda077d7a4637a0260cda110f0c8b4ed
   languageName: node
   linkType: hard
 
