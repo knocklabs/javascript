@@ -53,3 +53,7 @@ export type BulkUpdateMessagesInChannelProperties = {
     tenants?: string[];
   };
 };
+
+export type UpdateMessageStatusOptions = {
+  metadata?: Record<string, string>;
+};
