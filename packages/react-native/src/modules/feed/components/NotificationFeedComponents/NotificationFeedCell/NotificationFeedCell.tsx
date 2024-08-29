@@ -17,7 +17,7 @@ import {
   ViewStyle,
   useWindowDimensions,
 } from "react-native";
-import { RenderHTML } from "react-native-render-html";
+import { MixedStyleDeclaration, RenderHTML } from "react-native-render-html";
 
 import { useTheme } from "../../../../../theme/useTheme";
 import {
@@ -114,7 +114,9 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
         <RenderHTML
           contentWidth={width}
           source={{ html: block.rendered }}
-          tagsStyles={resolvedStyle.htmlStyles as any}
+          tagsStyles={
+            resolvedStyle.htmlStyles as Record<string, MixedStyleDeclaration>
+          }
         />
       ),
       [width, resolvedStyle.htmlStyles],
@@ -142,7 +144,12 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
           ))}
         </View>
       ),
-      [onCellActionButtonTap, item],
+      [
+        onCellActionButtonTap,
+        item,
+        resolvedStyle.primaryActionButtonStyle,
+        resolvedStyle.secondaryActionButtonStyle,
+      ],
     );
 
     return (
