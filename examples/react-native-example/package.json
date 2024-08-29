@@ -1,7 +1,7 @@
 {
   "name": "@knocklabs/react-native-example",
-  "version": "1.1.10",
-  "main": "src/index.ts",
+  "version": "1.1.12",
+  "main": "src/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
