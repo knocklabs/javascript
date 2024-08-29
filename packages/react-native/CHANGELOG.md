@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.12
+
+### Patch Changes
+
+- Updated dependencies [5545f9e]
+  - @knocklabs/client@0.10.12
+  - @knocklabs/react-core@0.2.23
+
+## 0.2.11
+
+### Patch Changes
+
+- 671c510: Adding a prop to our KnockExpoPushNotificationProvider to allow users to opt out of our auto registration
+
 ## 0.2.10
 
 ### Patch Changes

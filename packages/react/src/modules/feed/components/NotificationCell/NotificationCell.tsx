@@ -63,7 +63,10 @@ export const NotificationCell = React.forwardRef<
 
     const onContainerClickHandler = React.useCallback(() => {
       // Mark as interacted + read once we click the item
-      feedClient.markAsInteracted(item);
+      feedClient.markAsInteracted(item, {
+        type: "cell_click",
+        action: actionUrl,
+      });
 
       if (onItemClick) return onItemClick(item);
 
@@ -72,7 +75,13 @@ export const NotificationCell = React.forwardRef<
 
     const onButtonClickHandler = React.useCallback(
       (e: React.MouseEvent, button: ActionButton) => {
-        feedClient.markAsInteracted(item);
+        // Record the interaction with the metadata for the button that was clicked
+        feedClient.markAsInteracted(item, {
+          type: "button_click",
+          name: button.name,
+          label: button.label,
+          action: button.action,
+        });
 
         if (onButtonClick) return onButtonClick(item, button);
 

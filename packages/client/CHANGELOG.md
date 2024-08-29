@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.12
+
+### Patch Changes
+
+- 5545f9e: feat: support passing metadata for interactions
+
 ## 0.10.11
 
 ### Patch Changes

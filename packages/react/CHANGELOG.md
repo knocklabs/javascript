@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.26
+
+### Patch Changes
+
+- 5545f9e: feat: support passing metadata for interactions
+- Updated dependencies [5545f9e]
+  - @knocklabs/client@0.10.12
+  - @knocklabs/react-core@0.2.23
+
 ## 0.2.25
 
 ### Patch Changes
