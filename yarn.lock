@@ -4988,10 +4988,10 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.20.0"
     "@knocklabs/react-native": "workspace:^"
-    expo: "npm:>=50.0.14"
-    expo-constants: "npm:>=15.4.0"
-    expo-device: "npm:>=5.9.3"
-    expo-notifications: "npm:>=0.27.6"
+    expo: "npm:>=51.0.24"
+    expo-constants: "npm:>=16.0.2"
+    expo-device: "npm:>=6.0.2"
+    expo-notifications: "npm:>=0.28.14"
     expo-status-bar: "npm:~1.11.1"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
@@ -12993,7 +12993,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-constants@npm:>=15.4.0, expo-constants@npm:>=16.0.2, expo-constants@npm:~16.0.0":
+"expo-constants@npm:>=16.0.2, expo-constants@npm:~16.0.0":
   version: 16.0.2
   resolution: "expo-constants@npm:16.0.2"
   dependencies:
@@ -13005,7 +13005,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-device@npm:>=5.9.3, expo-device@npm:>=6.0.2":
+"expo-device@npm:>=6.0.2":
   version: 6.0.2
   resolution: "expo-device@npm:6.0.2"
   dependencies:
@@ -13069,7 +13069,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-notifications@npm:>=0.27.6, expo-notifications@npm:>=0.28.14":
+"expo-notifications@npm:>=0.28.14":
   version: 0.28.15
   resolution: "expo-notifications@npm:0.28.15"
   dependencies:
@@ -13094,7 +13094,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:>=50.0.14, expo@npm:>=51.0.24":
+"expo@npm:>=51.0.24":
   version: 51.0.24
   resolution: "expo@npm:51.0.24"
   dependencies:
