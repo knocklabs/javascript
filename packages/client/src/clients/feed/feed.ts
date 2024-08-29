@@ -407,6 +407,53 @@ class Feed {
     return result;
   }
 
+  async markAllReadAsArchived() {
+    // Note: there is the potential for a race condition here because the bulk
+    // update is an async method, so if a new message comes in during this window before
+    // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
+    const { items, ...state } = this.store.getState();
+    console.log("[Feed] Items", items);
+    // Filter items to only include those that are unread
+    const unreadItems = items.filter((item) => item.read_at === null);
+    console.log("[Feed] Unread items", unreadItems);
+    // Mark all the unread items as archived and read
+    const itemIds = unreadItems.map((i) => i.id);
+    console.log("[Feed] Unread item IDs", itemIds);
+    state.setItemAttrs(itemIds, {
+      archived_at: new Date().toISOString(),
+    });
+
+    // Here if we're looking at a feed that excludes all of the archived items by default then we
+    // will want to optimistically remove all of the items from the feed as they are now all excluded
+    const shouldOptimisticallyRemoveItems =
+      this.defaultOptions.archived === "exclude";
+
+    if (shouldOptimisticallyRemoveItems) {
+      // Remove all the read items from the store and reset the badge count
+      const remainingItems = items.filter((item) => !itemIds.includes(item.id));
+      // Build the new metadata
+      const updatedMetadata = {
+        ...state.metadata,
+        total_count: remainingItems.length,
+        unread_count: 0,
+      };
+
+      console.log("[Feed] Remaining items", remainingItems);
+
+      state.setResult({
+        entries: remainingItems,
+        meta: updatedMetadata,
+        page_info: state.pageInfo,
+      });
+    }
+
+    // Issue the API request to the bulk status change API
+    const result = await this.makeBulkStatusUpdate("archive");
+    // this.emitEvent("all_archived", readItems);
+
+    return result;
+  }
+
   async markAsUnarchived(itemOrItems: FeedItemOrItems) {
     this.optimisticallyPerformStatusUpdate(itemOrItems, "unarchived", {
       archived_at: null,
