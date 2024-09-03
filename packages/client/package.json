@@ -47,7 +47,7 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.7",
+    "@babel/cli": "^7.25.6",
     "@babel/core": "^7.20.0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
