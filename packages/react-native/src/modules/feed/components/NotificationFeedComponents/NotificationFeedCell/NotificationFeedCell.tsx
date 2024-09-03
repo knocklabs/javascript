@@ -82,13 +82,13 @@ export const NotificationFeedCell: React.FC<NotificationFeedCellProps> = memo(
             year: "numeric",
           }),
         sentAtDateTextStyle: styleOverride?.sentAtDateTextStyle ?? {
-          fontSize: theme.fontSizes.knock2,
+          fontSize: theme.fontSizes[2],
           color: theme.colors.gray9,
           fontWeight: theme.fontWeights.medium,
         },
         htmlStyles: styleOverride?.htmlStyles ?? {
           p: {
-            fontSize: theme.fontSizes.knock2,
+            fontSize: theme.fontSizes[2],
             fontFamily: theme.fontFamily.sanserif,
             margin: 0,
             color: theme.colors.gray12,

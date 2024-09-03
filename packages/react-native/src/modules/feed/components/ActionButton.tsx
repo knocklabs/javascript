@@ -48,7 +48,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       },
       baseText: {
         fontFamily: theme.fontFamily.sanserif,
-        fontSize: theme.fontSizes.knock2,
+        fontSize: theme.fontSizes[2],
         fontWeight: theme.fontWeights.medium,
         color: theme.colors.gray12,
       },

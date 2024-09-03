@@ -48,7 +48,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
       text: {
         fontWeight: theme.fontWeights.medium,
         color: theme.colors.gray11,
-        fontSize: theme.fontSizes.knock3,
+        fontSize: theme.fontSizes[3],
         fontFamily: theme.fontFamily.sanserif,
       },
     }),

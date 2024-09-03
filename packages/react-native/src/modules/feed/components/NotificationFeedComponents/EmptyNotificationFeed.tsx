@@ -24,12 +24,12 @@ const EmptyNotificationFeed: React.FC<EmptyFeedViewProps> = ({
   const resolvedStyle: EmptyNotificationFeedStyle = useMemo(
     () => ({
       titleStyle: styleOverride?.titleStyle ?? {
-        fontSize: theme.fontSizes.knock2,
+        fontSize: theme.fontSizes[2],
         fontWeight: theme.fontWeights.medium,
         color: theme.colors.gray12,
       },
       subtitleStyle: styleOverride?.subtitleStyle ?? {
-        fontSize: theme.fontSizes.knock2,
+        fontSize: theme.fontSizes[2],
         color: theme.colors.gray11,
         fontWeight: theme.fontWeights.normal,
       },

@@ -56,7 +56,7 @@ const NotificationFeedHeader: React.FC<NotificationFeedHeaderProps> = ({
     () => ({
       textStyle: {
         fontFamily: config.textStyle?.fontFamily ?? theme.fontFamily.sanserif,
-        fontSize: config.textStyle?.fontSize ?? theme.fontSizes.knock2,
+        fontSize: config.textStyle?.fontSize ?? theme.fontSizes[2],
         fontWeight: config.textStyle?.fontWeight ?? theme.fontWeights.medium,
       },
       selectedColor: config.selectedColor ?? theme.colors.accent11,
