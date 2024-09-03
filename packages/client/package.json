@@ -69,7 +69,7 @@
     "vitest": "^2.0.5"
   },
   "dependencies": {
-    "@babel/runtime": "^7.25.4",
+    "@babel/runtime": "^7.25.6",
     "@knocklabs/types": "workspace:^",
     "@types/phoenix": "^1.5.4",
     "axios": "^1.7.4",
