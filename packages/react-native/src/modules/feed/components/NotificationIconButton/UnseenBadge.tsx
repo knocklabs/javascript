@@ -46,7 +46,7 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
         style={[
           styles.badgeCount,
           {
-            fontSize: theme.fontSizes.knock0,
+            fontSize: theme.fontSizes[0],
             fontFamily: theme.fontFamily.sanserif,
             fontWeight: theme.fontWeights.medium,
           },

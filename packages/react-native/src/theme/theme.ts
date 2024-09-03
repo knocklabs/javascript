@@ -15,16 +15,16 @@ type FontWeight =
 const lightTheme = {
   // Font sizes
   fontSizes: {
-    knock0: 11,
-    knock1: 12,
-    knock2: 14,
-    knock3: 16,
-    knock4: 18,
-    knock5: 20,
-    knock6: 24,
-    knock7: 30,
-    knock8: 36,
-    knock9: 48,
+    0: 11,
+    1: 12,
+    2: 14,
+    3: 16,
+    4: 18,
+    5: 20,
+    6: 24,
+    7: 30,
+    8: 36,
+    9: 48,
   },
   // Spacing
   spacing: {
