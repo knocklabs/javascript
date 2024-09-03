@@ -11,7 +11,7 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.0",
     "web-vitals": "^1.0.1",
-    "zustand": "^3.7.2"
+    "zustand": "^4.5.5"
   },
   "scripts": {
     "dev": "PORT=3001 BROWSER=none react-scripts start",

@@ -52,7 +52,7 @@
     "@knocklabs/client": "workspace:^",
     "date-fns": "^3.3.1",
     "swr": "^2.2.5",
-    "zustand": "^3.7.2"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@testing-library/react": "^14.2.0",
