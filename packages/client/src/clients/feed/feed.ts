@@ -415,13 +415,10 @@ class Feed {
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
     const { items, ...state } = this.store.getState();
-    console.log("[Feed] Items", items);
     // Filter items to only include those that are unread
     const unreadItems = items.filter((item) => item.read_at === null);
-    console.log("[Feed] Unread items", unreadItems);
     // Mark all the unread items as archived and read
     const itemIds = unreadItems.map((i) => i.id);
-    console.log("[Feed] Unread item IDs", itemIds);
     state.setItemAttrs(itemIds, {
       archived_at: new Date().toISOString(),
     });
@@ -440,8 +437,6 @@ class Feed {
         total_count: remainingItems.length,
         unread_count: 0,
       };
-
-      console.log("[Feed] Remaining items", remainingItems);
 
       state.setResult({
         entries: remainingItems,
