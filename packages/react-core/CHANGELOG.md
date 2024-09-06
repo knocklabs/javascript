@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.24
+
+### Patch Changes
+
+- 1d440f7: Prebuild InApp Feed Components for React Native
+- Updated dependencies [1d440f7]
+  - @knocklabs/client@0.10.13
+
 ## 0.2.23
 
 ### Patch Changes

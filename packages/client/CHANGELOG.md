@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.13
+
+### Patch Changes
+
+- 1d440f7: Prebuild InApp Feed Components for React Native
+
 ## 0.10.12
 
 ### Patch Changes
