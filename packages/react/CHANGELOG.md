@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.27
+
+### Patch Changes
+
+- 9b91c18: fix: add label to notification filter select
+- Updated dependencies [1d440f7]
+  - @knocklabs/client@0.10.13
+  - @knocklabs/react-core@0.2.24
+
 ## 0.2.26
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.13
+
+### Patch Changes
+
+- 1d440f7: feat: add prebuilt In App Feed Components for React Native
+
 ## 0.10.12
 
 ### Patch Changes

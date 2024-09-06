@@ -1,5 +1,16 @@
 # @knocklabs/react-native-example
 
+## 1.2.0
+
+### Minor Changes
+
+- 1d440f7: feat: add prebuilt In App Feed Components for React Native
+
+### Patch Changes
+
+- Updated dependencies [1d440f7]
+  - @knocklabs/react-native@0.3.0
+
 ## 1.1.12
 
 ### Patch Changes
