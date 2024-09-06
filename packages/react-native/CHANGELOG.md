@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 1d440f7: Prebuild InApp Feed Components for React Native
+- 1d440f7: feat: add prebuilt In App Feed Components for React Native
 
 ### Patch Changes
 
