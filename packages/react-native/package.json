@@ -83,7 +83,7 @@
     "expo-device": ">=6.0.2",
     "expo-notifications": ">=0.28.16",
     "react": "^18.2.0",
-    "react-native": "^0.73.4",
+    "react-native": "^0.75.2",
     "rimraf": "^6.0.1",
     "typescript": "^5.5.4",
     "vite": "^5.0.0",
