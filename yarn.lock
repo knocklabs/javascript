@@ -5168,7 +5168,7 @@ __metadata:
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
     expo-device: "npm:>=6.0.2"
-    expo-notifications: "npm:>=0.28.14"
+    expo-notifications: "npm:>=0.28.16"
     expo-status-bar: "npm:~1.11.1"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
@@ -5193,7 +5193,7 @@ __metadata:
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
     expo-device: "npm:>=6.0.2"
-    expo-notifications: "npm:>=0.28.14"
+    expo-notifications: "npm:>=0.28.16"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
     react-native-gesture-handler: "npm:^2.1.0"
@@ -13576,9 +13576,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-notifications@npm:>=0.28.14":
-  version: 0.28.15
-  resolution: "expo-notifications@npm:0.28.15"
+"expo-notifications@npm:>=0.28.16":
+  version: 0.28.16
+  resolution: "expo-notifications@npm:0.28.16"
   dependencies:
     "@expo/image-utils": "npm:^0.5.0"
     "@ide/backoff": "npm:^1.0.0"
@@ -13590,7 +13590,7 @@ __metadata:
     fs-extra: "npm:^9.1.0"
   peerDependencies:
     expo: "*"
-  checksum: 10c0/bcb2e86dbcaf8324bd386fa7b2928b73c6389b3734b6686e17582c561b09b39c13169af212a8556e7e65bba31fa8dbdd5fe78be9a5a3b3c187aa019cf6fd6348
+  checksum: 10c0/11b1b33c984b68413d8f1edd04d80a34bcc1dc8ba43ea7dedf46e62aa9edac7f3256de04d02c94e5368c6fba9064dd0e75a18e2a72cb604c3e6a8f482fd75cd2
   languageName: node
   linkType: hard
 
