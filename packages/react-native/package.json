@@ -70,7 +70,7 @@
     "react-native-svg": "^15.6.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.37",
+    "@types/react": "^18.3.6",
     "@types/react-native-htmlview": "^0.16.5",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
