@@ -137,7 +137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.24.0":
+"@babel/core@npm:^7.24.0, @babel/core@npm:^7.25.2":
   version: 7.25.2
   resolution: "@babel/core@npm:7.25.2"
   dependencies:
@@ -4997,7 +4997,7 @@ __metadata:
   resolution: "@knocklabs/client@workspace:packages/client"
   dependencies:
     "@babel/cli": "npm:^7.25.6"
-    "@babel/core": "npm:^7.20.0"
+    "@babel/core": "npm:^7.25.2"
     "@babel/plugin-proposal-class-properties": "npm:^7.16.7"
     "@babel/plugin-proposal-object-rest-spread": "npm:^7.16.7"
     "@babel/plugin-transform-runtime": "npm:^7.25.4"
@@ -5110,7 +5110,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@knocklabs/react-native-example@workspace:examples/react-native-example"
   dependencies:
-    "@babel/core": "npm:^7.20.0"
+    "@babel/core": "npm:^7.25.2"
     "@knocklabs/react-native": "workspace:^"
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
