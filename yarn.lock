@@ -8333,7 +8333,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^4.3.2":
+"@vitejs/plugin-react@npm:^4.2.0, @vitejs/plugin-react@npm:^4.3.2":
   version: 4.3.2
   resolution: "@vitejs/plugin-react@npm:4.3.2"
   dependencies:
@@ -14800,7 +14800,7 @@ __metadata:
     "@eslint/js": "npm:^9.9.0"
     "@types/react": "npm:^18.3.6"
     "@types/react-dom": "npm:^18.2.15"
-    "@vitejs/plugin-react": "npm:^4.3.2"
+    "@vitejs/plugin-react": "npm:^4.2.0"
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
