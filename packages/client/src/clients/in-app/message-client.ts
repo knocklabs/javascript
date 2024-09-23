@@ -21,7 +21,7 @@ export class InAppMessageClient {
 
   constructor(
     readonly channelClient: InAppChannelClient,
-    readonly schema: string,
+    readonly messageType: string,
     options: InAppMessageClientOptions,
   ) {
     this.knock = channelClient.knock;
@@ -51,11 +51,11 @@ export class InAppMessageClient {
       __fetchSource: undefined,
     };
 
-    const queryParamsString = JSON.stringify(queryParams);
+    const queryKey = `${this.messageType}-${JSON.stringify(queryParams)}`;
 
     const result = await this.knock.client().makeRequest({
       method: "GET",
-      url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}`,
+      url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`,
       params: queryParams,
     });
 
@@ -72,7 +72,7 @@ export class InAppMessageClient {
     }
 
     const response: InAppMessagesQueryInfo = {
-      items: result.body.items,
+      items: result.body.entries,
       pageInfo: result.body.page_info,
     };
 
@@ -88,7 +88,7 @@ export class InAppMessageClient {
         // Store query results
         queries: {
           ...state.queries,
-          [queryParamsString]: response,
+          [queryKey]: response,
         },
       };
     });
