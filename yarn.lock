@@ -4760,6 +4760,7 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.16.7"
     "@babel/runtime": "npm:^7.25.6"
     "@knocklabs/types": "workspace:^"
+    "@tanstack/store": "npm:^0.5.5"
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/phoenix": "npm:^1.5.4"
     "@typescript-eslint/eslint-plugin": "npm:^6.20.0"
@@ -7208,6 +7209,13 @@ __metadata:
   dependencies:
     defer-to-connect: "npm:^2.0.1"
   checksum: 10c0/4629d2fbb2ea67c2e9dc03af235c0991c79ebdddcbc19aed5d5732fb29ce01c13331e9b1a491584b9069bd6ecde6581dcbf871f11b7eefdebbab34de6cf2197e
+  languageName: node
+  linkType: hard
+
+"@tanstack/store@npm:^0.5.5":
+  version: 0.5.5
+  resolution: "@tanstack/store@npm:0.5.5"
+  checksum: 10c0/d06ba882f4196c24ffd1f72f31f3b8939e9fabe642bb03800451cf62b621a60c863c3b4a876384fd13fe3c70bfcae5d230243dba90faa45c15fdaad89e2787f1
   languageName: node
   linkType: hard
 
