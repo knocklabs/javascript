@@ -5009,7 +5009,7 @@ __metadata:
     prettier: "npm:^3.1.0"
     rimraf: "npm:^6.0.1"
     rollup: "npm:^4.21.0"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
     vite: "npm:^5.0.0"
     vitest: "npm:^2.0.5"
     zustand: "npm:^3.7.2"
@@ -5027,7 +5027,7 @@ __metadata:
     eslint-config-prettier: "npm:^9.0.0"
     eslint-config-turbo: "npm:^2.0.11"
     eslint-plugin-only-warn: "npm:^1.1.0"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
 
@@ -5083,7 +5083,7 @@ __metadata:
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
     swr: "npm:^2.2.5"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -5107,7 +5107,7 @@ __metadata:
     expo-status-bar: "npm:~1.11.1"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
 
@@ -5135,7 +5135,7 @@ __metadata:
     react-native-render-html: "npm:^6.3.4"
     react-native-svg: "npm:^15.6.0"
     rimraf: "npm:^6.0.1"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -5186,7 +5186,7 @@ __metadata:
     react-popper-tooltip: "npm:^4.4.2"
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -5202,7 +5202,7 @@ __metadata:
   resolution: "@knocklabs/types@workspace:packages/types"
   dependencies:
     eslint: "npm:^8.56.0"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
 
@@ -18532,7 +18532,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-icons: "npm:^4.12.0"
     swr: "npm:^2.2.5"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
     uuid: "npm:^9.0.1"
   languageName: unknown
   linkType: soft
@@ -22521,7 +22521,7 @@ __metadata:
     next: "npm:14.0.4"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
 
@@ -22543,7 +22543,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     tailwindcss: "npm:^3.3.0"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
 
@@ -24115,13 +24115,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.5.4":
-  version: 5.5.4
-  resolution: "typescript@npm:5.5.4"
+"typescript@npm:^5.6.2":
+  version: 5.6.2
+  resolution: "typescript@npm:5.6.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/422be60f89e661eab29ac488c974b6cc0a660fb2228003b297c3d10c32c90f3bcffc1009b43876a082515a3c376b1eefcce823d6e78982e6878408b9a923199c
+  checksum: 10c0/3ed8297a8c7c56b7fec282532503d1ac795239d06e7c4966b42d4330c6cf433a170b53bcf93a130a7f14ccc5235de5560df4f1045eb7f3550b46ebed16d3c5e5
   languageName: node
   linkType: hard
 
@@ -24135,13 +24135,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.5.4#optional!builtin<compat/typescript>":
-  version: 5.5.4
-  resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=d69c25"
+"typescript@patch:typescript@npm%3A^5.6.2#optional!builtin<compat/typescript>":
+  version: 5.6.2
+  resolution: "typescript@patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=d69c25"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/10dd9881baba22763de859e8050d6cb6e2db854197495c6f1929b08d1eb2b2b00d0b5d9b0bcee8472f1c3f4a7ef6a5d7ebe0cfd703f853aa5ae465b8404bc1ba
+  checksum: 10c0/e6c1662e4852e22fe4bbdca471dca3e3edc74f6f1df043135c44a18a7902037023ccb0abdfb754595ca9028df8920f2f8492c00fc3cbb4309079aae8b7de71cd
   languageName: node
   linkType: hard
 
