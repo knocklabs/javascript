@@ -45,13 +45,13 @@ export interface InAppMessage<T = GenericData> {
 }
 
 export interface InAppMessagesQueryInfo {
+  networkStatus: NetworkStatus;
+  loading: boolean;
   items: InAppMessage[];
-  pageInfo: PageInfo;
+  pageInfo?: PageInfo;
 }
 
 export interface InAppStoreState {
-  networkStatus: NetworkStatus;
-  loading: boolean;
   messages: Record<string, InAppMessage>;
   queries: Record<string, InAppMessagesQueryInfo>;
 }

@@ -1,7 +1,5 @@
 import { Store } from "@tanstack/store";
 
-import { NetworkStatus } from "../../networkStatus";
-
 import { InAppStoreState } from "./types";
 
 export type InAppStore = Store<
@@ -11,8 +9,6 @@ export type InAppStore = Store<
 
 export function createStore() {
   return new Store<InAppStoreState>({
-    networkStatus: NetworkStatus.ready,
-    loading: false,
     messages: {},
     queries: {},
   });
