@@ -8,24 +8,18 @@ import {
   InAppMessagesQueryInfo,
 } from "./types";
 
-const defaultOptions: Pick<InAppMessageClientOptions, "archived"> = {
-  archived: "exclude",
-};
-
 /**
  * Manages realtime connection to in app messages service.
  */
 export class InAppMessageClient {
   private knock: Knock;
-  private defaultOptions: InAppMessageClientOptions;
 
   constructor(
     readonly channelClient: InAppChannelClient,
     readonly messageType: string,
-    options: InAppMessageClientOptions,
+    readonly defaultOptions: InAppMessageClientOptions = {},
   ) {
     this.knock = channelClient.knock;
-    this.defaultOptions = { ...defaultOptions, ...options };
   }
 
   async fetch(options: FetchInAppMessagesOptions = {}) {

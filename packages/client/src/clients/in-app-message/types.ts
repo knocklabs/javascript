@@ -30,9 +30,8 @@ export interface InAppMessage<T = GenericData> {
   __cursor: string;
   id: string;
   message_type: string;
-  schema_variant_key: string;
+  schema_variant: string;
   schema_version: string;
-  priority: number;
   content: Record<string, ContentField>;
   data: T | null;
   inserted_at: string;
@@ -57,16 +56,28 @@ export interface InAppStoreState {
   queries: Record<string, InAppMessagesQueryInfo>;
 }
 
+export type EngagementStatus =
+  | "read"
+  | "unread"
+  | "seen"
+  | "unseen"
+  | "link_clicked"
+  | "link_unclicked"
+  | "interacted"
+  | "uninteracted";
+
 export interface InAppMessageClientOptions {
   order?: "asc" | "desc";
   before?: string;
   after?: string;
   page_size?: number;
-  status?: "unread" | "read" | "unseen" | "seen" | "all";
+  engagement_status?: EngagementStatus[];
   // Optionally scope all requests to a particular tenant
-  tenant?: string;
+  tenant_id?: string;
   // Optionally scope to notifications with any tenancy or no tenancy
-  has_tenant?: boolean;
+  with_null_tenant?: boolean;
+  // Optionally scope to notifications from the given workflow
+  workflow_key?: string;
   // Optionally scope to notifications with any of the categories provided
   workflow_categories?: string[];
   // Optionally scope to a given archived status (defaults to `exclude`)
