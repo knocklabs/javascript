@@ -14793,9 +14793,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"in-app-messaging-example@workspace:examples/in-app-messaging-example":
+"in-app-messaging-example@workspace:examples/in-app-message-example":
   version: 0.0.0-use.local
-  resolution: "in-app-messaging-example@workspace:examples/in-app-messaging-example"
+  resolution: "in-app-messaging-example@workspace:examples/in-app-message-example"
   dependencies:
     "@eslint/js": "npm:^9.9.0"
     "@types/react": "npm:^18.3.6"
