@@ -2,6 +2,7 @@ import Knock, {
   InAppChannelClient,
   InAppMessageClient,
 } from "@knocklabs/client";
+import { GenericData } from "@knocklabs/types";
 import { useEffect, useState } from "react";
 
 const knockClient = new Knock(import.meta.env.VITE_KNOCK_API_KEY!, {
@@ -22,12 +23,12 @@ const inAppMessageClient = new InAppMessageClient(
 );
 
 function App() {
-  const [response, setResponse] = useState<any>({});
+  const [response, setResponse] = useState<GenericData>({});
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       const response = await inAppMessageClient.fetch();
-      setResponse(response);
+      setResponse(response as GenericData);
     }, 500);
 
     return () => {
@@ -37,7 +38,7 @@ function App() {
 
   return (
     <>
-      <h1>Knock In App Messaging</h1>
+      <h1>Knock In-App Message Example</h1>
       <hr />
       <h2>Env</h2>
       <pre>{JSON.stringify(import.meta.env, null, 2)}</pre>
