@@ -24,19 +24,6 @@ export class InAppMessageClient {
 
   async fetch(options: FetchInAppMessagesOptions = {}) {
     // TODO: Create better abstraction for reading from / writing to store
-    const { networkStatus } = this.channelClient.store.state;
-
-    // If there's an existing request in flight, then do nothing
-    if (isRequestInFlight(networkStatus)) {
-      return;
-    }
-
-    // Set the loading type based on the request type it is
-    this.channelClient.store.setState((state) => ({
-      ...state,
-      networkStatus: options.__loadingType ?? NetworkStatus.loading,
-    }));
-
     const queryParams = {
       ...this.defaultOptions,
       ...options,
@@ -46,6 +33,29 @@ export class InAppMessageClient {
     };
 
     const queryKey = `${this.messageType}-${JSON.stringify(queryParams)}`;
+    const queryState = this.channelClient.store.state.queries[queryKey] ?? {
+      items: [],
+      loading: false,
+      networkStatus: NetworkStatus.ready,
+    };
+    const networkStatus = queryState.networkStatus;
+
+    // If there's an existing request in flight, then do nothing
+    if (networkStatus && isRequestInFlight(networkStatus)) {
+      return;
+    }
+
+    // Set the loading type based on the request type it is
+    this.channelClient.store.setState((state) => ({
+      ...state,
+      queries: {
+        ...state.queries,
+        [queryKey]: {
+          ...queryState,
+          networkStatus: options.__loadingType ?? NetworkStatus.loading,
+        },
+      },
+    }));
 
     const result = await this.knock.client().makeRequest({
       method: "GET",
@@ -56,7 +66,13 @@ export class InAppMessageClient {
     if (result.statusCode === "error" || !result.body) {
       this.channelClient.store.setState((state) => ({
         ...state,
-        networkStatus: NetworkStatus.error,
+        queries: {
+          ...state.queries,
+          [queryKey]: {
+            ...queryState,
+            networkStatus: NetworkStatus.error,
+          },
+        },
       }));
 
       return {
@@ -65,28 +81,29 @@ export class InAppMessageClient {
       };
     }
 
-    const response: InAppMessagesQueryInfo = {
+    const queryInfo: InAppMessagesQueryInfo = {
       items: result.body.entries,
       pageInfo: result.body.page_info,
+      loading: false,
+      networkStatus: NetworkStatus.ready,
     };
 
-    // TODO: Update queries state page info based on before/after like in feed.ts
     this.channelClient.store.setState((state) => {
       return {
         ...state,
         // Store new messages in shared store
-        messages: response.items.reduce((messages, message) => {
+        messages: queryInfo.items.reduce((messages, message) => {
           messages[message.id] = message;
           return messages;
         }, state.messages),
         // Store query results
         queries: {
           ...state.queries,
-          [queryKey]: response,
+          [queryKey]: queryInfo,
         },
       };
     });
 
-    return { data: response, status: result.statusCode };
+    return { data: queryInfo, status: result.statusCode };
   }
 }
