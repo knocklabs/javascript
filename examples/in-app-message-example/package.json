@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@knocklabs/client": "workspace:^",
+    "@knocklabs/react-core": "workspace:^"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

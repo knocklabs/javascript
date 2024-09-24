@@ -1,9 +1,12 @@
+import { GenericData, PageInfo } from "@knocklabs/types";
+
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 
 import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
+  InAppMessage,
   InAppMessageClientOptions,
   InAppMessageResponse,
   InAppMessagesQueryInfo,
@@ -15,15 +18,31 @@ import {
 export class InAppMessageClient {
   private knock: Knock;
 
+  public queryKey: string;
+
   constructor(
     readonly channelClient: InAppChannelClient,
     readonly messageType: string,
     readonly defaultOptions: InAppMessageClientOptions = {},
   ) {
     this.knock = channelClient.knock;
+    this.queryKey = this.buildQueryKey(defaultOptions);
   }
 
-  async fetch(options: FetchInAppMessagesOptions = {}) {
+  async fetch(options: FetchInAppMessagesOptions = {}): Promise<
+    | {
+        data: {
+          items?: InAppMessage[];
+          pageInfo?: PageInfo;
+        };
+        status: "ok";
+      }
+    | {
+        data: GenericData;
+        status: "error";
+      }
+    | undefined
+  > {
     // TODO: Create better abstraction for reading from / writing to store
     const queryParams = {
       ...this.defaultOptions,
@@ -33,8 +52,11 @@ export class InAppMessageClient {
       __fetchSource: undefined,
     };
 
-    const queryKey = `${this.messageType}-${JSON.stringify(queryParams)}`;
-    const queryState = this.channelClient.store.state.queries[queryKey] ?? {
+    this.queryKey = this.buildQueryKey(queryParams);
+
+    const queryState = this.channelClient.store.state.queries[
+      this.queryKey
+    ] ?? {
       loading: false,
       networkStatus: NetworkStatus.ready,
     };
@@ -50,9 +72,10 @@ export class InAppMessageClient {
       ...state,
       queries: {
         ...state.queries,
-        [queryKey]: {
+        [this.queryKey]: {
           ...queryState,
           networkStatus: options.__loadingType ?? NetworkStatus.loading,
+          loading: true,
         },
       },
     }));
@@ -62,15 +85,17 @@ export class InAppMessageClient {
       url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`,
       params: queryParams,
     });
+    // TODO: Maybe map to camel case props?
 
     if (result.statusCode === "error" || !result.body) {
       this.channelClient.store.setState((state) => ({
         ...state,
         queries: {
           ...state.queries,
-          [queryKey]: {
+          [this.queryKey]: {
             ...queryState,
             networkStatus: NetworkStatus.error,
+            loading: false,
           },
         },
       }));
@@ -103,11 +128,18 @@ export class InAppMessageClient {
         // Store query results
         queries: {
           ...state.queries,
-          [queryKey]: queryInfo,
+          [this.queryKey]: queryInfo,
         },
       };
     });
 
     return { data: response, status: result.statusCode };
+  }
+
+  // ----------------------------------------------
+  // Helpers
+  // ----------------------------------------------
+  private buildQueryKey(params: GenericData) {
+    return `${this.messageType}-${JSON.stringify(params)}`;
   }
 }
