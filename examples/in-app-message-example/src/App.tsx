@@ -1,69 +1,12 @@
 import { InAppMessageTextContentField, NetworkStatus } from "@knocklabs/client";
 import {
+  Banner,
   KnockInAppMessageChannelProvider,
   KnockProvider,
-  useInAppMessage,
   useInAppMessages,
 } from "@knocklabs/react";
+import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
-
-function Message() {
-  const [messageType, setMessageType] = useState("card");
-
-  const { message, loading, networkStatus } = useInAppMessage(messageType);
-
-  return (
-    <>
-      <h2>Message</h2>
-      <div
-        style={{ height: 24, display: "flex", justifyContent: "space-between" }}
-      >
-        <select
-          value={messageType}
-          onChange={(e) => setMessageType(e.currentTarget.value)}
-        >
-          <option value="banner">Banner</option>
-          <option value="card">Card</option>
-        </select>
-        {(loading || networkStatus === NetworkStatus.loading) && (
-          <div>Loading...</div>
-        )}
-      </div>
-      <div>
-        {message?.message_type === "banner" ? (
-          <div className="banner" key={message.id}>
-            <h2>
-              {(message.content.title as InAppMessageTextContentField).rendered}
-            </h2>
-            <p>
-              {(message.content.body as InAppMessageTextContentField).rendered}
-            </p>
-            {(message.content.dismissible as InAppMessageTextContentField)
-              .value && <button>Dismiss</button>}
-          </div>
-        ) : message?.message_type === "card" ? (
-          <div className="card" key={message.id}>
-            <h2>
-              {
-                (message.content.heading as InAppMessageTextContentField)
-                  .rendered
-              }
-            </h2>
-            {/* @ts-expect-error Need to type */}
-            <a href={message.content.action.action.rendered}>
-              {/* @ts-expect-error Need to type */}
-              {message.content.action.text.rendered}
-            </a>
-          </div>
-        ) : (
-          <pre key={message?.id}>
-            {JSON.stringify({ content: message?.content }, null, 2)}
-          </pre>
-        )}
-      </div>
-    </>
-  );
-}
 
 function Messages() {
   const [messageType, setMessageType] = useState("banner");
@@ -135,7 +78,8 @@ function App() {
         <>
           <h1>Knock In-App Message Example</h1>
           <hr />
-          <Message />
+          <h2>Banner</h2>
+          <Banner />
           <hr />
           <Messages />
           <hr />
