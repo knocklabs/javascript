@@ -3,28 +3,37 @@ import { GenericData, PageInfo } from "@knocklabs/types";
 import { NetworkStatus } from "../../networkStatus";
 import { NotificationSource } from "../messages/interfaces";
 
-export interface CommonContentField {
+export interface InAppMessageTextContentField {
   key: string;
-  label: string;
   rendered: string;
-  type: "text" | "markdown" | "boolean" | "textarea";
+  type: "text" | "markdown" | "textarea";
   value: string;
 }
 
-export interface ButtonContentField {
+export interface InAppMessageBooleanContentField {
+  key: string;
+  rendered: boolean;
+  type: "boolean";
+  value: boolean;
+}
+
+export interface InAppMessageButtonContentField {
   key: string;
   type: "button";
-  text: Exclude<CommonContentField, "key | type"> & {
+  text: Exclude<InAppMessageTextContentField, "key | type"> & {
     key: "text";
     type: "text";
   };
-  action: Exclude<CommonContentField, "key | type"> & {
+  action: Exclude<InAppMessageTextContentField, "key | type"> & {
     key: "action";
     type: "text";
   };
 }
 
-export type ContentField = CommonContentField | ButtonContentField;
+export type InAppMessageContentField =
+  | InAppMessageTextContentField
+  | InAppMessageBooleanContentField
+  | InAppMessageButtonContentField;
 
 export interface InAppMessage<T = GenericData> {
   __cursor: string;
@@ -32,7 +41,7 @@ export interface InAppMessage<T = GenericData> {
   message_type: string;
   schema_variant: string;
   schema_version: string;
-  content: Record<string, ContentField>;
+  content: Record<string, InAppMessageContentField>;
   data: T | null;
   inserted_at: string;
   updated_at: string;
@@ -44,19 +53,23 @@ export interface InAppMessage<T = GenericData> {
   source: NotificationSource;
 }
 
+export interface InAppMessageResponse {
+  items: InAppMessage[];
+  pageInfo: PageInfo;
+}
+
 export interface InAppMessagesQueryInfo {
   networkStatus: NetworkStatus;
   loading: boolean;
-  items: InAppMessage[];
-  pageInfo?: PageInfo;
+  data?: InAppMessageResponse;
 }
 
-export interface InAppStoreState {
+export interface InAppMessageStoreState {
   messages: Record<string, InAppMessage>;
   queries: Record<string, InAppMessagesQueryInfo>;
 }
 
-export type EngagementStatus =
+export type InAppMessageEngagementStatus =
   | "read"
   | "unread"
   | "seen"
@@ -71,13 +84,11 @@ export interface InAppMessageClientOptions {
   before?: string;
   after?: string;
   page_size?: number;
-  engagement_status?: EngagementStatus[];
-  // Optionally scope all requests to a particular tenant
-  tenant_id?: string;
-  // Optionally scope to notifications with any tenancy or no tenancy
-  with_null_tenant?: boolean;
-  // Optionally scope to notifications from the given workflow
-  workflow_key?: string;
+  engagement_status?: InAppMessageEngagementStatus[];
+  // Optionally scope all requests to a particular tenant or tenants
+  tenant_id?: string | string[];
+  // Optionally scope to notifications from the given workflow or workflows
+  workflow_key?: string | string[];
   // Optionally scope to notifications with any of the categories provided
   workflow_categories?: string[];
   // Optionally scope to a given archived status (defaults to `exclude`)
