@@ -46,7 +46,7 @@ export const Banner: React.FC<BannerProps> = () => {
       }
       return values;
     },
-    {} as Record<string, string | { text: string; action: string }>,
+    {} as Record<string, string | boolean | { text: string; action: string }>,
   ) as unknown as BannerContent;
 
   // TODO: Track interaction on load or whatever other events necessary
