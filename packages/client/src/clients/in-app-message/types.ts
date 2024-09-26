@@ -52,7 +52,9 @@ export interface InAppMessageClientOptions {
   before?: string;
   after?: string;
   page_size?: number;
-  engagement_status?: InAppMessageEngagementStatus[];
+  engagement_status?:
+    | InAppMessageEngagementStatus
+    | InAppMessageEngagementStatus[];
   // Optionally scope all requests to a particular tenant or tenants
   tenant_id?: string | string[];
   // Optionally scope to notifications from the given workflow or workflows

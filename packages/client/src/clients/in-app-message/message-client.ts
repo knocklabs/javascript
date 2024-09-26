@@ -64,6 +64,7 @@ export class InAppMessageClient {
 
     // If there's an existing request in flight, then do nothing
     if (networkStatus && isRequestInFlight(networkStatus)) {
+      // TODO: Evaluate response for in flight request
       return;
     }
 

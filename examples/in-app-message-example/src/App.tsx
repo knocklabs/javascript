@@ -1,4 +1,4 @@
-import { InAppMessageTextContentField, NetworkStatus } from "@knocklabs/client";
+import { NetworkStatus } from "@knocklabs/client";
 import {
   Banner,
   KnockInAppMessageChannelProvider,
@@ -35,25 +35,16 @@ function Messages() {
           if (message_type === "banner") {
             return (
               <div className="banner" key={id}>
-                <h2>
-                  {(content.title as InAppMessageTextContentField).rendered}
-                </h2>
-                <p>{(content.body as InAppMessageTextContentField).rendered}</p>
-                {(content.dismissible as InAppMessageTextContentField)
-                  .value && <button>Dismiss</button>}
+                <h2>{content.title}</h2>
+                <p>{content.body}</p>
+                {content.dismissible.value && <button>Dismiss</button>}
               </div>
             );
           } else if (message_type === "card") {
             return (
               <div className="card" key={id}>
-                <h2>
-                  {(content.heading as InAppMessageTextContentField).rendered}
-                </h2>
-                {/* @ts-expect-error Need to type */}
-                <a href={content.action.action.rendered}>
-                  {/* @ts-expect-error Need to type */}
-                  {content.action.text.rendered}
-                </a>
+                <h2>{content.heading}</h2>
+                <a href={content.action.action}>{content.action.text}</a>
               </div>
             );
           } else {
