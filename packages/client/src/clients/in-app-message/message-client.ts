@@ -140,6 +140,7 @@ export class InAppMessageClient {
   // Helpers
   // ----------------------------------------------
   private buildQueryKey(params: GenericData) {
+    // TODO: Update query key format to match GET request url (w/ query params)
     return `${this.messageType}-${JSON.stringify(params)}`;
   }
 }

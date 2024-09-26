@@ -14927,6 +14927,8 @@ __metadata:
   resolution: "in-app-message-example@workspace:examples/in-app-message-example"
   dependencies:
     "@eslint/js": "npm:^9.9.0"
+    "@knocklabs/client": "workspace:^"
+    "@knocklabs/react-core": "workspace:^"
     "@types/react": "npm:^18.3.6"
     "@types/react-dom": "npm:^18.2.15"
     "@vitejs/plugin-react": "npm:^4.2.0"
