@@ -24,7 +24,7 @@ export const useInAppMessages = (
   // Could definitely create selectors as functions in the client library though
   const messages = useStore(inAppChannelClient.store, (state) => {
     const messageIds = new Set(
-      state.queries[inAppMessageClient.queryKey]?.items?.map(
+      state.queries[inAppMessageClient.queryKey]?.data?.items?.map(
         (message) => message.id,
       ),
     );

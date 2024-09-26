@@ -1,4 +1,4 @@
-import { CommonContentField, NetworkStatus } from "@knocklabs/client";
+import { InAppMessageTextContentField, NetworkStatus } from "@knocklabs/client";
 import {
   KnockInAppMessageChannelProvider,
   KnockProvider,
@@ -32,15 +32,23 @@ function Message() {
       <div>
         {message?.message_type === "banner" ? (
           <div className="banner" key={message.id}>
-            <h2>{(message.content.title as CommonContentField).rendered}</h2>
-            <p>{(message.content.body as CommonContentField).rendered}</p>
-            {(message.content.dismissible as CommonContentField).value && (
-              <button>Dismiss</button>
-            )}
+            <h2>
+              {(message.content.title as InAppMessageTextContentField).rendered}
+            </h2>
+            <p>
+              {(message.content.body as InAppMessageTextContentField).rendered}
+            </p>
+            {(message.content.dismissible as InAppMessageTextContentField)
+              .value && <button>Dismiss</button>}
           </div>
         ) : message?.message_type === "card" ? (
           <div className="card" key={message.id}>
-            <h2>{(message.content.heading as CommonContentField).rendered}</h2>
+            <h2>
+              {
+                (message.content.heading as InAppMessageTextContentField)
+                  .rendered
+              }
+            </h2>
             {/* @ts-expect-error Need to type */}
             <a href={message.content.action.action.rendered}>
               {/* @ts-expect-error Need to type */}
@@ -84,17 +92,20 @@ function Messages() {
           if (message_type === "banner") {
             return (
               <div className="banner" key={id}>
-                <h2>{(content.title as CommonContentField).rendered}</h2>
-                <p>{(content.body as CommonContentField).rendered}</p>
-                {(content.dismissible as CommonContentField).value && (
-                  <button>Dismiss</button>
-                )}
+                <h2>
+                  {(content.title as InAppMessageTextContentField).rendered}
+                </h2>
+                <p>{(content.body as InAppMessageTextContentField).rendered}</p>
+                {(content.dismissible as InAppMessageTextContentField)
+                  .value && <button>Dismiss</button>}
               </div>
             );
           } else if (message_type === "card") {
             return (
               <div className="card" key={id}>
-                <h2>{(content.heading as CommonContentField).rendered}</h2>
+                <h2>
+                  {(content.heading as InAppMessageTextContentField).rendered}
+                </h2>
                 {/* @ts-expect-error Need to type */}
                 <a href={content.action.action.rendered}>
                   {/* @ts-expect-error Need to type */}
