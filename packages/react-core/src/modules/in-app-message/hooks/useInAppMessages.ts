@@ -1,17 +1,19 @@
 import {
-  FetchInAppMessagesOptions,
   InAppMessage,
   InAppMessageClient,
+  InAppMessageClientOptions,
 } from "@knocklabs/client";
 import { useStore } from "@tanstack/react-store";
 import { useEffect, useMemo } from "react";
 
 import { useInAppMessageChannel } from "../context";
 
+export type UseInAppMessagesOptions = InAppMessageClientOptions;
+
 // TODO: Type so that the message content (or fields) is typed
 export const useInAppMessages = (
   messageType: string,
-  options: FetchInAppMessagesOptions = {},
+  options: UseInAppMessagesOptions = {},
 ) => {
   const { inAppChannelClient } = useInAppMessageChannel();
 
@@ -63,9 +65,11 @@ export const useInAppMessages = (
   return { messages, networkStatus, loading };
 };
 
+export type UseInAppMessageOptions = Omit<UseInAppMessagesOptions, "page_size">;
+
 export const useInAppMessage = (
   messageType: string,
-  options: Omit<FetchInAppMessagesOptions, "page_size"> = {},
+  options: UseInAppMessageOptions = {},
 ) => {
   const { messages, ...info } = useInAppMessages(messageType, {
     ...options,

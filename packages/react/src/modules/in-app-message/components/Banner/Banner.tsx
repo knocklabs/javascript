@@ -1,14 +1,10 @@
-import { useInAppMessage } from "@knocklabs/react-core";
+import { UseInAppMessageOptions, useInAppMessage } from "@knocklabs/react-core";
 import React from "react";
 
 import "./styles.css";
 
-// TODO: Styling - css vars, naming/prefix, dark mode
-// TODO: Consider customizing build to split css for feed and in-app-message?
-
-// TODO: Extract reusable parts for all ootb components
 export interface BannerProps {
-  // TODO: Props for filters - entire options or break out?
+  filters?: UseInAppMessageOptions;
 }
 
 const MESSAGE_TYPE = "banner";
@@ -29,8 +25,8 @@ interface BannerContent {
   dismissible: boolean;
 }
 
-export const Banner: React.FC<BannerProps> = () => {
-  const { message } = useInAppMessage(MESSAGE_TYPE);
+export const Banner: React.FC<BannerProps> = ({ filters }) => {
+  const { message } = useInAppMessage(MESSAGE_TYPE, filters);
 
   if (!message) return null;
 
