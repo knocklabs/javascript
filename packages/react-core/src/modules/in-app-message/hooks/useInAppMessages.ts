@@ -2,7 +2,9 @@ import {
   InAppMessage,
   InAppMessageClient,
   InAppMessageClientOptions,
+  NetworkStatus,
 } from "@knocklabs/client";
+import { GenericData } from "@knocklabs/types";
 import { useStore } from "@tanstack/react-store";
 import { useEffect, useMemo } from "react";
 
@@ -10,11 +12,16 @@ import { useInAppMessageChannel } from "../context";
 
 export type UseInAppMessagesOptions = InAppMessageClientOptions;
 
-// TODO: Type so that the message content (or fields) is typed
-export const useInAppMessages = (
+export interface InAppMessagesResponse<TContent, TData> {
+  messages: InAppMessage<TContent, TData>[];
+  networkStatus: NetworkStatus;
+  loading: boolean;
+}
+
+export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
   messageType: string,
   options: UseInAppMessagesOptions = {},
-) => {
+): InAppMessagesResponse<TContent, TData> => {
   const { inAppChannelClient } = useInAppMessageChannel();
 
   const inAppMessageClient = useMemo(() => {
@@ -31,15 +38,14 @@ export const useInAppMessages = (
       ),
     );
 
-    const messages = Object.entries(state.messages).reduce<InAppMessage[]>(
-      (messages, [id, message]) => {
-        if (messageIds.has(id)) {
-          messages.push(message);
-        }
-        return messages;
-      },
-      [],
-    );
+    const messages = Object.entries(state.messages).reduce<
+      InAppMessage<TContent, TData>[]
+    >((messages, [id, message]) => {
+      if (messageIds.has(id)) {
+        messages.push(message as InAppMessage<TContent, TData>);
+      }
+      return messages;
+    }, []);
 
     return messages;
   });
@@ -48,7 +54,10 @@ export const useInAppMessages = (
     inAppChannelClient.store,
     (state) => {
       const query = state.queries[inAppMessageClient.queryKey];
-      return { networkStatus: query?.networkStatus, loading: query?.loading };
+      return {
+        networkStatus: query?.networkStatus ?? NetworkStatus.ready,
+        loading: query?.loading ?? false,
+      };
     },
   );
 
@@ -67,11 +76,17 @@ export const useInAppMessages = (
 
 export type UseInAppMessageOptions = Omit<UseInAppMessagesOptions, "page_size">;
 
-export const useInAppMessage = (
+export interface InAppMessageResponse<TContent, TData> {
+  message?: InAppMessage<TContent, TData>;
+  networkStatus: NetworkStatus;
+  loading: boolean;
+}
+
+export const useInAppMessage = <TContent = GenericData, TData = GenericData>(
   messageType: string,
   options: UseInAppMessageOptions = {},
-) => {
-  const { messages, ...info } = useInAppMessages(messageType, {
+): InAppMessageResponse<TContent, TData> => {
+  const { messages, ...info } = useInAppMessages<TContent, TData>(messageType, {
     ...options,
     page_size: 1,
   });

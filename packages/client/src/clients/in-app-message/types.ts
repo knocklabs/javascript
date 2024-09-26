@@ -3,46 +3,14 @@ import { GenericData, PageInfo } from "@knocklabs/types";
 import { NetworkStatus } from "../../networkStatus";
 import { NotificationSource } from "../messages/interfaces";
 
-export interface InAppMessageTextContentField {
-  key: string;
-  rendered: string;
-  type: "text" | "markdown" | "textarea";
-  value: string;
-}
-
-export interface InAppMessageBooleanContentField {
-  key: string;
-  rendered: boolean;
-  type: "boolean";
-  value: boolean;
-}
-
-export interface InAppMessageButtonContentField {
-  key: string;
-  type: "button";
-  text: Exclude<InAppMessageTextContentField, "key | type"> & {
-    key: "text";
-    type: "text";
-  };
-  action: Exclude<InAppMessageTextContentField, "key | type"> & {
-    key: "action";
-    type: "text";
-  };
-}
-
-export type InAppMessageContentField =
-  | InAppMessageTextContentField
-  | InAppMessageBooleanContentField
-  | InAppMessageButtonContentField;
-
-export interface InAppMessage<T = GenericData> {
+export interface InAppMessage<TContent = GenericData, TData = GenericData> {
   __cursor: string;
   id: string;
   message_type: string;
   schema_variant: string;
   schema_version: string;
-  content: Record<string, InAppMessageContentField>;
-  data: T | null;
+  content: TContent;
+  data: TData | null;
   inserted_at: string;
   updated_at: string;
   seen_at: string | null;

@@ -9,8 +9,6 @@ export interface BannerProps {
 
 const MESSAGE_TYPE = "banner";
 
-// TODO: Ideally pass this to use in app message(s) and the returned message
-// has the content and values typed correctly
 interface BannerContent {
   title: string;
   body: string;
@@ -26,47 +24,32 @@ interface BannerContent {
 }
 
 export const Banner: React.FC<BannerProps> = ({ filters }) => {
-  const { message } = useInAppMessage(MESSAGE_TYPE, filters);
+  const { message } = useInAppMessage<BannerContent>(MESSAGE_TYPE, filters);
 
   if (!message) return null;
-
-  const values = Object.values(message.content).reduce(
-    (values, field) => {
-      if (field.type === "button") {
-        values[field.key] = {
-          text: field.text.rendered,
-          action: field.action.rendered,
-        };
-      } else {
-        values[field.key] = field.rendered;
-      }
-      return values;
-    },
-    {} as Record<string, string | boolean | { text: string; action: string }>,
-  ) as unknown as BannerContent;
 
   // TODO: Track interaction on load or whatever other events necessary
 
   return (
     <div className="knk-banner">
       <div className="knk-banner__message">
-        <div className="knk-banner__title">{values.title}</div>
-        <div className="knk-banner__body">{values.body}</div>
+        <div className="knk-banner__title">{message.content.title}</div>
+        <div className="knk-banner__body">{message.content.body}</div>
       </div>
       <div className="knk-banner__actions">
-        {values.secondary_button && (
+        {message.content.secondary_button && (
           <button className="knk-banner__btn knk-banner__btn--secondary">
-            {values.secondary_button.text}
+            {message.content.secondary_button.text}
           </button>
         )}
 
-        {values.primary_button && (
+        {message.content.primary_button && (
           <button className="knk-banner__btn">
-            {values.primary_button.text}
+            {message.content.primary_button.text}
           </button>
         )}
 
-        {values.dismissible && (
+        {message.content.dismissible && (
           // TODO: Archive message on click
           <button className="knk-banner__close">
             <svg
