@@ -5,6 +5,7 @@ import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
   InAppMessageClientOptions,
+  InAppMessageResponse,
   InAppMessagesQueryInfo,
 } from "./types";
 
@@ -34,7 +35,6 @@ export class InAppMessageClient {
 
     const queryKey = `${this.messageType}-${JSON.stringify(queryParams)}`;
     const queryState = this.channelClient.store.state.queries[queryKey] ?? {
-      items: [],
       loading: false,
       networkStatus: NetworkStatus.ready,
     };
@@ -81,18 +81,22 @@ export class InAppMessageClient {
       };
     }
 
-    const queryInfo: InAppMessagesQueryInfo = {
+    const response: InAppMessageResponse = {
       items: result.body.entries,
       pageInfo: result.body.page_info,
+    };
+
+    const queryInfo: InAppMessagesQueryInfo = {
       loading: false,
       networkStatus: NetworkStatus.ready,
+      data: response,
     };
 
     this.channelClient.store.setState((state) => {
       return {
         ...state,
         // Store new messages in shared store
-        messages: queryInfo.items.reduce((messages, message) => {
+        messages: response.items.reduce((messages, message) => {
           messages[message.id] = message;
           return messages;
         }, state.messages),
@@ -104,6 +108,6 @@ export class InAppMessageClient {
       };
     });
 
-    return { data: queryInfo, status: result.statusCode };
+    return { data: response, status: result.statusCode };
   }
 }
