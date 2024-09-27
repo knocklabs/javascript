@@ -1,0 +1,57 @@
+/* TODO: Set up css variables to match designs */
+/* TODO: Consider shared theme for all ootb components */
+/* TODO: maybe brink in telegraph tokens */
+.iam-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 16px 24px;
+  border-radius: 8px;
+  border: 0.5px solid #e0e1e6;
+  box-shadow: 0px 12px 20px rgba(28, 32, 36, 0.1);
+  gap: 16px;
+}
+.iam-banner__message {
+  min-width: 380px;
+}
+.iam-banner__title {
+  color: #1c2024;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+.iam-banner__body {
+  color: #60646c;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+.iam-banner__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.iam-banner__action {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  border-radius: 6px;
+  padding: 8px 16px;
+  border: 0.5px solid #1c2024;
+  background: #1c2024;
+  color: #fcfcfd;
+}
+.iam-banner__action--secondary {
+  border-color: #d9d9e0;
+  background: #ffffff;
+  color: #1c2024;
+}
+.iam-banner__close {
+  padding: 11px;
+  border: none;
+  background: none;
+  line-height: 0;
+}

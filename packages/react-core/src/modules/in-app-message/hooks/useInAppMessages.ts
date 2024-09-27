@@ -29,19 +29,20 @@ export const useInAppMessages = (
       ),
     );
 
-    const messages = Object.entries(state.messages).reduce<InAppMessage[]>(
-      (messages, [id, message]) => {
-        if (messageIds.has(id)) {
-          messages.push(message);
-        }
-        return messages;
-      },
-      [],
-    );
+    // TODO: Just grab based on the message id instead of looping over all messages
+    const messages = Object.entries(state.messages).reduce<
+      InAppMessage<TContent, TData>[]
+    >((messages, [id, message]) => {
+      if (messageIds.has(id)) {
+        messages.push(message as InAppMessage<TContent, TData>);
+      }
+      return messages;
+    }, []);
 
     return messages;
   });
 
+  // TODO: Consolidate to a single useStore call to get all message info
   const { networkStatus, loading } = useStore(
     inAppChannelClient.store,
     (state) => {

@@ -1,11 +1,10 @@
-import Knock, { InAppChannelClient } from "@knocklabs/client";
+import { InAppChannelClient } from "@knocklabs/client";
 import * as React from "react";
 
 import { useKnockClient } from "../../core";
 import { ColorMode } from "../../core/constants";
 
 export interface KnockInAppMessageChannelProviderState {
-  knock: Knock;
   inAppChannelClient: InAppChannelClient;
   colorMode: ColorMode;
 }
@@ -33,7 +32,6 @@ export const KnockInAppMessageChannelProvider: React.FC<
   return (
     <InAppMessageContext.Provider
       value={{
-        knock,
         inAppChannelClient,
         colorMode,
       }}
