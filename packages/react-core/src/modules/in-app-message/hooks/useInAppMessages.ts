@@ -54,7 +54,7 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
   const { networkStatus, loading } = useStore(
     inAppChannelClient.store,
     (state) => {
-      const query = state.queries[InAppMessagesClient.queryKey];
+      const query = state.queries[inAppMessagesClient.queryKey];
       return {
         networkStatus: query?.networkStatus ?? NetworkStatus.ready,
         loading: query?.loading ?? false,
@@ -64,7 +64,7 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      InAppMessagesClient.fetch();
+      inAppMessagesClient.fetch();
     }, 2500);
 
     return () => {
