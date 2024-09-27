@@ -70,7 +70,7 @@ function App() {
           <h1>Knock In-App Message Example</h1>
           <hr />
           <h2>Banner</h2>
-          <Banner />
+          <Banner.Default />
           <hr />
           <Messages />
           <hr />
