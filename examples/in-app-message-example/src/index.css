@@ -35,3 +35,24 @@ h1 {
     color: #747bff;
   }
 }
+
+.banner {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.77);
+  border-radius: 4px;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.77);
+  border-radius: 7px;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

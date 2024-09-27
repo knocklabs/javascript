@@ -54,7 +54,7 @@ export interface InAppMessage<T = GenericData> {
 }
 
 export interface InAppMessageResponse {
-  items: InAppMessage[];
+  entries: InAppMessage[];
   pageInfo: PageInfo;
 }
 
