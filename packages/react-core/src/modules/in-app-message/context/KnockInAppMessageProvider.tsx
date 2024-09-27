@@ -4,26 +4,29 @@ import * as React from "react";
 import { useKnockClient } from "../../core";
 import { ColorMode } from "../../core/constants";
 
-export interface KnockInAppMessageChannelProviderState {
+export interface KnockInAppChannelProviderState {
   inAppChannelClient: InAppChannelClient;
   colorMode: ColorMode;
 }
 
-export interface KnockInAppMessageChannelProviderProps {
+export interface KnockInAppChannelProviderProps {
   // In-App Message props
   channelId: string;
+
+  // TODO: Support default props which will get passed down
 
   // Extra options
   colorMode?: ColorMode;
 }
 
 const InAppMessageContext = React.createContext<
-  KnockInAppMessageChannelProviderState | undefined
+  KnockInAppChannelProviderState | undefined
 >(undefined);
 
-export const KnockInAppMessageChannelProvider: React.FC<
-  React.PropsWithChildren<KnockInAppMessageChannelProviderProps>
+export const KnockInAppChannelProvider: React.FC<
+  React.PropsWithChildren<KnockInAppChannelProviderProps>
 > = ({ children, channelId, colorMode = "light" }) => {
+  // TODO: Catch knock error and resurface (same in KnockFeedProvider)
   const knock = useKnockClient();
   const inAppChannelClient = React.useMemo(() => {
     return new InAppChannelClient(knock, channelId);
@@ -41,15 +44,14 @@ export const KnockInAppMessageChannelProvider: React.FC<
   );
 };
 
-export const useInAppMessageChannel =
-  (): KnockInAppMessageChannelProviderState => {
-    const context = React.useContext(InAppMessageContext);
+export const useInAppMessageChannel = (): KnockInAppChannelProviderState => {
+  const context = React.useContext(InAppMessageContext);
 
-    if (!context) {
-      throw new Error(
-        "useInAppMessageChannel must be used within a KnockInAppMessageChannelProvider",
-      );
-    }
+  if (!context) {
+    throw new Error(
+      "useInAppMessageChannel must be used within a KnockInAppChannelProvider",
+    );
+  }
 
-    return context;
-  };
+  return context;
+};

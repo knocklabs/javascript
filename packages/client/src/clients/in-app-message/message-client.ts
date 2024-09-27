@@ -29,15 +29,17 @@ export class InAppMessageClient {
     this.queryKey = this.buildQueryKey(defaultOptions);
   }
 
+  // TODO: Clean up return types
   async fetch(options: FetchInAppMessagesOptions = {}): Promise<
     | {
         data: {
-          items?: InAppMessage[];
-          pageInfo?: PageInfo;
+          entries: InAppMessage[];
+          pageInfo: PageInfo;
         };
         status: "ok";
       }
     | {
+        // TODO: Better type
         data: GenericData;
         status: "error";
       }
@@ -80,6 +82,7 @@ export class InAppMessageClient {
       },
     }));
 
+    // TODO: Move to method on user.getInAppMessages
     const result = await this.knock.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`,
@@ -107,13 +110,14 @@ export class InAppMessageClient {
     }
 
     const response: InAppMessageResponse = {
-      items: result.body.entries,
+      entries: result.body.entries,
       pageInfo: result.body.page_info,
     };
 
     const queryInfo: InAppMessagesQueryInfo = {
       loading: false,
       networkStatus: NetworkStatus.ready,
+      // TODO: Only store message ids on query info
       data: response,
     };
 
@@ -121,7 +125,7 @@ export class InAppMessageClient {
       return {
         ...state,
         // Store new messages in shared store
-        messages: response.items.reduce((messages, message) => {
+        messages: response.entries.reduce((messages, message) => {
           messages[message.id] = message;
           return messages;
         }, state.messages),

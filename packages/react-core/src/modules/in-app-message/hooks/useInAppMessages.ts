@@ -16,6 +16,7 @@ export const useInAppMessages = (
   const { inAppChannelClient } = useInAppMessageChannel();
 
   const inAppMessageClient = useMemo(() => {
+    // TODO: Ensure this is stable and doesn't recreate the message client
     return new InAppMessageClient(inAppChannelClient, messageType, options);
   }, [inAppChannelClient, messageType, options]);
 
@@ -24,7 +25,7 @@ export const useInAppMessages = (
   // Could definitely create selectors as functions in the client library though
   const messages = useStore(inAppChannelClient.store, (state) => {
     const messageIds = new Set(
-      state.queries[inAppMessageClient.queryKey]?.data?.items?.map(
+      state.queries[inAppMessageClient.queryKey]?.data?.entries?.map(
         (message) => message.id,
       ),
     );
