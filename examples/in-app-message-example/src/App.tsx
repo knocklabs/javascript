@@ -5,6 +5,7 @@ import {
   KnockProvider,
   useInAppMessages,
 } from "@knocklabs/react";
+import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
 
 function Messages() {
@@ -68,6 +69,7 @@ function App() {
         <>
           <h1>Knock In-App Message Example</h1>
           <hr />
+          <h2>Banner</h2>
           <Banner.Default />
           <hr />
           <Messages />
