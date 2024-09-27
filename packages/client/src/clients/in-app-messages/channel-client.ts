@@ -9,6 +9,8 @@ import { InAppStore, createStore } from "./store";
 export class InAppChannelClient {
   public store: InAppStore;
 
+  // TODO: Allow passing in default options here which will get passed to message client (also update provider)
+
   constructor(
     readonly knock: Knock,
     readonly channelId: string,

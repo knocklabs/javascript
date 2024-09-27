@@ -7,15 +7,15 @@ import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
   InAppMessage,
-  InAppMessageClientOptions,
   InAppMessageResponse,
+  InAppMessagesClientOptions,
   InAppMessagesQueryInfo,
 } from "./types";
 
 /**
  * Manages realtime connection to in app messages service.
  */
-export class InAppMessageClient {
+export class InAppMessagesClient {
   private knock: Knock;
 
   public queryKey: string;
@@ -23,7 +23,7 @@ export class InAppMessageClient {
   constructor(
     readonly channelClient: InAppChannelClient,
     readonly messageType: string,
-    readonly defaultOptions: InAppMessageClientOptions = {},
+    readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
     this.knock = channelClient.knock;
     this.queryKey = this.buildQueryKey(defaultOptions);
@@ -69,6 +69,7 @@ export class InAppMessageClient {
       return;
     }
 
+    // TODO: Move to method on channel client
     // Set the loading type based on the request type it is
     this.channelClient.store.setState((state) => ({
       ...state,

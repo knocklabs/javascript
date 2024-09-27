@@ -1,1 +1,1 @@
-export * from "./KnockInAppMessageProvider";
+export * from "./KnockInAppChannelProvider";
