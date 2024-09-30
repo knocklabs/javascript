@@ -9,7 +9,7 @@
     "NEXT_PUBLIC_KNOCK_*",
     "EXPO_PUBLIC_KNOCK_*"
   ],
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": [
         "^build"
