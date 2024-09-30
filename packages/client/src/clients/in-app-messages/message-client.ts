@@ -89,7 +89,6 @@ export class InAppMessagesClient {
       url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`,
       params: queryParams,
     });
-    // TODO: Maybe map to camel case props?
 
     if (result.statusCode === "error" || !result.body) {
       this.channelClient.store.setState((state) => ({
