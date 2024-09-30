@@ -71,6 +71,7 @@
   "dependencies": {
     "@babel/runtime": "^7.25.6",
     "@knocklabs/types": "workspace:^",
+    "@tanstack/store": "^0.5.5",
     "@types/phoenix": "^1.5.4",
     "axios": "^1.7.4",
     "axios-retry": "^4.5.0",
