@@ -1,3 +1,37 @@
+/* In-App Message theme */
+:root {
+  --iam-black: #000000;
+  --iam-white: #ffffff;
+  --iam-surface: var(--knock-white);
+  --iam-surface-2: var(--knock-gray-2);
+  --iam-accent: var(--knock-accent-9);
+  --iam-accent-light: var(--knock-accent-3);
+  --iam-accent-dark: var(--knock-accent-11);
+  --iam-secondary: var(--knock-gray-9);
+  --iam-secondary-light: var(--knock-gray-3);
+  --iam-secondary-dark: var(--knock-gray-11);
+  --iam-content: var(--knock-gray-12);
+  --iam-content-light: var(--knock-gray-11);
+  --iam-content-disabled: var(--knock-gray-9);
+  --iam-content-contrast: var(--knock-white);
+  --iam-border: var(--knock-gray-5);
+  --iam-border-light: var(--knock-gray-4);
+  --iam-border-dark: var(--knock-gray-7);
+}
+
+/* Color mode specific overrides */
+/* Most are appearance differences are handled at the --knock token level */
+[data-knock-color-mode="light"] {
+  --iam-surface: var(--knock-white);
+  --iam-surface-2: var(--knock-gray-2);
+}
+
+[data-knock-color-mode="dark"] {
+  --iam-surface: var(--knock-gray-2);
+  --iam-surface-2: var(--knock-gray-1);
+}
+
+/* Notification feed theme */
 :root {
   /* Font sizes */
   --rnf-font-size-xs: 0.75rem;
