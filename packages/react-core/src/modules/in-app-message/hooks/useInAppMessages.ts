@@ -35,30 +35,9 @@ export const useInAppMessages = <
     return new InAppMessagesClient(inAppChannelClient, messageType, options);
   }, [inAppChannelClient, messageType, options]);
 
-  // TODO: Create selectors as functions in the client library though
   const { messages, networkStatus, loading } = useStore(
     inAppChannelClient.store,
-    (state) => {
-      const queryInfo = state.queries[inAppMessagesClient.queryKey];
-      const messageIds = queryInfo?.data?.messageIds ?? [];
-
-      const messages = messageIds.reduce<InAppMessage<TContent, TData>[]>(
-        (messages, messageId) => {
-          const message = state.messages[messageId];
-          if (message) {
-            messages.push(message as InAppMessage<TContent, TData>);
-          }
-          return messages;
-        },
-        [],
-      );
-
-      return {
-        messages,
-        networkStatus: queryInfo?.networkStatus ?? NetworkStatus.ready,
-        loading: queryInfo?.loading ?? false,
-      };
-    },
+    inAppMessagesClient.getQueryInfoSelector<TContent, TData>,
   );
 
   useEffect(() => {

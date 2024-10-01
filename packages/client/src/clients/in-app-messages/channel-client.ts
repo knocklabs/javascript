@@ -1,6 +1,7 @@
 import Knock from "../../knock";
 
 import { InAppStore, createStore } from "./store";
+import { InAppMessagesQueryInfo } from "./types";
 
 /**
  * Manages the configuration for an in app channel.
@@ -16,5 +17,15 @@ export class InAppChannelClient {
     readonly channelId: string,
   ) {
     this.store = createStore();
+  }
+
+  setQueryState(queryKey: string, queryInfo: InAppMessagesQueryInfo) {
+    this.store.setState((state) => ({
+      ...state,
+      queries: {
+        ...state.queries,
+        [queryKey]: queryInfo,
+      },
+    }));
   }
 }

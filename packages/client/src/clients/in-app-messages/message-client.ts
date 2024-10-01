@@ -6,7 +6,9 @@ import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
+  InAppMessage,
   InAppMessageResponse,
+  InAppMessageStoreState,
   InAppMessagesClientOptions,
   InAppMessagesQueryInfo,
 } from "./types";
@@ -67,19 +69,12 @@ export class InAppMessagesClient {
       return;
     }
 
-    // TODO: Move to method on channel client
     // Set the loading type based on the request type it is
-    this.channelClient.store.setState((state) => ({
-      ...state,
-      queries: {
-        ...state.queries,
-        [this.queryKey]: {
-          ...queryState,
-          networkStatus: options.__loadingType ?? NetworkStatus.loading,
-          loading: true,
-        },
-      },
-    }));
+    this.channelClient.setQueryState(this.queryKey, {
+      ...queryState,
+      networkStatus: options.__loadingType ?? NetworkStatus.loading,
+      loading: true,
+    });
 
     try {
       const response = await this.knock.user.getInAppMessages<TContent, TData>({
@@ -115,23 +110,48 @@ export class InAppMessagesClient {
 
       return { data: response, status: "ok" };
     } catch (error) {
-      this.channelClient.store.setState((state) => ({
-        ...state,
-        queries: {
-          ...state.queries,
-          [this.queryKey]: {
-            ...queryState,
-            networkStatus: NetworkStatus.error,
-            loading: false,
-          },
-        },
-      }));
+      this.channelClient.setQueryState(this.queryKey, {
+        ...queryState,
+        networkStatus: NetworkStatus.error,
+        loading: false,
+      });
 
       return {
         status: "error",
         error: error as Error,
       };
     }
+  }
+
+  getQueryInfoSelector<
+    TContent extends GenericData = GenericData,
+    TData extends GenericData = GenericData,
+  >(
+    state: InAppMessageStoreState,
+  ): {
+    messages: InAppMessage<TContent, TData>[];
+    loading: boolean;
+    networkStatus: NetworkStatus;
+  } {
+    const queryInfo = state.queries[this.queryKey];
+    const messageIds = queryInfo?.data?.messageIds ?? [];
+
+    const messages = messageIds.reduce<InAppMessage<TContent, TData>[]>(
+      (messages, messageId) => {
+        const message = state.messages[messageId];
+        if (message) {
+          messages.push(message as InAppMessage<TContent, TData>);
+        }
+        return messages;
+      },
+      [],
+    );
+
+    return {
+      messages,
+      networkStatus: queryInfo?.networkStatus ?? NetworkStatus.ready,
+      loading: queryInfo?.loading ?? false,
+    };
   }
 
   // ----------------------------------------------
