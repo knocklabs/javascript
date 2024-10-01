@@ -12,13 +12,19 @@ import { useInAppChannel } from "../context";
 
 export interface UseInAppMessagesOptions extends InAppMessagesClientOptions {}
 
-export interface UseInAppMessagesResponse<TContent, TData> {
+export interface UseInAppMessagesResponse<
+  TContent extends GenericData,
+  TData extends GenericData,
+> {
   messages: InAppMessage<TContent, TData>[];
   networkStatus: NetworkStatus;
   loading: boolean;
 }
 
-export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
+export const useInAppMessages = <
+  TContent extends GenericData = GenericData,
+  TData extends GenericData = GenericData,
+>(
   messageType: string,
   options: UseInAppMessagesOptions = {},
 ): UseInAppMessagesResponse<TContent, TData> => {
@@ -30,34 +36,27 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
   }, [inAppChannelClient, messageType, options]);
 
   // TODO: Create selectors as functions in the client library though
-  const messages = useStore(inAppChannelClient.store, (state) => {
-    const messageIds = new Set(
-      state.queries[inAppMessagesClient.queryKey]?.data?.entries?.map(
-        (message) => message.id,
-      ),
-    );
-
-    // TODO: Just grab based on the message id instead of looping over all messages
-    const messages = Object.entries(state.messages).reduce<
-      InAppMessage<TContent, TData>[]
-    >((messages, [id, message]) => {
-      if (messageIds.has(id)) {
-        messages.push(message as InAppMessage<TContent, TData>);
-      }
-      return messages;
-    }, []);
-
-    return messages;
-  });
-
-  // TODO: Consolidate to a single useStore call to get all message info
-  const { networkStatus, loading } = useStore(
+  const { messages, networkStatus, loading } = useStore(
     inAppChannelClient.store,
     (state) => {
-      const query = state.queries[inAppMessagesClient.queryKey];
+      const queryInfo = state.queries[inAppMessagesClient.queryKey];
+      const messageIds = queryInfo?.data?.messageIds ?? [];
+
+      const messages = messageIds.reduce<InAppMessage<TContent, TData>[]>(
+        (messages, messageId) => {
+          const message = state.messages[messageId];
+          if (message) {
+            messages.push(message as InAppMessage<TContent, TData>);
+          }
+          return messages;
+        },
+        [],
+      );
+
       return {
-        networkStatus: query?.networkStatus ?? NetworkStatus.ready,
-        loading: query?.loading ?? false,
+        messages,
+        networkStatus: queryInfo?.networkStatus ?? NetworkStatus.ready,
+        loading: queryInfo?.loading ?? false,
       };
     },
   );
@@ -77,13 +76,19 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
 
 export type UseInAppMessageOptions = Omit<UseInAppMessagesOptions, "page_size">;
 
-export interface UseInAppMessageResponse<TContent, TData> {
+export interface UseInAppMessageResponse<
+  TContent extends GenericData,
+  TData extends GenericData,
+> extends GenericData {
   message?: InAppMessage<TContent, TData>;
   networkStatus: NetworkStatus;
   loading: boolean;
 }
 
-export const useInAppMessage = <TContent = GenericData, TData = GenericData>(
+export const useInAppMessage = <
+  TContent extends GenericData = GenericData,
+  TData extends GenericData = GenericData,
+>(
   messageType: string,
   options: UseInAppMessageOptions = {},
 ): UseInAppMessageResponse<TContent, TData> => {

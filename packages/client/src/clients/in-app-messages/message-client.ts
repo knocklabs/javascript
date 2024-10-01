@@ -1,4 +1,4 @@
-import { GenericData, PageInfo } from "@knocklabs/types";
+import { GenericData } from "@knocklabs/types";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
@@ -6,7 +6,6 @@ import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
-  InAppMessage,
   InAppMessageResponse,
   InAppMessagesClientOptions,
   InAppMessagesQueryInfo,
@@ -29,24 +28,23 @@ export class InAppMessagesClient {
     this.queryKey = this.buildQueryKey(defaultOptions);
   }
 
-  // TODO: Clean up return types
-  async fetch(options: FetchInAppMessagesOptions = {}): Promise<
+  async fetch<
+    TContent extends GenericData = GenericData,
+    TData extends GenericData = GenericData,
+  >(
+    options: FetchInAppMessagesOptions = {},
+  ): Promise<
     | {
-        data: {
-          entries: InAppMessage[];
-          pageInfo: PageInfo;
-        };
         status: "ok";
+        data: InAppMessageResponse<TContent, TData>;
       }
     | {
-        // TODO: Better type
-        data: GenericData;
         status: "error";
+        error: Error;
       }
     | undefined
   > {
-    // TODO: Create better abstraction for reading from / writing to store
-    const queryParams = {
+    const params = {
       ...this.defaultOptions,
       ...options,
       // Unset options that should not be sent to the API
@@ -54,7 +52,7 @@ export class InAppMessagesClient {
       __fetchSource: undefined,
     };
 
-    this.queryKey = this.buildQueryKey(queryParams);
+    this.queryKey = this.buildQueryKey(params);
 
     const queryState = this.channelClient.store.state.queries[
       this.queryKey
@@ -83,14 +81,40 @@ export class InAppMessagesClient {
       },
     }));
 
-    // TODO: Move to method on user.getInAppMessages
-    const result = await this.knock.client().makeRequest({
-      method: "GET",
-      url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`,
-      params: queryParams,
-    });
+    try {
+      const response = await this.knock.user.getInAppMessages<TContent, TData>({
+        channelId: this.channelClient.channelId,
+        messageType: this.messageType,
+        params,
+      });
 
-    if (result.statusCode === "error" || !result.body) {
+      const queryInfo: InAppMessagesQueryInfo = {
+        loading: false,
+        networkStatus: NetworkStatus.ready,
+        data: {
+          messageIds: response.entries.map((iam) => iam.id),
+          pageInfo: response.pageInfo,
+        },
+      };
+
+      this.channelClient.store.setState((state) => {
+        return {
+          ...state,
+          // Store new messages in shared store
+          messages: response.entries.reduce((messages, message) => {
+            messages[message.id] = message;
+            return messages;
+          }, state.messages),
+          // Store query results
+          queries: {
+            ...state.queries,
+            [this.queryKey]: queryInfo,
+          },
+        };
+      });
+
+      return { data: response, status: "ok" };
+    } catch (error) {
       this.channelClient.store.setState((state) => ({
         ...state,
         queries: {
@@ -104,40 +128,10 @@ export class InAppMessagesClient {
       }));
 
       return {
-        status: result.statusCode,
-        data: result.error || result.body,
+        status: "error",
+        error: error as Error,
       };
     }
-
-    const response: InAppMessageResponse = {
-      entries: result.body.entries,
-      pageInfo: result.body.page_info,
-    };
-
-    const queryInfo: InAppMessagesQueryInfo = {
-      loading: false,
-      networkStatus: NetworkStatus.ready,
-      // TODO: Only store message ids on query info
-      data: response,
-    };
-
-    this.channelClient.store.setState((state) => {
-      return {
-        ...state,
-        // Store new messages in shared store
-        messages: response.entries.reduce((messages, message) => {
-          messages[message.id] = message;
-          return messages;
-        }, state.messages),
-        // Store query results
-        queries: {
-          ...state.queries,
-          [this.queryKey]: queryInfo,
-        },
-      };
-    });
-
-    return { data: response, status: result.statusCode };
   }
 
   // ----------------------------------------------
