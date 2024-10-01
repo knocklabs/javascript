@@ -57,6 +57,8 @@ function Messages() {
 }
 
 function App() {
+  const [colorMode, setColorMode] = useState<"dark" | "light">("dark");
+
   return (
     <KnockProvider
       apiKey={import.meta.env.VITE_KNOCK_API_KEY!}
@@ -65,12 +67,22 @@ function App() {
     >
       <KnockInAppChannelProvider
         channelId={import.meta.env.VITE_KNOCK_CHANNEL_ID}
+        colorMode={colorMode}
       >
         <>
           <h1>Knock In-App Message Example</h1>
+          <button
+            onClick={() =>
+              setColorMode(colorMode === "dark" ? "light" : "dark")
+            }
+          >
+            Toggle color mode
+          </button>
           <hr />
           <h2>Banner</h2>
-          <Banner.Default />
+          <div>
+            <Banner.Default />
+          </div>
           <hr />
           <Messages />
           <hr />

@@ -1,4 +1,9 @@
-import { UseInAppMessageOptions, useInAppMessage } from "@knocklabs/react-core";
+import {
+  ColorMode,
+  UseInAppMessageOptions,
+  useInAppChannel,
+  useInAppMessage,
+} from "@knocklabs/react-core";
 import clsx from "clsx";
 import React from "react";
 
@@ -130,9 +135,12 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   );
 };
 
-const DefaultView: React.FC<{ content: BannerContent }> = ({ content }) => {
+const DefaultView: React.FC<{
+  content: BannerContent;
+  colorMode?: ColorMode;
+}> = ({ content, colorMode = "light" }) => {
   return (
-    <Root>
+    <Root data-color-mode={colorMode}>
       <Content>
         <Title title={content.title} />
         <Body body={content.body} />
@@ -162,13 +170,14 @@ const DefaultView: React.FC<{ content: BannerContent }> = ({ content }) => {
 };
 
 const Default: React.FC<BannerProps> = ({ filters }) => {
+  const { colorMode } = useInAppChannel();
   const { message } = useInAppMessage<BannerContent>(MESSAGE_TYPE, filters);
 
   if (!message) return null;
 
   // TODO: Track interaction on load or whatever other events necessary
 
-  return <DefaultView content={message.content} />;
+  return <DefaultView content={message.content} colorMode={colorMode} />;
 };
 
 const View = {} as {

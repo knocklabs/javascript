@@ -8,6 +8,7 @@
     "build": "turbo build",
     "build:packages": "turbo build --filter=\"./packages/*\"",
     "dev": "turbo dev",
+    "dev:packages": "turbo dev --filter=\"./packages/*\"",
     "dev:next-example": "turbo dev --filter=\"./packages/*\" --filter=nextjs-example",
     "lint": "turbo lint",
     "format": "turbo format",

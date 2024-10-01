@@ -8,7 +8,7 @@ import { GenericData } from "@knocklabs/types";
 import { useStore } from "@tanstack/react-store";
 import { useEffect, useMemo } from "react";
 
-import { useInAppMessageChannel } from "../context";
+import { useInAppChannel } from "../context";
 
 export interface UseInAppMessagesOptions extends InAppMessagesClientOptions {}
 
@@ -22,7 +22,7 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
   messageType: string,
   options: UseInAppMessagesOptions = {},
 ): UseInAppMessagesResponse<TContent, TData> => {
-  const { inAppChannelClient } = useInAppMessageChannel();
+  const { inAppChannelClient } = useInAppChannel();
 
   const inAppMessagesClient = useMemo(() => {
     // TODO: Ensure this is stable and doesn't recreate the message client

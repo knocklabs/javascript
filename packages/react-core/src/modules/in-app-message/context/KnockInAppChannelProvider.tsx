@@ -44,12 +44,12 @@ export const KnockInAppChannelProvider: React.FC<
   );
 };
 
-export const useInAppMessageChannel = (): KnockInAppChannelProviderState => {
+export const useInAppChannel = (): KnockInAppChannelProviderState => {
   const context = React.useContext(InAppMessageContext);
 
   if (!context) {
     throw new Error(
-      "useInAppMessageChannel must be used within a KnockInAppChannelProvider",
+      "useInAppChannel must be used within a KnockInAppChannelProvider",
     );
   }
 
