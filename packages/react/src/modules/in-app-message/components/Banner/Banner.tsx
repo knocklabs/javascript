@@ -140,7 +140,7 @@ const DefaultView: React.FC<{
   colorMode?: ColorMode;
 }> = ({ content, colorMode = "light" }) => {
   return (
-    <Root data-color-mode={colorMode}>
+    <Root data-knock-color-mode={colorMode}>
       <Content>
         <Title title={content.title} />
         <Body body={content.body} />

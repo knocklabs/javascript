@@ -3,7 +3,7 @@
   --iam-shadow-1: 0px 12px 20px rgba(28, 32, 36, 0.1);
 }
 
-[data-color-mode="dark"] {
+[data-knock-color-mode="dark"] {
   --iam-surface-1: #520ca1;
   --iam-shadow-1: 0px 12px 20px rgba(250, 250, 250, 1);
 }
