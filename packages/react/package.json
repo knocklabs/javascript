@@ -33,6 +33,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
+    "gen:tokens": "node ./scripts/generateCssTokens.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "type:check": "tsc --noEmit",
