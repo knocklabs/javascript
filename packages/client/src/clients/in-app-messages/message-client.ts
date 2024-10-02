@@ -26,6 +26,10 @@ export class InAppMessagesClient {
     readonly messageType: string,
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
+    this.defaultOptions = {
+      ...channelClient.defaultOptions,
+      ...defaultOptions,
+    };
     this.knock = channelClient.knock;
     this.queryKey = this.buildQueryKey(defaultOptions);
   }

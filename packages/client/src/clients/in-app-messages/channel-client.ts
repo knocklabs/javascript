@@ -1,7 +1,7 @@
 import Knock from "../../knock";
 
 import { InAppStore, createStore } from "./store";
-import { InAppMessagesQueryInfo } from "./types";
+import { InAppMessagesClientOptions, InAppMessagesQueryInfo } from "./types";
 
 /**
  * Manages the configuration for an in app channel.
@@ -10,11 +10,10 @@ import { InAppMessagesQueryInfo } from "./types";
 export class InAppChannelClient {
   public store: InAppStore;
 
-  // TODO: Allow passing in default options here which will get passed to message client (also update provider)
-
   constructor(
     readonly knock: Knock,
     readonly channelId: string,
+    readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
     this.store = createStore();
   }

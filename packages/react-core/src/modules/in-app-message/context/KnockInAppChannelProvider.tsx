@@ -1,4 +1,7 @@
-import { InAppChannelClient } from "@knocklabs/client";
+import {
+  InAppChannelClient,
+  InAppMessagesClientOptions,
+} from "@knocklabs/client";
 import * as React from "react";
 
 import { useKnockClient } from "../../core";
@@ -13,7 +16,7 @@ export interface KnockInAppChannelProviderProps {
   // In-App Message props
   channelId: string;
 
-  // TODO: Support default props which will get passed down
+  defaultOptions?: InAppMessagesClientOptions;
 
   // Extra options
   colorMode?: ColorMode;
@@ -25,12 +28,13 @@ const InAppMessageContext = React.createContext<
 
 export const KnockInAppChannelProvider: React.FC<
   React.PropsWithChildren<KnockInAppChannelProviderProps>
-> = ({ children, channelId, colorMode = "light" }) => {
+> = ({ children, channelId, colorMode = "light", defaultOptions }) => {
   // TODO: Catch knock error and resurface (same in KnockFeedProvider)
   const knock = useKnockClient();
   const inAppChannelClient = React.useMemo(() => {
-    return new InAppChannelClient(knock, channelId);
-  }, [knock, channelId]);
+    // TODO: Ensure this is stable when options are passed in
+    return new InAppChannelClient(knock, channelId, defaultOptions);
+  }, [knock, channelId, defaultOptions]);
 
   return (
     <InAppMessageContext.Provider
