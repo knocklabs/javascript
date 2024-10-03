@@ -174,17 +174,17 @@ const DefaultView: React.FC<{
         <Body body={content.body} />
       </Content>
       <Actions>
-        {content.secondary_button && (
-          <SecondaryAction
-            text={content.secondary_button.text}
-            action={content.secondary_button.action}
-          />
-        )}
-
         {content.primary_button && (
           <PrimaryAction
             text={content.primary_button.text}
             action={content.primary_button.action}
+          />
+        )}
+
+        {content.secondary_button && (
+          <SecondaryAction
+            text={content.secondary_button.text}
+            action={content.secondary_button.action}
           />
         )}
       </Actions>
