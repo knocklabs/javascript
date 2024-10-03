@@ -5,7 +5,7 @@ import {
   useInAppMessage,
 } from "@knocklabs/react-core";
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { ActionContent } from "../types";
 
@@ -138,10 +138,15 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 const DefaultView: React.FC<{
   content: BannerContent;
   colorMode?: ColorMode;
+  onInteracted?: () => void;
   onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onDismissClick }) => {
+}> = ({ content, colorMode = "light", onInteracted, onDismissClick }) => {
   return (
-    <Root data-knock-color-mode={colorMode}>
+    <Root
+      data-knock-color-mode={colorMode}
+      onClick={onInteracted}
+      onFocus={onInteracted}
+    >
       <Content>
         <Title title={content.title} />
         <Body body={content.body} />
@@ -174,20 +179,30 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
     filters,
   );
 
+  // Mark the message as seen on render
+  useEffect(() => {
+    if (!message || message.seen_at !== null) return;
+
+    inAppMessagesClient.markAsSeen(message);
+  }, [message, inAppMessagesClient]);
+
   if (!message) return null;
 
   const onDismissClick = () => {
     inAppMessagesClient.markAsArchived(message);
   };
 
+  const onInteracted = () => {
+    inAppMessagesClient.markAsInteracted(message);
+  };
+
   return (
-    <>
-      <DefaultView
-        content={message.content}
-        colorMode={colorMode}
-        onDismissClick={onDismissClick}
-      />
-    </>
+    <DefaultView
+      content={message.content}
+      colorMode={colorMode}
+      onDismissClick={onDismissClick}
+      onInteracted={onInteracted}
+    />
   );
 };
 
