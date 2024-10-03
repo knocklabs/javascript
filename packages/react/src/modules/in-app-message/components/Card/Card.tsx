@@ -11,13 +11,14 @@ import { ActionContent } from "../types";
 
 import "./styles.css";
 
-const MESSAGE_TYPE = "banner";
+const MESSAGE_TYPE = "card";
 
-export interface BannerProps {
+export interface CardProps {
   filters?: UseInAppMessageOptions;
 }
 
-export interface BannerContent {
+export interface CardContent {
+  headline: string;
   title: string;
   body: string;
   primary_button?: {
@@ -35,7 +36,7 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("iam-banner", className)} {...props}>
+    <div className={clsx("iam-card", className)} {...props}>
       {children}
     </div>
   );
@@ -45,8 +46,28 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("iam-banner__message", className)} {...props}>
+    <div className={clsx("iam-card__message", className)} {...props}>
       {children}
+    </div>
+  );
+};
+
+const Header: React.FC<
+  React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
+> = ({ children, className, ...props }) => {
+  return (
+    <div className={clsx("iam-card__header", className)} {...props}>
+      {children}
+    </div>
+  );
+};
+
+const Headline: React.FC<
+  { headline: string } & React.ComponentPropsWithRef<"div">
+> = ({ headline, className, ...props }) => {
+  return (
+    <div className={clsx("iam-card__headline", className)} {...props}>
+      {headline}
     </div>
   );
 };
@@ -55,7 +76,7 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("iam-banner__title", className)} {...props}>
+    <div className={clsx("iam-card__title", className)} {...props}>
       {title}
     </div>
   );
@@ -67,7 +88,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   ...props
 }) => {
   return (
-    <div className={clsx("iam-banner__body", className)} {...props}>
+    <div className={clsx("iam-card__body", className)} {...props}>
       {body}
     </div>
   );
@@ -77,7 +98,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("iam-banner__actions", className)} {...props}>
+    <div className={clsx("iam-card__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -87,11 +108,7 @@ const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
 > = ({ text, action, className, ...props }) => {
   return (
-    <a
-      href={action}
-      className={clsx("iam-banner__action", className)}
-      {...props}
-    >
+    <a href={action} className={clsx("iam-card__action", className)} {...props}>
       {text}
     </a>
   );
@@ -104,7 +121,7 @@ const SecondaryAction: React.FC<
     <a
       href={action}
       className={clsx(
-        "iam-banner__action iam-banner__action--secondary",
+        "iam-card__action iam-card__action--secondary",
         className,
       )}
       {...props}
@@ -119,7 +136,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button className={clsx("iam-banner__close", className)} {...props}>
+    <button className={clsx("iam-card__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -136,7 +153,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 };
 
 const DefaultView: React.FC<{
-  content: BannerContent;
+  content: CardContent;
   colorMode?: ColorMode;
   onInteracted?: () => void;
   onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -148,6 +165,11 @@ const DefaultView: React.FC<{
       onFocus={onInteracted}
     >
       <Content>
+        <Header>
+          <Headline headline={content.headline} />
+          {content.dismissible && <DismissButton onClick={onDismissClick} />}
+        </Header>
+
         <Title title={content.title} />
         <Body body={content.body} />
       </Content>
@@ -165,16 +187,14 @@ const DefaultView: React.FC<{
             action={content.primary_button.action}
           />
         )}
-
-        {content.dismissible && <DismissButton onClick={onDismissClick} />}
       </Actions>
     </Root>
   );
 };
 
-const Default: React.FC<BannerProps> = ({ filters }) => {
+const Default: React.FC<CardProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
-  const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
+  const { message, inAppMessagesClient } = useInAppMessage<CardContent>(
     MESSAGE_TYPE,
     filters,
   );
@@ -210,6 +230,7 @@ const View = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
+  Headline: typeof Headline;
   Title: typeof Title;
   Body: typeof Body;
   Actions: typeof Actions;
@@ -230,15 +251,15 @@ Object.assign(View, {
   DismissButton,
 });
 
-const Banner = {} as {
+const Card = {} as {
   View: typeof View;
   Default: typeof Default;
 };
 
 // TODO: Consider how to structure these exports
-Object.assign(Banner, {
+Object.assign(Card, {
   View,
   Default,
 });
 
-export { Banner };
+export { Card };
