@@ -31,6 +31,7 @@ export interface BannerContent {
   dismissible?: boolean;
 }
 
+// TODO: Use `knock` prefix instead of "iam"?
 const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
@@ -179,6 +180,7 @@ DefaultView.displayName = "BannerView.Default";
 
 const Banner: React.FC<BannerProps> = ({ filters }) => {
   const { colorMode } = useInAppMessagesChannel();
+
   const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
     MESSAGE_TYPE,
     filters,

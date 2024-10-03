@@ -48,14 +48,13 @@ export const useInAppMessages = <
   );
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      inAppMessagesClient.fetch();
-    }, 2500);
+    inAppMessagesClient.fetch();
+    inAppMessagesClient.subscribe();
 
     return () => {
-      clearTimeout(intervalId);
-    };
-  }, [inAppMessagesClient]);
+      inAppMessagesClient.unsubscribe()
+    }
+  }, []);
 
   return { messages, networkStatus, loading, inAppMessagesClient };
 };
