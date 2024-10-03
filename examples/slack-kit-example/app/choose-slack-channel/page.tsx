@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { useState } from "react";
 
+import FetchUserIdForm from "../components/fetch-user-id-form";
 import SlackChannelWrapper from "../components/slack-channel-wrapper";
 import { getAppDetails } from "../lib/app-details";
 
 export default async function Page() {
-  const { collection, objectId } = getAppDetails();
+  const { collection, objectId, userId } = getAppDetails();
+
   return (
     <>
       <h2 className="text-xl font-bold my-4">Choose a Slack Channel</h2>
@@ -42,6 +45,13 @@ export default async function Page() {
         collection={collection}
         objectId={objectId}
       ></SlackChannelWrapper>
+
+      <h2 className="text-xl font-bold my-4">Fetch User ID</h2>
+      <p className="mb-4">
+        Enter an email address to fetch the corresponding user ID.
+      </p>
+      <FetchUserIdForm />
+
       <Link
         className="mt-6 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
         href="/initiate-auth"
@@ -53,6 +63,12 @@ export default async function Page() {
         href="/examine-channel-data"
       >
         Next
+      </a>
+      <a
+        className="mt-6 mx-4 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
+        href="/trigger-workflow-user"
+      >
+        Trigger User Workflow
       </a>
     </>
   );

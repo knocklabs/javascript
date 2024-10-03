@@ -1,4 +1,4 @@
-import { Knock } from "@knocklabs/node";
+import { Knock, Recipient, RecipientWithUpsert } from "@knocklabs/node";
 
 import { getAppDetails } from "./app-details";
 
@@ -30,14 +30,20 @@ export async function getObject(collection: string, objectId: string) {
 }
 
 export async function triggerWorkflow(formData: FormData) {
-  const { workflowKey, collection, objectId, tenant } = await getAppDetails();
+  const { workflowKey, collection, objectId, tenant, userId } =
+    await getAppDetails();
+  let recipient: Recipient | RecipientWithUpsert = { id: "123" };
+  if (formData.get("recipient") === "user") {
+    recipient = { id: userId };
+  }
+  if (formData.get("recipient") === "object") {
+    recipient = {
+      collection: collection,
+      id: objectId,
+    };
+  }
   const result = await knockClient.workflows.trigger(workflowKey, {
-    recipients: [
-      {
-        collection: collection,
-        id: objectId,
-      },
-    ],
+    recipients: [recipient],
     tenant: tenant,
     data: {
       message: formData.get("message"),

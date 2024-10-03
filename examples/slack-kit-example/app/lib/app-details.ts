@@ -7,7 +7,7 @@ export function getAppDetails() {
     tenant: "knock-projects",
     collection: "repositories",
     objectId: "repo-2",
-    userId: "123",
+    userId: "10",
     workflowKey: "new-issue",
   };
 }
