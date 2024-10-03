@@ -26,11 +26,13 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
 
   const inAppMessagesClient = useMemo(() => {
     // TODO: Ensure this is stable and doesn't recreate the message client
+    // XXX: Pretty sure this does create a new client instance at each render.
     return new InAppMessagesClient(inAppChannelClient, messageType, options);
   }, [inAppChannelClient, messageType, options]);
 
   // TODO: Create selectors as functions in the client library though
   const messages = useStore(inAppChannelClient.store, (state) => {
+    // console.log("messages")
     const messageIds = new Set(
       state.queries[inAppMessagesClient.queryKey]?.data?.entries?.map(
         (message) => message.id,
@@ -63,14 +65,13 @@ export const useInAppMessages = <TContent = GenericData, TData = GenericData>(
   );
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      inAppMessagesClient.fetch();
-    }, 2500);
+    inAppMessagesClient.fetch();
+    inAppMessagesClient.subscribe();
 
     return () => {
-      clearTimeout(intervalId);
-    };
-  }, [inAppMessagesClient]);
+      inAppMessagesClient.unsubscribe()
+    }
+  }, []);
 
   return { messages, networkStatus, loading };
 };
