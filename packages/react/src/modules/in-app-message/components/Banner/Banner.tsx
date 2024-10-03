@@ -26,6 +26,7 @@ export interface BannerContent {
   dismissible: boolean;
 }
 
+// TODO: Use `knock` prefix instead of "iam"?
 const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
@@ -161,6 +162,7 @@ const DefaultView: React.FC<{ content: BannerContent }> = ({ content }) => {
   );
 };
 
+// TODO: This should just be Banner?
 const Default: React.FC<BannerProps> = ({ filters }) => {
   const { message } = useInAppMessage<BannerContent>(MESSAGE_TYPE, filters);
 
@@ -171,6 +173,7 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
   return <DefaultView content={message.content} />;
 };
 
+// TODO: Just call this Default or Component?
 const View = {} as {
   Root: typeof Root;
   Content: typeof Content;

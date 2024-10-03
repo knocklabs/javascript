@@ -1,4 +1,5 @@
 import { GenericData, PageInfo } from "@knocklabs/types";
+import { Channel } from "phoenix";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
@@ -14,9 +15,13 @@ import {
 
 /**
  * Manages realtime connection to in app messages service.
+ *
+ * TODO: Rename to InAppMessagesClient to singular?
  */
 export class InAppMessagesClient {
   private knock: Knock;
+
+  private channel: Channel | undefined;
 
   public queryKey: string;
 
@@ -45,6 +50,8 @@ export class InAppMessagesClient {
       }
     | undefined
   > {
+    console.log("fetch")
+
     // TODO: Create better abstraction for reading from / writing to store
     const queryParams = {
       ...this.defaultOptions,
@@ -71,17 +78,20 @@ export class InAppMessagesClient {
 
     // TODO: Move to method on channel client
     // Set the loading type based on the request type it is
-    this.channelClient.store.setState((state) => ({
-      ...state,
-      queries: {
-        ...state.queries,
-        [this.queryKey]: {
-          ...queryState,
-          networkStatus: options.__loadingType ?? NetworkStatus.loading,
-          loading: true,
+    this.channelClient.store.setState((state) => {
+      // console.log("setState 1")
+      return {
+        ...state,
+        queries: {
+          ...state.queries,
+          [this.queryKey]: {
+            ...queryState,
+            networkStatus: options.__loadingType ?? NetworkStatus.loading,
+            loading: true,
+          },
         },
-      },
-    }));
+      }
+    });
 
     // TODO: Move to method on user.getInAppMessages
     const result = await this.knock.client().makeRequest({
@@ -122,6 +132,7 @@ export class InAppMessagesClient {
     };
 
     this.channelClient.store.setState((state) => {
+      // console.log("setState 2")
       return {
         ...state,
         // Store new messages in shared store
@@ -140,9 +151,55 @@ export class InAppMessagesClient {
     return { data: response, status: result.statusCode };
   }
 
-  // ----------------------------------------------
-  // Helpers
-  // ----------------------------------------------
+  subscribe() {
+    console.log("subscribe")
+    const { socket } = this.knock.client();
+
+    // In server environments we might not have a socket connection.
+    if (!socket) return;
+
+    // Connect the socket only if no active connection yet.
+    if (!socket.isConnected()) {
+      socket.connect();
+    }
+
+    // Init a channel if none set up yet.
+    if (!this.channel) {
+      this.channel = socket.channel(this.buildSocketTopic(), {
+        ...this.defaultOptions,
+        message_type: this.messageType,
+      });
+
+      this.channel.on("message.created", (resp) => this.handleMessageCreated(resp));
+
+      // TODO: Check if we need an auto socket manager.
+    }
+
+    // Join the channel if we're not already in a joining or leaving state.
+    if (["closed", "errored"].includes(this.channel.state)) {
+      this.channel.join();
+    }
+  }
+
+  unsubscribe() {
+    if (this.channel) {
+      this.channel.leave();
+      this.channel.off("message.created");
+    }
+  }
+
+  // TODO: Type the response correctly.
+  private async handleMessageCreated(_: any) {
+    console.log("handleMessageCreated")
+
+    // Re-fetch the latest messages using the default params.
+    await this.fetch();
+  }
+
+  private buildSocketTopic() {
+    return `in_app:${this.channelClient.channelId}:${this.knock.userId}`;
+  }
+
   private buildQueryKey(params: GenericData) {
     // TODO: Update query key format to match GET request url (w/ query params)
     return `${this.messageType}-${JSON.stringify(params)}`;

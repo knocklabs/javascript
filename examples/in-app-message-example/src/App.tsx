@@ -5,6 +5,7 @@ import {
   KnockProvider,
   useInAppMessages,
 } from "@knocklabs/react";
+import { useInAppMessage } from "@knocklabs/react-core";
 import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
 
@@ -56,6 +57,23 @@ function Messages() {
   );
 }
 
+const Card = (opts: any) => {
+  const [counter, setCounter] = useState(0);
+  const { message } = useInAppMessage("card", opts);
+
+  if (!message) return null;
+
+  return (
+    <div>
+      Card: {JSON.stringify(opts)}
+
+      <button onClick={() => setCounter(counter + 1)}>
+        click
+      </button>
+    </div>
+  )
+}
+
 function App() {
   return (
     <KnockProvider
@@ -69,13 +87,15 @@ function App() {
         <>
           <h1>Knock In-App Message Example</h1>
           <hr />
-          <h2>Banner</h2>
-          <Banner.Default />
-          <hr />
-          <Messages />
+          <h2>Card</h2>
+          <Card trigger_data={JSON.stringify({seven: "seven"})} />
+          <Card trigger_data={JSON.stringify({eight: "eight"})} />
+          <Card trigger_data={JSON.stringify({nine: "nine"})} />
+          <Card workflow_key="hello" />
           <hr />
           <h2>Env</h2>
           <pre>{JSON.stringify(import.meta.env, null, 2)}</pre>
+          <input type="text" />
         </>
       </KnockInAppChannelProvider>
     </KnockProvider>
