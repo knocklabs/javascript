@@ -3,6 +3,7 @@ import { NetworkStatus } from "../../networkStatus";
 
 import { InAppStore, createStore } from "./store";
 import {
+  InAppMessage,
   InAppMessageResponse,
   InAppMessagesClientOptions,
   InAppMessagesQueryInfo,
@@ -21,6 +22,27 @@ export class InAppChannelClient {
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
     this.store = createStore();
+  }
+
+  // ----------------------------------------------
+  // Store helpers
+  // ----------------------------------------------
+  setMessageAttrs(messageIds: string[], attrs: Partial<InAppMessage>) {
+    this.store.setState((state) => ({
+      ...state,
+      messages: {
+        ...state.messages,
+        ...messageIds.reduce<Record<string, InAppMessage>>((messages, id) => {
+          if (state.messages[id]) {
+            messages[id] = {
+              ...state.messages[id],
+              ...attrs,
+            };
+          }
+          return messages;
+        }, {}),
+      },
+    }));
   }
 
   setQueryResponse(queryKey: string, response: InAppMessageResponse) {

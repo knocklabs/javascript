@@ -138,7 +138,8 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 const DefaultView: React.FC<{
   content: BannerContent;
   colorMode?: ColorMode;
-}> = ({ content, colorMode = "light" }) => {
+  onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
+}> = ({ content, colorMode = "light", onDismissClick }) => {
   return (
     <Root data-knock-color-mode={colorMode}>
       <Content>
@@ -160,10 +161,7 @@ const DefaultView: React.FC<{
           />
         )}
 
-        {content.dismissible && (
-          // TODO: Archive message on click
-          <DismissButton />
-        )}
+        {content.dismissible && <DismissButton onClick={onDismissClick} />}
       </Actions>
     </Root>
   );
@@ -171,16 +169,30 @@ const DefaultView: React.FC<{
 
 const Default: React.FC<BannerProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
-  const { message } = useInAppMessage<BannerContent>(MESSAGE_TYPE, filters);
+  const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
+    MESSAGE_TYPE,
+    filters,
+  );
 
   if (!message) return null;
 
-  // TODO: Track interaction on load or whatever other events necessary
+  const onDismissClick = () => {
+    inAppMessagesClient.markAsArchived(message);
+  };
 
-  return <DefaultView content={message.content} colorMode={colorMode} />;
+  return (
+    <>
+      <DefaultView
+        content={message.content}
+        colorMode={colorMode}
+        onDismissClick={onDismissClick}
+      />
+    </>
+  );
 };
 
 const View = {} as {
+  Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
   Title: typeof Title;
@@ -192,6 +204,7 @@ const View = {} as {
 };
 
 Object.assign(View, {
+  Default: DefaultView,
   Root,
   Content,
   Title,

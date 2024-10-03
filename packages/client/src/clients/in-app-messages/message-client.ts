@@ -2,6 +2,7 @@ import { GenericData } from "@knocklabs/types";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
+import { MessageEngagementStatus } from "../messages/interfaces";
 
 import { InAppChannelClient } from "./channel-client";
 import {
@@ -30,9 +31,12 @@ export class InAppMessagesClient {
       ...defaultOptions,
     };
     this.knock = channelClient.knock;
-    this.queryKey = this.buildQueryKey(defaultOptions);
+    this.queryKey = this.buildQueryKey(this.defaultOptions);
   }
 
+  // ----------------------------------------------
+  // Data fetching
+  // ----------------------------------------------
   async fetch<
     TContent extends GenericData = GenericData,
     TData extends GenericData = GenericData,
@@ -130,6 +134,57 @@ export class InAppMessagesClient {
       networkStatus: queryInfo?.networkStatus ?? NetworkStatus.ready,
       loading: queryInfo?.loading ?? false,
     };
+  }
+
+  // ----------------------------------------------
+  // Message engagement
+  // ----------------------------------------------
+  async markAsArchived(itemOrItems: InAppMessage | InAppMessage[]) {
+    const shouldOptimisticallyRemoveItems =
+      this.defaultOptions.archived === "exclude";
+
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    const itemIds: string[] = items.map((item) => item.id);
+
+    const queryInfo = this.channelClient.store.state.queries[this.queryKey];
+
+    // Optimistically update the message status.
+    this.channelClient.setMessageAttrs(itemIds, {
+      archived_at: new Date().toISOString(),
+    });
+
+    // If set to exclude, also remove the message id from the list of messages for the given query
+    if (shouldOptimisticallyRemoveItems && queryInfo?.data) {
+      this.channelClient.setQueryState(this.queryKey, {
+        ...queryInfo,
+        data: {
+          ...queryInfo.data,
+          messageIds: queryInfo.data.messageIds?.filter(
+            (id) => !itemIds.includes(id),
+          ),
+        },
+      });
+    }
+
+    return this.makeStatusUpdate(itemOrItems, "archived");
+  }
+
+  private async makeStatusUpdate(
+    itemOrItems: InAppMessage | InAppMessage[],
+    type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
+    metadata?: Record<string, string>,
+  ) {
+    // Always treat items as a batch to use the corresponding batch endpoint
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    const itemIds = items.map((item) => item.id);
+
+    const result = await this.knock.messages.batchUpdateStatuses(
+      itemIds,
+      type,
+      { metadata },
+    );
+
+    return result;
   }
 
   // ----------------------------------------------

@@ -19,6 +19,7 @@ export interface UseInAppMessagesResponse<
   messages: InAppMessage<TContent, TData>[];
   networkStatus: NetworkStatus;
   loading: boolean;
+  inAppMessagesClient: InAppMessagesClient;
 }
 
 export const useInAppMessages = <
@@ -31,13 +32,13 @@ export const useInAppMessages = <
   const { inAppChannelClient } = useInAppChannel();
 
   const inAppMessagesClient = useMemo(() => {
-    // TODO: Ensure this is stable and doesn't recreate the message client
+    // TODO: This is not stable
     return new InAppMessagesClient(inAppChannelClient, messageType, options);
   }, [inAppChannelClient, messageType, options]);
 
   const { messages, networkStatus, loading } = useStore(
     inAppChannelClient.store,
-    inAppMessagesClient.getQueryInfoSelector<TContent, TData>,
+    (state) => inAppMessagesClient.getQueryInfoSelector<TContent, TData>(state),
   );
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const useInAppMessages = <
     };
   }, [inAppMessagesClient]);
 
-  return { messages, networkStatus, loading };
+  return { messages, networkStatus, loading, inAppMessagesClient };
 };
 
 export type UseInAppMessageOptions = Omit<UseInAppMessagesOptions, "page_size">;
@@ -62,6 +63,7 @@ export interface UseInAppMessageResponse<
   message?: InAppMessage<TContent, TData>;
   networkStatus: NetworkStatus;
   loading: boolean;
+  inAppMessagesClient: InAppMessagesClient;
 }
 
 export const useInAppMessage = <
@@ -71,10 +73,10 @@ export const useInAppMessage = <
   messageType: string,
   options: UseInAppMessageOptions = {},
 ): UseInAppMessageResponse<TContent, TData> => {
-  const { messages, ...info } = useInAppMessages<TContent, TData>(messageType, {
+  const { messages, ...rest } = useInAppMessages<TContent, TData>(messageType, {
     ...options,
     page_size: 1,
   });
 
-  return { message: messages[0], ...info };
+  return { message: messages[0], ...rest };
 };
