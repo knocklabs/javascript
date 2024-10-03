@@ -16,6 +16,7 @@ export interface SlackAuthButtonProps {
   slackClientId: string;
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
+  additionalScopes?: string[];
 }
 
 const openSlackOauthPopup = (url: string) => {
@@ -45,6 +46,7 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   slackClientId,
   redirectUrl,
   onAuthenticationComplete,
+  additionalScopes,
 }) => {
   const { t } = useTranslations();
   const knock = useKnockClient();
@@ -60,6 +62,7 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   const { buildSlackAuthUrl, disconnectFromSlack } = useSlackAuth(
     slackClientId,
     redirectUrl,
+    additionalScopes,
   );
 
   useEffect(() => {
