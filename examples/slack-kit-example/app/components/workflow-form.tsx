@@ -5,8 +5,10 @@ import { useFormStatus } from "react-dom";
 
 export default function WorkflowForm({
   action,
+  recipient,
 }: {
   action: (formData: FormData) => void;
+  recipient: "object" | "user";
 }) {
   const ref = useRef<HTMLFormElement>(null);
   function SubmitButton() {
@@ -25,6 +27,7 @@ export default function WorkflowForm({
     <form
       className="block"
       action={async (formData: FormData) => {
+        formData.append("recipient", recipient);
         await action(formData);
         ref.current?.reset();
       }}

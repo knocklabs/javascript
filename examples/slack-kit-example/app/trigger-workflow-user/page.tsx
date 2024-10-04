@@ -5,7 +5,7 @@ import triggerWorkflow from "../lib/actions/triggerWorkflow";
 import { getAppDetails } from "../lib/app-details";
 
 export default async function Page() {
-  const { workflowKey, collection, objectId, tenant } = getAppDetails();
+  const { workflowKey, collection, objectId, tenant, userId } = getAppDetails();
   return (
     <>
       <h2 className="text-xl font-bold my-4">Trigger a Workflow</h2>
@@ -23,8 +23,7 @@ export default async function Page() {
   await knockClient.workflows.trigger(${workflowKey}, {
     recipients: [
       {
-        collection: ${collection},
-        id: ${objectId},
+        id: ${userId},
       },
     ],
     tenant: ${tenant},
@@ -47,7 +46,7 @@ export default async function Page() {
         Go ahead and submit the form below to test your Slack integration, then
         check your Slack channel to see your message.
       </p>
-      <WorkflowForm action={triggerWorkflow} recipient="object"></WorkflowForm>
+      <WorkflowForm action={triggerWorkflow} recipient="user"></WorkflowForm>
       <Link
         className="mt-8 inline-block bg-[#E95744] text-white p-2 rounded-md hover:bg-[#E64733]"
         href="/examine-channel-data"

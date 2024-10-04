@@ -16,6 +16,7 @@ export default function AuthWrapper() {
             slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
             redirectUrl={process.env.NEXT_PUBLIC_REDIRECT_URL}
             onAuthenticationComplete={onAuthComplete}
+            additionalScopes={["users:read", "users:read.email"]}
           />
         }
       />

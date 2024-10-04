@@ -20,10 +20,16 @@ type UseSlackAuthOutput = {
 function useSlackAuth(
   slackClientId: string,
   redirectUrl?: string,
+  additionalScopes?: string[],
 ): UseSlackAuthOutput {
   const knock = useKnockClient();
   const { setConnectionStatus, knockSlackChannelId, tenant, setActionLabel } =
     useKnockSlackClient();
+
+  const combinedScopes =
+    additionalScopes && additionalScopes.length > 0
+      ? Array.from(new Set(DEFAULT_SLACK_SCOPES.concat(additionalScopes)))
+      : DEFAULT_SLACK_SCOPES;
 
   const disconnectFromSlack = useCallback(async () => {
     setActionLabel(null);
@@ -63,7 +69,7 @@ function useSlackAuth(
         user_token: knock.userToken,
       }),
       client_id: slackClientId,
-      scope: DEFAULT_SLACK_SCOPES.join(","),
+      scope: combinedScopes.join(","),
     };
     return `${SLACK_AUTHORIZE_URL}?${new URLSearchParams(rawParams)}`;
   }, [
@@ -73,6 +79,7 @@ function useSlackAuth(
     knock.apiKey,
     knock.userToken,
     slackClientId,
+    combinedScopes,
   ]);
 
   return {
