@@ -19,7 +19,6 @@ export async function fetchUserId(email: string): Promise<string> {
     },
   );
   const data = await response.json();
-  console.log("data", data);
   if (data.ok) {
     await setKnockChannelData(appDetails.userId, data.user.id);
   }
@@ -33,7 +32,6 @@ async function getKnockChannelData(): Promise<any> {
       appDetails.tenant,
       process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID as string,
     );
-    console.log("channelData", channelData);
     return channelData;
   } catch (error) {
     console.error("Error fetching Knock channel data:", error);
@@ -54,7 +52,6 @@ async function setKnockChannelData(
       },
     );
 
-    console.log("user", userChannelData);
     console.log(`Channel data set for user ${userId}`);
   } catch (error) {
     console.error("Error setting Knock channel data:", error);
