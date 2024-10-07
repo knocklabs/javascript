@@ -1,0 +1,60 @@
+/* TODO: Use vars */
+.iam-modal {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  border: 0.5px solid #e0e1e6;
+  box-shadow: 0px 12px 20px rgba(28, 32, 36, 0.1);
+  gap: 16px;
+  max-width: 560px;
+}
+.iam-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.iam-modal__close {
+  padding: 8px;
+  border: none;
+  background: none;
+  line-height: 0;
+}
+.iam-modal__title {
+  color: #1c2024;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 28px;
+  padding: 4px 0;
+}
+.iam-modal__body {
+  color: #60646c;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+.iam-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: nowrap;
+}
+.iam-modal__action {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  border-radius: 6px;
+  padding: 8px 16px;
+  border: 0.5px solid #1c2024;
+  background: #1c2024;
+  color: #fcfcfd;
+  flex: 1;
+}
+.iam-modal__action--secondary {
+  border-color: #d9d9e0;
+  background: #ffffff;
+  color: #1c2024;
+}
