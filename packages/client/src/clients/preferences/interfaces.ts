@@ -1,7 +1,7 @@
 import { ChannelType } from "@knocklabs/types";
 
 export type ChannelTypePreferences = {
-  [K in ChannelType]?: boolean;
+  [_K in ChannelType]?: boolean;
 };
 
 export type WorkflowPreferenceSetting =
