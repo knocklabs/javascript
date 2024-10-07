@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.28
+
+### Patch Changes
+
+- 47a88da: feature: allow passing additional OAuth scope to SlackAuthButton
+- Updated dependencies [47a88da]
+  - @knocklabs/react-core@0.2.25
+
 ## 0.2.27
 
 ### Patch Changes

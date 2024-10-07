@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.25
+
+### Patch Changes
+
+- 47a88da: feature: allow passing additional OAuth scope to SlackAuthButton
+
 ## 0.2.24
 
 ### Patch Changes
