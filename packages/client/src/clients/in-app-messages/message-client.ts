@@ -10,7 +10,6 @@ import {
   InAppMessageResponse,
   InAppMessageStoreState,
   InAppMessagesClientOptions,
-  InAppMessagesQueryInfo,
 } from "./types";
 
 /**
@@ -74,8 +73,7 @@ export class InAppMessagesClient {
     }
 
     // Set the loading type based on the request type it is
-    this.channelClient.setQueryState(this.queryKey, {
-      ...queryState,
+    this.channelClient.setQueryStatus(this.queryKey, {
       networkStatus: options.__loadingType ?? NetworkStatus.loading,
       loading: true,
     });
@@ -87,35 +85,11 @@ export class InAppMessagesClient {
         params,
       });
 
-      const queryInfo: InAppMessagesQueryInfo = {
-        loading: false,
-        networkStatus: NetworkStatus.ready,
-        data: {
-          messageIds: response.entries.map((iam) => iam.id),
-          pageInfo: response.pageInfo,
-        },
-      };
-
-      this.channelClient.store.setState((state) => {
-        return {
-          ...state,
-          // Store new messages in shared store
-          messages: response.entries.reduce((messages, message) => {
-            messages[message.id] = message;
-            return messages;
-          }, state.messages),
-          // Store query results
-          queries: {
-            ...state.queries,
-            [this.queryKey]: queryInfo,
-          },
-        };
-      });
+      this.channelClient.setQueryResponse(this.queryKey, response);
 
       return { data: response, status: "ok" };
     } catch (error) {
-      this.channelClient.setQueryState(this.queryKey, {
-        ...queryState,
+      this.channelClient.setQueryStatus(this.queryKey, {
         networkStatus: NetworkStatus.error,
         loading: false,
       });

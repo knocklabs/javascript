@@ -1,7 +1,12 @@
 import Knock from "../../knock";
+import { NetworkStatus } from "../../networkStatus";
 
 import { InAppStore, createStore } from "./store";
-import { InAppMessagesClientOptions, InAppMessagesQueryInfo } from "./types";
+import {
+  InAppMessageResponse,
+  InAppMessagesClientOptions,
+  InAppMessagesQueryInfo,
+} from "./types";
 
 /**
  * Manages the configuration for an in app channel.
@@ -18,12 +23,45 @@ export class InAppChannelClient {
     this.store = createStore();
   }
 
-  setQueryState(queryKey: string, queryInfo: InAppMessagesQueryInfo) {
+  setQueryResponse(queryKey: string, response: InAppMessageResponse) {
+    const queryInfo: InAppMessagesQueryInfo = {
+      loading: false,
+      networkStatus: NetworkStatus.ready,
+      data: {
+        messageIds: response.entries.map((iam) => iam.id),
+        pageInfo: response.pageInfo,
+      },
+    };
+
+    this.store.setState((state) => {
+      return {
+        ...state,
+        // Store new messages in store
+        messages: response.entries.reduce((messages, message) => {
+          messages[message.id] = message;
+          return messages;
+        }, state.messages),
+        // Store query results
+        queries: {
+          ...state.queries,
+          [queryKey]: queryInfo,
+        },
+      };
+    });
+  }
+
+  setQueryStatus(
+    queryKey: string,
+    status: Pick<InAppMessagesQueryInfo, "loading" | "networkStatus">,
+  ) {
     this.store.setState((state) => ({
       ...state,
       queries: {
         ...state.queries,
-        [queryKey]: queryInfo,
+        [queryKey]: {
+          ...state.queries[queryKey],
+          ...status,
+        },
       },
     }));
   }
