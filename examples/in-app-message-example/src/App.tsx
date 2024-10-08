@@ -66,6 +66,7 @@ function App() {
       apiKey={import.meta.env.VITE_KNOCK_API_KEY!}
       userId={import.meta.env.VITE_KNOCK_USER_ID!}
       host={import.meta.env.VITE_KNOCK_HOST}
+      logLevel="debug"
     >
       <KnockInAppChannelProvider
         channelId={import.meta.env.VITE_KNOCK_CHANNEL_ID}
@@ -105,22 +106,7 @@ function App() {
           <hr />
           <Messages />
 
-          <Modal.View.Default
-            colorMode={colorMode}
-            content={{
-              title: "Modal title",
-              body: "Contextual copy about what is being shown in the Modal. Use modals for announcements, timely updates, and messages with important calls to action.",
-              dismissible: true,
-              primary_button: {
-                text: "Primary",
-                action: "",
-              },
-              secondary_button: {
-                text: "Secondary",
-                action: "",
-              },
-            }}
-          />
+          <Modal.Default />
         </>
       </KnockInAppChannelProvider>
     </KnockProvider>
