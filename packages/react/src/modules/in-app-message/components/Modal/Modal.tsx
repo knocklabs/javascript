@@ -4,6 +4,7 @@ import {
   useInAppChannel,
   useInAppMessage,
 } from "@knocklabs/react-core";
+import * as Dialog from "@radix-ui/react-dialog";
 import clsx from "clsx";
 import React, { useEffect } from "react";
 
@@ -31,46 +32,78 @@ export interface ModalContent {
   dismissible?: boolean;
 }
 
-// TODO: Use radix dialog to handle portal etc.
-// TODO: Overlay
+type RootProps = Omit<
+  React.ComponentPropsWithoutRef<typeof Dialog.Root>,
+  "modal"
+> &
+  React.PropsWithChildren<React.ComponentPropsWithRef<"div">>;
 
-const Root: React.FC<
-  React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
-> = ({ children, className, ...props }) => {
+const Root = ({ children, onOpenChange, ...props }: RootProps) => {
   return (
-    <div className={clsx("iam-modal", className)} {...props}>
-      {children}
-    </div>
+    <Dialog.Root defaultOpen onOpenChange={onOpenChange} {...props}>
+      <Dialog.Portal>{children}</Dialog.Portal>
+    </Dialog.Root>
   );
 };
 
-const Content: React.FC<
-  React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
-> = ({ children, className, ...props }) => {
-  return (
-    <div className={clsx("iam-modal__message", className)} {...props}>
-      {children}
-    </div>
-  );
-};
+type OverlayProps = React.ComponentPropsWithoutRef<typeof Dialog.Overlay> &
+  React.ComponentPropsWithRef<"div">;
+type OverlayRef = React.ElementRef<"div">;
+
+// TODO: Causes layout shift...
+const Overlay = React.forwardRef<OverlayRef, OverlayProps>(
+  ({ className, ...props }, forwardedRef) => {
+    return (
+      <Dialog.Overlay
+        className={clsx("knock-iam-modal__overlay", className)}
+        ref={forwardedRef}
+        {...props}
+      />
+    );
+  },
+);
+
+type ContentProps = React.ComponentPropsWithoutRef<typeof Dialog.Content> &
+  React.ComponentPropsWithRef<"div">;
+type ContentRef = React.ElementRef<"div">;
+
+const Content = React.forwardRef<ContentRef, ContentProps>(
+  ({ children, className, ...props }, forwardedRef) => {
+    return (
+      <Dialog.Content
+        className={clsx("knock-iam-modal", className)}
+        ref={forwardedRef}
+        {...props}
+      >
+        {children}
+      </Dialog.Content>
+    );
+  },
+);
 
 const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("iam-modal__header", className)} {...props}>
+    <div className={clsx("knock-iam-modal__header", className)} {...props}>
       {children}
     </div>
   );
 };
 
-const Title: React.FC<
-  { title: string } & React.ComponentPropsWithRef<"div">
-> = ({ title, className, ...props }) => {
+type TitleProps = React.ComponentPropsWithoutRef<typeof Dialog.Title> &
+  React.ComponentPropsWithRef<"div"> & {
+    title: string;
+  };
+
+const Title = ({ title, className, ...props }: TitleProps) => {
   return (
-    <div className={clsx("iam-modal__title", className)} {...props}>
+    <Dialog.Title
+      className={clsx("knock-iam-modal__title", className)}
+      {...props}
+    >
       {title}
-    </div>
+    </Dialog.Title>
   );
 };
 
@@ -80,9 +113,12 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   ...props
 }) => {
   return (
-    <div className={clsx("iam-modal__body", className)} {...props}>
+    <Dialog.Description
+      className={clsx("knock-iam-modal__body", className)}
+      {...props}
+    >
       {body}
-    </div>
+    </Dialog.Description>
   );
 };
 
@@ -90,7 +126,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("iam-modal__actions", className)} {...props}>
+    <div className={clsx("knock-iam-modal__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -102,7 +138,7 @@ const PrimaryAction: React.FC<
   return (
     <a
       href={action}
-      className={clsx("iam-modal__action", className)}
+      className={clsx("knock-iam-modal__action", className)}
       {...props}
     >
       {text}
@@ -117,7 +153,7 @@ const SecondaryAction: React.FC<
     <a
       href={action}
       className={clsx(
-        "iam-modal__action iam-modal__action--secondary",
+        "knock-iam-modal__action knock-iam-modal__action--secondary",
         className,
       )}
       {...props}
@@ -127,12 +163,15 @@ const SecondaryAction: React.FC<
   );
 };
 
-const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
-  className,
-  ...props
-}) => {
+type CloseProps = React.ComponentPropsWithoutRef<typeof Dialog.Close> &
+  React.ComponentPropsWithRef<"button">;
+
+const Close = ({ className, ...props }: CloseProps) => {
   return (
-    <button className={clsx("iam-modal__close", className)} {...props}>
+    <Dialog.Close
+      className={clsx("knock-iam-modal__close", className)}
+      {...props}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -144,45 +183,54 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
           <path d="M3.97 3.97a.75.75 0 0 1 1.06 0l9 9a.75.75 0 1 1-1.06 1.06l-9-9a.75.75 0 0 1 0-1.06Z" />
         </g>
       </svg>
-    </button>
+    </Dialog.Close>
   );
 };
 
 const DefaultView: React.FC<{
   content: ModalContent;
   colorMode?: ColorMode;
+  onOpenChange?: (open: boolean) => void;
   onInteracted?: () => void;
   onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onInteracted, onDismissClick }) => {
+}> = ({
+  content,
+  colorMode = "light",
+  onOpenChange,
+  onInteracted,
+  onDismissClick,
+}) => {
   return (
     <Root
-      data-knock-color-mode={colorMode}
+      onOpenChange={onOpenChange}
       onClick={onInteracted}
       onFocus={onInteracted}
     >
-      <Content>
+      <Overlay />
+      {/* Must pass color mode to content for css variables to be set properly */}
+      <Content data-knock-color-mode={colorMode}>
         <Header>
           <Title title={content.title} />
-          {content.dismissible && <DismissButton onClick={onDismissClick} />}
+          {content.dismissible && <Close onClick={onDismissClick} />}
         </Header>
 
         <Body body={content.body} />
-      </Content>
-      <Actions>
-        {content.primary_button && (
-          <PrimaryAction
-            text={content.primary_button.text}
-            action={content.primary_button.action}
-          />
-        )}
 
-        {content.secondary_button && (
-          <SecondaryAction
-            text={content.secondary_button.text}
-            action={content.secondary_button.action}
-          />
-        )}
-      </Actions>
+        <Actions>
+          {content.secondary_button && (
+            <SecondaryAction
+              text={content.secondary_button.text}
+              action={content.secondary_button.action}
+            />
+          )}
+          {content.primary_button && (
+            <PrimaryAction
+              text={content.primary_button.text}
+              action={content.primary_button.action}
+            />
+          )}
+        </Actions>
+      </Content>
     </Root>
   );
 };
@@ -203,6 +251,12 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
 
   if (!message) return null;
 
+  const onOpenChange = (open: boolean) => {
+    if (!open) {
+      inAppMessagesClient.markAsArchived(message);
+    }
+  };
+
   const onDismissClick = () => {
     inAppMessagesClient.markAsArchived(message);
   };
@@ -215,6 +269,7 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
     <DefaultView
       content={message.content}
       colorMode={colorMode}
+      onOpenChange={onOpenChange}
       onDismissClick={onDismissClick}
       onInteracted={onInteracted}
     />
@@ -224,25 +279,27 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
 const View = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
+  Overlay: typeof Overlay;
   Content: typeof Content;
   Title: typeof Title;
   Body: typeof Body;
   Actions: typeof Actions;
   PrimaryAction: typeof PrimaryAction;
   SecondaryAction: typeof SecondaryAction;
-  DismissButton: typeof DismissButton;
+  Close: typeof Close;
 };
 
 Object.assign(View, {
   Default: DefaultView,
   Root,
+  Overlay,
   Content,
   Title,
   Body,
   Actions,
   PrimaryAction,
   SecondaryAction,
-  DismissButton,
+  Close,
 });
 
 const Modal = {} as {
@@ -250,7 +307,6 @@ const Modal = {} as {
   Default: typeof Default;
 };
 
-// TODO: Consider how to structure these exports
 Object.assign(Modal, {
   View,
   Default,

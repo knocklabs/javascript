@@ -4,6 +4,7 @@ import {
   Card,
   KnockInAppChannelProvider,
   KnockProvider,
+  Modal,
   useInAppMessages,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
@@ -103,6 +104,23 @@ function App() {
           />
           <hr />
           <Messages />
+
+          <Modal.View.Default
+            colorMode={colorMode}
+            content={{
+              title: "Modal title",
+              body: "Contextual copy about what is being shown in the Modal. Use modals for announcements, timely updates, and messages with important calls to action.",
+              dismissible: true,
+              primary_button: {
+                text: "Primary",
+                action: "",
+              },
+              secondary_button: {
+                text: "Secondary",
+                action: "",
+              },
+            }}
+          />
         </>
       </KnockInAppChannelProvider>
     </KnockProvider>

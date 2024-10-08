@@ -24,7 +24,7 @@ const fs = require("fs/promises");
   // 2. Add to theme.css file
   const themeCssPath = path.resolve(__dirname, "../src/theme.css");
   let themeCss = await fs.readFile(themeCssPath, "utf-8");
-  themeCss = tokensCss + themeCss;
+  themeCss = tokensCss + "\n" + themeCss;
 
   // 3. Update theme.css
   await fs.writeFile(themeCssPath, themeCss);
