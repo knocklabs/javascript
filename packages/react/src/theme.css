@@ -363,9 +363,9 @@
 [data-knock-color-mode="light"] {
   --knock-iam-surface: var(--knock-white);
   --knock-iam-surface-2: var(--knock-gray-2);
-  --knock-iam-accent: var(--knock-orange-9);
-  --knock-iam-accent-light: var(--knock-orange-3);
-  --knock-iam-accent-dark: var(--knock-orange-11);
+  --knock-iam-accent: var(--knock-gray-12);
+  --knock-iam-accent-light: var(--knock-gray-4);
+  --knock-iam-accent-dark: var(--knock-gray-12);
   --knock-iam-secondary: var(--knock-gray-9);
   --knock-iam-secondary-light: var(--knock-gray-3);
   --knock-iam-secondary-dark: var(--knock-gray-11);
@@ -383,16 +383,16 @@
 [data-knock-color-mode="dark"] {
   --knock-iam-surface: var(--knock-white);
   --knock-iam-surface-2: var(--knock-gray-2);
-  --knock-iam-accent: var(--knock-orange-9);
-  --knock-iam-accent-light: var(--knock-orange-3);
-  --knock-iam-accent-dark: var(--knock-orange-11);
+  --knock-iam-accent: var(--knock-white);
+  --knock-iam-accent-light: var(--knock-gray-4);
+  --knock-iam-accent-dark: var(--knock-gray-12);
   --knock-iam-secondary: var(--knock-gray-9);
   --knock-iam-secondary-light: var(--knock-gray-3);
   --knock-iam-secondary-dark: var(--knock-gray-11);
   --knock-iam-content: var(--knock-gray-12);
   --knock-iam-content-light: var(--knock-gray-11);
   --knock-iam-content-disabled: var(--knock-gray-9);
-  --knock-iam-content-contrast: var(--knock-white);
+  --knock-iam-content-contrast: var(--knock-gray-0);
   --knock-iam-border: var(--knock-gray-5);
   --knock-iam-border-light: var(--knock-gray-4);
   --knock-iam-border-dark: var(--knock-gray-7);
