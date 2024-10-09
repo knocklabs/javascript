@@ -3,7 +3,10 @@ import { GenericData, PageInfo } from "@knocklabs/types";
 import { NetworkStatus } from "../../networkStatus";
 import { NotificationSource } from "../messages/interfaces";
 
-export interface InAppMessage<TContent = GenericData, TData = GenericData> {
+export interface InAppMessage<
+  TContent extends GenericData = GenericData,
+  TData extends GenericData = GenericData,
+> {
   __cursor: string;
   id: string;
   message_type: string;
@@ -21,15 +24,21 @@ export interface InAppMessage<TContent = GenericData, TData = GenericData> {
   source: NotificationSource;
 }
 
-export interface InAppMessageResponse {
-  entries: InAppMessage[];
+export interface InAppMessageResponse<
+  TContent extends GenericData = GenericData,
+  TData extends GenericData = GenericData,
+> {
+  entries: InAppMessage<TContent, TData>[];
   pageInfo: PageInfo;
 }
 
 export interface InAppMessagesQueryInfo {
   networkStatus: NetworkStatus;
   loading: boolean;
-  data?: InAppMessageResponse;
+  data?: {
+    messageIds: string[];
+    pageInfo: PageInfo;
+  };
 }
 
 export interface InAppMessageStoreState {
