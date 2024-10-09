@@ -4,6 +4,7 @@ import {
   Card,
   KnockInAppChannelProvider,
   KnockProvider,
+  Modal,
   useInAppMessages,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
@@ -65,6 +66,7 @@ function App() {
       apiKey={import.meta.env.VITE_KNOCK_API_KEY!}
       userId={import.meta.env.VITE_KNOCK_USER_ID!}
       host={import.meta.env.VITE_KNOCK_HOST}
+      logLevel="debug"
     >
       <KnockInAppChannelProvider
         channelId={import.meta.env.VITE_KNOCK_CHANNEL_ID}
@@ -103,6 +105,8 @@ function App() {
           />
           <hr />
           <Messages />
+
+          <Modal.Default />
         </>
       </KnockInAppChannelProvider>
     </KnockProvider>
