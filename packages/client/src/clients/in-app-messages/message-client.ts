@@ -197,7 +197,7 @@ export class InAppMessagesClient {
   async markAsArchived(itemOrItems: InAppMessage | InAppMessage[]) {
     const itemIds = this.getItemIds(itemOrItems);
 
-    const queryInfo = this.channelClient.store.state.queries[this.queryKey];
+    // const queryInfo = this.channelClient.store.state.queries[this.queryKey];
 
     // Optimistically update the message status.
     this.channelClient.setMessageAttrs(itemIds, {
@@ -205,19 +205,20 @@ export class InAppMessagesClient {
     });
 
     // If set to exclude, also remove the message id from the list of messages for the given query
-    const shouldOptimisticallyRemoveItems =
-      this.defaultOptions.archived === "exclude";
-    if (shouldOptimisticallyRemoveItems && queryInfo?.data) {
-      this.channelClient.setQueryState(this.queryKey, {
-        ...queryInfo,
-        data: {
-          ...queryInfo.data,
-          messageIds: queryInfo.data.messageIds?.filter(
-            (id) => !itemIds.includes(id),
-          ),
-        },
-      });
-    }
+    // TODO: Figure out optimistic updates
+    // const shouldOptimisticallyRemoveItems =
+    //   this.defaultOptions.archived === "exclude";
+    // if (shouldOptimisticallyRemoveItems && queryInfo?.data) {
+    //   this.channelClient.setQueryState(this.queryKey, {
+    //     ...queryInfo,
+    //     data: {
+    //       ...queryInfo.data,
+    //       messageIds: queryInfo.data.messageIds?.filter(
+    //         (id) => !itemIds.includes(id),
+    //       ),
+    //     },
+    //   });
+    // }
 
     return this.makeStatusUpdate(itemOrItems, "archived");
   }
