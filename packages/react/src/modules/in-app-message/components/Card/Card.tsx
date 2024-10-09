@@ -163,11 +163,7 @@ const DefaultView: React.FC<{
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
 }> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
   return (
-    <Root
-      data-knock-color-mode={colorMode}
-      onClick={onInteract}
-      onFocus={onInteract}
-    >
+    <Root data-knock-color-mode={colorMode} onClick={onInteract}>
       <Content>
         <Header>
           <Headline headline={content.headline} />
