@@ -9,9 +9,7 @@ export interface KnockProviderState {
   knock: Knock;
 }
 
-const ProviderStateContext = React.createContext<KnockProviderState | null>(
-  null,
-);
+const KnockContext = React.createContext<KnockProviderState | null>(null);
 
 export interface KnockProviderProps {
   // Knock client props
@@ -59,20 +57,20 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   );
 
   return (
-    <ProviderStateContext.Provider
+    <KnockContext.Provider
       value={{
         knock,
       }}
     >
       <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
-    </ProviderStateContext.Provider>
+    </KnockContext.Provider>
   );
 };
 
 export const useKnockClient = (): Knock => {
-  const context = React.useContext(ProviderStateContext) as KnockProviderState;
-  if (context === undefined) {
-    throw new Error("useKnock must be used within a KnockProvider");
+  const context = React.useContext(KnockContext);
+  if (!context) {
+    throw new Error("useKnockClient must be used within a KnockProvider");
   }
   return context.knock;
 };
