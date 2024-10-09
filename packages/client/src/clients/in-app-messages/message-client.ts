@@ -32,6 +32,8 @@ export class InAppMessagesClient {
     };
     this.knock = channelClient.knock;
     this.queryKey = this.buildQueryKey(this.defaultOptions);
+
+    this.knock.log(`[IAM] Initialized a client for message ${messageType}`);
   }
 
   // ----------------------------------------------

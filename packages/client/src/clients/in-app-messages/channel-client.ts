@@ -22,6 +22,8 @@ export class InAppChannelClient {
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
     this.store = createStore();
+
+    this.knock.log(`[IAM] Initialized a client on channel ${channelId}`);
   }
 
   // ----------------------------------------------

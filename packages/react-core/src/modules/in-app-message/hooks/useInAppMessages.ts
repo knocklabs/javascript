@@ -8,6 +8,7 @@ import { GenericData } from "@knocklabs/types";
 import { useStore } from "@tanstack/react-store";
 import { useEffect, useMemo } from "react";
 
+import { useStableOptions } from "../../core";
 import { useInAppChannel } from "../context";
 
 export interface UseInAppMessagesOptions extends InAppMessagesClientOptions {}
@@ -31,10 +32,15 @@ export const useInAppMessages = <
 ): UseInAppMessagesResponse<TContent, TData> => {
   const { inAppChannelClient } = useInAppChannel();
 
+  const stableOptions = useStableOptions(options);
+
   const inAppMessagesClient = useMemo(() => {
-    // TODO: This is not stable
-    return new InAppMessagesClient(inAppChannelClient, messageType, options);
-  }, [inAppChannelClient, messageType, options]);
+    return new InAppMessagesClient(
+      inAppChannelClient,
+      messageType,
+      stableOptions,
+    );
+  }, [inAppChannelClient, messageType, stableOptions]);
 
   const { messages, networkStatus, loading } = useStore(
     inAppChannelClient.store,
