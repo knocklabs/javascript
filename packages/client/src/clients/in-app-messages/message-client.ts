@@ -1,15 +1,16 @@
-import { GenericData, PageInfo } from "@knocklabs/types";
+import { GenericData } from "@knocklabs/types";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
+import { MessageEngagementStatus } from "../messages/interfaces";
 
 import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
   InAppMessage,
   InAppMessageResponse,
+  InAppMessageStoreState,
   InAppMessagesClientOptions,
-  InAppMessagesQueryInfo,
 } from "./types";
 
 /**
@@ -25,28 +26,36 @@ export class InAppMessagesClient {
     readonly messageType: string,
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
+    this.defaultOptions = {
+      ...channelClient.defaultOptions,
+      ...defaultOptions,
+    };
     this.knock = channelClient.knock;
-    this.queryKey = this.buildQueryKey(defaultOptions);
+    this.queryKey = this.buildQueryKey(this.defaultOptions);
+
+    this.knock.log(`[IAM] Initialized a client for message ${messageType}`);
   }
 
-  // TODO: Clean up return types
-  async fetch(options: FetchInAppMessagesOptions = {}): Promise<
+  // ----------------------------------------------
+  // Data fetching
+  // ----------------------------------------------
+  async fetch<
+    TContent extends GenericData = GenericData,
+    TData extends GenericData = GenericData,
+  >(
+    options: FetchInAppMessagesOptions = {},
+  ): Promise<
     | {
-        data: {
-          entries: InAppMessage[];
-          pageInfo: PageInfo;
-        };
         status: "ok";
+        data: InAppMessageResponse<TContent, TData>;
       }
     | {
-        // TODO: Better type
-        data: GenericData;
         status: "error";
+        error: Error;
       }
     | undefined
   > {
-    // TODO: Create better abstraction for reading from / writing to store
-    const queryParams = {
+    const params = {
       ...this.defaultOptions,
       ...options,
       // Unset options that should not be sent to the API
@@ -54,7 +63,7 @@ export class InAppMessagesClient {
       __fetchSource: undefined,
     };
 
-    this.queryKey = this.buildQueryKey(queryParams);
+    this.queryKey = this.buildQueryKey(params);
 
     const queryState = this.channelClient.store.state.queries[
       this.queryKey
@@ -69,82 +78,190 @@ export class InAppMessagesClient {
       return;
     }
 
-    // TODO: Move to method on channel client
     // Set the loading type based on the request type it is
-    this.channelClient.store.setState((state) => ({
-      ...state,
-      queries: {
-        ...state.queries,
-        [this.queryKey]: {
-          ...queryState,
-          networkStatus: options.__loadingType ?? NetworkStatus.loading,
-          loading: true,
-        },
-      },
-    }));
-
-    // TODO: Move to method on user.getInAppMessages
-    const result = await this.knock.client().makeRequest({
-      method: "GET",
-      url: `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`,
-      params: queryParams,
+    this.channelClient.setQueryStatus(this.queryKey, {
+      networkStatus: options.__loadingType ?? NetworkStatus.loading,
+      loading: true,
     });
 
-    if (result.statusCode === "error" || !result.body) {
-      this.channelClient.store.setState((state) => ({
-        ...state,
-        queries: {
-          ...state.queries,
-          [this.queryKey]: {
-            ...queryState,
-            networkStatus: NetworkStatus.error,
-            loading: false,
-          },
-        },
-      }));
+    try {
+      const response = await this.knock.user.getInAppMessages<TContent, TData>({
+        channelId: this.channelClient.channelId,
+        messageType: this.messageType,
+        params,
+      });
+
+      this.channelClient.setQueryResponse(this.queryKey, response);
+
+      return { data: response, status: "ok" };
+    } catch (error) {
+      this.channelClient.setQueryStatus(this.queryKey, {
+        networkStatus: NetworkStatus.error,
+        loading: false,
+      });
 
       return {
-        status: result.statusCode,
-        data: result.error || result.body,
+        status: "error",
+        error: error as Error,
       };
     }
+  }
 
-    const response: InAppMessageResponse = {
-      entries: result.body.entries,
-      pageInfo: result.body.page_info,
+  getQueryInfoSelector<
+    TContent extends GenericData = GenericData,
+    TData extends GenericData = GenericData,
+  >(
+    state: InAppMessageStoreState,
+  ): {
+    messages: InAppMessage<TContent, TData>[];
+    loading: boolean;
+    networkStatus: NetworkStatus;
+  } {
+    const queryInfo = state.queries[this.queryKey];
+    const messageIds = queryInfo?.data?.messageIds ?? [];
+
+    const messages = messageIds.reduce<InAppMessage<TContent, TData>[]>(
+      (messages, messageId) => {
+        const message = state.messages[messageId];
+        if (message) {
+          messages.push(message as InAppMessage<TContent, TData>);
+        }
+        return messages;
+      },
+      [],
+    );
+
+    return {
+      messages,
+      networkStatus: queryInfo?.networkStatus ?? NetworkStatus.ready,
+      loading: queryInfo?.loading ?? false,
     };
+  }
 
-    const queryInfo: InAppMessagesQueryInfo = {
-      loading: false,
-      networkStatus: NetworkStatus.ready,
-      // TODO: Only store message ids on query info
-      data: response,
-    };
+  // ----------------------------------------------
+  // Message engagement
+  // ----------------------------------------------
+  async markAsSeen(itemOrItems: InAppMessage | InAppMessage[]) {
+    const itemIds = this.getItemIds(itemOrItems);
 
-    this.channelClient.store.setState((state) => {
-      return {
-        ...state,
-        // Store new messages in shared store
-        messages: response.entries.reduce((messages, message) => {
-          messages[message.id] = message;
-          return messages;
-        }, state.messages),
-        // Store query results
-        queries: {
-          ...state.queries,
-          [this.queryKey]: queryInfo,
-        },
-      };
+    this.channelClient.setMessageAttrs(itemIds, {
+      seen_at: new Date().toISOString(),
     });
 
-    return { data: response, status: result.statusCode };
+    return this.makeStatusUpdate(itemOrItems, "seen");
+  }
+
+  async markAsUnseen(itemOrItems: InAppMessage | InAppMessage[]) {
+    const itemIds = this.getItemIds(itemOrItems);
+
+    this.channelClient.setMessageAttrs(itemIds, {
+      seen_at: null,
+    });
+
+    return this.makeStatusUpdate(itemOrItems, "unseen");
+  }
+
+  async markAsRead(itemOrItems: InAppMessage | InAppMessage[]) {
+    const itemIds = this.getItemIds(itemOrItems);
+
+    this.channelClient.setMessageAttrs(itemIds, {
+      read_at: new Date().toISOString(),
+    });
+
+    return this.makeStatusUpdate(itemOrItems, "read");
+  }
+
+  async markAsUnread(itemOrItems: InAppMessage | InAppMessage[]) {
+    const itemIds = this.getItemIds(itemOrItems);
+
+    this.channelClient.setMessageAttrs(itemIds, {
+      read_at: null,
+    });
+
+    return this.makeStatusUpdate(itemOrItems, "unread");
+  }
+
+  async markAsInteracted(
+    itemOrItems: InAppMessage | InAppMessage[],
+    metadata?: Record<string, string>,
+  ) {
+    const now = new Date().toISOString();
+    const itemIds = this.getItemIds(itemOrItems);
+
+    this.channelClient.setMessageAttrs(itemIds, {
+      read_at: now,
+      interacted_at: now,
+    });
+
+    return this.makeStatusUpdate(itemOrItems, "interacted", metadata);
+  }
+
+  async markAsArchived(itemOrItems: InAppMessage | InAppMessage[]) {
+    const itemIds = this.getItemIds(itemOrItems);
+
+    // const queryInfo = this.channelClient.store.state.queries[this.queryKey];
+
+    // Optimistically update the message status.
+    this.channelClient.setMessageAttrs(itemIds, {
+      archived_at: new Date().toISOString(),
+    });
+
+    // If set to exclude, also remove the message id from the list of messages for the given query
+    // TODO: Figure out optimistic updates
+    // const shouldOptimisticallyRemoveItems =
+    //   this.defaultOptions.archived === "exclude";
+    // if (shouldOptimisticallyRemoveItems && queryInfo?.data) {
+    //   this.channelClient.setQueryState(this.queryKey, {
+    //     ...queryInfo,
+    //     data: {
+    //       ...queryInfo.data,
+    //       messageIds: queryInfo.data.messageIds?.filter(
+    //         (id) => !itemIds.includes(id),
+    //       ),
+    //     },
+    //   });
+    // }
+
+    return this.makeStatusUpdate(itemOrItems, "archived");
+  }
+
+  async markAsUnarchived(itemOrItems: InAppMessage | InAppMessage[]) {
+    const itemIds = this.getItemIds(itemOrItems);
+
+    this.channelClient.setMessageAttrs(itemIds, {
+      archived_at: null,
+    });
+
+    return this.makeStatusUpdate(itemOrItems, "unarchived");
+  }
+
+  private async makeStatusUpdate(
+    itemOrItems: InAppMessage | InAppMessage[],
+    type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
+    metadata?: Record<string, string>,
+  ) {
+    // Always treat items as a batch to use the corresponding batch endpoint
+    const itemIds = this.getItemIds(itemOrItems);
+
+    const result = await this.knock.messages.batchUpdateStatuses(
+      itemIds,
+      type,
+      { metadata },
+    );
+
+    return result;
   }
 
   // ----------------------------------------------
   // Helpers
   // ----------------------------------------------
-  private buildQueryKey(params: GenericData) {
+  private buildQueryKey(params: GenericData): string {
     // TODO: Update query key format to match GET request url (w/ query params)
     return `${this.messageType}-${JSON.stringify(params)}`;
+  }
+
+  private getItemIds(itemOrItems: InAppMessage | InAppMessage[]): string[] {
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    return items.map((item) => item.id);
   }
 }
