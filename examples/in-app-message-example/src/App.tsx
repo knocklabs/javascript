@@ -1,8 +1,10 @@
 import { NetworkStatus } from "@knocklabs/client";
 import {
   Banner,
+  Card,
   KnockInAppChannelProvider,
   KnockProvider,
+  Modal,
   useInAppMessages,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
@@ -64,6 +66,7 @@ function App() {
       apiKey={import.meta.env.VITE_KNOCK_API_KEY!}
       userId={import.meta.env.VITE_KNOCK_USER_ID!}
       host={import.meta.env.VITE_KNOCK_HOST}
+      logLevel="debug"
     >
       <KnockInAppChannelProvider
         channelId={import.meta.env.VITE_KNOCK_CHANNEL_ID}
@@ -80,14 +83,30 @@ function App() {
           </button>
           <hr />
           <h2>Banner</h2>
-          <div>
-            <Banner.Default />
-          </div>
+          <Banner.Default />
+          <hr />
+          <h2>Card</h2>
+          <Card.View.Default
+            colorMode={colorMode}
+            content={{
+              headline: "Something new",
+              title: "Check out what we're cooking!",
+              body: "The greatest enterprise software to grace your procurement pipeline.",
+              dismissible: true,
+              primary_button: {
+                text: "Upgrade $$$$",
+                action: "",
+              },
+              secondary_button: {
+                text: "Upgrade a little $$",
+                action: "",
+              },
+            }}
+          />
           <hr />
           <Messages />
-          <hr />
-          <h2>Env</h2>
-          <pre>{JSON.stringify(import.meta.env, null, 2)}</pre>
+
+          <Modal.Default />
         </>
       </KnockInAppChannelProvider>
     </KnockProvider>

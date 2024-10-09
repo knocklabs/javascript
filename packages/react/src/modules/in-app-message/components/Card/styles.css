@@ -1,39 +1,54 @@
-.knock-iam-banner {
+.knock-iam-card {
+  background: var(--knock-iam-surface);
+  padding: var(--knock-spacing-4);
+  border-radius: var(--knock-rounded-2);
+  border: 0.5px solid var(--knock-iam-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--knock-spacing-4);
+  max-width: var(--knock-spacing-96);
+}
+.knock-iam-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--knock-iam-surface);
-  padding: var(--knock-spacing-4) var(--knock-spacing-6);
-  border-radius: var(--knock-rounded-4);
-  border: 0.5px solid var(--knock-iam-border);
-  box-shadow: var(--knock-shadow-2);
-  gap: var(--knock-spacing-4);
+  align-self: stretch;
+  gap: var(--knock-spacing-2);
 }
-.knock-iam-banner__message {
-  min-width: var(--knock-spacing-96);
+.knock-iam-card__headline {
+  color: var(--knock-iam-accent-dark);
+  font-size: var(--knock-text-1);
+  font-weight: var(--knock-weight-medium);
+  line-height: var(--knock-leading-1);
+  letter-spacing: var(--knock-tracking-1);
 }
-.knock-iam-banner__title {
+.knock-iam-card__message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+.knock-iam-card__title {
   color: var(--knock-iam-content);
   font-size: var(--knock-text-4);
   font-weight: var(--knock-weight-medium);
   line-height: var(--knock-leading-4);
 }
-.knock-iam-banner__body {
+.knock-iam-card__body {
   color: var(--knock-iam-content-light);
   font-size: var(--knock-text-3);
   font-weight: var(--knock-weight-regular);
   line-height: var(--knock-leading-3);
 }
-.knock-iam-banner__actions {
+.knock-iam-card__actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--knock-spacing-3);
 }
-.knock-iam-banner__action {
+.knock-iam-card__action {
   text-decoration: none;
   font-size: var(--knock-text-3);
-  font-weight: var(--knock-weight-regular);
+  font-weight: var(--knock-weight-medium);
   line-height: var(--knock-leading-3);
   border-radius: var(--knock-rounded-3);
   padding: 0 var(--knock-spacing-4);
@@ -46,12 +61,12 @@
   background: var(--knock-iam-accent);
   color: var(--knock-iam-content-contrast);
 }
-.knock-iam-banner__action--secondary {
+.knock-iam-card__action--secondary {
   border-color: var(--knock-iam-border-dark);
   background: var(--knock-iam-surface);
   color: var(--knock-iam-content);
 }
-.knock-iam-banner__close {
+.knock-iam-card__close {
   padding: var(--knock-spacing-3);
   border: none;
   background: none;
