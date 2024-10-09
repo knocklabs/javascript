@@ -201,7 +201,7 @@ const DefaultView: React.FC<{
   onDismiss,
 }) => {
   return (
-    <Root onOpenChange={onOpenChange} onClick={onInteract} onFocus={onInteract}>
+    <Root onOpenChange={onOpenChange} onClick={onInteract}>
       <Overlay />
       {/* Must pass color mode to content for css variables to be set properly */}
       <Content data-knock-color-mode={colorMode}>
