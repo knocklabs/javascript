@@ -138,14 +138,14 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 const DefaultView: React.FC<{
   content: BannerContent;
   colorMode?: ColorMode;
-  onInteracted?: () => void;
-  onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onInteracted, onDismissClick }) => {
+  onInteract?: () => void;
+  onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
+}> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
   return (
     <Root
       data-knock-color-mode={colorMode}
-      onClick={onInteracted}
-      onFocus={onInteracted}
+      onClick={onInteract}
+      onFocus={onInteract}
     >
       <Content>
         <Title title={content.title} />
@@ -166,7 +166,7 @@ const DefaultView: React.FC<{
           />
         )}
 
-        {content.dismissible && <DismissButton onClick={onDismissClick} />}
+        {content.dismissible && <DismissButton onClick={onDismiss} />}
       </Actions>
     </Root>
   );
@@ -188,11 +188,11 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
 
   if (!message) return null;
 
-  const onDismissClick = () => {
+  const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);
   };
 
-  const onInteracted = () => {
+  const onInteract = () => {
     inAppMessagesClient.markAsInteracted(message);
   };
 
@@ -200,8 +200,8 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
     <DefaultView
       content={message.content}
       colorMode={colorMode}
-      onDismissClick={onDismissClick}
-      onInteracted={onInteracted}
+      onDismiss={onDismiss}
+      onInteract={onInteract}
     />
   );
 };

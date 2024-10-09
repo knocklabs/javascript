@@ -159,19 +159,19 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 const DefaultView: React.FC<{
   content: CardContent;
   colorMode?: ColorMode;
-  onInteracted?: () => void;
-  onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onInteracted, onDismissClick }) => {
+  onInteract?: () => void;
+  onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
+}> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
   return (
     <Root
       data-knock-color-mode={colorMode}
-      onClick={onInteracted}
-      onFocus={onInteracted}
+      onClick={onInteract}
+      onFocus={onInteract}
     >
       <Content>
         <Header>
           <Headline headline={content.headline} />
-          {content.dismissible && <DismissButton onClick={onDismissClick} />}
+          {content.dismissible && <DismissButton onClick={onDismiss} />}
         </Header>
 
         <Title title={content.title} />
@@ -212,11 +212,11 @@ const Default: React.FC<CardProps> = ({ filters }) => {
 
   if (!message) return null;
 
-  const onDismissClick = () => {
+  const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);
   };
 
-  const onInteracted = () => {
+  const onInteract = () => {
     inAppMessagesClient.markAsInteracted(message);
   };
 
@@ -224,8 +224,8 @@ const Default: React.FC<CardProps> = ({ filters }) => {
     <DefaultView
       content={message.content}
       colorMode={colorMode}
-      onDismissClick={onDismissClick}
-      onInteracted={onInteracted}
+      onDismiss={onDismiss}
+      onInteract={onInteract}
     />
   );
 };

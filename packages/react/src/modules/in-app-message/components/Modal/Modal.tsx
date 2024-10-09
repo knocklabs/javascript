@@ -191,27 +191,23 @@ const DefaultView: React.FC<{
   content: ModalContent;
   colorMode?: ColorMode;
   onOpenChange?: (open: boolean) => void;
-  onInteracted?: () => void;
-  onDismissClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onInteract?: () => void;
+  onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
 }> = ({
   content,
   colorMode = "light",
   onOpenChange,
-  onInteracted,
-  onDismissClick,
+  onInteract,
+  onDismiss,
 }) => {
   return (
-    <Root
-      onOpenChange={onOpenChange}
-      onClick={onInteracted}
-      onFocus={onInteracted}
-    >
+    <Root onOpenChange={onOpenChange} onClick={onInteract} onFocus={onInteract}>
       <Overlay />
       {/* Must pass color mode to content for css variables to be set properly */}
       <Content data-knock-color-mode={colorMode}>
         <Header>
           <Title title={content.title} />
-          {content.dismissible && <Close onClick={onDismissClick} />}
+          {content.dismissible && <Close onClick={onDismiss} />}
         </Header>
 
         <Body body={content.body} />
@@ -257,11 +253,11 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
     }
   };
 
-  const onDismissClick = () => {
+  const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);
   };
 
-  const onInteracted = () => {
+  const onInteract = () => {
     inAppMessagesClient.markAsInteracted(message);
   };
 
@@ -270,8 +266,8 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
       content={message.content}
       colorMode={colorMode}
       onOpenChange={onOpenChange}
-      onDismissClick={onDismissClick}
-      onInteracted={onInteracted}
+      onDismiss={onDismiss}
+      onInteract={onInteract}
     />
   );
 };
