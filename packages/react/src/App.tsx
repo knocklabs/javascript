@@ -1,12 +1,12 @@
 import {
-  Banner,
+  BannerView,
   Button,
   ButtonGroup,
-  Card,
+  CardView,
   KnockFeedProvider,
   KnockInAppChannelProvider,
   KnockProvider,
-  Modal,
+  ModalView,
 } from ".";
 import { FunctionComponent, useState } from "react";
 
@@ -29,7 +29,7 @@ const App: FunctionComponent = () => {
           >
             Toggle color mode - {colorMode}
           </button>
-          <Modal.View.Default
+          <ModalView.Default
             colorMode={colorMode}
             content={{
               title: "Modal title",
@@ -47,7 +47,7 @@ const App: FunctionComponent = () => {
           />
 
           <h2>Card</h2>
-          <Card.View.Default
+          <CardView.Default
             colorMode={colorMode}
             content={{
               headline: "Something new",
@@ -66,7 +66,7 @@ const App: FunctionComponent = () => {
           />
 
           <h2>Banner</h2>
-          <Banner.View.Default
+          <BannerView.Default
             colorMode={colorMode}
             content={{
               title: "Check out what we're cooking!",

@@ -168,7 +168,7 @@ const DefaultView: React.FC<{
   );
 };
 
-const Default: React.FC<BannerProps> = ({ filters }) => {
+const Banner: React.FC<BannerProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
   const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
     MESSAGE_TYPE,
@@ -202,7 +202,7 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
   );
 };
 
-const View = {} as {
+const BannerView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
@@ -214,7 +214,7 @@ const View = {} as {
   DismissButton: typeof DismissButton;
 };
 
-Object.assign(View, {
+Object.assign(BannerView, {
   Default: DefaultView,
   Root,
   Content,
@@ -226,14 +226,4 @@ Object.assign(View, {
   DismissButton,
 });
 
-const Banner = {} as {
-  View: typeof View;
-  Default: typeof Default;
-};
-
-Object.assign(Banner, {
-  View,
-  Default,
-});
-
-export { Banner };
+export { Banner, BannerView };
