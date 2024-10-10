@@ -192,7 +192,7 @@ const DefaultView: React.FC<{
   );
 };
 
-const Default: React.FC<CardProps> = ({ filters }) => {
+const Card: React.FC<CardProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
   const { message, inAppMessagesClient } = useInAppMessage<CardContent>(
     MESSAGE_TYPE,
@@ -226,7 +226,7 @@ const Default: React.FC<CardProps> = ({ filters }) => {
   );
 };
 
-const View = {} as {
+const CardView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
@@ -239,7 +239,7 @@ const View = {} as {
   DismissButton: typeof DismissButton;
 };
 
-Object.assign(View, {
+Object.assign(CardView, {
   Default: DefaultView,
   Root,
   Content,
@@ -251,14 +251,4 @@ Object.assign(View, {
   DismissButton,
 });
 
-const Card = {} as {
-  View: typeof View;
-  Default: typeof Default;
-};
-
-Object.assign(Card, {
-  View,
-  Default,
-});
-
-export { Card };
+export { Card, CardView };

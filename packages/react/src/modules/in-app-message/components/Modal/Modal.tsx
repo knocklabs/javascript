@@ -231,7 +231,7 @@ const DefaultView: React.FC<{
   );
 };
 
-const Default: React.FC<ModalProps> = ({ filters }) => {
+const Modal: React.FC<ModalProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
   const { message, inAppMessagesClient } = useInAppMessage<ModalContent>(
     MESSAGE_TYPE,
@@ -272,7 +272,7 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
   );
 };
 
-const View = {} as {
+const ModalView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Overlay: typeof Overlay;
@@ -285,7 +285,7 @@ const View = {} as {
   Close: typeof Close;
 };
 
-Object.assign(View, {
+Object.assign(ModalView, {
   Default: DefaultView,
   Root,
   Overlay,
@@ -298,14 +298,4 @@ Object.assign(View, {
   Close,
 });
 
-const Modal = {} as {
-  View: typeof View;
-  Default: typeof Default;
-};
-
-Object.assign(Modal, {
-  View,
-  Default,
-});
-
-export { Modal };
+export { Modal, ModalView };

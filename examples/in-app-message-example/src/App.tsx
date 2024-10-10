@@ -1,7 +1,7 @@
 import { NetworkStatus } from "@knocklabs/client";
 import {
   Banner,
-  Card,
+  CardView,
   KnockInAppChannelProvider,
   KnockProvider,
   Modal,
@@ -83,10 +83,10 @@ function App() {
           </button>
           <hr />
           <h2>Banner</h2>
-          <Banner.Default />
+          <Banner />
           <hr />
           <h2>Card</h2>
-          <Card.View.Default
+          <CardView.Default
             colorMode={colorMode}
             content={{
               headline: "Something new",
@@ -106,7 +106,7 @@ function App() {
           <hr />
           <Messages />
 
-          <Modal.Default />
+          <Modal />
         </>
       </KnockInAppChannelProvider>
     </KnockProvider>
