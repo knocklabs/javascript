@@ -45,6 +45,7 @@ const Root = ({ children, onOpenChange, ...props }: RootProps) => {
     </Dialog.Root>
   );
 };
+Root.displayName = "ModalView.Root";
 
 type OverlayProps = React.ComponentPropsWithoutRef<typeof Dialog.Overlay> &
   React.ComponentPropsWithRef<"div">;
@@ -62,6 +63,7 @@ const Overlay = React.forwardRef<OverlayRef, OverlayProps>(
     );
   },
 );
+Overlay.displayName = "ModalView.Overlay";
 
 type ContentProps = React.ComponentPropsWithoutRef<typeof Dialog.Content> &
   React.ComponentPropsWithRef<"div">;
@@ -80,6 +82,7 @@ const Content = React.forwardRef<ContentRef, ContentProps>(
     );
   },
 );
+Content.displayName = "ModalView.Content";
 
 const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -90,6 +93,7 @@ const Header: React.FC<
     </div>
   );
 };
+Header.displayName = "ModalView.Header";
 
 type TitleProps = React.ComponentPropsWithoutRef<typeof Dialog.Title> &
   React.ComponentPropsWithRef<"div"> & {
@@ -106,6 +110,7 @@ const Title = ({ title, className, ...props }: TitleProps) => {
     </Dialog.Title>
   );
 };
+Title.displayName = "ModalView.Title";
 
 const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   body,
@@ -121,6 +126,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
     </Dialog.Description>
   );
 };
+Body.displayName = "ModalView.Body";
 
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -131,6 +137,7 @@ const Actions: React.FC<
     </div>
   );
 };
+Actions.displayName = "ModalView.Actions";
 
 const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -145,6 +152,7 @@ const PrimaryAction: React.FC<
     </a>
   );
 };
+PrimaryAction.displayName = "ModalView.PrimaryAction";
 
 const SecondaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -162,6 +170,7 @@ const SecondaryAction: React.FC<
     </a>
   );
 };
+SecondaryAction.displayName = "ModalView.SecondaryAction";
 
 type CloseProps = React.ComponentPropsWithoutRef<typeof Dialog.Close> &
   React.ComponentPropsWithRef<"button">;
@@ -186,6 +195,7 @@ const Close = ({ className, ...props }: CloseProps) => {
     </Dialog.Close>
   );
 };
+Close.displayName = "ModalView.Close";
 
 const DefaultView: React.FC<{
   content: ModalContent;
@@ -230,6 +240,7 @@ const DefaultView: React.FC<{
     </Root>
   );
 };
+DefaultView.displayName = "ModalView.Default";
 
 const Modal: React.FC<ModalProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
@@ -271,6 +282,7 @@ const Modal: React.FC<ModalProps> = ({ filters }) => {
     />
   );
 };
+Modal.displayName = "Modal";
 
 const ModalView = {} as {
   Default: typeof DefaultView;
