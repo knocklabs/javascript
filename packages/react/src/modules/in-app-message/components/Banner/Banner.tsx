@@ -40,6 +40,7 @@ const Root: React.FC<
     </div>
   );
 };
+Root.displayName = "BannerView.Root";
 
 const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -50,6 +51,7 @@ const Content: React.FC<
     </div>
   );
 };
+Content.displayName = "BannerView.Content";
 
 const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
@@ -60,6 +62,7 @@ const Title: React.FC<
     </div>
   );
 };
+Title.displayName = "BannerView.Title";
 
 const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   body,
@@ -72,6 +75,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
     </div>
   );
 };
+Body.displayName = "BannerView.Body";
 
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -82,6 +86,7 @@ const Actions: React.FC<
     </div>
   );
 };
+Actions.displayName = "BannerView.Actions";
 
 const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -96,6 +101,7 @@ const PrimaryAction: React.FC<
     </a>
   );
 };
+PrimaryAction.displayName = "BannerView.PrimaryAction";
 
 const SecondaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -113,6 +119,7 @@ const SecondaryAction: React.FC<
     </a>
   );
 };
+SecondaryAction.displayName = "BannerView.SecondaryAction";
 
 const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   className,
@@ -134,6 +141,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
     </button>
   );
 };
+DismissButton.displayName = "BannerView.DismissButton";
 
 const DefaultView: React.FC<{
   content: BannerContent;
@@ -167,6 +175,7 @@ const DefaultView: React.FC<{
     </Root>
   );
 };
+DefaultView.displayName = "BannerView.Default";
 
 const Banner: React.FC<BannerProps> = ({ filters }) => {
   const { colorMode } = useInAppChannel();
@@ -201,6 +210,7 @@ const Banner: React.FC<BannerProps> = ({ filters }) => {
     />
   );
 };
+Banner.displayName = "Banner";
 
 const BannerView = {} as {
   Default: typeof DefaultView;
