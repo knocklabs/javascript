@@ -1,4 +1,4 @@
-import { GenericData, PageInfo } from "@knocklabs/types";
+import { GenericData, PageInfo, Tenant } from "@knocklabs/types";
 
 import { NetworkStatus } from "../../networkStatus";
 import { NotificationSource } from "../messages/interfaces";
@@ -6,6 +6,7 @@ import { NotificationSource } from "../messages/interfaces";
 export interface InAppMessage<
   TContent extends GenericData = GenericData,
   TData extends GenericData = GenericData,
+  TTenantProperties = GenericData,
 > {
   __cursor: string;
   id: string;
@@ -22,6 +23,7 @@ export interface InAppMessage<
   archived_at: string | null;
   link_clicked_at: string | null;
   source: NotificationSource;
+  tenant: Tenant<TTenantProperties>;
 }
 
 export interface InAppMessageResponse<
