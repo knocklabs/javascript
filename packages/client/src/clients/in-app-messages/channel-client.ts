@@ -100,7 +100,6 @@ export class InAppMessagesChannelClient {
   }
 
   subscribe(client: InAppMessagesClient) {
-    // console.log("InAppChannelClient.subscribe", client.referenceId)
     if (!this.socketDriver) return;
 
     // Pass the unsub func back to the iam client.
@@ -108,7 +107,6 @@ export class InAppMessagesChannelClient {
   }
 
   unsubscribe(client: InAppMessagesClient) {
-    // console.log("InAppChannelClient.subscribe", client.referenceId)
     if (!this.socketDriver) return;
 
     this.socketDriver.leave(client);

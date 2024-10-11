@@ -16,8 +16,6 @@ import {
 
 /**
  * Manages realtime connection to in app messages service.
- *
- * TODO: Rename to InAppMessagesClient to singular?
  */
 export class InAppMessagesClient {
   private knock: Knock;

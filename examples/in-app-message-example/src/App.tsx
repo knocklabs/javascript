@@ -7,7 +7,6 @@ import {
   Modal,
   useInAppMessages,
 } from "@knocklabs/react";
-import { useInAppMessage } from "@knocklabs/react-core";
 import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
 
@@ -57,23 +56,6 @@ function Messages() {
       </div>
     </>
   );
-}
-
-const Card = (opts: any) => {
-  const [counter, setCounter] = useState(0);
-  const { message } = useInAppMessage("card", opts);
-
-  if (!message) return null;
-
-  return (
-    <div>
-      Card: {JSON.stringify(opts)}
-
-      <button onClick={() => setCounter(counter + 1)}>
-        click
-      </button>
-    </div>
-  )
 }
 
 function App() {
