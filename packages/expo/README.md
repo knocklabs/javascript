@@ -1,6 +1,6 @@
 # Knock Expo SDK
 
-A set of components for integrating [Knock](https://knock.app) in-app notifications into a React Native application.
+A set of components for integrating [Knock](https://knock.app) in-app notifications into an Expo + React Native application.
 
 > Not using Expo? See our vanilla [React Native SDK](../react-native/README.md).
 
