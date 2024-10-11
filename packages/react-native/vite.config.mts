@@ -27,14 +27,7 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         // External packages that should not be bundled into your library.
-        external: [
-          "react",
-          "react-native",
-          "expo",
-          "expo-constants",
-          "expo-device",
-          "expo-notifications",
-        ],
+        external: ["react", "react-native"],
         output: {
           interop: "compat",
           format: formats[0],
