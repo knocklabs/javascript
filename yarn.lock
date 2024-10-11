@@ -5024,15 +5024,6 @@ __metadata:
     expo-notifications: "*"
     react: "*"
     react-native: "*"
-  peerDependenciesMeta:
-    expo:
-      optional: true
-    expo-constants:
-      optional: true
-    expo-device:
-      optional: true
-    expo-notifications:
-      optional: true
   languageName: unknown
   linkType: soft
 

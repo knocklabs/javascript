@@ -48,20 +48,6 @@
     "react": "*",
     "react-native": "*"
   },
-  "peerDependenciesMeta": {
-    "expo": {
-      "optional": true
-    },
-    "expo-constants": {
-      "optional": true
-    },
-    "expo-device": {
-      "optional": true
-    },
-    "expo-notifications": {
-      "optional": true
-    }
-  },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
