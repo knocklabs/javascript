@@ -4994,6 +4994,7 @@ __metadata:
   dependencies:
     "@knocklabs/client": "workspace:^"
     "@knocklabs/react-core": "workspace:^"
+    "@knocklabs/react-native": "workspace:^"
     "@types/react": "npm:^18.3.6"
     "@types/react-native-htmlview": "npm:^0.16.5"
     "@typescript-eslint/eslint-plugin": "npm:^6.20.0"

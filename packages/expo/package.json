@@ -65,6 +65,7 @@
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
+    "@knocklabs/react-native": "workspace:^",
     "react-native-gesture-handler": "^2.19.0",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "^15.6.0"
