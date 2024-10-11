@@ -1,5 +1,5 @@
+import { KnockExpoPushNotificationProvider } from "@knocklabs/expo";
 import {
-  KnockExpoPushNotificationProvider,
   KnockFeedProvider,
   KnockProvider,
   NotificationIconButton,

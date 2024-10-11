@@ -4988,7 +4988,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/expo@workspace:packages/expo":
+"@knocklabs/expo@workspace:^, @knocklabs/expo@workspace:packages/expo":
   version: 0.0.0-use.local
   resolution: "@knocklabs/expo@workspace:packages/expo"
   dependencies:
@@ -5095,7 +5095,7 @@ __metadata:
   resolution: "@knocklabs/react-native-example@workspace:examples/react-native-example"
   dependencies:
     "@babel/core": "npm:^7.25.7"
-    "@knocklabs/react-native": "workspace:^"
+    "@knocklabs/expo": "workspace:^"
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
     expo-device: "npm:>=6.0.2"
