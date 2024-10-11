@@ -4,6 +4,8 @@ A set of components for integrating [Knock](https://knock.app) in-app notificati
 
 [Full documentation](https://docs.knock.app/in-app-ui/react-native/overview)
 
+> Using Expo? See our [Expo SDK](../expo/README.md).
+
 ## Installation
 
 Via NPM:
