@@ -1,4 +1,4 @@
-import { ActionButton, FeedItem } from "@knocklabs/client";
+import type { ActionButton, FeedItem } from "@knocklabs/client";
 import { NotificationFeed } from "@knocklabs/expo";
 import React, { useCallback } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
