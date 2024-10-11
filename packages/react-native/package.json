@@ -41,26 +41,8 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
-    "expo": "*",
-    "expo-constants": "*",
-    "expo-device": "*",
-    "expo-notifications": "*",
     "react": "*",
     "react-native": "*"
-  },
-  "peerDependenciesMeta": {
-    "expo": {
-      "optional": true
-    },
-    "expo-constants": {
-      "optional": true
-    },
-    "expo-device": {
-      "optional": true
-    },
-    "expo-notifications": {
-      "optional": true
-    }
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
@@ -78,10 +60,6 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
-    "expo": ">=51.0.24",
-    "expo-constants": ">=16.0.2",
-    "expo-device": ">=6.0.2",
-    "expo-notifications": ">=0.28.16",
     "react": "^18.2.0",
     "react-native": "^0.73.4",
     "rimraf": "^6.0.1",

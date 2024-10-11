@@ -5121,10 +5121,6 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.4"
-    expo: "npm:>=51.0.24"
-    expo-constants: "npm:>=16.0.2"
-    expo-device: "npm:>=6.0.2"
-    expo-notifications: "npm:>=0.28.16"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
     react-native-gesture-handler: "npm:^2.19.0"
@@ -5136,21 +5132,8 @@ __metadata:
     vite-plugin-dts: "npm:^3.6.3"
     vite-plugin-no-bundle: "npm:^4.0.0"
   peerDependencies:
-    expo: "*"
-    expo-constants: "*"
-    expo-device: "*"
-    expo-notifications: "*"
     react: "*"
     react-native: "*"
-  peerDependenciesMeta:
-    expo:
-      optional: true
-    expo-constants:
-      optional: true
-    expo-device:
-      optional: true
-    expo-notifications:
-      optional: true
   languageName: unknown
   linkType: soft
 
