@@ -1,6 +1,8 @@
 import Knock from "../../knock";
 import { NetworkStatus } from "../../networkStatus";
 
+import { InAppMessagesClient } from "./message-client";
+import { InAppMessageSocketDriver } from "./socket-driver";
 import { InAppMessagesStore, createStore } from "./store";
 import {
   InAppMessage,
@@ -16,12 +18,19 @@ import {
 export class InAppMessagesChannelClient {
   public store: InAppMessagesStore;
 
+  private socketDriver: InAppMessageSocketDriver | undefined;
+
   constructor(
     readonly knock: Knock,
     readonly channelId: string,
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
     this.store = createStore();
+
+    const { socket } = this.knock.client();
+    if (socket) {
+      this.socketDriver = new InAppMessageSocketDriver(socket);
+    }
 
     this.knock.log(`[IAM] Initialized a client on channel ${channelId}`);
   }
@@ -88,5 +97,20 @@ export class InAppMessagesChannelClient {
         },
       },
     }));
+  }
+
+  subscribe(client: InAppMessagesClient) {
+    // console.log("InAppChannelClient.subscribe", client.referenceId)
+    if (!this.socketDriver) return;
+
+    // Pass the unsub func back to the iam client.
+    return this.socketDriver.join(client);
+  }
+
+  unsubscribe(client: InAppMessagesClient) {
+    // console.log("InAppChannelClient.subscribe", client.referenceId)
+    if (!this.socketDriver) return;
+
+    this.socketDriver.leave(client);
   }
 }

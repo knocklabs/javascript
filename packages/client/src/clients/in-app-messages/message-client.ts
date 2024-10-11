@@ -1,11 +1,12 @@
 import { GenericData } from "@knocklabs/types";
-import { Channel } from "phoenix";
+import { nanoid } from "nanoid";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { MessageEngagementStatus } from "../messages/interfaces";
 
 import { InAppMessagesChannelClient } from "./channel-client";
+import { SocketEventPayload, SocketEventType } from "./socket-driver";
 import {
   InAppMessage,
   InAppMessagesClientOptions,
@@ -21,9 +22,9 @@ import {
 export class InAppMessagesClient {
   private knock: Knock;
 
-  private channel: Channel | undefined;
-
   public queryKey: string;
+  public referenceId: string;
+  public unsub?: () => void;
 
   constructor(
     readonly channelClient: InAppMessagesChannelClient,
@@ -36,6 +37,7 @@ export class InAppMessagesClient {
     };
     this.knock = channelClient.knock;
     this.queryKey = this.buildQueryKey(this.defaultOptions);
+    this.referenceId = nanoid();
 
     this.knock.log(`[IAM] Initialized a client for message ${messageType}`);
   }
@@ -239,52 +241,25 @@ export class InAppMessagesClient {
   }
 
   subscribe() {
-    console.log("subscribe")
-    const { socket } = this.knock.client();
-
-    // In server environments we might not have a socket connection.
-    if (!socket) return;
-
-    // Connect the socket only if no active connection yet.
-    if (!socket.isConnected()) {
-      socket.connect();
-    }
-
-    // Init a channel if none set up yet.
-    if (!this.channel) {
-      this.channel = socket.channel(this.buildSocketTopic(), {
-        ...this.defaultOptions,
-        message_type: this.messageType,
-      });
-
-      this.channel.on("message.created", (resp) => this.handleMessageCreated(resp));
-
-      // TODO: Check if we need an auto socket manager.
-    }
-
-    // Join the channel if we're not already in a joining or leaving state.
-    if (["closed", "errored"].includes(this.channel.state)) {
-      this.channel.join();
-    }
+    this.unsub = this.channelClient.subscribe(this);
   }
 
   unsubscribe() {
-    if (this.channel) {
-      this.channel.leave();
-      this.channel.off("message.created");
+    this.channelClient.unsubscribe(this);
+  }
+
+  async handleSocketEvent(payload: SocketEventPayload) {
+    switch (payload.event) {
+      case SocketEventType.MessageCreated:
+        return await this.fetch();
+
+      default:
+        throw new Error(`Unhandled socket event: ${payload.event}`);
     }
   }
 
-  // TODO: Type the response correctly.
-  private async handleMessageCreated(_: any) {
-    console.log("handleMessageCreated")
-
-    // Re-fetch the latest messages using the default params.
-    await this.fetch();
-  }
-
-  private buildSocketTopic() {
-    return `in_app:${this.channelClient.channelId}:${this.knock.userId}`;
+  socketChannelTopic() {
+    return `in_app:${this.messageType}:${this.channelClient.channelId}:${this.knock.userId}`;
   }
 
   private getItemIds(itemOrItems: InAppMessage | InAppMessage[]): string[] {

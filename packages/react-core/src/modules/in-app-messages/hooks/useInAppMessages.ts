@@ -48,12 +48,14 @@ export const useInAppMessages = <
   );
 
   useEffect(() => {
-    inAppMessagesClient.fetch();
+    // inAppMessagesClient.fetch();
     inAppMessagesClient.subscribe();
 
     return () => {
-      inAppMessagesClient.unsubscribe()
-    }
+      inAppMessagesClient.unsubscribe();
+    };
+    // Run only once at mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { messages, networkStatus, loading, inAppMessagesClient };
