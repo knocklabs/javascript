@@ -246,6 +246,8 @@ export class InAppMessagesClient {
     this.channelClient.unsubscribe(this);
   }
 
+  // This is a callback function that will be invoked when a new socket event
+  // relevant for this message client is received (and if subscribed).
   async handleSocketEvent(payload: SocketEventPayload) {
     switch (payload.event) {
       case SocketEventType.MessageCreated:

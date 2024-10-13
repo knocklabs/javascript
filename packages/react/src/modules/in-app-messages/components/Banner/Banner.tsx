@@ -31,7 +31,6 @@ export interface BannerContent {
   dismissible?: boolean;
 }
 
-// TODO: Use `knock` prefix instead of "iam"?
 const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {

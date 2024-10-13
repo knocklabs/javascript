@@ -27,6 +27,9 @@ export class InAppMessagesChannelClient {
   ) {
     this.store = createStore();
 
+    // Initialize a socket driver for the in-app channel client, which there
+    // should be one per in-app channel client but it's abstracted out as a
+    // separate module for the organization/encapsulation purposes.
     const { socket } = this.knock.client();
     if (socket) {
       this.socketDriver = new InAppMessageSocketDriver(socket);
@@ -38,6 +41,7 @@ export class InAppMessagesChannelClient {
   // ----------------------------------------------
   // Store helpers
   // ----------------------------------------------
+
   setMessageAttrs(messageIds: string[], attrs: Partial<InAppMessage>) {
     this.store.setState((state) => ({
       ...state,
@@ -99,10 +103,15 @@ export class InAppMessagesChannelClient {
     }));
   }
 
+  /*
+   * Socket
+   */
+
   subscribe(client: InAppMessagesClient) {
     if (!this.socketDriver) return;
 
-    // Pass the unsub func back to the iam client.
+    // Pass the unsub func back to iam client so it can be used when
+    // unsubscribing.
     return this.socketDriver.join(client);
   }
 

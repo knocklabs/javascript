@@ -34,6 +34,12 @@ type WithAttn<P> = P & { attn: Array<ClientReferenceId> };
 
 type InAppMessageSocketInbox = Record<ClientReferenceId, SocketEventPayload>;
 
+/*
+ * Manages socket subscriptions for in-app messages, allowing multiple in-app
+ * message clients or components to listen for real time updates from the socket
+ * API via a single socket connection. It's expected to be instantiated once
+ * per an in-app channel.
+ */
 export class InAppMessageSocketDriver {
   // Mapping of live channels by topic. Note, there can be one or more in-app
   // message client(s) that can subscribe.
@@ -85,10 +91,16 @@ export class InAppMessageSocketDriver {
     const referenceId = iamClient.referenceId;
     const params = iamClient.defaultOptions;
 
+    // Ensure a live socket connection if not yet connected.
     if (!this.socket.isConnected()) {
       this.socket.connect();
     }
 
+    // If a new in-app message client joins, or has updated query params then
+    // track the updated params and (re)join with the latest query params.
+    // Note, each time we send combined params of all in-app message clients that
+    // have subscribed for a given message type (and an in-app channel and a
+    // user), grouped by client's reference id.
     if (!this.params[topic]) {
       this.params[topic] = {};
     }
@@ -98,6 +110,7 @@ export class InAppMessageSocketDriver {
       !maybeParams || JSON.stringify(maybeParams) !== JSON.stringify(params);
 
     if (hasNewOrUpdatedParams) {
+      // Tracks all subscribed client's params by its reference id and by topic.
       this.params[topic] = { ...this.params[topic], [referenceId]: params };
     }
 
@@ -106,15 +119,19 @@ export class InAppMessageSocketDriver {
       for (const eventType of SOCKET_EVENT_TYPES) {
         newChannel.on(eventType, (payload) => this.setInbox(payload));
       }
+      // Tracks live channels by channel topic.
       this.channels[topic] = newChannel;
     }
 
     const channel = this.channels[topic];
 
+    // Join the channel if not already joined or joining or leaving.
     if (["closed", "errored"].includes(channel.state)) {
       channel.join();
     }
 
+    // Let the in-app message client subscribe to the "inbox", so it can be
+    // notified when there's a new socket event that is relevant for the client.
     const unsub = this.inbox.subscribe(() => {
       const payload = this.inbox.state[referenceId];
       if (!payload) return;
@@ -158,6 +175,9 @@ export class InAppMessageSocketDriver {
   private setInbox(payload: WithAttn<SocketEventPayload>) {
     const { attn, ...rest } = payload;
 
+    // Set the incoming socket event into the inbox, keyed by relevant client
+    // reference ids provided by the server (via attn field), so we can notify
+    // only the clients that need to be notified.
     this.inbox.setState(() =>
       attn.reduce((acc, referenceId) => {
         return { ...acc, [referenceId]: rest };
