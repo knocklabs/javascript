@@ -258,7 +258,7 @@ export class InAppMessagesClient {
   private buildQueryKey(params: GenericData): string {
     const baseKey = `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`;
     const paramsString = new URLSearchParams(params).toString();
-    return paramsString ? `${baseKey}?${paramsString}` : baseKey
+    return paramsString ? `${baseKey}?${paramsString}` : baseKey;
   }
 
   private getItemIds(itemOrItems: InAppMessage | InAppMessage[]): string[] {

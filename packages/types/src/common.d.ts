@@ -55,7 +55,7 @@ export type WorkflowPreferenceSetting =
   | ConditionalPreferenceSettings;
 
 export type ChannelTypePreferences = {
-  [K in ChannelType]?: boolean | ConditionalPreferenceSettings;
+  [_K in ChannelType]?: boolean | ConditionalPreferenceSettings;
 };
 
 export type ConditionalPreferenceSettings = {
