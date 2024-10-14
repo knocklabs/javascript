@@ -14,7 +14,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@faker-js/faker": "^8.3.1",
+    "@faker-js/faker": "^9.0.3",
     "@knocklabs/node": "^0.6.4",
     "@knocklabs/react": "workspace:^",
     "framer-motion": "^11.3.30",
