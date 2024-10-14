@@ -316,7 +316,7 @@ export const useExpoPushNotifications =
     const context = useContext(KnockExpoPushNotificationContext);
     if (context === undefined) {
       throw new Error(
-        "[Knock] useExpoPushNotifications must be used within a PushNotificationProvider",
+        "[Knock] useExpoPushNotifications must be used within a KnockExpoPushNotificationProvider",
       );
     }
     return context;
