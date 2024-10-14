@@ -14,6 +14,20 @@ import {
   InAppMessagesClientOptions,
 } from "./types";
 
+const engagementFilterRules: Record<
+  InAppMessageEngagementStatus,
+  (msg: InAppMessage) => boolean
+> = {
+  read: (msg) => Boolean(msg.read_at),
+  unread: (msg) => !msg.read_at,
+  seen: (msg) => Boolean(msg.seen_at),
+  unseen: (msg) => !msg.seen_at,
+  interacted: (msg) => Boolean(msg.interacted_at),
+  uninteracted: (msg) => !msg.interacted_at,
+  link_clicked: (msg) => Boolean(msg.link_clicked_at),
+  link_unclicked: (msg) => !msg.link_clicked_at,
+};
+
 /**
  * Manages realtime connection to in app messages service.
  */
@@ -266,31 +280,18 @@ export class InAppMessagesClient {
     message: InAppMessage,
     options: InAppMessagesClientOptions,
   ): boolean {
-    // Filter by engagement status
-    const rules: Record<
-      InAppMessageEngagementStatus,
-      (msg: InAppMessage) => boolean
-    > = {
-      read: (msg) => Boolean(msg.read_at),
-      unread: (msg) => !msg.read_at,
-      seen: (msg) => Boolean(msg.seen_at),
-      unseen: (msg) => !msg.seen_at,
-      interacted: (msg) => Boolean(msg.interacted_at),
-      uninteracted: (msg) => !msg.interacted_at,
-      link_clicked: (msg) => Boolean(msg.link_clicked_at),
-      link_unclicked: (msg) => !msg.link_clicked_at,
-    };
-
-    for (const status of options.engagement_status ?? []) {
-      if (!rules[status](message)) {
-        return false;
-      }
-    }
-
     // Filter by archived status
     if (options.archived === "exclude" && message.archived_at) return false;
     if (options.archived === "only" && !message.archived_at) return false;
 
-    return true;
+    // If no engagement statuses specified, return true
+    if (!options.engagement_status || options.engagement_status.length === 0) {
+      return true;
+    }
+
+    // Check if the message matches any of the specificed engagement statuses
+    return options.engagement_status.some((status) =>
+      engagementFilterRules[status](message),
+    );
   }
 }
