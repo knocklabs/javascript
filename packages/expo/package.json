@@ -1,6 +1,6 @@
 {
-  "name": "@knocklabs/react-native",
-  "version": "0.3.1",
+  "name": "@knocklabs/expo",
+  "version": "0.0.0",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -41,12 +41,17 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
+    "expo": "*",
+    "expo-constants": "*",
+    "expo-device": "*",
+    "expo-notifications": "*",
     "react": "*",
     "react-native": "*"
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
+    "@knocklabs/react-native": "workspace:^",
     "react-native-gesture-handler": "^2.19.0",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "^15.6.0"
@@ -60,6 +65,10 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "expo": ">=51.0.24",
+    "expo-constants": ">=16.0.2",
+    "expo-device": ">=6.0.2",
+    "expo-notifications": ">=0.28.16",
     "react": "^18.2.0",
     "react-native": "^0.73.4",
     "rimraf": "^6.0.1",

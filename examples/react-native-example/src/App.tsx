@@ -3,7 +3,7 @@ import {
   KnockFeedProvider,
   KnockProvider,
   NotificationIconButton,
-} from "@knocklabs/react-native";
+} from "@knocklabs/expo";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";

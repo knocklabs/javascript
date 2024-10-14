@@ -1,24 +1,78 @@
-# Knock React Native SDK
+# Knock Expo SDK
 
-A set of components for integrating [Knock](https://knock.app) in-app notifications into a React Native application.
+A set of components for integrating [Knock](https://knock.app) in-app notifications into an Expo + React Native application.
 
-[Full documentation](https://docs.knock.app/in-app-ui/react-native/overview)
-
-> Using Expo? See our [Expo SDK](../expo/README.md) and our [migration guide](../expo/README.md#migrating-from-knocklabsreact-native).
+> Not using Expo? See our vanilla [React Native SDK](../react-native/README.md).
 
 ## Installation
 
 Via NPM:
 
 ```
-npm install @knocklabs/react-native
+npm install @knocklabs/expo
 ```
 
 Via Yarn:
 
 ```
-yarn add @knocklabs/react-native
+yarn add @knocklabs/expo
 ```
+
+## Migrating from `@knocklabs/react-native`
+
+As of `@knocklabs/react-native` v0.4.0, `KnockExpoPushNotificationProvider` has moved to our Expo SDK. To migrate:
+
+1. Remove `@knocklabs/react-native` from your project
+
+   NPM:
+
+   ```bash
+   npm uninstall @knocklabs/react-native
+   ```
+
+   Yarn:
+
+   ```bash
+   yarn remove @knocklabs/react-native
+   ```
+
+1. Install `@knocklabs/expo`
+
+   NPM:
+
+   ```bash
+   npm install @knocklabs/expo
+   ```
+
+   Yarn:
+
+   ```bash
+   yarn add @knocklabs/expo
+   ```
+
+1. Update any import statements from `@knocklabs/react-native` to `@knocklabs/expo`
+
+   From:
+
+   ```js
+   import {
+     KnockExpoPushNotificationProvider,
+     KnockFeedProvider,
+     KnockProvider,
+     NotificationIconButton,
+   } from "@knocklabs/react-native";
+   ```
+
+   To:
+
+   ```js
+   import {
+     KnockExpoPushNotificationProvider,
+     KnockFeedProvider,
+     KnockProvider,
+     NotificationIconButton,
+   } from "@knocklabs/expo";
+   ```
 
 ## Configuration
 
@@ -37,7 +91,7 @@ import {
   KnockFeedProvider,
   KnockProvider,
   NotificationFeedContainer,
-} from "@knocklabs/react-native";
+} from "@knocklabs/expo";
 
 const YourAppLayout = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -60,10 +114,7 @@ const YourAppLayout = () => {
 Alternatively, if you don't want to use our components you can render the feed in a headless mode using our hooks:
 
 ```jsx
-import {
-  useAuthenticatedKnockClient,
-  useNotifications,
-} from "@knocklabs/react-native";
+import { useAuthenticatedKnockClient, useNotifications } from "@knocklabs/expo";
 import create from "zustand";
 
 const YourAppLayout = () => {
