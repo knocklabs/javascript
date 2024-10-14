@@ -18,6 +18,14 @@ Via Yarn:
 yarn add @knocklabs/expo
 ```
 
+## Migrating from `@knocklabs/react-native`
+
+As of `@knocklabs/react-native` v0.4.0, `KnockExpoPushNotificationProvider` has moved to our Expo SDK. To migrate:
+
+1. Remove `@knocklabs/react-native` from your project (`npm uninstall @knocklabs/react-native` OR `yarn remove @knocklabs/react-native`)
+2. Install `@knocklabs/expo` (`npm install @knocklabs/expo` OR `yarn add @knocklabs/expo`)
+3. Update any import statements from `@knocklabs/react-native` to `@knocklabs/expo`
+
 ## Configuration
 
 To configure the feed you will need:
