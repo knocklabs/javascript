@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import clsx from "clsx";
 import React, { useEffect } from "react";
@@ -178,7 +178,7 @@ const DefaultView: React.FC<{
 DefaultView.displayName = "BannerView.Default";
 
 const Banner: React.FC<BannerProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
+  const { colorMode } = useInAppMessagesChannel();
   const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
     MESSAGE_TYPE,
     filters,
@@ -191,7 +191,8 @@ const Banner: React.FC<BannerProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);

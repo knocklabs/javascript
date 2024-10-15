@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import * as Dialog from "@radix-ui/react-dialog";
 import clsx from "clsx";
@@ -243,7 +243,7 @@ const DefaultView: React.FC<{
 DefaultView.displayName = "ModalView.Default";
 
 const Modal: React.FC<ModalProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
+  const { colorMode } = useInAppMessagesChannel();
   const { message, inAppMessagesClient } = useInAppMessage<ModalContent>(
     MESSAGE_TYPE,
     filters,
@@ -256,7 +256,8 @@ const Modal: React.FC<ModalProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onOpenChange = (open: boolean) => {
     if (!open) {

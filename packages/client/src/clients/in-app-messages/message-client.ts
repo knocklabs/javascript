@@ -4,13 +4,12 @@ import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { MessageEngagementStatus } from "../messages/interfaces";
 
-import { InAppChannelClient } from "./channel-client";
+import { InAppMessagesChannelClient } from "./channel-client";
 import {
-  FetchInAppMessagesOptions,
   InAppMessage,
-  InAppMessageResponse,
-  InAppMessageStoreState,
   InAppMessagesClientOptions,
+  InAppMessagesResponse,
+  InAppMessagesStoreState,
 } from "./types";
 
 /**
@@ -22,7 +21,7 @@ export class InAppMessagesClient {
   public queryKey: string;
 
   constructor(
-    readonly channelClient: InAppChannelClient,
+    readonly channelClient: InAppMessagesChannelClient,
     readonly messageType: string,
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
@@ -42,12 +41,10 @@ export class InAppMessagesClient {
   async fetch<
     TContent extends GenericData = GenericData,
     TData extends GenericData = GenericData,
-  >(
-    options: FetchInAppMessagesOptions = {},
-  ): Promise<
+  >(): Promise<
     | {
         status: "ok";
-        data: InAppMessageResponse<TContent, TData>;
+        data: InAppMessagesResponse<TContent, TData>;
       }
     | {
         status: "error";
@@ -55,13 +52,7 @@ export class InAppMessagesClient {
       }
     | undefined
   > {
-    const params = {
-      ...this.defaultOptions,
-      ...options,
-      // Unset options that should not be sent to the API
-      __loadingType: undefined,
-      __fetchSource: undefined,
-    };
+    const params = this.defaultOptions;
 
     this.queryKey = this.buildQueryKey(params);
 
@@ -80,7 +71,7 @@ export class InAppMessagesClient {
 
     // Set the loading type based on the request type it is
     this.channelClient.setQueryStatus(this.queryKey, {
-      networkStatus: options.__loadingType ?? NetworkStatus.loading,
+      networkStatus: NetworkStatus.loading,
       loading: true,
     });
 
@@ -111,7 +102,7 @@ export class InAppMessagesClient {
     TContent extends GenericData = GenericData,
     TData extends GenericData = GenericData,
   >(
-    state: InAppMessageStoreState,
+    state: InAppMessagesStoreState,
   ): {
     messages: InAppMessage<TContent, TData>[];
     loading: boolean;
@@ -199,28 +190,9 @@ export class InAppMessagesClient {
   async markAsArchived(itemOrItems: InAppMessage | InAppMessage[]) {
     const itemIds = this.getItemIds(itemOrItems);
 
-    // const queryInfo = this.channelClient.store.state.queries[this.queryKey];
-
-    // Optimistically update the message status.
     this.channelClient.setMessageAttrs(itemIds, {
       archived_at: new Date().toISOString(),
     });
-
-    // If set to exclude, also remove the message id from the list of messages for the given query
-    // TODO: Figure out optimistic updates
-    // const shouldOptimisticallyRemoveItems =
-    //   this.defaultOptions.archived === "exclude";
-    // if (shouldOptimisticallyRemoveItems && queryInfo?.data) {
-    //   this.channelClient.setQueryState(this.queryKey, {
-    //     ...queryInfo,
-    //     data: {
-    //       ...queryInfo.data,
-    //       messageIds: queryInfo.data.messageIds?.filter(
-    //         (id) => !itemIds.includes(id),
-    //       ),
-    //     },
-    //   });
-    // }
 
     return this.makeStatusUpdate(itemOrItems, "archived");
   }

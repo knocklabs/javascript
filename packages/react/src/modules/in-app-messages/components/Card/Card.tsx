@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import clsx from "clsx";
 import React, { useEffect } from "react";
@@ -204,7 +204,7 @@ const DefaultView: React.FC<{
 DefaultView.displayName = "CardView.Default";
 
 const Card: React.FC<CardProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
+  const { colorMode } = useInAppMessagesChannel();
   const { message, inAppMessagesClient } = useInAppMessage<CardContent>(
     MESSAGE_TYPE,
     filters,
@@ -217,7 +217,8 @@ const Card: React.FC<CardProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);
