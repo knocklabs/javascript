@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import clsx from "clsx";
 import React, { useEffect } from "react";
@@ -40,6 +40,7 @@ const Root: React.FC<
     </div>
   );
 };
+Root.displayName = "BannerView.Root";
 
 const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -50,6 +51,7 @@ const Content: React.FC<
     </div>
   );
 };
+Content.displayName = "BannerView.Content";
 
 const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
@@ -60,6 +62,7 @@ const Title: React.FC<
     </div>
   );
 };
+Title.displayName = "BannerView.Title";
 
 const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   body,
@@ -72,6 +75,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
     </div>
   );
 };
+Body.displayName = "BannerView.Body";
 
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -82,6 +86,7 @@ const Actions: React.FC<
     </div>
   );
 };
+Actions.displayName = "BannerView.Actions";
 
 const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -96,6 +101,7 @@ const PrimaryAction: React.FC<
     </a>
   );
 };
+PrimaryAction.displayName = "BannerView.PrimaryAction";
 
 const SecondaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -113,6 +119,7 @@ const SecondaryAction: React.FC<
     </a>
   );
 };
+SecondaryAction.displayName = "BannerView.SecondaryAction";
 
 const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   className,
@@ -134,6 +141,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
     </button>
   );
 };
+DismissButton.displayName = "BannerView.DismissButton";
 
 const DefaultView: React.FC<{
   content: BannerContent;
@@ -142,11 +150,7 @@ const DefaultView: React.FC<{
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
 }> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
   return (
-    <Root
-      data-knock-color-mode={colorMode}
-      onClick={onInteract}
-      onFocus={onInteract}
-    >
+    <Root data-knock-color-mode={colorMode} onClick={onInteract}>
       <Content>
         <Title title={content.title} />
         <Body body={content.body} />
@@ -171,9 +175,10 @@ const DefaultView: React.FC<{
     </Root>
   );
 };
+DefaultView.displayName = "BannerView.Default";
 
-const Default: React.FC<BannerProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
+const Banner: React.FC<BannerProps> = ({ filters }) => {
+  const { colorMode } = useInAppMessagesChannel();
   const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
     MESSAGE_TYPE,
     filters,
@@ -186,7 +191,8 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);
@@ -205,8 +211,9 @@ const Default: React.FC<BannerProps> = ({ filters }) => {
     />
   );
 };
+Banner.displayName = "Banner";
 
-const View = {} as {
+const BannerView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
@@ -218,7 +225,7 @@ const View = {} as {
   DismissButton: typeof DismissButton;
 };
 
-Object.assign(View, {
+Object.assign(BannerView, {
   Default: DefaultView,
   Root,
   Content,
@@ -230,14 +237,4 @@ Object.assign(View, {
   DismissButton,
 });
 
-const Banner = {} as {
-  View: typeof View;
-  Default: typeof Default;
-};
-
-Object.assign(Banner, {
-  View,
-  Default,
-});
-
-export { Banner };
+export { Banner, BannerView };

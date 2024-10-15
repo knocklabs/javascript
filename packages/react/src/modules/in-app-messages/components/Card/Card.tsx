@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import clsx from "clsx";
 import React, { useEffect } from "react";
@@ -41,6 +41,7 @@ const Root: React.FC<
     </div>
   );
 };
+Root.displayName = "CardView.Root";
 
 const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -51,6 +52,7 @@ const Content: React.FC<
     </div>
   );
 };
+Content.displayName = "CardView.Content";
 
 const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -61,6 +63,7 @@ const Header: React.FC<
     </div>
   );
 };
+Header.displayName = "CardView.Header";
 
 const Headline: React.FC<
   { headline: string } & React.ComponentPropsWithRef<"div">
@@ -71,6 +74,7 @@ const Headline: React.FC<
     </div>
   );
 };
+Headline.displayName = "CardView.Headline";
 
 const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
@@ -81,6 +85,7 @@ const Title: React.FC<
     </div>
   );
 };
+Title.displayName = "CardView.Title";
 
 const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   body,
@@ -93,6 +98,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
     </div>
   );
 };
+Body.displayName = "CardView.Body";
 
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -103,6 +109,7 @@ const Actions: React.FC<
     </div>
   );
 };
+Actions.displayName = "CardView.Actions";
 
 const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -117,6 +124,7 @@ const PrimaryAction: React.FC<
     </a>
   );
 };
+PrimaryAction.displayName = "CardView.PrimaryAction";
 
 const SecondaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -134,6 +142,7 @@ const SecondaryAction: React.FC<
     </a>
   );
 };
+SecondaryAction.displayName = "CardView.SecondaryAction";
 
 const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   className,
@@ -155,6 +164,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
     </button>
   );
 };
+DismissButton.displayName = "CardView.DismissButton";
 
 const DefaultView: React.FC<{
   content: CardContent;
@@ -163,11 +173,7 @@ const DefaultView: React.FC<{
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
 }> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
   return (
-    <Root
-      data-knock-color-mode={colorMode}
-      onClick={onInteract}
-      onFocus={onInteract}
-    >
+    <Root data-knock-color-mode={colorMode} onClick={onInteract}>
       <Content>
         <Header>
           <Headline headline={content.headline} />
@@ -195,9 +201,10 @@ const DefaultView: React.FC<{
     </Root>
   );
 };
+DefaultView.displayName = "CardView.Default";
 
-const Default: React.FC<CardProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
+const Card: React.FC<CardProps> = ({ filters }) => {
+  const { colorMode } = useInAppMessagesChannel();
   const { message, inAppMessagesClient } = useInAppMessage<CardContent>(
     MESSAGE_TYPE,
     filters,
@@ -210,7 +217,8 @@ const Default: React.FC<CardProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);
@@ -229,8 +237,9 @@ const Default: React.FC<CardProps> = ({ filters }) => {
     />
   );
 };
+Card.displayName = "Card";
 
-const View = {} as {
+const CardView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
@@ -243,7 +252,7 @@ const View = {} as {
   DismissButton: typeof DismissButton;
 };
 
-Object.assign(View, {
+Object.assign(CardView, {
   Default: DefaultView,
   Root,
   Content,
@@ -255,14 +264,4 @@ Object.assign(View, {
   DismissButton,
 });
 
-const Card = {} as {
-  View: typeof View;
-  Default: typeof Default;
-};
-
-Object.assign(Card, {
-  View,
-  Default,
-});
-
-export { Card };
+export { Card, CardView };

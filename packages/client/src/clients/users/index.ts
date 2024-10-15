@@ -3,7 +3,7 @@ import { GenericData } from "@knocklabs/types";
 import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
-import { InAppMessageResponse } from "../in-app-messages";
+import { InAppMessagesResponse } from "../in-app-messages";
 import {
   GetPreferencesOptions,
   PreferenceOptions,
@@ -115,7 +115,7 @@ class UserClient {
       params,
     });
 
-    return this.handleResponse<InAppMessageResponse<TContent, TData>>(result);
+    return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {

@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import * as Dialog from "@radix-ui/react-dialog";
 import clsx from "clsx";
@@ -45,6 +45,7 @@ const Root = ({ children, onOpenChange, ...props }: RootProps) => {
     </Dialog.Root>
   );
 };
+Root.displayName = "ModalView.Root";
 
 type OverlayProps = React.ComponentPropsWithoutRef<typeof Dialog.Overlay> &
   React.ComponentPropsWithRef<"div">;
@@ -62,6 +63,7 @@ const Overlay = React.forwardRef<OverlayRef, OverlayProps>(
     );
   },
 );
+Overlay.displayName = "ModalView.Overlay";
 
 type ContentProps = React.ComponentPropsWithoutRef<typeof Dialog.Content> &
   React.ComponentPropsWithRef<"div">;
@@ -80,6 +82,7 @@ const Content = React.forwardRef<ContentRef, ContentProps>(
     );
   },
 );
+Content.displayName = "ModalView.Content";
 
 const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -90,6 +93,7 @@ const Header: React.FC<
     </div>
   );
 };
+Header.displayName = "ModalView.Header";
 
 type TitleProps = React.ComponentPropsWithoutRef<typeof Dialog.Title> &
   React.ComponentPropsWithRef<"div"> & {
@@ -106,6 +110,7 @@ const Title = ({ title, className, ...props }: TitleProps) => {
     </Dialog.Title>
   );
 };
+Title.displayName = "ModalView.Title";
 
 const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   body,
@@ -121,6 +126,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
     </Dialog.Description>
   );
 };
+Body.displayName = "ModalView.Body";
 
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -131,6 +137,7 @@ const Actions: React.FC<
     </div>
   );
 };
+Actions.displayName = "ModalView.Actions";
 
 const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -145,6 +152,7 @@ const PrimaryAction: React.FC<
     </a>
   );
 };
+PrimaryAction.displayName = "ModalView.PrimaryAction";
 
 const SecondaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -162,6 +170,7 @@ const SecondaryAction: React.FC<
     </a>
   );
 };
+SecondaryAction.displayName = "ModalView.SecondaryAction";
 
 type CloseProps = React.ComponentPropsWithoutRef<typeof Dialog.Close> &
   React.ComponentPropsWithRef<"button">;
@@ -186,6 +195,7 @@ const Close = ({ className, ...props }: CloseProps) => {
     </Dialog.Close>
   );
 };
+Close.displayName = "ModalView.Close";
 
 const DefaultView: React.FC<{
   content: ModalContent;
@@ -201,7 +211,7 @@ const DefaultView: React.FC<{
   onDismiss,
 }) => {
   return (
-    <Root onOpenChange={onOpenChange} onClick={onInteract} onFocus={onInteract}>
+    <Root onOpenChange={onOpenChange} onClick={onInteract}>
       <Overlay />
       {/* Must pass color mode to content for css variables to be set properly */}
       <Content data-knock-color-mode={colorMode}>
@@ -230,9 +240,10 @@ const DefaultView: React.FC<{
     </Root>
   );
 };
+DefaultView.displayName = "ModalView.Default";
 
-const Default: React.FC<ModalProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
+const Modal: React.FC<ModalProps> = ({ filters }) => {
+  const { colorMode } = useInAppMessagesChannel();
   const { message, inAppMessagesClient } = useInAppMessage<ModalContent>(
     MESSAGE_TYPE,
     filters,
@@ -245,7 +256,8 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onOpenChange = (open: boolean) => {
     if (!open) {
@@ -271,8 +283,9 @@ const Default: React.FC<ModalProps> = ({ filters }) => {
     />
   );
 };
+Modal.displayName = "Modal";
 
-const View = {} as {
+const ModalView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Overlay: typeof Overlay;
@@ -285,7 +298,7 @@ const View = {} as {
   Close: typeof Close;
 };
 
-Object.assign(View, {
+Object.assign(ModalView, {
   Default: DefaultView,
   Root,
   Overlay,
@@ -298,14 +311,4 @@ Object.assign(View, {
   Close,
 });
 
-const Modal = {} as {
-  View: typeof View;
-  Default: typeof Default;
-};
-
-Object.assign(Modal, {
-  View,
-  Default,
-});
-
-export { Modal };
+export { Modal, ModalView };

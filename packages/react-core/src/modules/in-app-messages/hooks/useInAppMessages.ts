@@ -9,7 +9,7 @@ import { useStore } from "@tanstack/react-store";
 import { useEffect, useMemo } from "react";
 
 import { useStableOptions } from "../../core";
-import { useInAppChannel } from "../context";
+import { useInAppMessagesChannel } from "../context";
 
 export interface UseInAppMessagesOptions extends InAppMessagesClientOptions {}
 
@@ -30,20 +30,20 @@ export const useInAppMessages = <
   messageType: string,
   options: UseInAppMessagesOptions = {},
 ): UseInAppMessagesResponse<TContent, TData> => {
-  const { inAppChannelClient } = useInAppChannel();
+  const { inAppMessagesChannelClient } = useInAppMessagesChannel();
 
   const stableOptions = useStableOptions(options);
 
   const inAppMessagesClient = useMemo(() => {
     return new InAppMessagesClient(
-      inAppChannelClient,
+      inAppMessagesChannelClient,
       messageType,
       stableOptions,
     );
-  }, [inAppChannelClient, messageType, stableOptions]);
+  }, [inAppMessagesChannelClient, messageType, stableOptions]);
 
   const { messages, networkStatus, loading } = useStore(
-    inAppChannelClient.store,
+    inAppMessagesChannelClient.store,
     (state) => inAppMessagesClient.getQueryInfoSelector<TContent, TData>(state),
   );
 

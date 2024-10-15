@@ -1,8 +1,8 @@
 import { NetworkStatus } from "@knocklabs/client";
 import {
   Banner,
-  Card,
-  KnockInAppChannelProvider,
+  CardView,
+  KnockInAppMessagesChannelProvider,
   KnockProvider,
   Modal,
   useInAppMessages,
@@ -68,7 +68,7 @@ function App() {
       host={import.meta.env.VITE_KNOCK_HOST}
       logLevel="debug"
     >
-      <KnockInAppChannelProvider
+      <KnockInAppMessagesChannelProvider
         channelId={import.meta.env.VITE_KNOCK_CHANNEL_ID}
         colorMode={colorMode}
       >
@@ -83,10 +83,10 @@ function App() {
           </button>
           <hr />
           <h2>Banner</h2>
-          <Banner.Default />
+          <Banner />
           <hr />
           <h2>Card</h2>
-          <Card.View.Default
+          <CardView.Default
             colorMode={colorMode}
             content={{
               headline: "Something new",
@@ -106,9 +106,9 @@ function App() {
           <hr />
           <Messages />
 
-          <Modal.Default />
+          <Modal />
         </>
-      </KnockInAppChannelProvider>
+      </KnockInAppMessagesChannelProvider>
     </KnockProvider>
   );
 }

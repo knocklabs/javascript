@@ -1,4 +1,4 @@
-import { GenericData, PageInfo } from "@knocklabs/types";
+import { GenericData, PageInfo, Tenant } from "@knocklabs/types";
 
 import { NetworkStatus } from "../../networkStatus";
 import { NotificationSource } from "../messages/interfaces";
@@ -6,6 +6,7 @@ import { NotificationSource } from "../messages/interfaces";
 export interface InAppMessage<
   TContent extends GenericData = GenericData,
   TData extends GenericData = GenericData,
+  TTenantProperties = GenericData,
 > {
   __cursor: string;
   id: string;
@@ -22,9 +23,10 @@ export interface InAppMessage<
   archived_at: string | null;
   link_clicked_at: string | null;
   source: NotificationSource;
+  tenant: Tenant<TTenantProperties>;
 }
 
-export interface InAppMessageResponse<
+export interface InAppMessagesResponse<
   TContent extends GenericData = GenericData,
   TData extends GenericData = GenericData,
 > {
@@ -41,7 +43,7 @@ export interface InAppMessagesQueryInfo {
   };
 }
 
-export interface InAppMessageStoreState {
+export interface InAppMessagesStoreState {
   messages: Record<string, InAppMessage>;
   queries: Record<string, InAppMessagesQueryInfo>;
 }
@@ -73,8 +75,3 @@ export interface InAppMessagesClientOptions {
   // Optionally scope all notifications that contain this argument as part of their trigger payload
   trigger_data?: GenericData;
 }
-
-export type FetchInAppMessagesOptions = {
-  __loadingType?: NetworkStatus.loading | NetworkStatus.fetchMore;
-  __fetchSource?: "socket" | "http";
-} & InAppMessagesClientOptions;
