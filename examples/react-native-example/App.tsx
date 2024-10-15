@@ -1,14 +1,16 @@
+import {
+  KnockFeedProvider,
+  KnockProvider,
+  NotificationIconButton,
+} from "@knocklabs/react-native";
 import React from "react";
-import { SafeAreaView, ScrollView, StatusBar } from "react-native";
-import { Header } from "react-native/Libraries/NewAppScreen";
+import { SafeAreaView, StatusBar } from "react-native";
+import "react-native-svg";
 
 function App(): React.JSX.Element {
   return (
     <SafeAreaView>
       <StatusBar barStyle="light-content" />
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Header />
-      </ScrollView>
     </SafeAreaView>
   );
 }
