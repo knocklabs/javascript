@@ -52,12 +52,7 @@ export class InAppMessagesClient {
       }
     | undefined
   > {
-    const params = {
-      ...this.defaultOptions,
-      // Unset options that should not be sent to the API
-      __loadingType: undefined,
-      __fetchSource: undefined,
-    };
+    const params = this.defaultOptions;
 
     this.queryKey = this.buildQueryKey(params);
 
