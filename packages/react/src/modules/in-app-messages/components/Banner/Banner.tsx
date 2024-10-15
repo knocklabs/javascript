@@ -1,8 +1,8 @@
 import {
   ColorMode,
   UseInAppMessageOptions,
-  useInAppChannel,
   useInAppMessage,
+  useInAppMessagesChannel,
 } from "@knocklabs/react-core";
 import clsx from "clsx";
 import React, { useEffect } from "react";
@@ -11,14 +11,13 @@ import { ActionContent } from "../types";
 
 import "./styles.css";
 
-const MESSAGE_TYPE = "card";
+const MESSAGE_TYPE = "banner";
 
-export interface CardProps {
+export interface BannerProps {
   filters?: UseInAppMessageOptions;
 }
 
-export interface CardContent {
-  headline: string;
+export interface BannerContent {
   title: string;
   body: string;
   primary_button?: {
@@ -36,56 +35,34 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card", className)} {...props}>
+    <div className={clsx("knock-iam-banner", className)} {...props}>
       {children}
     </div>
   );
 };
-Root.displayName = "CardView.Root";
+Root.displayName = "BannerView.Root";
 
 const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__message", className)} {...props}>
+    <div className={clsx("knock-iam-banner__message", className)} {...props}>
       {children}
     </div>
   );
 };
-Content.displayName = "CardView.Content";
-
-const Header: React.FC<
-  React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
-> = ({ children, className, ...props }) => {
-  return (
-    <div className={clsx("knock-iam-card__header", className)} {...props}>
-      {children}
-    </div>
-  );
-};
-Header.displayName = "CardView.Header";
-
-const Headline: React.FC<
-  { headline: string } & React.ComponentPropsWithRef<"div">
-> = ({ headline, className, ...props }) => {
-  return (
-    <div className={clsx("knock-iam-card__headline", className)} {...props}>
-      {headline}
-    </div>
-  );
-};
-Headline.displayName = "CardView.Headline";
+Content.displayName = "BannerView.Content";
 
 const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__title", className)} {...props}>
+    <div className={clsx("knock-iam-banner__title", className)} {...props}>
       {title}
     </div>
   );
 };
-Title.displayName = "CardView.Title";
+Title.displayName = "BannerView.Title";
 
 const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   body,
@@ -93,23 +70,23 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   ...props
 }) => {
   return (
-    <div className={clsx("knock-iam-card__body", className)} {...props}>
+    <div className={clsx("knock-iam-banner__body", className)} {...props}>
       {body}
     </div>
   );
 };
-Body.displayName = "CardView.Body";
+Body.displayName = "BannerView.Body";
 
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__actions", className)} {...props}>
+    <div className={clsx("knock-iam-banner__actions", className)} {...props}>
       {children}
     </div>
   );
 };
-Actions.displayName = "CardView.Actions";
+Actions.displayName = "BannerView.Actions";
 
 const PrimaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -117,14 +94,14 @@ const PrimaryAction: React.FC<
   return (
     <a
       href={action}
-      className={clsx("knock-iam-card__action", className)}
+      className={clsx("knock-iam-banner__action", className)}
       {...props}
     >
       {text}
     </a>
   );
 };
-PrimaryAction.displayName = "CardView.PrimaryAction";
+PrimaryAction.displayName = "BannerView.PrimaryAction";
 
 const SecondaryAction: React.FC<
   ActionContent & React.ComponentPropsWithRef<"a">
@@ -133,7 +110,7 @@ const SecondaryAction: React.FC<
     <a
       href={action}
       className={clsx(
-        "knock-iam-card__action knock-iam-card__action--secondary",
+        "knock-iam-banner__action knock-iam-banner__action--secondary",
         className,
       )}
       {...props}
@@ -142,14 +119,14 @@ const SecondaryAction: React.FC<
     </a>
   );
 };
-SecondaryAction.displayName = "CardView.SecondaryAction";
+SecondaryAction.displayName = "BannerView.SecondaryAction";
 
 const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   className,
   ...props
 }) => {
   return (
-    <button className={clsx("knock-iam-card__close", className)} {...props}>
+    <button className={clsx("knock-iam-banner__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -164,10 +141,10 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
     </button>
   );
 };
-DismissButton.displayName = "CardView.DismissButton";
+DismissButton.displayName = "BannerView.DismissButton";
 
 const DefaultView: React.FC<{
-  content: CardContent;
+  content: BannerContent;
   colorMode?: ColorMode;
   onInteract?: () => void;
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
@@ -175,15 +152,17 @@ const DefaultView: React.FC<{
   return (
     <Root data-knock-color-mode={colorMode} onClick={onInteract}>
       <Content>
-        <Header>
-          <Headline headline={content.headline} />
-          {content.dismissible && <DismissButton onClick={onDismiss} />}
-        </Header>
-
         <Title title={content.title} />
         <Body body={content.body} />
       </Content>
       <Actions>
+        {content.secondary_button && (
+          <SecondaryAction
+            text={content.secondary_button.text}
+            action={content.secondary_button.action}
+          />
+        )}
+
         {content.primary_button && (
           <PrimaryAction
             text={content.primary_button.text}
@@ -191,21 +170,16 @@ const DefaultView: React.FC<{
           />
         )}
 
-        {content.secondary_button && (
-          <SecondaryAction
-            text={content.secondary_button.text}
-            action={content.secondary_button.action}
-          />
-        )}
+        {content.dismissible && <DismissButton onClick={onDismiss} />}
       </Actions>
     </Root>
   );
 };
-DefaultView.displayName = "CardView.Default";
+DefaultView.displayName = "BannerView.Default";
 
-const Card: React.FC<CardProps> = ({ filters }) => {
-  const { colorMode } = useInAppChannel();
-  const { message, inAppMessagesClient } = useInAppMessage<CardContent>(
+const Banner: React.FC<BannerProps> = ({ filters }) => {
+  const { colorMode } = useInAppMessagesChannel();
+  const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
     MESSAGE_TYPE,
     filters,
   );
@@ -237,13 +211,12 @@ const Card: React.FC<CardProps> = ({ filters }) => {
     />
   );
 };
-Card.displayName = "Card";
+Banner.displayName = "Banner";
 
-const CardView = {} as {
+const BannerView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
-  Headline: typeof Headline;
   Title: typeof Title;
   Body: typeof Body;
   Actions: typeof Actions;
@@ -252,7 +225,7 @@ const CardView = {} as {
   DismissButton: typeof DismissButton;
 };
 
-Object.assign(CardView, {
+Object.assign(BannerView, {
   Default: DefaultView,
   Root,
   Content,
@@ -264,4 +237,4 @@ Object.assign(CardView, {
   DismissButton,
 });
 
-export { Card, CardView };
+export { Banner, BannerView };

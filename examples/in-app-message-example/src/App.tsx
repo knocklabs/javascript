@@ -2,7 +2,7 @@ import { NetworkStatus } from "@knocklabs/client";
 import {
   Banner,
   CardView,
-  KnockInAppChannelProvider,
+  KnockInAppMessagesChannelProvider,
   KnockProvider,
   Modal,
   useInAppMessages,
@@ -68,7 +68,7 @@ function App() {
       host={import.meta.env.VITE_KNOCK_HOST}
       logLevel="debug"
     >
-      <KnockInAppChannelProvider
+      <KnockInAppMessagesChannelProvider
         channelId={import.meta.env.VITE_KNOCK_CHANNEL_ID}
         colorMode={colorMode}
       >
@@ -108,7 +108,7 @@ function App() {
 
           <Modal />
         </>
-      </KnockInAppChannelProvider>
+      </KnockInAppMessagesChannelProvider>
     </KnockProvider>
   );
 }

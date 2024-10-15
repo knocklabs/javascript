@@ -26,7 +26,7 @@ export interface InAppMessage<
   tenant: Tenant<TTenantProperties>;
 }
 
-export interface InAppMessageResponse<
+export interface InAppMessagesResponse<
   TContent extends GenericData = GenericData,
   TData extends GenericData = GenericData,
 > {
@@ -43,7 +43,7 @@ export interface InAppMessagesQueryInfo {
   };
 }
 
-export interface InAppMessageStoreState {
+export interface InAppMessagesStoreState {
   messages: Record<string, InAppMessage>;
   queries: Record<string, InAppMessagesQueryInfo>;
 }

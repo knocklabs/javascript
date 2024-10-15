@@ -4,7 +4,7 @@ import {
   ButtonGroup,
   CardView,
   KnockFeedProvider,
-  KnockInAppChannelProvider,
+  KnockInAppMessagesChannelProvider,
   KnockProvider,
   ModalView,
 } from ".";
@@ -21,7 +21,7 @@ const App: FunctionComponent = () => {
       <KnockProvider apiKey={""} userId={""}>
         <h1>@knocklabs/react playground</h1>
 
-        <KnockInAppChannelProvider channelId={""} colorMode={colorMode}>
+        <KnockInAppMessagesChannelProvider channelId={""} colorMode={colorMode}>
           <button
             onClick={() =>
               setColorMode(colorMode === "dark" ? "light" : "dark")
@@ -82,7 +82,7 @@ const App: FunctionComponent = () => {
               },
             }}
           />
-        </KnockInAppChannelProvider>
+        </KnockInAppMessagesChannelProvider>
         <KnockFeedProvider feedId={""}>
           <section style={{ marginTop: 24 }}>
             <h2>Buttons</h2>

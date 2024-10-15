@@ -1,14 +1,14 @@
 import { Store } from "@tanstack/store";
 
-import { InAppMessageStoreState } from "./types";
+import { InAppMessagesStoreState } from "./types";
 
-export type InAppStore = Store<
-  InAppMessageStoreState,
-  (cb: InAppMessageStoreState) => InAppMessageStoreState
+export type InAppMessagesStore = Store<
+  InAppMessagesStoreState,
+  (cb: InAppMessagesStoreState) => InAppMessagesStoreState
 >;
 
 export function createStore() {
-  return new Store<InAppMessageStoreState>({
+  return new Store<InAppMessagesStoreState>({
     messages: {},
     queries: {},
   });

@@ -4,12 +4,12 @@ import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { MessageEngagementStatus } from "../messages/interfaces";
 
-import { InAppChannelClient } from "./channel-client";
+import { InAppMessagesChannelClient } from "./channel-client";
 import {
   InAppMessage,
-  InAppMessageResponse,
-  InAppMessageStoreState,
   InAppMessagesClientOptions,
+  InAppMessagesResponse,
+  InAppMessagesStoreState,
 } from "./types";
 
 /**
@@ -21,7 +21,7 @@ export class InAppMessagesClient {
   public queryKey: string;
 
   constructor(
-    readonly channelClient: InAppChannelClient,
+    readonly channelClient: InAppMessagesChannelClient,
     readonly messageType: string,
     readonly defaultOptions: InAppMessagesClientOptions = {},
   ) {
@@ -44,7 +44,7 @@ export class InAppMessagesClient {
   >(): Promise<
     | {
         status: "ok";
-        data: InAppMessageResponse<TContent, TData>;
+        data: InAppMessagesResponse<TContent, TData>;
       }
     | {
         status: "error";
@@ -107,7 +107,7 @@ export class InAppMessagesClient {
     TContent extends GenericData = GenericData,
     TData extends GenericData = GenericData,
   >(
-    state: InAppMessageStoreState,
+    state: InAppMessagesStoreState,
   ): {
     messages: InAppMessage<TContent, TData>[];
     loading: boolean;
