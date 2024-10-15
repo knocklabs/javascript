@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- a82e897: Move KnockExpoPushNotificationProvider to @knocklabs/expo
+
 ## 0.3.1
 
 ### Patch Changes
