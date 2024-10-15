@@ -191,7 +191,8 @@ const Banner: React.FC<BannerProps> = ({ filters }) => {
     inAppMessagesClient.markAsSeen(message);
   }, [message, inAppMessagesClient]);
 
-  if (!message) return null;
+  // Exclude archived messages
+  if (!message || message.archived_at) return null;
 
   const onDismiss = () => {
     inAppMessagesClient.markAsArchived(message);

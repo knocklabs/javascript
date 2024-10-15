@@ -8,32 +8,16 @@ import { InAppChannelClient } from "./channel-client";
 import {
   FetchInAppMessagesOptions,
   InAppMessage,
-  InAppMessageEngagementStatus,
   InAppMessageResponse,
   InAppMessageStoreState,
   InAppMessagesClientOptions,
 } from "./types";
-
-const engagementFilterRules: Record<
-  InAppMessageEngagementStatus,
-  (msg: InAppMessage) => boolean
-> = {
-  read: (msg) => Boolean(msg.read_at),
-  unread: (msg) => !msg.read_at,
-  seen: (msg) => Boolean(msg.seen_at),
-  unseen: (msg) => !msg.seen_at,
-  interacted: (msg) => Boolean(msg.interacted_at),
-  uninteracted: (msg) => !msg.interacted_at,
-  link_clicked: (msg) => Boolean(msg.link_clicked_at),
-  link_unclicked: (msg) => !msg.link_clicked_at,
-};
 
 /**
  * Manages realtime connection to in app messages service.
  */
 export class InAppMessagesClient {
   private knock: Knock;
-  private fetchOptions: InAppMessagesClientOptions;
 
   public queryKey: string;
 
@@ -46,7 +30,6 @@ export class InAppMessagesClient {
       ...channelClient.defaultOptions,
       ...defaultOptions,
     };
-    this.fetchOptions = this.defaultOptions;
     this.knock = channelClient.knock;
     this.queryKey = this.buildQueryKey(this.defaultOptions);
 
@@ -79,9 +62,6 @@ export class InAppMessagesClient {
       __loadingType: undefined,
       __fetchSource: undefined,
     };
-
-    // Store the last used filters to use in query selector
-    this.fetchOptions = params;
 
     this.queryKey = this.buildQueryKey(params);
 
@@ -144,16 +124,7 @@ export class InAppMessagesClient {
       (messages, messageId) => {
         const message = state.messages[messageId];
         if (message) {
-          // Check if the message should be displayed based on engagement timestamps and
-          // the active query filters
-          const isVisible = this.getMessageVisibility(
-            message,
-            this.fetchOptions,
-          );
-
-          if (isVisible) {
-            messages.push(message as InAppMessage<TContent, TData>);
-          }
+          messages.push(message as InAppMessage<TContent, TData>);
         }
         return messages;
       },
@@ -274,24 +245,5 @@ export class InAppMessagesClient {
   private getItemIds(itemOrItems: InAppMessage | InAppMessage[]): string[] {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     return items.map((item) => item.id);
-  }
-
-  private getMessageVisibility(
-    message: InAppMessage,
-    options: InAppMessagesClientOptions,
-  ): boolean {
-    // Filter by archived status
-    if (options.archived === "exclude" && message.archived_at) return false;
-    if (options.archived === "only" && !message.archived_at) return false;
-
-    // If no engagement statuses specified, return true
-    if (!options.engagement_status || options.engagement_status.length === 0) {
-      return true;
-    }
-
-    // Check if the message matches any of the specificed engagement statuses
-    return options.engagement_status.some((status) =>
-      engagementFilterRules[status](message),
-    );
   }
 }
