@@ -4988,6 +4988,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@knocklabs/expo-example@workspace:examples/expo-example":
+  version: 0.0.0-use.local
+  resolution: "@knocklabs/expo-example@workspace:examples/expo-example"
+  dependencies:
+    "@babel/core": "npm:^7.25.7"
+    "@knocklabs/expo": "workspace:^"
+    expo: "npm:>=51.0.24"
+    expo-constants: "npm:>=16.0.2"
+    expo-device: "npm:>=6.0.2"
+    expo-notifications: "npm:>=0.28.16"
+    expo-status-bar: "npm:~1.12.1"
+    react: "npm:^18.2.0"
+    react-native: "npm:^0.73.4"
+    typescript: "npm:^5.6.2"
+  languageName: unknown
+  linkType: soft
+
 "@knocklabs/expo@workspace:^, @knocklabs/expo@workspace:packages/expo":
   version: 0.0.0-use.local
   resolution: "@knocklabs/expo@workspace:packages/expo"
@@ -5087,23 +5104,6 @@ __metadata:
     zustand: "npm:^3.7.2"
   peerDependencies:
     react: ^16.11.0 || ^17.0.0 || ^18.0.0
-  languageName: unknown
-  linkType: soft
-
-"@knocklabs/react-native-example@workspace:examples/react-native-example":
-  version: 0.0.0-use.local
-  resolution: "@knocklabs/react-native-example@workspace:examples/react-native-example"
-  dependencies:
-    "@babel/core": "npm:^7.25.7"
-    "@knocklabs/expo": "workspace:^"
-    expo: "npm:>=51.0.24"
-    expo-constants: "npm:>=16.0.2"
-    expo-device: "npm:>=6.0.2"
-    expo-notifications: "npm:>=0.28.16"
-    expo-status-bar: "npm:~1.12.1"
-    react: "npm:^18.2.0"
-    react-native: "npm:^0.73.4"
-    typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
 
