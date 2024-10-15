@@ -75,8 +75,3 @@ export interface InAppMessagesClientOptions {
   // Optionally scope all notifications that contain this argument as part of their trigger payload
   trigger_data?: GenericData;
 }
-
-export type FetchInAppMessagesOptions = {
-  __loadingType?: NetworkStatus.loading | NetworkStatus.fetchMore;
-  __fetchSource?: "socket" | "http";
-} & InAppMessagesClientOptions;

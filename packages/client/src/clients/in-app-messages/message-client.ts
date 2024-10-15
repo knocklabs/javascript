@@ -6,7 +6,6 @@ import { MessageEngagementStatus } from "../messages/interfaces";
 
 import { InAppChannelClient } from "./channel-client";
 import {
-  FetchInAppMessagesOptions,
   InAppMessage,
   InAppMessageResponse,
   InAppMessageStoreState,
@@ -42,9 +41,7 @@ export class InAppMessagesClient {
   async fetch<
     TContent extends GenericData = GenericData,
     TData extends GenericData = GenericData,
-  >(
-    options: FetchInAppMessagesOptions = {},
-  ): Promise<
+  >(): Promise<
     | {
         status: "ok";
         data: InAppMessageResponse<TContent, TData>;
@@ -57,7 +54,6 @@ export class InAppMessagesClient {
   > {
     const params = {
       ...this.defaultOptions,
-      ...options,
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
@@ -80,7 +76,7 @@ export class InAppMessagesClient {
 
     // Set the loading type based on the request type it is
     this.channelClient.setQueryStatus(this.queryKey, {
-      networkStatus: options.__loadingType ?? NetworkStatus.loading,
+      networkStatus: NetworkStatus.loading,
       loading: true,
     });
 
