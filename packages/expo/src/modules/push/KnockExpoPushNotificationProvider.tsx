@@ -4,6 +4,7 @@ import {
   MessageEngagementStatus,
 } from "@knocklabs/client";
 import { useKnockClient } from "@knocklabs/react-core";
+import type { KnockPushNotificationContextType } from "@knocklabs/react-native";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -15,14 +16,10 @@ import React, {
   useState,
 } from "react";
 
-export interface KnockExpoPushNotificationContextType {
+export interface KnockExpoPushNotificationContextType
+  extends KnockPushNotificationContextType {
   expoPushToken: string | null;
   registerForPushNotifications: () => Promise<void>;
-  registerPushTokenToChannel(token: string, channelId: string): Promise<void>;
-  unregisterPushTokenFromChannel(
-    token: string,
-    channelId: string,
-  ): Promise<void>;
   onNotificationReceived: (
     handler: (notification: Notifications.Notification) => void,
   ) => void;
