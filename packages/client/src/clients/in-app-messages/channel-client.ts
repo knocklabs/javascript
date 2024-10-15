@@ -1,20 +1,20 @@
 import Knock from "../../knock";
 import { NetworkStatus } from "../../networkStatus";
 
-import { InAppStore, createStore } from "./store";
+import { InAppMessagesStore, createStore } from "./store";
 import {
   InAppMessage,
-  InAppMessageResponse,
   InAppMessagesClientOptions,
   InAppMessagesQueryInfo,
+  InAppMessagesResponse,
 } from "./types";
 
 /**
  * Manages the configuration for an in app channel.
  * Stores all fetched messages to support optimistic updates.
  */
-export class InAppChannelClient {
-  public store: InAppStore;
+export class InAppMessagesChannelClient {
+  public store: InAppMessagesStore;
 
   constructor(
     readonly knock: Knock,
@@ -47,7 +47,7 @@ export class InAppChannelClient {
     }));
   }
 
-  setQueryResponse(queryKey: string, response: InAppMessageResponse) {
+  setQueryResponse(queryKey: string, response: InAppMessagesResponse) {
     const queryInfo: InAppMessagesQueryInfo = {
       loading: false,
       networkStatus: NetworkStatus.ready,
