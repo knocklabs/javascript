@@ -48,8 +48,8 @@ export const useInAppMessages = <
   );
 
   useEffect(() => {
-    inAppMessagesClient.fetch();
     inAppMessagesClient.subscribe();
+    inAppMessagesClient.fetch();
 
     return () => {
       inAppMessagesClient.unsubscribe();

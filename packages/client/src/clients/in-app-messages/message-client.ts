@@ -251,6 +251,8 @@ export class InAppMessagesClient {
   async handleSocketEvent(payload: SocketEventPayload) {
     switch (payload.event) {
       case SocketEventType.MessageCreated:
+        // TODO(KNO-7169): Explore using an in-app message in the socket event
+        // directly instead of re-fetching.
         return await this.fetch();
 
       default:
