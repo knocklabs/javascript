@@ -1,5 +1,12 @@
 # @knocklabs/react-native-example
 
+## 1.3.1
+
+### Patch Changes
+
+- Updated dependencies [4ac1e67]
+  - @knocklabs/expo@0.2.0
+
 ## 1.3.0
 
 ### Minor Changes

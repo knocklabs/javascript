@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- 4ac1e67: Add KnockPushNotificationProvider
+
 ## 0.4.0
 
 ### Minor Changes
