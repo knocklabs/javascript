@@ -109,7 +109,9 @@ export class InAppMessagesChannelClient {
 
   subscribe(client: InAppMessagesClient) {
     if (!this.socketManager) return;
-    this.knock.log(`[InAppMessagesClient] Subscribe a client ${client.referenceId} to socket events`);
+    this.knock.log(
+      `[InAppMessagesClient] Subscribe a client ${client.referenceId} to socket events`,
+    );
 
     // Pass the unsub func back to iam client so it can be used when
     // unsubscribing.
@@ -118,7 +120,9 @@ export class InAppMessagesChannelClient {
 
   unsubscribe(client: InAppMessagesClient) {
     if (!this.socketManager) return;
-    this.knock.log(`[InAppMessagesClient] Unsubscribe a client ${client.referenceId}`);
+    this.knock.log(
+      `[InAppMessagesClient] Unsubscribe a client ${client.referenceId}`,
+    );
 
     this.socketManager.leave(client);
   }
