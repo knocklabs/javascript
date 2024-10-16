@@ -4,7 +4,6 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
   },
@@ -20,7 +19,6 @@
     "@babel/preset-env": "^7.16.7",
     "@babel/runtime": "^7.25.6",
     "@react-native/babel-preset": "0.73.21",
-    "@react-native/eslint-config": "0.73.2",
     "@react-native/metro-config": "0.73.5",
     "@react-native/typescript-config": "0.73.1",
     "@types/react": "^18.3.6",
