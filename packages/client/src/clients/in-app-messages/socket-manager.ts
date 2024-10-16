@@ -40,7 +40,7 @@ type InAppMessageSocketInbox = Record<ClientReferenceId, SocketEventPayload>;
  * API via a single socket connection. It's expected to be instantiated once
  * per an in-app channel.
  */
-export class InAppMessageSocketDriver {
+export class InAppMessageSocketManager {
   // Mapping of live channels by topic. Note, there can be one or more in-app
   // message client(s) that can subscribe.
   private channels: Record<ChannelTopic, Channel>;

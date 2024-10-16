@@ -2,7 +2,7 @@ import Knock from "../../knock";
 import { NetworkStatus } from "../../networkStatus";
 
 import { InAppMessagesClient } from "./message-client";
-import { InAppMessageSocketDriver } from "./socket-driver";
+import { InAppMessageSocketManager } from "./socket-manager";
 import { InAppMessagesStore, createStore } from "./store";
 import {
   InAppMessage,
@@ -18,7 +18,7 @@ import {
 export class InAppMessagesChannelClient {
   public store: InAppMessagesStore;
 
-  private socketDriver: InAppMessageSocketDriver | undefined;
+  private socketManager: InAppMessageSocketManager | undefined;
 
   constructor(
     readonly knock: Knock,
@@ -27,12 +27,12 @@ export class InAppMessagesChannelClient {
   ) {
     this.store = createStore();
 
-    // Initialize a socket driver for the in-app channel client, which there
+    // Initialize a socket manager for the in-app channel client, which there
     // should be one per in-app channel client but it's abstracted out as a
     // separate module for the organization/encapsulation purposes.
     const { socket } = this.knock.client();
     if (socket) {
-      this.socketDriver = new InAppMessageSocketDriver(socket);
+      this.socketManager = new InAppMessageSocketManager(socket);
     }
 
     this.knock.log(`[IAM] Initialized a client on channel ${channelId}`);
@@ -108,16 +108,16 @@ export class InAppMessagesChannelClient {
    */
 
   subscribe(client: InAppMessagesClient) {
-    if (!this.socketDriver) return;
+    if (!this.socketManager) return;
 
     // Pass the unsub func back to iam client so it can be used when
     // unsubscribing.
-    return this.socketDriver.join(client);
+    return this.socketManager.join(client);
   }
 
   unsubscribe(client: InAppMessagesClient) {
-    if (!this.socketDriver) return;
+    if (!this.socketManager) return;
 
-    this.socketDriver.leave(client);
+    this.socketManager.leave(client);
   }
 }

@@ -6,7 +6,7 @@ import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { MessageEngagementStatus } from "../messages/interfaces";
 
 import { InAppMessagesChannelClient } from "./channel-client";
-import { SocketEventPayload, SocketEventType } from "./socket-driver";
+import { SocketEventPayload, SocketEventType } from "./socket-manager";
 import {
   InAppMessage,
   InAppMessagesClientOptions,
