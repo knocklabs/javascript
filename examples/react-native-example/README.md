@@ -18,9 +18,7 @@ yarn
 
 4. Configure the environment variables. Copy `.env.sample` to `.env` and add the relevant API keys and channel id from your Knock dashboard.
 
-5. Set up your development environment to run native apps depending on your operating system and the platform you'd like to run the example on. See the [Expo docs](https://docs.expo.dev/guides/local-app-development/) for more information.
-
-6. Run the example app. Optionally, specify which platform you'd like to run on
+5. Run the example app. Optionally, specify which platform you'd like to run on:
 
 ```sh
 yarn start
