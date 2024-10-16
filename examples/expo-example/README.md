@@ -2,6 +2,8 @@
 
 This example app uses [Knock](https://knock.app) to power in-app notifications. It uses the [Knock Expo SDK](../../packages/expo) and [Expo](https://docs.expo.dev/).
 
+> Not using Expo? See our [Knock + React Native example app](../react-native-example/README.md).
+
 ## Running locally
 
 1. Install dependencies from the root of the monorepo.
