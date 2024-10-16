@@ -26,12 +26,14 @@ function App(): React.JSX.Element {
       <KnockFeedProvider feedId={Config.KNOCK_FEED_CHANNEL_ID}>
         <SafeAreaView style={styles.container}>
           <StatusBar barStyle="light-content" />
-          <Text style={styles.heading}>Knock React Native Example</Text>
           {!isNotificationFeedOpen && (
-            <NotificationIconButton
-              onClick={onTopActionButtonTap}
-              badgeCountType={"unread"}
-            />
+            <>
+              <Text style={styles.heading}>Knock React Native Example</Text>
+              <NotificationIconButton
+                onClick={onTopActionButtonTap}
+                badgeCountType={"unread"}
+              />
+            </>
           )}
           {isNotificationFeedOpen && (
             <NotificationFeedContainer
@@ -49,7 +51,6 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 32,
     backgroundColor: "#e8e8ec",
     alignItems: "center",
     justifyContent: "center",
