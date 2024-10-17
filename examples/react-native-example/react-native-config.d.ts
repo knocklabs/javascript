@@ -4,6 +4,7 @@ declare module "react-native-config" {
     KNOCK_FEED_CHANNEL_ID: string;
     KNOCK_USER_ID: string;
     KNOCK_HOST?: string;
+    KNOCK_FCM_CHANNEL_ID?: string;
   }
 
   export const Config: NativeConfig;
