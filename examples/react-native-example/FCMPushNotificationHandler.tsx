@@ -61,10 +61,12 @@ function useFCMPushToken(): string | null {
       })
       .catch(console.error);
 
-    messaging().onTokenRefresh((token) => {
+    const unsubscribe = messaging().onTokenRefresh((token) => {
       console.log(`Push token refreshed: ${token}`);
       setToken(token);
     });
+
+    return unsubscribe;
   }, []);
 
   return token;
