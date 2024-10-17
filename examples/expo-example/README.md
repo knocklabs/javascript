@@ -1,6 +1,6 @@
-# Knock + React Native example app
+# Knock + Expo example app
 
-This example app uses [Knock](https://knock.app) to power in-app notifications. It uses the [Knock React Native SDK](../packages/react-native) and [Expo](https://docs.expo.dev/).
+This example app uses [Knock](https://knock.app) to power in-app notifications. It uses the [Knock Expo SDK](../../packages/expo) and [Expo](https://docs.expo.dev/).
 
 ## Running locally
 
