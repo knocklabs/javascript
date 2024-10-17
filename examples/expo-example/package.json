@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/expo-example",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "src/index.ts",
   "scripts": {
     "start": "expo start",
