@@ -4,4 +4,4 @@
 
 ### Minor Changes
 
-- 5c25092: Add vanilla React Native sample app
+- 5c25092: add vanilla React Native sample app
