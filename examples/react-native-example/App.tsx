@@ -9,8 +9,8 @@ import { SafeAreaView, StatusBar, StyleSheet, Text } from "react-native";
 import Config from "react-native-config";
 import "react-native-svg";
 
+import FCMPushNotificationHandler from "./FCMPushNotificationHandler";
 import NotificationFeedContainer from "./NotificationFeedContainer";
-import PushHandler from "./PushHandler";
 
 function App(): React.JSX.Element {
   const [isNotificationFeedOpen, setIsNotificationFeedOpen] = useState(false);
@@ -28,7 +28,7 @@ function App(): React.JSX.Element {
       <KnockFeedProvider feedId={Config.KNOCK_FEED_CHANNEL_ID}>
         <KnockPushNotificationProvider>
           <>
-            <PushHandler />
+            <FCMPushNotificationHandler />
             <SafeAreaView style={styles.container}>
               <StatusBar barStyle="light-content" />
               {!isNotificationFeedOpen && (

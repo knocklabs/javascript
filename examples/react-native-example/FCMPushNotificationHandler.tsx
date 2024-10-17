@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { PermissionsAndroid } from "react-native";
 import Config from "react-native-config";
 
-const PushHandler = () => {
+const FCMPushNotificationHandler = () => {
   const { registerPushTokenToChannel } = usePushNotifications();
 
   useEffect(() => {
@@ -41,4 +41,4 @@ const PushHandler = () => {
   return null;
 };
 
-export default PushHandler;
+export default FCMPushNotificationHandler;
