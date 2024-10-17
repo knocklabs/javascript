@@ -18,18 +18,14 @@ const FCMPushNotificationHandler = () => {
     ).catch(console.error);
 
     messaging()
-      .registerDeviceForRemoteMessages()
-      .then(() => {
-        messaging()
-          .getToken()
-          .then((token) => {
-            console.log(`Received push token: ${token}`);
-            registerPushTokenToChannel(
-              token,
-              Config.KNOCK_FCM_CHANNEL_ID!,
-            ).catch(console.error);
-          });
-      });
+      .getToken()
+      .then((token) => {
+        console.log(`Received push token: ${token}`);
+        registerPushTokenToChannel(token, Config.KNOCK_FCM_CHANNEL_ID!).catch(
+          console.error,
+        );
+      })
+      .catch(console.error);
   }, [registerPushTokenToChannel]);
 
   useEffect(() => {
