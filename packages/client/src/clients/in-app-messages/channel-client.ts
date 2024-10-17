@@ -1,6 +1,8 @@
 import Knock from "../../knock";
 import { NetworkStatus } from "../../networkStatus";
 
+import { InAppMessagesClient } from "./message-client";
+import { InAppMessageSocketManager } from "./socket-manager";
 import { InAppMessagesStore, createStore } from "./store";
 import {
   InAppMessage,
@@ -16,6 +18,8 @@ import {
 export class InAppMessagesChannelClient {
   public store: InAppMessagesStore;
 
+  private socketManager: InAppMessageSocketManager | undefined;
+
   constructor(
     readonly knock: Knock,
     readonly channelId: string,
@@ -23,12 +27,21 @@ export class InAppMessagesChannelClient {
   ) {
     this.store = createStore();
 
+    // Initialize a socket manager for the in-app channel client, which there
+    // should be one per in-app channel client but it's abstracted out as a
+    // separate module for the organization/encapsulation purposes.
+    const { socket } = this.knock.client();
+    if (socket) {
+      this.socketManager = new InAppMessageSocketManager(socket);
+    }
+
     this.knock.log(`[IAM] Initialized a client on channel ${channelId}`);
   }
 
   // ----------------------------------------------
   // Store helpers
   // ----------------------------------------------
+
   setMessageAttrs(messageIds: string[], attrs: Partial<InAppMessage>) {
     this.store.setState((state) => ({
       ...state,
@@ -88,5 +101,29 @@ export class InAppMessagesChannelClient {
         },
       },
     }));
+  }
+
+  /*
+   * Socket
+   */
+
+  subscribe(client: InAppMessagesClient) {
+    if (!this.socketManager) return;
+    this.knock.log(
+      `[InAppMessagesClient] Subscribe a client ${client.referenceId} to socket events`,
+    );
+
+    // Pass the unsub func back to iam client so it can be used when
+    // unsubscribing.
+    return this.socketManager.join(client);
+  }
+
+  unsubscribe(client: InAppMessagesClient) {
+    if (!this.socketManager) return;
+    this.knock.log(
+      `[InAppMessagesClient] Unsubscribe a client ${client.referenceId}`,
+    );
+
+    this.socketManager.leave(client);
   }
 }

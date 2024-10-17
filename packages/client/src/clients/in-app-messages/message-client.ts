@@ -1,10 +1,12 @@
 import { GenericData } from "@knocklabs/types";
+import { nanoid } from "nanoid";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import { MessageEngagementStatus } from "../messages/interfaces";
 
 import { InAppMessagesChannelClient } from "./channel-client";
+import { SocketEventPayload, SocketEventType } from "./socket-manager";
 import {
   InAppMessage,
   InAppMessagesClientOptions,
@@ -19,6 +21,8 @@ export class InAppMessagesClient {
   private knock: Knock;
 
   public queryKey: string;
+  public referenceId: string;
+  public unsub?: () => void;
 
   constructor(
     readonly channelClient: InAppMessagesChannelClient,
@@ -31,6 +35,7 @@ export class InAppMessagesClient {
     };
     this.knock = channelClient.knock;
     this.queryKey = this.buildQueryKey(this.defaultOptions);
+    this.referenceId = nanoid();
 
     this.knock.log(`[IAM] Initialized a client for message ${messageType}`);
   }
@@ -231,6 +236,32 @@ export class InAppMessagesClient {
     const baseKey = `/v1/users/${this.knock.userId}/in-app-messages/${this.channelClient.channelId}/${this.messageType}`;
     const paramsString = new URLSearchParams(params).toString();
     return paramsString ? `${baseKey}?${paramsString}` : baseKey;
+  }
+
+  subscribe() {
+    this.unsub = this.channelClient.subscribe(this);
+  }
+
+  unsubscribe() {
+    this.channelClient.unsubscribe(this);
+  }
+
+  // This is a callback function that will be invoked when a new socket event
+  // relevant for this message client is received (and if subscribed).
+  async handleSocketEvent(payload: SocketEventPayload) {
+    switch (payload.event) {
+      case SocketEventType.MessageCreated:
+        // TODO(KNO-7169): Explore using an in-app message in the socket event
+        // directly instead of re-fetching.
+        return await this.fetch();
+
+      default:
+        throw new Error(`Unhandled socket event: ${payload.event}`);
+    }
+  }
+
+  socketChannelTopic() {
+    return `in_app:${this.messageType}:${this.channelClient.channelId}:${this.knock.userId}`;
   }
 
   private getItemIds(itemOrItems: InAppMessage | InAppMessage[]): string[] {

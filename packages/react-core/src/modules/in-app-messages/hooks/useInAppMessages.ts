@@ -48,14 +48,15 @@ export const useInAppMessages = <
   );
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      inAppMessagesClient.fetch();
-    }, 2500);
+    inAppMessagesClient.subscribe();
+    inAppMessagesClient.fetch();
 
     return () => {
-      clearTimeout(intervalId);
+      inAppMessagesClient.unsubscribe();
     };
-  }, [inAppMessagesClient]);
+    // Run only once at mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { messages, networkStatus, loading, inAppMessagesClient };
 };

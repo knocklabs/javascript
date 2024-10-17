@@ -179,6 +179,7 @@ DefaultView.displayName = "BannerView.Default";
 
 const Banner: React.FC<BannerProps> = ({ filters }) => {
   const { colorMode } = useInAppMessagesChannel();
+
   const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
     MESSAGE_TYPE,
     filters,
