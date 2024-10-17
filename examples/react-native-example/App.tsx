@@ -28,7 +28,9 @@ function App(): React.JSX.Element {
       <KnockFeedProvider feedId={Config.KNOCK_FEED_CHANNEL_ID}>
         <KnockPushNotificationProvider>
           <>
-            <FCMPushNotificationHandler />
+            {Config.KNOCK_FCM_CHANNEL_ID !== undefined && (
+              <FCMPushNotificationHandler />
+            )}
             <SafeAreaView style={styles.container}>
               <StatusBar barStyle="light-content" />
               {!isNotificationFeedOpen && (
