@@ -33,8 +33,17 @@ const FCMPushNotificationHandler = () => {
   }, [registerPushTokenToChannel]);
 
   useEffect(() => {
+    // See https://rnfirebase.io/messaging/notifications#handling-interaction
+
+    messaging()
+      .getInitialNotification()
+      .then(() => {
+        console.log("App opened via notification from quit state");
+      })
+      .catch(console.error);
+
     messaging().onNotificationOpenedApp(() => {
-      console.log("App opened via notification");
+      console.log("App opened via notification while in the background");
     });
   }, []);
 
