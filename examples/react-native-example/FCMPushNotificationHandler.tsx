@@ -43,10 +43,7 @@ const FCMPushNotificationHandler = () => {
       console.log("App opened via notification while in the background");
     });
 
-    return () => {
-      console.log("Unsubscribing from notification events");
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   return null;
