@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { PermissionsAndroid } from "react-native";
 import Config from "react-native-config";
 
+/**
+ * An example of how to handle push notifications using Knock and Firebase Cloud Messaging via react-native-firebase.
+ */
 const FCMPushNotificationHandler = () => {
   const pushToken = useFCMPushToken();
   const { registerPushTokenToChannel } = usePushNotifications();
