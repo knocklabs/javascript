@@ -1,5 +1,12 @@
 # @knocklabs/react-native-example
 
+## 1.4.0
+
+### Minor Changes
+
+- 5c25092: Add vanilla React Native sample app
+- bde0c8a: Add example of how to receive push notifications using Firebase Cloud Messaging (FCM) and react-native-firebase
+
 ## 1.3.1
 
 ### Patch Changes
