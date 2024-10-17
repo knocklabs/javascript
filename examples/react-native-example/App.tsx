@@ -1,6 +1,7 @@
 import {
   KnockFeedProvider,
   KnockProvider,
+  KnockPushNotificationProvider,
   NotificationIconButton,
 } from "@knocklabs/react-native";
 import React, { useCallback, useState } from "react";
@@ -8,6 +9,7 @@ import { SafeAreaView, StatusBar, StyleSheet, Text } from "react-native";
 import Config from "react-native-config";
 import "react-native-svg";
 
+import FCMPushNotificationHandler from "./FCMPushNotificationHandler";
 import NotificationFeedContainer from "./NotificationFeedContainer";
 
 function App(): React.JSX.Element {
@@ -24,25 +26,32 @@ function App(): React.JSX.Element {
       logLevel="debug"
     >
       <KnockFeedProvider feedId={Config.KNOCK_FEED_CHANNEL_ID}>
-        <SafeAreaView style={styles.container}>
-          <StatusBar barStyle="light-content" />
-          {!isNotificationFeedOpen && (
-            <>
-              <Text style={styles.heading}>Knock React Native Example</Text>
-              <NotificationIconButton
-                onClick={onTopActionButtonTap}
-                badgeCountType={"unread"}
-              />
-            </>
-          )}
-          {isNotificationFeedOpen && (
-            <NotificationFeedContainer
-              handleClose={() =>
-                setIsNotificationFeedOpen(!isNotificationFeedOpen)
-              }
-            />
-          )}
-        </SafeAreaView>
+        <KnockPushNotificationProvider>
+          <>
+            {Config.KNOCK_FCM_CHANNEL_ID !== undefined && (
+              <FCMPushNotificationHandler />
+            )}
+            <SafeAreaView style={styles.container}>
+              <StatusBar barStyle="light-content" />
+              {!isNotificationFeedOpen && (
+                <>
+                  <Text style={styles.heading}>Knock React Native Example</Text>
+                  <NotificationIconButton
+                    onClick={onTopActionButtonTap}
+                    badgeCountType={"unread"}
+                  />
+                </>
+              )}
+              {isNotificationFeedOpen && (
+                <NotificationFeedContainer
+                  handleClose={() =>
+                    setIsNotificationFeedOpen(!isNotificationFeedOpen)
+                  }
+                />
+              )}
+            </SafeAreaView>
+          </>
+        </KnockPushNotificationProvider>
       </KnockFeedProvider>
     </KnockProvider>
   );
