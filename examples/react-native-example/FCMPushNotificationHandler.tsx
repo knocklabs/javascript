@@ -38,6 +38,15 @@ const FCMPushNotificationHandler = () => {
     });
   }, []);
 
+  useEffect(() => {
+    messaging().onTokenRefresh((token) => {
+      console.log(`Push token refreshed: ${token}`);
+      registerPushTokenToChannel(token, Config.KNOCK_FCM_CHANNEL_ID!).catch(
+        console.error,
+      );
+    });
+  }, [registerPushTokenToChannel]);
+
   return null;
 };
 
