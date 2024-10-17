@@ -29,3 +29,13 @@ yarn ios
 # Or run the app on Android
 yarn android
 ```
+
+## Testing push notifications on Android
+
+1. If you haven't already, set up a new Firebase Cloud Messaging (FCM) channel in your Knock dashboard. See [_How to configure FCM with Knock_](https://docs.knock.app/integrations/push/firebase#how-to-configure-fcm-with-knock).
+
+1. Copy the `google-services.json` file downloaded from the Firebase console into the `android/app/` directory.
+
+1. Update your `.env` file to set the `KNOCK_FCM_CHANNEL_ID` env var to the channel ID of your FCM channel in Knock.
+
+1. Run `yarn android` to rebuild the app.
