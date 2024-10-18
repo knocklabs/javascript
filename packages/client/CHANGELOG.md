@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.14
+
+### Patch Changes
+
+- 7510909: fix: ensure axios is always imported correctly
+
 ## 0.10.13
 
 ### Patch Changes
