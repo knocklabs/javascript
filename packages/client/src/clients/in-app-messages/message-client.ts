@@ -57,7 +57,11 @@ export class InAppMessagesClient {
       }
     | undefined
   > {
-    const params = this.defaultOptions;
+    const params = {
+      ...this.defaultOptions,
+      // Convert trigger_data to a string, which the API expects
+      trigger_data: JSON.stringify(this.defaultOptions.trigger_data),
+    };
 
     this.queryKey = this.buildQueryKey(params);
 
