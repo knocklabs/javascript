@@ -392,7 +392,7 @@
   --knock-iam-content: var(--knock-gray-12);
   --knock-iam-content-light: var(--knock-gray-11);
   --knock-iam-content-disabled: var(--knock-gray-9);
-  --knock-iam-content-contrast: var(--knock-gray-0);
+  --knock-iam-content-contrast: var(--knock-gray-1);
   --knock-iam-border: var(--knock-gray-5);
   --knock-iam-border-light: var(--knock-gray-4);
   --knock-iam-border-dark: var(--knock-gray-7);

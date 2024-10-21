@@ -1,10 +1,10 @@
 import { NetworkStatus } from "@knocklabs/client";
 import {
-  Banner,
+  BannerView,
   CardView,
   KnockInAppMessagesChannelProvider,
   KnockProvider,
-  Modal,
+  ModalView,
   useInAppMessages,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
@@ -79,26 +79,41 @@ function App() {
               setColorMode(colorMode === "dark" ? "light" : "dark")
             }
           >
-            Toggle color mode
+            Toggle color mode: {colorMode}
           </button>
           <hr />
           <h2>Banner</h2>
-          <Banner />
+          <BannerView.Default
+            colorMode={colorMode}
+            content={{
+              title: "Banner title",
+              body: "Copy about a feature or an action that your user should be aware of.",
+              dismissible: true,
+              primary_button: {
+                text: "Primary",
+                action: "",
+              },
+              secondary_button: {
+                text: "Secondary",
+                action: "",
+              },
+            }}
+          />
           <hr />
           <h2>Card</h2>
           <CardView.Default
             colorMode={colorMode}
             content={{
-              headline: "Something new",
-              title: "Check out what we're cooking!",
-              body: "The greatest enterprise software to grace your procurement pipeline.",
+              headline: "Headline",
+              title: "Card title",
+              body: "Copy about the feature or general information to highlight. Try to provide a CTA where possible.",
               dismissible: true,
               primary_button: {
-                text: "Upgrade $$$$",
+                text: "Primary",
                 action: "",
               },
               secondary_button: {
-                text: "Upgrade a little $$",
+                text: "Secondary",
                 action: "",
               },
             }}
@@ -106,7 +121,22 @@ function App() {
           <hr />
           <Messages />
 
-          <Modal />
+          <ModalView.Default
+            colorMode={colorMode}
+            content={{
+              title: "Modal title",
+              body: "Contextual copy about what is being shown in the Modal. Use modals for announcements, timely updates, and messages with important calls to action.",
+              dismissible: true,
+              primary_button: {
+                text: "Primary",
+                action: "",
+              },
+              secondary_button: {
+                text: "Secondary",
+                action: "",
+              },
+            }}
+          />
         </>
       </KnockInAppMessagesChannelProvider>
     </KnockProvider>
