@@ -63,7 +63,7 @@
     "@typescript-eslint/parser": "^8.8.1",
     "@vitejs/plugin-react": "^4.3.2",
     "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "expo": ">=51.0.24",
     "expo-constants": ">=16.0.2",
