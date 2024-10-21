@@ -147,7 +147,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.11.6":
+"@babel/core@npm:^7.11.6, @babel/core@npm:^7.25.8":
   version: 7.25.8
   resolution: "@babel/core@npm:7.25.8"
   dependencies:
@@ -167,29 +167,6 @@ __metadata:
     json5: "npm:^2.2.3"
     semver: "npm:^6.3.1"
   checksum: 10c0/8411ea506e6f7c8a39ab5c1524b00589fa3b087edb47389708f7fe07170929192171734666e3ea10b95a951643a531a6d09eedfe071572c9ea28516646265086
-  languageName: node
-  linkType: hard
-
-"@babel/core@npm:^7.25.7":
-  version: 7.25.7
-  resolution: "@babel/core@npm:7.25.7"
-  dependencies:
-    "@ampproject/remapping": "npm:^2.2.0"
-    "@babel/code-frame": "npm:^7.25.7"
-    "@babel/generator": "npm:^7.25.7"
-    "@babel/helper-compilation-targets": "npm:^7.25.7"
-    "@babel/helper-module-transforms": "npm:^7.25.7"
-    "@babel/helpers": "npm:^7.25.7"
-    "@babel/parser": "npm:^7.25.7"
-    "@babel/template": "npm:^7.25.7"
-    "@babel/traverse": "npm:^7.25.7"
-    "@babel/types": "npm:^7.25.7"
-    convert-source-map: "npm:^2.0.0"
-    debug: "npm:^4.1.0"
-    gensync: "npm:^1.0.0-beta.2"
-    json5: "npm:^2.2.3"
-    semver: "npm:^6.3.1"
-  checksum: 10c0/dad20af39624086afc3a0910bd97ae712c9ad0e9dda09fc5da93876e8ea1802b63ddd81c44f4aa8a9834db46de801eaab1ce9b81ab54b4fe907ae052c24de136
   languageName: node
   linkType: hard
 
@@ -5562,7 +5539,7 @@ __metadata:
   resolution: "@knocklabs/client@workspace:packages/client"
   dependencies:
     "@babel/cli": "npm:^7.25.7"
-    "@babel/core": "npm:^7.25.7"
+    "@babel/core": "npm:^7.25.8"
     "@babel/plugin-proposal-class-properties": "npm:^7.16.7"
     "@babel/plugin-proposal-object-rest-spread": "npm:^7.16.7"
     "@babel/plugin-transform-runtime": "npm:^7.25.4"
@@ -5612,7 +5589,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@knocklabs/expo-example@workspace:examples/expo-example"
   dependencies:
-    "@babel/core": "npm:^7.25.7"
+    "@babel/core": "npm:^7.25.8"
     "@knocklabs/expo": "workspace:^"
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
@@ -5731,7 +5708,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@knocklabs/react-native-example@workspace:examples/react-native-example"
   dependencies:
-    "@babel/core": "npm:^7.25.7"
+    "@babel/core": "npm:^7.25.8"
     "@babel/preset-env": "npm:^7.16.7"
     "@babel/runtime": "npm:^7.25.6"
     "@knocklabs/react-native": "workspace:^"
