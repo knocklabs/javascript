@@ -73,7 +73,5 @@ export interface InAppMessagesClientOptions {
   // Optionally scope to a given archived status (defaults to `exclude`)
   archived?: "include" | "exclude" | "only";
   // Optionally scope all notifications that contain this argument as part of their trigger payload
-  // TODO(KNO-7140): This currently does not work because the API expects this
-  // to be a json string.
   trigger_data?: GenericData;
 }

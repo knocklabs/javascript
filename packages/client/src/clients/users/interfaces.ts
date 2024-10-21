@@ -14,5 +14,7 @@ export interface GetChannelDataInput {
 export interface GetInAppMessagesInput {
   channelId: string;
   messageType: string;
-  params: InAppMessagesClientOptions;
+  params: Omit<InAppMessagesClientOptions, "trigger_data"> & {
+    trigger_data: string;
+  };
 }
