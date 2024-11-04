@@ -18,7 +18,7 @@
     "@knocklabs/node": "^0.6.4",
     "@knocklabs/react": "workspace:^",
     "framer-motion": "^11.11.10",
-    "next": "14.2.14",
+    "next": "15.0.2",
     "next-seo": "^6.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
