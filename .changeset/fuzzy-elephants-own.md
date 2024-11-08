@@ -1,5 +1,5 @@
 ---
-"@knocklabs/react": patch
+"@knocklabs/react": minor
 ---
 
 new prerelease version
