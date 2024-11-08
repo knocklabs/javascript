@@ -54,9 +54,7 @@ export const useInAppMessages = <
     return () => {
       inAppMessagesClient.unsubscribe();
     };
-    // Run only once at mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [inAppMessagesClient]);
 
   return { messages, networkStatus, loading, inAppMessagesClient };
 };
