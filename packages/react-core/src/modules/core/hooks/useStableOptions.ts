@@ -1,5 +1,5 @@
+import fastDeepEqual from "fast-deep-equal";
 import { useMemo, useRef } from "react";
-import shallow from "zustand/shallow";
 
 export default function useStableOptions<T>(options: T): T {
   const optionsRef = useRef<T>();
@@ -7,7 +7,7 @@ export default function useStableOptions<T>(options: T): T {
   return useMemo(() => {
     const currentOptions = optionsRef.current;
 
-    if (currentOptions && shallow(options, currentOptions)) {
+    if (currentOptions && fastDeepEqual(options, currentOptions)) {
       return currentOptions;
     }
 
