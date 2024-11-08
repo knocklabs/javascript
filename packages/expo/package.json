@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/expo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -61,9 +61,9 @@
     "@types/react-native-htmlview": "^0.16.5",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^8.8.1",
-    "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react": "^4.3.3",
     "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "expo": ">=51.0.24",
     "expo-constants": ">=16.0.2",
@@ -72,7 +72,7 @@
     "react": "^18.2.0",
     "react-native": "^0.73.4",
     "rimraf": "^6.0.1",
-    "typescript": "^5.6.2",
+    "typescript": "^5.6.3",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.6.3",
     "vite-plugin-no-bundle": "^4.0.0"

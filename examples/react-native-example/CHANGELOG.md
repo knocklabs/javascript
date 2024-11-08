@@ -1,5 +1,12 @@
 # @knocklabs/react-native-example
 
+## 1.4.1
+
+### Patch Changes
+
+- a01826d: Unsubscribe token refresh listener in FCM push notification example
+  - @knocklabs/react-native@0.5.1
+
 ## 1.4.0
 
 ### Minor Changes

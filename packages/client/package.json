@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/client",
-  "version": "0.10.13",
+  "version": "0.10.14",
   "description": "The clientside library for interacting with Knock",
   "homepage": "https://github.com/knocklabs/javascript/tree/main/packages/client",
   "author": "@knocklabs",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.25.7",
-    "@babel/core": "^7.25.7",
+    "@babel/core": "^7.25.8",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
     "@babel/plugin-transform-runtime": "^7.25.4",
@@ -63,10 +63,10 @@
     "jsonwebtoken": "^9.0.2",
     "prettier": "^3.1.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.22.5",
-    "typescript": "^5.6.2",
+    "rollup": "^4.24.2",
+    "typescript": "^5.6.3",
     "vite": "^5.0.0",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.4"
   },
   "dependencies": {
     "@babel/runtime": "^7.25.6",

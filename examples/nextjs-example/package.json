@@ -1,6 +1,6 @@
 {
   "name": "nextjs-example",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,14 +11,14 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/react": "^2.10.3",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^9.0.3",
     "@knocklabs/node": "^0.6.4",
     "@knocklabs/react": "workspace:^",
-    "framer-motion": "^11.3.30",
-    "next": "14.2.14",
+    "framer-motion": "^11.11.10",
+    "next": "15.0.2",
     "next-seo": "^6.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -29,13 +29,13 @@
   "devDependencies": {
     "@knocklabs/eslint-config": "workspace:^",
     "@knocklabs/typescript-config": "workspace:^",
-    "@next/eslint-plugin-next": "^14.0.2",
+    "@next/eslint-plugin-next": "^15.0.1",
     "@types/eslint": "^8.44.7",
     "@types/node": "^22",
     "@types/react": "^18.3.6",
     "@types/react-dom": "^18.2.15",
     "@types/uuid": "^10.0.0",
     "eslint": "^8.56.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   }
 }
