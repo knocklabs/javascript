@@ -20,7 +20,7 @@ export interface KnockFeedProviderState {
   colorMode: ColorMode;
 }
 
-const FeedStateContext = React.createContext<
+const KnockFeedContext = React.createContext<
   KnockFeedProviderState | undefined
 >(undefined);
 
@@ -38,12 +38,18 @@ export interface KnockFeedProviderProps {
 export const KnockFeedProvider: React.FC<
   PropsWithChildren<KnockFeedProviderProps>
 > = ({ feedId, children, defaultFeedOptions = {}, colorMode = "light" }) => {
-  const knock = useKnockClient();
+  let knock: Knock;
+  try {
+    knock = useKnockClient();
+  } catch (error) {
+    throw new Error("KnockFeedProvider must be used within a KnockProvider.");
+  }
+
   const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
   const useFeedStore = useCreateNotificationStore(feedClient);
 
   return (
-    <FeedStateContext.Provider
+    <KnockFeedContext.Provider
       key={feedProviderKey(knock.userId, feedId, defaultFeedOptions)}
       value={{
         knock,
@@ -53,13 +59,12 @@ export const KnockFeedProvider: React.FC<
       }}
     >
       {children}
-    </FeedStateContext.Provider>
+    </KnockFeedContext.Provider>
   );
 };
 
 export const useKnockFeed = (): KnockFeedProviderState => {
-  const context = React.useContext(FeedStateContext);
-
+  const context = React.useContext(KnockFeedContext);
   if (!context) {
     throw new Error("useKnockFeed must be used within a KnockFeedProvider");
   }

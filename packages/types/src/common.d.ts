@@ -18,3 +18,52 @@ export type ChannelType =
   | "push"
   | "chat"
   | "http";
+
+export interface Tenant<T = GenericData> {
+  id: string;
+  properties: T;
+  settings?: TenantSettings;
+  created_at?: string;
+  updated_at: string;
+}
+
+export interface TenantSettings {
+  branding?: TenantBrandingSettings;
+  preference_set?: PreferenceSetProperties;
+}
+
+export interface TenantBrandingSettings {
+  primary_color?: string;
+  primary_color_contrast?: string;
+  logo_url?: string;
+  icon_url?: string;
+}
+
+export interface PreferenceSetProperties {
+  workflows?: WorkflowPreferences;
+  categories?: WorkflowPreferences;
+  channel_types?: ChannelTypePreferences;
+}
+
+export interface WorkflowPreferences {
+  [key: string]: WorkflowPreferenceSetting;
+}
+
+export type WorkflowPreferenceSetting =
+  | boolean
+  | { channel_types: ChannelTypePreferences }
+  | ConditionalPreferenceSettings;
+
+export type ChannelTypePreferences = {
+  [_K in ChannelType]?: boolean | ConditionalPreferenceSettings;
+};
+
+export type ConditionalPreferenceSettings = {
+  conditions: Condition[];
+};
+
+export interface Condition {
+  argument: string;
+  variable: string;
+  operator: string;
+}

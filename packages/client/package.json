@@ -71,11 +71,13 @@
   "dependencies": {
     "@babel/runtime": "^7.25.6",
     "@knocklabs/types": "workspace:^",
+    "@tanstack/store": "^0.5.5",
     "@types/phoenix": "^1.5.4",
     "axios": "^1.7.4",
     "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
+    "nanoid": "^3.0.0",
     "phoenix": "1.6.16",
     "zustand": "^3.7.2"
   }
