@@ -20,7 +20,7 @@
     "@babel/preset-env": "^7.16.7",
     "@babel/runtime": "^7.25.6",
     "@react-native/babel-preset": "0.73.21",
-    "@react-native/metro-config": "0.73.5",
+    "@react-native/metro-config": "0.76.1",
     "@react-native/typescript-config": "0.73.1",
     "@types/react": "^18.3.6",
     "@types/react-test-renderer": "^18.0.0",
