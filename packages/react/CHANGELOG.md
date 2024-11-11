@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.30
+
+### Patch Changes
+
+- e8dfae8: Pin Radix dependencies to support React 16
+
 ## 0.2.29
 
 ### Patch Changes
