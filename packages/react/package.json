@@ -54,8 +54,8 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
-    "@radix-ui/react-popover": "^1.0.7",
-    "@radix-ui/react-visually-hidden": "^1.0.3",
+    "@radix-ui/react-popover": "1.0.7",
+    "@radix-ui/react-visually-hidden": "1.0.3",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2"
