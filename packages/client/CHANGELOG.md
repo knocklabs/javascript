@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.15
+
+### Patch Changes
+
+- 26166e3: fix: update preference set types
+- Updated dependencies [26166e3]
+  - @knocklabs/types@0.1.5
+
 ## 0.10.14
 
 ### Patch Changes
