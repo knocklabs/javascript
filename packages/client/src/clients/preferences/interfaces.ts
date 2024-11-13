@@ -1,12 +1,17 @@
-import { ChannelType } from "@knocklabs/types";
+import { ChannelType, Condition } from "@knocklabs/types";
+
+export type ConditionalPreferenceSettings = {
+  conditions: Condition[];
+};
 
 export type ChannelTypePreferences = {
-  [_K in ChannelType]?: boolean;
+  [_K in ChannelType]?: boolean | ConditionalPreferenceSettings;
 };
 
 export type WorkflowPreferenceSetting =
   | boolean
-  | { channel_types: ChannelTypePreferences };
+  | { channel_types: ChannelTypePreferences }
+  | ConditionalPreferenceSettings;
 
 export type WorkflowPreferences = Partial<
   Record<string, WorkflowPreferenceSetting>
@@ -20,9 +25,9 @@ export interface SetPreferencesProperties {
 
 export interface PreferenceSet {
   id: string;
-  categories: WorkflowPreferences;
-  workflows: WorkflowPreferences;
-  channel_types: ChannelTypePreferences;
+  categories: WorkflowPreferences | null;
+  workflows: WorkflowPreferences | null;
+  channel_types: ChannelTypePreferences | null;
 }
 
 export interface PreferenceOptions {
