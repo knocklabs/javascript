@@ -18,3 +18,9 @@ export type ChannelType =
   | "push"
   | "chat"
   | "http";
+
+export interface Condition {
+  argument: string;
+  variable: string;
+  operator: string;
+}
