@@ -1,5 +1,11 @@
 # @knocklabs/types
 
+## 0.1.5
+
+### Patch Changes
+
+- 26166e3: fix: update preference set types
+
 ## 0.1.4
 
 ### Patch Changes
