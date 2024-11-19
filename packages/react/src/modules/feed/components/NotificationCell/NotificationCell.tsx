@@ -74,7 +74,7 @@ export const NotificationCell = React.forwardRef<
     }, [item, actionUrl, onItemClick, feedClient]);
 
     const onButtonClickHandler = React.useCallback(
-      (e: React.MouseEvent, button: ActionButton) => {
+      (_e: React.MouseEvent, button: ActionButton) => {
         // Record the interaction with the metadata for the button that was clicked
         feedClient.markAsInteracted(item, {
           type: "button_click",

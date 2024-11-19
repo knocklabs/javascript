@@ -87,7 +87,7 @@ function useConnectedSlackChannels({
         data: { connections: channelsToSendToKnock },
       });
       fetchAndSetConnectedChannels();
-    } catch (error) {
+    } catch (_error) {
       setError(t("slackChannelSetError") || "");
     }
     setIsUpdating(false);

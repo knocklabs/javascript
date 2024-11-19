@@ -83,7 +83,7 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
         if (onAuthenticationComplete) {
           onAuthenticationComplete(event.data);
         }
-      } catch (error) {
+      } catch (_error) {
         setConnectionStatus("error");
       }
     };
