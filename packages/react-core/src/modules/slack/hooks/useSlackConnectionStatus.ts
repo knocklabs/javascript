@@ -81,7 +81,7 @@ function useSlackConnectionStatus(
         // This is for any Knock errors that would require a reconnect.
 
         setConnectionStatus("error");
-      } catch (error) {
+      } catch (_error) {
         setConnectionStatus("error");
       }
     };

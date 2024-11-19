@@ -11,7 +11,7 @@ export async function setToken(params = {}) {
     const jsonResponse = await resp.json();
 
     return jsonResponse;
-  } catch (e) {
+  } catch (_e) {
     return { error: "Error sending request" };
   }
 }

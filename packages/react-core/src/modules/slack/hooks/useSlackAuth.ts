@@ -45,7 +45,7 @@ function useSlackAuth(
       } else {
         setConnectionStatus("error");
       }
-    } catch (error) {
+    } catch (_error) {
       setConnectionStatus("error");
     }
   }, [

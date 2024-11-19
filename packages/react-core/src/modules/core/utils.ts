@@ -21,7 +21,7 @@ export function formatTimestamp(
     });
 
     return formatted;
-  } catch (e) {
+  } catch (_e) {
     return ts;
   }
 }
