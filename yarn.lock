@@ -5044,7 +5044,7 @@ __metadata:
     "@knocklabs/expo": "workspace:^"
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
-    expo-device: "npm:>=6.0.2"
+    expo-device: "npm:>=7.0.1"
     expo-notifications: "npm:>=0.28.16"
     expo-status-bar: "npm:~1.12.1"
     react: "npm:^18.2.0"
@@ -5070,7 +5070,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.14"
     expo: "npm:>=51.0.24"
     expo-constants: "npm:>=16.0.2"
-    expo-device: "npm:>=6.0.2"
+    expo-device: "npm:>=7.0.1"
     expo-notifications: "npm:>=0.28.16"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
@@ -13780,14 +13780,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-device@npm:>=6.0.2":
-  version: 6.0.2
-  resolution: "expo-device@npm:6.0.2"
+"expo-device@npm:>=7.0.1":
+  version: 7.0.1
+  resolution: "expo-device@npm:7.0.1"
   dependencies:
     ua-parser-js: "npm:^0.7.33"
   peerDependencies:
     expo: "*"
-  checksum: 10c0/f1a83e765d06a2f82e4567bb9007db083f7f8bba14c617d3dad5d948d8b57e3eca2b97e98edd168fa8cefbf6eea4953cff6aa131df96e15954cfa34e023541ac
+  checksum: 10c0/b9faaad827121f1b5dea5b38b7d418215ab675d416403cfa5d78c71a97ce4f0e1c57dd6b8e4017cd1d87ccfc7e49bc7739f6bba26a287db6598d0add26ccacdd
   languageName: node
   linkType: hard
 
