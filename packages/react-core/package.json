@@ -58,7 +58,7 @@
     "@testing-library/react": "^14.2.0",
     "@types/react": "^18.3.6",
     "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
+    "@typescript-eslint/parser": "^8.15.0",
     "@vitejs/plugin-react": "^4.3.3",
     "babel-plugin-react-require": "^4.0.3",
     "eslint": "^8.56.0",
