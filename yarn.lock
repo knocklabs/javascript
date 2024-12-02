@@ -4999,7 +4999,7 @@ __metadata:
     "@babel/runtime": "npm:^7.25.6"
     "@knocklabs/types": "workspace:^"
     "@types/jsonwebtoken": "npm:^9.0.5"
-    "@types/phoenix": "npm:^1.5.4"
+    "@types/phoenix": "npm:^1.6.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.14.0"
     "@typescript-eslint/parser": "npm:^8.16.0"
     axios: "npm:^1.7.4"
@@ -5010,7 +5010,7 @@ __metadata:
     eventemitter2: "npm:^6.4.5"
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
-    phoenix: "npm:1.6.16"
+    phoenix: "npm:1.7.14"
     prettier: "npm:^3.1.0"
     rimraf: "npm:^6.0.1"
     rollup: "npm:^4.27.4"
@@ -8168,10 +8168,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/phoenix@npm:^1.5.4":
-  version: 1.6.5
-  resolution: "@types/phoenix@npm:1.6.5"
-  checksum: 10c0/a5a6bb468c1596905fd6d1d493fd468cb0b325b0d09573845e01124d65267e606ad9c526701201e2e30d334721108e5e1b98e4fe9dc9d6270eb2f90042cc7bda
+"@types/phoenix@npm:^1.6.6":
+  version: 1.6.6
+  resolution: "@types/phoenix@npm:1.6.6"
+  checksum: 10c0/4dfcb3fd36341ed5500de030291af14163c599857e00d2d4ff065d4c4600317d5d20aa170913fb9609747a09436e3add44db7d0c709bdf80f36cddcc67a42021
   languageName: node
   linkType: hard
 
@@ -19988,10 +19988,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"phoenix@npm:1.6.16":
-  version: 1.6.16
-  resolution: "phoenix@npm:1.6.16"
-  checksum: 10c0/2d38857255886a0182082a13e7ea3ff689acf17c53ca96a0f77fb012b8fd4aef4c695eba3922e66939eef846a999d670e05472254da23e4fd4a2444ea32b4f1e
+"phoenix@npm:1.7.14":
+  version: 1.7.14
+  resolution: "phoenix@npm:1.7.14"
+  checksum: 10c0/df1fd7c5023474f35d38dafc3185c80351de2c9b3fdba1684ef60bac71759e5b6d931811f61059eb9579b0b85fd912a31af6ddc6c25f1b23c460093cd377b72f
   languageName: node
   linkType: hard
 

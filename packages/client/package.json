@@ -71,12 +71,12 @@
   "dependencies": {
     "@babel/runtime": "^7.25.6",
     "@knocklabs/types": "workspace:^",
-    "@types/phoenix": "^1.5.4",
+    "@types/phoenix": "^1.6.6",
     "axios": "^1.7.4",
     "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
-    "phoenix": "1.6.16",
+    "phoenix": "1.7.14",
     "zustand": "^3.7.2"
   }
 }
