@@ -48,7 +48,7 @@ export interface InAppMessagesStoreState {
   queries: Record<string, InAppMessagesQueryInfo>;
 }
 
-export type InAppMessageEngagementStatus =
+type InAppMessageEngagementStatus =
   | "read"
   | "unread"
   | "seen"
@@ -60,10 +60,11 @@ export type InAppMessageEngagementStatus =
 
 export interface InAppMessagesClientOptions {
   order?: "asc" | "desc";
-  before?: string;
-  after?: string;
-  page_size?: number;
   engagement_status?: InAppMessageEngagementStatus[];
+  // Optionally scope by schema version, either for an exact version (e.g. "1.0.0")
+  // or a version range as a comparator (e.g. ">2.0.0" or "<=1.2.0"). Must
+  // provide a valid semver in the format of `major.minor.patch`.
+  schema_version?: string;
   // Optionally scope all requests to a particular tenant or tenants
   tenant_id?: string | string[];
   // Optionally scope to notifications from the given workflow or workflows
@@ -74,4 +75,8 @@ export interface InAppMessagesClientOptions {
   archived?: "include" | "exclude" | "only";
   // Optionally scope all notifications that contain this argument as part of their trigger payload
   trigger_data?: GenericData;
+  // Pagination params
+  before?: string;
+  after?: string;
+  page_size?: number;
 }
