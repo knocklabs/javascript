@@ -187,19 +187,21 @@ describe("teardown method", () => {
 
   test("disconnects socket if connected", () => {
     const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123");
+
+    const client = knock.client();
     const disconnectSpy = vi.fn();
     const isConnectedSpy = vi.fn().mockReturnValue(true);
 
-    vi.spyOn(knock, 'client').mockReturnValue({
-      socket: {
+    Object.defineProperty(client, 'socket', {
+      value: {
         disconnect: disconnectSpy,
         isConnected: isConnectedSpy
-      }
-    } as any);
+      },
+      configurable: true
+    });
 
-    knock.authenticate("user123");
     knock.teardown();
-
     expect(isConnectedSpy).toHaveBeenCalled();
     expect(disconnectSpy).toHaveBeenCalled();
   });
