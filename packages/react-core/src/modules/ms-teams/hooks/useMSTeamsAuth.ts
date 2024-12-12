@@ -34,7 +34,7 @@ function useMSTeamsAuth(
         user_token: knock.userToken,
       }),
       client_id: msTeamsBotId,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: encodeURIComponent(REDIRECT_URI),
     };
     return `${MS_TEAMS_ADMINCONSENT_URL}?${new URLSearchParams(rawParams)}`;
   }, [
