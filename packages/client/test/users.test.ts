@@ -2,7 +2,6 @@ import { beforeEach, afterEach, describe, expect, test, vi } from "vitest";
 import Knock from "../src/knock";
 import { SetChannelDataInput, GetChannelDataInput } from "../src/clients/users/interfaces";
 import {
-  PreferenceSet,
   SetPreferencesProperties,
   GetPreferencesOptions,
 } from "../src/clients/preferences/interfaces";
