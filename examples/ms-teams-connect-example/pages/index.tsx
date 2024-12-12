@@ -1,4 +1,4 @@
-import { KnockProvider } from "@knocklabs/react";
+import { KnockMSTeamsProvider, KnockProvider } from "@knocklabs/react";
 
 export default function Home() {
   const user = {
@@ -17,15 +17,22 @@ export default function Home() {
       userId={user.id}
       host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
     >
-      <div
-        style={{
-          marginBottom: "20px",
-          fontFamily: "monospace",
-          fontSize: "40px",
-        }}
+      <KnockMSTeamsProvider
+        knockMSTeamsChannelId={
+          process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_CHANNEL_ID!
+        }
+        tenantId={process.env.NEXT_PUBLIC_TENANT_ID!}
       >
-        MS Teams connector examples
-      </div>
+        <div
+          style={{
+            marginBottom: "20px",
+            fontFamily: "monospace",
+            fontSize: "40px",
+          }}
+        >
+          MS Teams connector examples
+        </div>
+      </KnockMSTeamsProvider>
     </KnockProvider>
   );
 }
