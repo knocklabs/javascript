@@ -104,3 +104,88 @@ describe("it handles authentication correctly", () => {
     expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("client method", () => {
+  test("warns when not authenticated", () => {
+    const knock = new Knock("pk_test_12345");
+    const consoleSpy = vi.spyOn(console, "warn");
+    knock.client();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Knock] You must call authenticate(userId, userToken) first before trying to make a request.\n" +
+      "        Typically you'll see this message when you're creating a feed instance before having called\n" +
+      "        authenticate with a user Id and token. That means we won't know who to issue the request\n" +
+      "        to Knock on behalf of.\n" +
+      "        "
+    );
+  });
+
+  test("returns client instance when authenticated", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123", "test-token");
+    const client = knock.client();
+    expect(client).toBeDefined();
+    expect(client).toHaveProperty("apiKey", "pk_test_12345");
+    expect(client).toHaveProperty("userToken", "test-token");
+  });
+});
+
+describe("isAuthenticated method", () => {
+  test("returns true when userId exists", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123");
+    expect(knock.isAuthenticated()).toBe(true);
+  });
+
+  test("returns false when no userId exists", () => {
+    const knock = new Knock("pk_test_12345");
+    expect(knock.isAuthenticated()).toBe(false);
+  });
+
+  test("checks userToken when checkUserToken is true", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123");
+    expect(knock.isAuthenticated(true)).toBe(false);
+  });
+
+  test("returns true when both userId and valid token exist", () => {
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", 60);
+    knock.authenticate("user123", token);
+    expect(knock.isAuthenticated(true)).toBe(true);
+  });
+});
+
+describe("teardown method", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.resetAllMocks();
+  });
+
+  test("clears token expiration timer", () => {
+    const knock = new Knock("pk_test_12345");
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+    const token = generateMockToken("user123", 60);
+
+    knock.authenticate("user123", token, {
+      timeBeforeExpirationInMs: 500,
+    });
+
+    knock.teardown();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+  });
+
+  test("cleans up internal state", () => {
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", 60);
+
+    knock.authenticate("user123", token);
+    expect(knock.isAuthenticated()).toBe(true);
+
+    knock.teardown();
+    expect(knock.isAuthenticated()).toBe(false);
+  });
+});
