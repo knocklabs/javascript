@@ -12,6 +12,8 @@ const en: I18nContent = {
     unread: "Unread",
     read: "Read",
     unseen: "Unseen",
+    msTeamsConnectContainerDescription:
+      "Connect to get notifications in Microsoft Teams",
     slackConnectChannel: "Connect channel",
     slackChannelId: "Slack channel ID",
     slackConnecting: "Connecting to Slack...",

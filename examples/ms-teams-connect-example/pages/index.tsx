@@ -2,6 +2,7 @@ import {
   KnockMSTeamsProvider,
   KnockProvider,
   MSTeamsAuthButton,
+  MSTeamsAuthContainer,
 } from "@knocklabs/react";
 
 export default function Home() {
@@ -50,9 +51,46 @@ export default function Home() {
             >
               MS Teams Connector options
             </div>
+
+            <div>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  marginTop: "40px",
+                  fontFamily: "monospace",
+                  fontSize: "18px",
+                  color: "gray",
+                }}
+              >
+                Button
+              </div>
+              <div style={{ margin: "10px", padding: "10px" }}>
+                <MSTeamsAuthButton
+                  msTeamsBotId={process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_BOT_ID!}
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginBottom: "10px",
+                marginTop: "40px",
+                fontFamily: "monospace",
+                fontSize: "18px",
+                color: "gray",
+              }}
+            >
+              Container with button
+            </div>
             <div style={{ margin: "10px", padding: "10px" }}>
-              <MSTeamsAuthButton
-                msTeamsBotId={process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_BOT_ID!}
+              <MSTeamsAuthContainer
+                actionButton={
+                  <MSTeamsAuthButton
+                    msTeamsBotId={
+                      process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_BOT_ID!
+                    }
+                  />
+                }
               />
             </div>
           </div>
