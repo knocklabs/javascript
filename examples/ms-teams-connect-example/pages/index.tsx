@@ -1,4 +1,8 @@
-import { KnockMSTeamsProvider, KnockProvider } from "@knocklabs/react";
+import {
+  KnockMSTeamsProvider,
+  KnockProvider,
+  MSTeamsAuthButton,
+} from "@knocklabs/react";
 
 export default function Home() {
   const user = {
@@ -23,14 +27,35 @@ export default function Home() {
         }
         tenantId={process.env.NEXT_PUBLIC_TENANT_ID!}
       >
-        <div
+        <h1
           style={{
-            marginBottom: "20px",
+            margin: "0 0 20px",
             fontFamily: "monospace",
             fontSize: "40px",
+            fontWeight: "normal",
           }}
         >
           MS Teams connector examples
+        </h1>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div>
+            <div
+              style={{
+                marginBottom: "10px",
+                marginTop: "40px",
+                fontFamily: "monospace",
+                fontSize: "25px",
+                color: "gray",
+              }}
+            >
+              MS Teams Connector options
+            </div>
+            <div style={{ margin: "10px", padding: "10px" }}>
+              <MSTeamsAuthButton
+                msTeamsBotId={process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_BOT_ID!}
+              />
+            </div>
+          </div>
         </div>
       </KnockMSTeamsProvider>
     </KnockProvider>
