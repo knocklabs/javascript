@@ -156,8 +156,12 @@ describe("isAuthenticated method", () => {
 });
 
 describe("teardown method", () => {
+  const MOCK_NOW = 1000000;
+  const TOKEN_EXPIRY = MOCK_NOW / 1000 + 3600;
+
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.spyOn(Date, 'now').mockImplementation(() => MOCK_NOW);
   });
 
   afterEach(() => {
@@ -165,27 +169,48 @@ describe("teardown method", () => {
     vi.resetAllMocks();
   });
 
-  test("clears token expiration timer", () => {
-    const knock = new Knock("pk_test_12345");
+  test("clears token expiration timer", async () => {
     const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
-    const token = generateMockToken("user123", 60);
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", TOKEN_EXPIRY);
+    const onUserTokenExpiring = vi.fn();
 
     knock.authenticate("user123", token, {
-      timeBeforeExpirationInMs: 500,
+      onUserTokenExpiring,
+      timeBeforeExpirationInMs: 1000,
     });
 
+    vi.advanceTimersByTime(1);
     knock.teardown();
     expect(clearTimeoutSpy).toHaveBeenCalled();
   });
 
-  test("cleans up internal state", () => {
+  test("disconnects socket if connected", () => {
     const knock = new Knock("pk_test_12345");
-    const token = generateMockToken("user123", 60);
+    const disconnectSpy = vi.fn();
+    const isConnectedSpy = vi.fn().mockReturnValue(true);
 
-    knock.authenticate("user123", token);
-    expect(knock.isAuthenticated()).toBe(true);
+    vi.spyOn(knock, 'client').mockReturnValue({
+      socket: {
+        disconnect: disconnectSpy,
+        isConnected: isConnectedSpy
+      }
+    } as any);
 
+    knock.authenticate("user123");
     knock.teardown();
-    expect(knock.isAuthenticated()).toBe(false);
+
+    expect(isConnectedSpy).toHaveBeenCalled();
+    expect(disconnectSpy).toHaveBeenCalled();
+  });
+
+  test("maintains authentication state", () => {
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", TOKEN_EXPIRY);
+    knock.authenticate("user123", token);
+
+    expect(knock.isAuthenticated()).toBe(true);
+    knock.teardown();
+    expect(knock.isAuthenticated()).toBe(true);
   });
 });
