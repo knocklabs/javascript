@@ -1,8 +1,8 @@
-import { useMSTeamsAuth } from "@knocklabs/react-core";
+import { useMSTeamsAuth, useTranslations } from "@knocklabs/react-core";
 import { FunctionComponent } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
-import { SlackIcon } from "../../../slack/components/SlackIcon";
+import { MSTeamsIcon } from "../MSTeamsIcon";
 
 export interface MSTeamsAuthButtonProps {
   msTeamsBotId: string;
@@ -15,6 +15,7 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   redirectUrl,
   onAuthenticationComplete,
 }) => {
+  const { t } = useTranslations();
   const { buildMSTeamsAuthUrl } = useMSTeamsAuth(msTeamsBotId, redirectUrl);
 
   return (
@@ -22,8 +23,8 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
       onClick={() => openPopupWindow(buildMSTeamsAuthUrl())}
       className="rsk-connect__button rsk-connect__button--disconnected"
     >
-      <SlackIcon height="16px" width="16px" />
-      <span>Connect</span>
+      <MSTeamsIcon height="16px" width="16px" />
+      <span>{t("msTeamsConnect")}</span>
     </button>
   );
 };

@@ -1,8 +1,8 @@
 import { useTranslations } from "@knocklabs/react-core";
 import { FunctionComponent } from "react";
 
-import { SlackIcon } from "../../../slack/components/SlackIcon";
 import "../../theme.css";
+import { MSTeamsIcon } from "../MSTeamsIcon";
 
 import "./styles.css";
 
@@ -18,8 +18,7 @@ export const MSTeamsAuthContainer: FunctionComponent<
   return (
     <div className="rtk-auth">
       <div className="rtk-auth__header">
-        {/* TODO Use TeamsIcon */}
-        <SlackIcon height="32px" width="32px" />
+        <MSTeamsIcon height="32px" width="32px" />
         <div>{actionButton}</div>
       </div>
       <div className="rtk-auth__title">Microsoft Teams</div>
