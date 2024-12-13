@@ -5,7 +5,7 @@ import { Socket } from "phoenix";
 type ApiClientOptions = {
   host: string;
   apiKey: string;
-  userToken: string | undefined;
+  userToken?: string;
 };
 
 export interface ApiResponse {
@@ -20,7 +20,7 @@ export interface ApiResponse {
 class ApiClient {
   private host: string;
   private apiKey: string;
-  private userToken: string | null;
+  private userToken: string | undefined;
   private axiosClient: AxiosInstance;
 
   public socket: Socket | undefined;
@@ -28,7 +28,7 @@ class ApiClient {
   constructor(options: ApiClientOptions) {
     this.host = options.host;
     this.apiKey = options.apiKey;
-    this.userToken = options.userToken || null;
+    this.userToken = options.userToken;
 
     // Create a retryable axios client, but account for issues where the axios export is not
     // the default in certain bundlers (Webpack).
