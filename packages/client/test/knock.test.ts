@@ -109,7 +109,10 @@ describe("client method", () => {
   test("warns when not authenticated", () => {
     const knock = new Knock("pk_test_12345");
     const consoleSpy = vi.spyOn(console, "warn");
-    knock.client();
+    const client = knock.client();
+    expect(client).toBeDefined();  // client() always returns an ApiClient instance
+    expect(client).toHaveProperty("apiKey", "pk_test_12345");
+    expect(client).toHaveProperty("userToken", undefined);
     expect(consoleSpy).toHaveBeenCalledWith(
       "[Knock] You must call authenticate(userId, userToken) first before trying to make a request.\n" +
       "        Typically you'll see this message when you're creating a feed instance before having called\n" +
@@ -121,11 +124,12 @@ describe("client method", () => {
 
   test("returns client instance when authenticated", () => {
     const knock = new Knock("pk_test_12345");
-    knock.authenticate("user123", "test-token");
+    const token = generateMockToken("user123", 60);
+    knock.authenticate("user123", token);
     const client = knock.client();
     expect(client).toBeDefined();
     expect(client).toHaveProperty("apiKey", "pk_test_12345");
-    expect(client).toHaveProperty("userToken", "test-token");
+    expect(client).toHaveProperty("userToken", token);
   });
 });
 
