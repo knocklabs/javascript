@@ -47,7 +47,15 @@ export type BulkUpdateMessagesInChannelProperties = {
   status: "seen" | "read" | "archive";
   options: {
     user_ids?: string[];
-    engagement_status?: "seen" | "read" | "unseen" | "unread";
+    engagement_status?:
+      | "seen"
+      | "read"
+      | "archived"
+      | "unseen"
+      | "unread"
+      | "unarchived"
+      | "interacted"
+      | "link_clicked";
     archived?: "exclude" | "include" | "only";
     has_tenant?: boolean;
     tenants?: string[];
