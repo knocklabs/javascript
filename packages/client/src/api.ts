@@ -30,15 +30,8 @@ class ApiClient {
     this.apiKey = options.apiKey;
     this.userToken = options.userToken || null;
 
-    // Create a retryable axios client, but account for issues where the axios export is not
-    // the default in certain bundlers (Webpack).
-    //
-    // NOTE: This is a temporary fix that exists because of this issue:
-    // https://github.com/axios/axios/issues/6591
-    const axiosInstance = // @ts-expect-error Fixing the issue described above
-      (axios.default ? axios.default : axios) as AxiosStatic;
-
-    this.axiosClient = axiosInstance.create({
+    // Create a retryable axios client
+    this.axiosClient = axios.create({
       baseURL: this.host,
       headers: {
         Accept: "application/json",
