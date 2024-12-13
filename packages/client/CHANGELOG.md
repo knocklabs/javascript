@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.16
+
+### Patch Changes
+
+- bc99374: fix: bundle client package using "compat" interop
+
 ## 0.10.15
 
 ### Patch Changes
