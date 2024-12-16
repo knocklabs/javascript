@@ -5106,12 +5106,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/node@npm:^0.6.4":
-  version: 0.6.13
-  resolution: "@knocklabs/node@npm:0.6.13"
+"@knocklabs/node@npm:^0.6.15":
+  version: 0.6.15
+  resolution: "@knocklabs/node@npm:0.6.15"
   dependencies:
     jose: "npm:^5.2.0"
-  checksum: 10c0/6a74130faf4ed40c1fed8bbf97395a71db90009c12f16982016e812aabbec4996e5dbf833d01325a0cfc28cd70accbcf42312e473ed8b29286319d0191b02af5
+  checksum: 10c0/a0d747a0536279459cdfa6d7379e34d6e5aee39f74e1c565d04ccc53133bae9d2ee72740c0b1029466e525f371f49c16c24d31395806f34d2184d679dd8c1972
   languageName: node
   linkType: hard
 
@@ -19235,7 +19235,7 @@ __metadata:
     "@emotion/styled": "npm:^11.13.0"
     "@faker-js/faker": "npm:^9.0.3"
     "@knocklabs/eslint-config": "workspace:^"
-    "@knocklabs/node": "npm:^0.6.4"
+    "@knocklabs/node": "npm:^0.6.15"
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.0.4"
@@ -23303,7 +23303,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "slack-kit-example@workspace:examples/slack-kit-example"
   dependencies:
-    "@knocklabs/node": "npm:^0.6.4"
+    "@knocklabs/node": "npm:^0.6.15"
     "@knocklabs/react": "npm:*"
     "@types/node": "npm:^22"
     "@types/react": "npm:^18.3.6"
