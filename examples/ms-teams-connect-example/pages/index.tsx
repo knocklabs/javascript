@@ -5,6 +5,8 @@ import {
   MSTeamsAuthContainer,
 } from "@knocklabs/react";
 
+import { useSetToken } from "../hooks";
+
 export default function Home() {
   const user = {
     id: "123",
@@ -15,12 +17,31 @@ export default function Home() {
     updated_at: "",
     created_at: "",
   };
+  const redirectUrl = process.env.NEXT_PUBLIC_REDIRECT_URL;
+
+  const onAuthComplete = (result: string) => {
+    console.log("Result from MS Teams authentication:", result);
+  };
+
+  const { isLoading, isError } = useSetToken({
+    tenant: process.env.NEXT_PUBLIC_TENANT_ID!,
+    user,
+  });
+
+  if (isLoading) {
+    return <div>Loading…</div>;
+  }
+
+  if (isError) {
+    return <div>Not found</div>;
+  }
 
   return (
     <KnockProvider
       apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
       userId={user.id}
       host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
+      userToken={localStorage.getItem("knock-user-token")!}
     >
       <KnockMSTeamsProvider
         knockMSTeamsChannelId={
@@ -51,7 +72,6 @@ export default function Home() {
             >
               MS Teams Connector options
             </div>
-
             <div>
               <div
                 style={{
@@ -67,10 +87,11 @@ export default function Home() {
               <div style={{ margin: "10px", padding: "10px" }}>
                 <MSTeamsAuthButton
                   msTeamsBotId={process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_BOT_ID!}
+                  redirectUrl={redirectUrl}
+                  onAuthenticationComplete={onAuthComplete}
                 />
               </div>
             </div>
-
             <div
               style={{
                 marginBottom: "10px",
@@ -89,6 +110,8 @@ export default function Home() {
                     msTeamsBotId={
                       process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_BOT_ID!
                     }
+                    redirectUrl={redirectUrl}
+                    onAuthenticationComplete={onAuthComplete}
                   />
                 }
               />
