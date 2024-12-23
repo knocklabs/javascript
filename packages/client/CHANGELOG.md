@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.17
+
+### Patch Changes
+
+- 988aaf9: fix: engagement_status in BulkUpdateMessagesInChannelProperties type
+
 ## 0.10.16
 
 ### Patch Changes
