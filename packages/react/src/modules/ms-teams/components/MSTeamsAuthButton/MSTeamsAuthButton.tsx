@@ -8,6 +8,8 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { openPopupWindow } from "../../../core/utils";
 import { MSTeamsIcon } from "../MSTeamsIcon";
 
+import "./styles.css";
+
 export interface MSTeamsAuthButtonProps {
   msTeamsBotId: string;
   redirectUrl?: string;
@@ -70,7 +72,7 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   // Loading states
   if (connectionStatus === "connecting") {
     return (
-      <div className="rsk-connect__button rsk-connect__button--loading">
+      <div className="rtk-connect__button rtk-connect__button--loading">
         <MSTeamsIcon height="16px" width="16px" />
         <span>{t("msTeamsConnecting")}</span>
       </div>
@@ -82,10 +84,10 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
     return (
       <button
         onClick={() => openPopupWindow(buildMSTeamsAuthUrl())}
-        className="rsk-connect__button rsk-connect__button--error"
+        className="rtk-connect__button rtk-connect__button--error"
       >
         <MSTeamsIcon height="16px" width="16px" />
-        <span className="rsk-connect__button__text--error">
+        <span className="rtk-connect__button__text--error">
           {t("msTeamsError")}
         </span>
       </button>
@@ -97,7 +99,7 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
     return (
       <button
         onClick={() => openPopupWindow(buildMSTeamsAuthUrl())}
-        className="rsk-connect__button rsk-connect__button--disconnected"
+        className="rtk-connect__button rtk-connect__button--disconnected"
       >
         <MSTeamsIcon height="16px" width="16px" />
         <span>{t("msTeamsConnect")}</span>
@@ -108,7 +110,7 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   // Connected state
   return (
     <button
-      className="rsk-connect__button rsk-connect__button--connected"
+      className="rtk-connect__button rtk-connect__button--connected"
       disabled
     >
       <MSTeamsIcon height="16px" width="16px" />
