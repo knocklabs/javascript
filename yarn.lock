@@ -5011,7 +5011,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
     phoenix: "npm:1.7.14"
-    prettier: "npm:^3.1.0"
+    prettier: "npm:^3.4.2"
     rimraf: "npm:^6.0.1"
     rollup: "npm:^4.27.4"
     typescript: "npm:^5.6.3"
@@ -5101,17 +5101,17 @@ __metadata:
     "@knocklabs/prettier-config": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
     "@manypkg/cli": "npm:^0.22.0"
-    prettier: "npm:^3.1.0"
+    prettier: "npm:^3.4.2"
     turbo: "npm:^2.3.3"
   languageName: unknown
   linkType: soft
 
-"@knocklabs/node@npm:^0.6.4":
-  version: 0.6.13
-  resolution: "@knocklabs/node@npm:0.6.13"
+"@knocklabs/node@npm:^0.6.15":
+  version: 0.6.15
+  resolution: "@knocklabs/node@npm:0.6.15"
   dependencies:
     jose: "npm:^5.2.0"
-  checksum: 10c0/6a74130faf4ed40c1fed8bbf97395a71db90009c12f16982016e812aabbec4996e5dbf833d01325a0cfc28cd70accbcf42312e473ed8b29286319d0191b02af5
+  checksum: 10c0/a0d747a0536279459cdfa6d7379e34d6e5aee39f74e1c565d04ccc53133bae9d2ee72740c0b1029466e525f371f49c16c24d31395806f34d2184d679dd8c1972
   languageName: node
   linkType: hard
 
@@ -5120,7 +5120,7 @@ __metadata:
   resolution: "@knocklabs/prettier-config@workspace:packages/prettier-config"
   dependencies:
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
-    prettier: "npm:^3.1.0"
+    prettier: "npm:^3.4.2"
   languageName: unknown
   linkType: soft
 
@@ -5164,7 +5164,7 @@ __metadata:
     "@babel/runtime": "npm:^7.25.6"
     "@knocklabs/react-native": "workspace:^"
     "@react-native-firebase/app": "npm:^21.5.0"
-    "@react-native-firebase/messaging": "npm:^21.4.0"
+    "@react-native-firebase/messaging": "npm:^21.6.1"
     "@react-native/babel-preset": "npm:0.73.21"
     "@react-native/metro-config": "npm:0.76.1"
     "@react-native/typescript-config": "npm:0.73.1"
@@ -5172,7 +5172,7 @@ __metadata:
     "@types/react-test-renderer": "npm:^18.0.0"
     babel-jest: "npm:^29.6.3"
     eslint: "npm:^8.56.0"
-    prettier: "npm:^3.1.0"
+    prettier: "npm:^3.4.2"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
     react-native-config: "npm:^1.5.3"
@@ -5470,12 +5470,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/eslint-plugin-next@npm:^15.0.4":
-  version: 15.0.4
-  resolution: "@next/eslint-plugin-next@npm:15.0.4"
+"@next/eslint-plugin-next@npm:^15.1.0":
+  version: 15.1.0
+  resolution: "@next/eslint-plugin-next@npm:15.1.0"
   dependencies:
     fast-glob: "npm:3.3.1"
-  checksum: 10c0/ce55e4102712baac47d79f4b6ed8962b472d1a9aafe2ec0fcb7160e818fd2768d806c7a6cd95e122e1c32ac1897bc10cb39f70b6c53f7b36589269177f88f66f
+  checksum: 10c0/d20c396d9c298523e31b4402d126e28d536cfa151bc6a9a9da3e74bddd5770547c76d5fbda59fe4332ffaea3af1e7f489b2358336cb2f921d3561577a0f4cd1a
   languageName: node
   linkType: hard
 
@@ -6524,16 +6524,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/messaging@npm:^21.4.0":
-  version: 21.4.0
-  resolution: "@react-native-firebase/messaging@npm:21.4.0"
+"@react-native-firebase/messaging@npm:^21.6.1":
+  version: 21.6.1
+  resolution: "@react-native-firebase/messaging@npm:21.6.1"
   peerDependencies:
-    "@react-native-firebase/app": 21.4.0
+    "@react-native-firebase/app": 21.6.1
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 10c0/b2a523816d6c03eed2fe3acd7508a33cb1570f13448932e18cb2e7ac7b559b1aec4d1453b6e18c6a0d54e8cf487f9fb749c5280418aa6dad6bac58384cbccf0e
+  checksum: 10c0/d783fb8ef7fcbe1dfb7fdd2efde974e6696c6e4d6fe1ac9ff490534b0d52b7655bdf67df0878bd4ccb353f28bc8dd519418dbfeee9bb0110299f28781f9237a3
   languageName: node
   linkType: hard
 
@@ -19254,10 +19254,10 @@ __metadata:
     "@emotion/styled": "npm:^11.13.0"
     "@faker-js/faker": "npm:^9.0.3"
     "@knocklabs/eslint-config": "workspace:^"
-    "@knocklabs/node": "npm:^0.6.4"
+    "@knocklabs/node": "npm:^0.6.15"
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
-    "@next/eslint-plugin-next": "npm:^15.0.4"
+    "@next/eslint-plugin-next": "npm:^15.1.0"
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^22"
     "@types/react": "npm:^18.3.6"
@@ -21133,12 +21133,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.1.0":
-  version: 3.3.3
-  resolution: "prettier@npm:3.3.3"
+"prettier@npm:^3.4.2":
+  version: 3.4.2
+  resolution: "prettier@npm:3.4.2"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/b85828b08e7505716324e4245549b9205c0cacb25342a030ba8885aba2039a115dbcf75a0b7ca3b37bc9d101ee61fab8113fc69ca3359f2a226f1ecc07ad2e26
+  checksum: 10c0/99e076a26ed0aba4ebc043880d0f08bbb8c59a4c6641cdee6cdadf2205bdd87aa1d7823f50c3aea41e015e99878d37c58d7b5f0e663bba0ef047f94e36b96446
   languageName: node
   linkType: hard
 
@@ -23322,7 +23322,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "slack-kit-example@workspace:examples/slack-kit-example"
   dependencies:
-    "@knocklabs/node": "npm:^0.6.4"
+    "@knocklabs/node": "npm:^0.6.15"
     "@knocklabs/react": "npm:*"
     "@types/node": "npm:^22"
     "@types/react": "npm:^18.3.6"
