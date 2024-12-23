@@ -7,7 +7,8 @@ import { useKnockClient } from "../../core";
 const MS_TEAMS_ADMINCONSENT_URL =
   "https://login.microsoftonline.com/organizations/adminconsent";
 
-const REDIRECT_URI = "https://api.knock.app/providers/ms-teams/authenticate";
+// @ts-expect-error env vars are statically replaced by Vite at build time
+const REDIRECT_URI = import.meta.env.VITE_MS_TEAMS_REDIRECT_URI;
 
 interface UseMSTeamsAuthOutput {
   buildMSTeamsAuthUrl: () => string;
