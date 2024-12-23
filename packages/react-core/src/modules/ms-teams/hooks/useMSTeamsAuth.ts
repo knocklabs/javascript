@@ -7,8 +7,7 @@ import { useKnockClient } from "../../core";
 const MS_TEAMS_ADMINCONSENT_URL =
   "https://login.microsoftonline.com/organizations/adminconsent";
 
-// TODO Implement /authenticate endpoint
-const REDIRECT_URI = "https://api.knock.app/providers/msteams/authenticate";
+const REDIRECT_URI = "https://api.knock.app/providers/ms-teams/authenticate";
 
 interface UseMSTeamsAuthOutput {
   buildMSTeamsAuthUrl: () => string;
@@ -25,7 +24,7 @@ function useMSTeamsAuth(
     const rawParams = {
       state: JSON.stringify({
         redirect_url: redirectUrl,
-        access_token_object: {
+        ms_teams_tenant_object: {
           object_id: tenantId,
           collection: TENANT_OBJECT_COLLECTION,
         },
@@ -34,7 +33,7 @@ function useMSTeamsAuth(
         user_token: knock.userToken,
       }),
       client_id: msTeamsBotId,
-      redirect_uri: encodeURIComponent(REDIRECT_URI),
+      redirect_uri: REDIRECT_URI,
     };
     return `${MS_TEAMS_ADMINCONSENT_URL}?${new URLSearchParams(rawParams)}`;
   }, [
