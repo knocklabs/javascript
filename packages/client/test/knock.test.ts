@@ -104,3 +104,119 @@ describe("it handles authentication correctly", () => {
     expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("client method", () => {
+  test("warns when not authenticated", () => {
+    const knock = new Knock("pk_test_12345");
+    const consoleSpy = vi.spyOn(console, "warn");
+    const client = knock.client();
+    expect(client).toBeDefined();  // client() always returns an ApiClient instance
+    expect(client).toHaveProperty("apiKey", "pk_test_12345");
+    expect(client).toHaveProperty("userToken", undefined);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Knock] You must call authenticate(userId, userToken) first before trying to make a request.\n" +
+      "        Typically you'll see this message when you're creating a feed instance before having called\n" +
+      "        authenticate with a user Id and token. That means we won't know who to issue the request\n" +
+      "        to Knock on behalf of.\n" +
+      "        "
+    );
+  });
+
+  test("returns client instance when authenticated", () => {
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", 60);
+    knock.authenticate("user123", token);
+    const client = knock.client();
+    expect(client).toBeDefined();
+    expect(client).toHaveProperty("apiKey", "pk_test_12345");
+    expect(client).toHaveProperty("userToken", token);
+  });
+});
+
+describe("isAuthenticated method", () => {
+  test("returns true when userId exists", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123");
+    expect(knock.isAuthenticated()).toBe(true);
+  });
+
+  test("returns false when no userId exists", () => {
+    const knock = new Knock("pk_test_12345");
+    expect(knock.isAuthenticated()).toBe(false);
+  });
+
+  test("checks userToken when checkUserToken is true", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123");
+    expect(knock.isAuthenticated(true)).toBe(false);
+  });
+
+  test("returns true when both userId and valid token exist", () => {
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", 60);
+    knock.authenticate("user123", token);
+    expect(knock.isAuthenticated(true)).toBe(true);
+  });
+});
+
+describe("teardown method", () => {
+  const MOCK_NOW = 1000000;
+  const TOKEN_EXPIRY = MOCK_NOW / 1000 + 3600;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.spyOn(Date, 'now').mockImplementation(() => MOCK_NOW);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.resetAllMocks();
+  });
+
+  test("clears token expiration timer", async () => {
+    const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", TOKEN_EXPIRY);
+    const onUserTokenExpiring = vi.fn();
+
+    knock.authenticate("user123", token, {
+      onUserTokenExpiring,
+      timeBeforeExpirationInMs: 1000,
+    });
+
+    vi.advanceTimersByTime(1);
+    knock.teardown();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+  });
+
+  test("disconnects socket if connected", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("user123");
+
+    const client = knock.client();
+    const disconnectSpy = vi.fn();
+    const isConnectedSpy = vi.fn().mockReturnValue(true);
+
+    Object.defineProperty(client, 'socket', {
+      value: {
+        disconnect: disconnectSpy,
+        isConnected: isConnectedSpy
+      },
+      configurable: true
+    });
+
+    knock.teardown();
+    expect(isConnectedSpy).toHaveBeenCalled();
+    expect(disconnectSpy).toHaveBeenCalled();
+  });
+
+  test("maintains authentication state", () => {
+    const knock = new Knock("pk_test_12345");
+    const token = generateMockToken("user123", TOKEN_EXPIRY);
+    knock.authenticate("user123", token);
+
+    expect(knock.isAuthenticated()).toBe(true);
+    knock.teardown();
+    expect(knock.isAuthenticated()).toBe(true);
+  });
+});
