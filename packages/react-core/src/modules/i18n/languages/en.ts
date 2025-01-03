@@ -19,6 +19,7 @@ const en: I18nContent = {
       "Connect to get notifications in Microsoft Teams",
     msTeamsError: "Error",
     msTeamsReconnect: "Reconnect",
+    msTeamsTenantIdNotSet: "Microsoft Teams tenant ID not set.",
     slackConnectChannel: "Connect channel",
     slackChannelId: "Slack channel ID",
     slackConnecting: "Connecting to Slack...",
