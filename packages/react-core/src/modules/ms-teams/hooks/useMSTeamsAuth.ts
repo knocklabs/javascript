@@ -12,6 +12,7 @@ const REDIRECT_URI = import.meta.env.VITE_MS_TEAMS_REDIRECT_URI;
 
 interface UseMSTeamsAuthOutput {
   buildMSTeamsAuthUrl: () => string;
+  disconnectFromMSTeams: () => void;
 }
 
 function useMSTeamsAuth(
@@ -19,7 +20,12 @@ function useMSTeamsAuth(
   redirectUrl?: string,
 ): UseMSTeamsAuthOutput {
   const knock = useKnockClient();
-  const { knockMSTeamsChannelId, tenantId } = useKnockMSTeamsClient();
+  const {
+    setConnectionStatus,
+    knockMSTeamsChannelId,
+    tenantId,
+    setActionLabel,
+  } = useKnockMSTeamsClient();
 
   const buildMSTeamsAuthUrl = useCallback(() => {
     const rawParams = {
@@ -46,7 +52,32 @@ function useMSTeamsAuth(
     msTeamsBotId,
   ]);
 
-  return { buildMSTeamsAuthUrl };
+  const disconnectFromMSTeams = useCallback(async () => {
+    setActionLabel(null);
+    setConnectionStatus("disconnecting");
+    try {
+      const disconnectResult = await knock.msTeams.disconnect({
+        tenantId,
+        knockChannelId: knockMSTeamsChannelId,
+      });
+
+      if (disconnectResult === "ok") {
+        setConnectionStatus("disconnected");
+      } else {
+        setConnectionStatus("error");
+      }
+    } catch (_error) {
+      setConnectionStatus("error");
+    }
+  }, [
+    setConnectionStatus,
+    knock.msTeams,
+    tenantId,
+    knockMSTeamsChannelId,
+    setActionLabel,
+  ]);
+
+  return { buildMSTeamsAuthUrl, disconnectFromMSTeams };
 }
 
 export default useMSTeamsAuth;

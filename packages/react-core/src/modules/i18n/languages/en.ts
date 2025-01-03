@@ -17,6 +17,8 @@ const en: I18nContent = {
     msTeamsConnecting: "Connecting to Microsoft Teams…",
     msTeamsConnectContainerDescription:
       "Connect to get notifications in Microsoft Teams",
+    msTeamsDisconnect: "Disconnect",
+    msTeamsDisconnecting: "Disconnecting from Microsoft Teams…",
     msTeamsError: "Error",
     msTeamsReconnect: "Reconnect",
     msTeamsTenantIdNotSet: "Microsoft Teams tenant ID not set.",
