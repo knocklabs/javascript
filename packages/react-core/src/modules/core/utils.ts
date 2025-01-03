@@ -82,9 +82,15 @@ export function slackProviderKey({
 export function msTeamsProviderKey({
   knockMSTeamsChannelId,
   tenantId,
+  connectionStatus,
+  errorLabel,
 }: {
   knockMSTeamsChannelId: string;
   tenantId: string;
+  connectionStatus: string;
+  errorLabel: string | null;
 }) {
-  return [knockMSTeamsChannelId, tenantId].join("-");
+  return [knockMSTeamsChannelId, tenantId, connectionStatus, errorLabel]
+    .filter((f) => f !== null && f !== undefined)
+    .join("-");
 }
