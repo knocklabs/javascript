@@ -61,11 +61,7 @@ function useMSTeamsAuth(
         knockChannelId: knockMSTeamsChannelId,
       });
 
-      if (disconnectResult === "ok") {
-        setConnectionStatus("disconnected");
-      } else {
-        setConnectionStatus("error");
-      }
+      setConnectionStatus(disconnectResult === "ok" ? "disconnected" : "error");
     } catch (_error) {
       setConnectionStatus("error");
     }
