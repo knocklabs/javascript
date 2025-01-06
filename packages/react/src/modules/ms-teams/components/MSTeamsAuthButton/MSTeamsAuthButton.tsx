@@ -54,9 +54,7 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
           setConnectionStatus("error");
         }
 
-        if (onAuthenticationComplete) {
-          onAuthenticationComplete(event.data);
-        }
+        onAuthenticationComplete?.(event.data);
       } catch (_error) {
         setConnectionStatus("error");
       }
