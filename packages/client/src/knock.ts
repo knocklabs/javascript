@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import MessageClient from "./clients/messages";
-import MSTeamsClient from "./clients/msTeams";
+import MSTeamsClient from "./clients/ms-teams";
 import ObjectClient from "./clients/objects";
 import Preferences from "./clients/preferences";
 import SlackClient from "./clients/slack";
