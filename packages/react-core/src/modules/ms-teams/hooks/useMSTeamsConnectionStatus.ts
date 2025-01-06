@@ -49,9 +49,9 @@ function useMSTeamsConnectionStatus(
           return setConnectionStatus("disconnected");
         }
 
-        // This is a normal response for a tenant that doesn't have an access
-        // token set on it, meaning it's not connected to MSTeams, so we
-        // give it a "disconnected" status instead of an error status.
+        // This is a normal response for a tenant that doesn't have
+        // ms_teams_tenant_id set on it, meaning it's not connected to MS Teams,
+        // so we give it a "disconnected" status instead of an error status.
         if (
           authRes.code === "ERR_BAD_REQUEST" &&
           authRes.response?.data?.message === t("msTeamsTenantIdNotSet")
