@@ -57,7 +57,7 @@
   "devDependencies": {
     "@testing-library/react": "^14.2.0",
     "@types/react": "^18.3.6",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.16.0",
     "@vitejs/plugin-react": "^4.3.4",
     "babel-plugin-react-require": "^4.0.3",
