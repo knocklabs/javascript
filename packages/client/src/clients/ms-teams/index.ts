@@ -30,7 +30,7 @@ class MSTeamsClient {
   async disconnect({ tenantId, knockChannelId }: MSTeamsDisconnectInput) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
-      url: `/v1/providers/ms-teams/${knockChannelId}/disconnect`,
+      url: `/v1/providers/ms-teams/${knockChannelId}/revoke_access`,
       params: {
         ms_teams_tenant_object: {
           object_id: tenantId,
