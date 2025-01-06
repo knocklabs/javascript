@@ -1,13 +1,9 @@
 import { ApiResponse } from "../../api";
+import { AuthCheckInput, RevokeAccessTokenInput } from "../../interfaces";
 import Knock from "../../knock";
 import { TENANT_OBJECT_COLLECTION } from "../objects/constants";
 
-import {
-  AuthCheckInput,
-  GetSlackChannelsInput,
-  GetSlackChannelsResponse,
-  RevokeAccessTokenInput,
-} from "./interfaces";
+import { GetSlackChannelsInput, GetSlackChannelsResponse } from "./interfaces";
 
 class SlackClient {
   private instance: Knock;

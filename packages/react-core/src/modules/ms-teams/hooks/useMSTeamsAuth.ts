@@ -56,12 +56,12 @@ function useMSTeamsAuth(
     setActionLabel(null);
     setConnectionStatus("disconnecting");
     try {
-      const disconnectResult = await knock.msTeams.disconnect({
+      const revokeResult = await knock.msTeams.revokeAccessToken({
         tenantId,
         knockChannelId: knockMSTeamsChannelId,
       });
 
-      setConnectionStatus(disconnectResult === "ok" ? "disconnected" : "error");
+      setConnectionStatus(revokeResult === "ok" ? "disconnected" : "error");
     } catch (_error) {
       setConnectionStatus("error");
     }

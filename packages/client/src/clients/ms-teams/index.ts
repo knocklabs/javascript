@@ -1,8 +1,7 @@
 import { ApiResponse } from "../../api";
+import { AuthCheckInput, RevokeAccessTokenInput } from "../../interfaces";
 import Knock from "../../knock";
 import { TENANT_OBJECT_COLLECTION } from "../objects/constants";
-
-import { MSTeamsAuthCheckInput, MSTeamsDisconnectInput } from "./interfaces";
 
 class MSTeamsClient {
   private instance: Knock;
@@ -11,7 +10,7 @@ class MSTeamsClient {
     this.instance = instance;
   }
 
-  async authCheck({ tenantId, knockChannelId }: MSTeamsAuthCheckInput) {
+  async authCheck({ tenant: tenantId, knockChannelId }: AuthCheckInput) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/providers/ms-teams/${knockChannelId}/auth_check`,
@@ -27,7 +26,10 @@ class MSTeamsClient {
     return this.handleResponse(result);
   }
 
-  async disconnect({ tenantId, knockChannelId }: MSTeamsDisconnectInput) {
+  async revokeAccessToken({
+    tenant: tenantId,
+    knockChannelId,
+  }: RevokeAccessTokenInput) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/providers/ms-teams/${knockChannelId}/revoke_access`,

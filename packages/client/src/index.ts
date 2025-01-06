@@ -10,7 +10,6 @@ export * from "./clients/preferences/interfaces";
 export * from "./clients/slack";
 export * from "./clients/slack/interfaces";
 export * from "./clients/ms-teams";
-export * from "./clients/ms-teams/interfaces";
 export * from "./clients/users";
 export * from "./clients/users/interfaces";
 export * from "./clients/messages";
