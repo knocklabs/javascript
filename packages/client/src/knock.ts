@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import MessageClient from "./clients/messages";
+import MSTeamsClient from "./clients/msTeams";
 import ObjectClient from "./clients/objects";
 import Preferences from "./clients/preferences";
 import SlackClient from "./clients/slack";
@@ -27,6 +28,7 @@ class Knock {
   readonly objects = new ObjectClient(this);
   readonly preferences = new Preferences(this);
   readonly slack = new SlackClient(this);
+  readonly msTeams = new MSTeamsClient(this);
   readonly user = new UserClient(this);
   readonly messages = new MessageClient(this);
 

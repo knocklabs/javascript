@@ -74,3 +74,23 @@ export function slackProviderKey({
     .filter((f) => f !== null && f !== undefined)
     .join("-");
 }
+
+/*
+  Used to build a consistent key for the KnockMSTeamsProvider so that React knows when
+  to trigger a re-render of the context when a key property changes.
+*/
+export function msTeamsProviderKey({
+  knockMSTeamsChannelId,
+  tenantId,
+  connectionStatus,
+  errorLabel,
+}: {
+  knockMSTeamsChannelId: string;
+  tenantId: string;
+  connectionStatus: string;
+  errorLabel: string | null;
+}) {
+  return [knockMSTeamsChannelId, tenantId, connectionStatus, errorLabel]
+    .filter((f) => f !== null && f !== undefined)
+    .join("-");
+}

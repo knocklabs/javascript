@@ -13,6 +13,15 @@ export interface Translations {
   readonly unread: string;
   readonly read: string;
   readonly unseen: string;
+  readonly msTeamsConnect: string;
+  readonly msTeamsConnected: string;
+  readonly msTeamsConnecting: string;
+  readonly msTeamsConnectContainerDescription: string;
+  readonly msTeamsDisconnect: string;
+  readonly msTeamsDisconnecting: string;
+  readonly msTeamsError: string;
+  readonly msTeamsReconnect: string;
+  readonly msTeamsTenantIdNotSet: string;
   readonly slackConnectChannel: string;
   readonly slackChannelId: string;
   readonly slackConnecting: string;

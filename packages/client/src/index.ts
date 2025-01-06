@@ -9,6 +9,8 @@ export * from "./clients/objects/constants";
 export * from "./clients/preferences/interfaces";
 export * from "./clients/slack";
 export * from "./clients/slack/interfaces";
+export * from "./clients/msTeams";
+export * from "./clients/msTeams/interfaces";
 export * from "./clients/users";
 export * from "./clients/users/interfaces";
 export * from "./clients/messages";
