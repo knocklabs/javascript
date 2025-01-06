@@ -57,7 +57,7 @@ function useMSTeamsAuth(
     setConnectionStatus("disconnecting");
     try {
       const revokeResult = await knock.msTeams.revokeAccessToken({
-        tenantId,
+        tenant: tenantId,
         knockChannelId: knockMSTeamsChannelId,
       });
 
