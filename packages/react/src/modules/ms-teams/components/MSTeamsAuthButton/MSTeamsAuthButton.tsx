@@ -7,6 +7,7 @@ import {
 import { FunctionComponent, useEffect } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
+import "../../theme.css";
 import { MSTeamsIcon } from "../MSTeamsIcon";
 
 import "./styles.css";
