@@ -1,5 +1,6 @@
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
+import { TENANT_OBJECT_COLLECTION } from "../objects/constants";
 
 import {
   AuthCheckInput,
@@ -7,8 +8,6 @@ import {
   GetSlackChannelsResponse,
   RevokeAccessTokenInput,
 } from "./interfaces";
-
-const TENANT_COLLECTION = "$tenants";
 
 class SlackClient {
   private instance: Knock;
@@ -24,7 +23,7 @@ class SlackClient {
       params: {
         access_token_object: {
           object_id: tenant,
-          collection: TENANT_COLLECTION,
+          collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
       },
@@ -45,7 +44,7 @@ class SlackClient {
       params: {
         access_token_object: {
           object_id: tenant,
-          collection: TENANT_COLLECTION,
+          collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
         query_options: {
@@ -68,7 +67,7 @@ class SlackClient {
       params: {
         access_token_object: {
           object_id: tenant,
-          collection: TENANT_COLLECTION,
+          collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
       },

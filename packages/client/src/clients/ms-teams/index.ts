@@ -1,9 +1,8 @@
 import { ApiResponse } from "../../api";
 import Knock from "../../knock";
+import { TENANT_OBJECT_COLLECTION } from "../objects/constants";
 
 import { MSTeamsAuthCheckInput, MSTeamsDisconnectInput } from "./interfaces";
-
-const TENANT_COLLECTION = "$tenants";
 
 class MSTeamsClient {
   private instance: Knock;
@@ -19,7 +18,7 @@ class MSTeamsClient {
       params: {
         ms_teams_tenant_object: {
           object_id: tenantId,
-          collection: TENANT_COLLECTION,
+          collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
       },
@@ -35,7 +34,7 @@ class MSTeamsClient {
       params: {
         ms_teams_tenant_object: {
           object_id: tenantId,
-          collection: TENANT_COLLECTION,
+          collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
       },
