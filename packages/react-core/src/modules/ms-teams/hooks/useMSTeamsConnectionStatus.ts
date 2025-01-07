@@ -41,11 +41,11 @@ function useMSTeamsConnectionStatus(
           knockChannelId: knockMSTeamsChannelId,
         });
 
-        if (authRes.connection?.ok) {
+        if (authRes.connection?.ok === true) {
           return setConnectionStatus("connected");
         }
 
-        if (!authRes.connection?.ok) {
+        if (authRes.connection?.ok === false) {
           return setConnectionStatus("disconnected");
         }
 
