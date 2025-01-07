@@ -37,7 +37,7 @@ function useMSTeamsConnectionStatus(
 
       try {
         const authRes = await knock.msTeams.authCheck({
-          tenantId,
+          tenant: tenantId,
           knockChannelId: knockMSTeamsChannelId,
         });
 
