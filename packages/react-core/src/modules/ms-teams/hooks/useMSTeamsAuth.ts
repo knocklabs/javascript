@@ -1,14 +1,13 @@
 import { useKnockMSTeamsClient } from "..";
 import { TENANT_OBJECT_COLLECTION } from "@knocklabs/client";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useKnockClient } from "../../core";
 
 const MS_TEAMS_ADMINCONSENT_URL =
   "https://login.microsoftonline.com/organizations/adminconsent";
 
-// @ts-expect-error env vars are statically replaced by Vite at build time
-const REDIRECT_URI = import.meta.env.VITE_MS_TEAMS_REDIRECT_URI;
+const AUTH_REDIRECT_PATH = "/providers/ms-teams/authenticate";
 
 interface UseMSTeamsAuthOutput {
   buildMSTeamsAuthUrl: () => string;
@@ -27,6 +26,11 @@ function useMSTeamsAuth(
     setActionLabel,
   } = useKnockMSTeamsClient();
 
+  const authRedirectUri = useMemo(
+    () => knock.host + AUTH_REDIRECT_PATH,
+    [knock.host],
+  );
+
   const buildMSTeamsAuthUrl = useCallback(() => {
     const rawParams = {
       state: JSON.stringify({
@@ -40,7 +44,7 @@ function useMSTeamsAuth(
         user_token: knock.userToken,
       }),
       client_id: msTeamsBotId,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: authRedirectUri,
     };
     return `${MS_TEAMS_ADMINCONSENT_URL}?${new URLSearchParams(rawParams)}`;
   }, [
@@ -50,6 +54,7 @@ function useMSTeamsAuth(
     knock.apiKey,
     knock.userToken,
     msTeamsBotId,
+    authRedirectUri,
   ]);
 
   const disconnectFromMSTeams = useCallback(async () => {
