@@ -41,6 +41,12 @@
   line-height: var(--knock-leading-3);
   margin: 0;
 }
+.knock-iam-modal__body > :first-child {
+  margin-top: 0;
+}
+.knock-iam-modal__body > :last-child {
+  margin-bottom: 0;
+}
 .knock-iam-modal__actions {
   display: flex;
   align-items: center;

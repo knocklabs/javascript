@@ -120,10 +120,9 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   return (
     <Dialog.Description
       className={clsx("knock-iam-modal__body", className)}
+      dangerouslySetInnerHTML={{ __html: body }}
       {...props}
-    >
-      {body}
-    </Dialog.Description>
+    />
   );
 };
 Body.displayName = "ModalView.Body";

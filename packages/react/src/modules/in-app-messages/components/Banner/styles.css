@@ -24,6 +24,12 @@
   font-weight: var(--knock-weight-regular);
   line-height: var(--knock-leading-3);
 }
+.knock-iam-banner__body > :first-child {
+  margin-top: 0;
+}
+.knock-iam-banner__body > :last-child {
+  margin-bottom: 0;
+}
 .knock-iam-banner__actions {
   display: flex;
   align-items: center;

@@ -93,9 +93,11 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
   ...props
 }) => {
   return (
-    <div className={clsx("knock-iam-card__body", className)} {...props}>
-      {body}
-    </div>
+    <div
+      className={clsx("knock-iam-card__body", className)}
+      dangerouslySetInnerHTML={{ __html: body }}
+      {...props}
+    />
   );
 };
 Body.displayName = "CardView.Body";
