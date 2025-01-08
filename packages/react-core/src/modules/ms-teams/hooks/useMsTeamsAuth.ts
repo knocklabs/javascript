@@ -1,4 +1,4 @@
-import { useKnockMSTeamsClient } from "..";
+import { useKnockMsTeamsClient } from "..";
 import { TENANT_OBJECT_COLLECTION } from "@knocklabs/client";
 import { useCallback, useMemo } from "react";
 
@@ -9,29 +9,29 @@ const MS_TEAMS_ADMINCONSENT_URL =
 
 const AUTH_REDIRECT_PATH = "/providers/ms-teams/authenticate";
 
-interface UseMSTeamsAuthOutput {
-  buildMSTeamsAuthUrl: () => string;
-  disconnectFromMSTeams: () => void;
+interface UseMsTeamsAuthOutput {
+  buildMsTeamsAuthUrl: () => string;
+  disconnectFromMsTeams: () => void;
 }
 
-function useMSTeamsAuth(
+function useMsTeamsAuth(
   msTeamsBotId: string,
   redirectUrl?: string,
-): UseMSTeamsAuthOutput {
+): UseMsTeamsAuthOutput {
   const knock = useKnockClient();
   const {
     setConnectionStatus,
-    knockMSTeamsChannelId,
+    knockMsTeamsChannelId,
     tenantId,
     setActionLabel,
-  } = useKnockMSTeamsClient();
+  } = useKnockMsTeamsClient();
 
   const authRedirectUri = useMemo(
     () => knock.host + AUTH_REDIRECT_PATH,
     [knock.host],
   );
 
-  const buildMSTeamsAuthUrl = useCallback(() => {
+  const buildMsTeamsAuthUrl = useCallback(() => {
     const rawParams = {
       state: JSON.stringify({
         redirect_url: redirectUrl,
@@ -39,7 +39,7 @@ function useMSTeamsAuth(
           object_id: tenantId,
           collection: TENANT_OBJECT_COLLECTION,
         },
-        channel_id: knockMSTeamsChannelId,
+        channel_id: knockMsTeamsChannelId,
         public_key: knock.apiKey,
         user_token: knock.userToken,
       }),
@@ -50,20 +50,20 @@ function useMSTeamsAuth(
   }, [
     redirectUrl,
     tenantId,
-    knockMSTeamsChannelId,
+    knockMsTeamsChannelId,
     knock.apiKey,
     knock.userToken,
     msTeamsBotId,
     authRedirectUri,
   ]);
 
-  const disconnectFromMSTeams = useCallback(async () => {
+  const disconnectFromMsTeams = useCallback(async () => {
     setActionLabel(null);
     setConnectionStatus("disconnecting");
     try {
       const revokeResult = await knock.msTeams.revokeAccessToken({
         tenant: tenantId,
-        knockChannelId: knockMSTeamsChannelId,
+        knockChannelId: knockMsTeamsChannelId,
       });
 
       setConnectionStatus(revokeResult === "ok" ? "disconnected" : "error");
@@ -74,11 +74,11 @@ function useMSTeamsAuth(
     setConnectionStatus,
     knock.msTeams,
     tenantId,
-    knockMSTeamsChannelId,
+    knockMsTeamsChannelId,
     setActionLabel,
   ]);
 
-  return { buildMSTeamsAuthUrl, disconnectFromMSTeams };
+  return { buildMsTeamsAuthUrl, disconnectFromMsTeams };
 }
 
-export default useMSTeamsAuth;
+export default useMsTeamsAuth;

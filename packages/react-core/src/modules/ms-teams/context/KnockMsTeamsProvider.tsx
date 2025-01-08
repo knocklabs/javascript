@@ -3,11 +3,11 @@ import { PropsWithChildren } from "react";
 
 import { useKnockClient } from "../../core";
 import { msTeamsProviderKey } from "../../core/utils";
-import { useMSTeamsConnectionStatus } from "../hooks";
-import { ConnectionStatus } from "../hooks/useMSTeamsConnectionStatus";
+import { useMsTeamsConnectionStatus } from "../hooks";
+import { ConnectionStatus } from "../hooks/useMsTeamsConnectionStatus";
 
-export interface KnockMSTeamsProviderState {
-  knockMSTeamsChannelId: string;
+export interface KnockMsTeamsProviderState {
+  knockMsTeamsChannelId: string;
   tenantId: string;
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (connectionStatus: ConnectionStatus) => void;
@@ -17,17 +17,17 @@ export interface KnockMSTeamsProviderState {
   setActionLabel: (label: string | null) => void;
 }
 
-const MSTeamsProviderStateContext =
-  React.createContext<KnockMSTeamsProviderState | null>(null);
+const MsTeamsProviderStateContext =
+  React.createContext<KnockMsTeamsProviderState | null>(null);
 
-export interface KnockMSTeamsProviderProps {
-  knockMSTeamsChannelId: string;
+export interface KnockMsTeamsProviderProps {
+  knockMsTeamsChannelId: string;
   tenantId: string;
 }
 
-export const KnockMSTeamsProvider: React.FC<
-  PropsWithChildren<KnockMSTeamsProviderProps>
-> = ({ knockMSTeamsChannelId, tenantId, children }) => {
+export const KnockMsTeamsProvider: React.FC<
+  PropsWithChildren<KnockMsTeamsProviderProps>
+> = ({ knockMsTeamsChannelId, tenantId, children }) => {
   const knock = useKnockClient();
 
   const {
@@ -37,12 +37,12 @@ export const KnockMSTeamsProvider: React.FC<
     setErrorLabel,
     actionLabel,
     setActionLabel,
-  } = useMSTeamsConnectionStatus(knock, knockMSTeamsChannelId, tenantId);
+  } = useMsTeamsConnectionStatus(knock, knockMsTeamsChannelId, tenantId);
 
   return (
-    <MSTeamsProviderStateContext.Provider
+    <MsTeamsProviderStateContext.Provider
       key={msTeamsProviderKey({
-        knockMSTeamsChannelId,
+        knockMsTeamsChannelId,
         tenantId,
         connectionStatus,
         errorLabel,
@@ -54,20 +54,20 @@ export const KnockMSTeamsProvider: React.FC<
         setErrorLabel,
         actionLabel,
         setActionLabel,
-        knockMSTeamsChannelId,
+        knockMsTeamsChannelId,
         tenantId,
       }}
     >
       {children}
-    </MSTeamsProviderStateContext.Provider>
+    </MsTeamsProviderStateContext.Provider>
   );
 };
 
-export const useKnockMSTeamsClient = (): KnockMSTeamsProviderState => {
-  const context = React.useContext(MSTeamsProviderStateContext);
+export const useKnockMsTeamsClient = (): KnockMsTeamsProviderState => {
+  const context = React.useContext(MsTeamsProviderStateContext);
   if (!context) {
     throw new Error(
-      "useKnockMSTeamsClient must be used within a KnockMSTeamsProvider",
+      "useKnockMsTeamsClient must be used within a KnockMsTeamsProvider",
     );
   }
   return context;

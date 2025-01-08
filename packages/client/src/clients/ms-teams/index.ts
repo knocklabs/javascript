@@ -3,7 +3,7 @@ import { AuthCheckInput, RevokeAccessTokenInput } from "../../interfaces";
 import Knock from "../../knock";
 import { TENANT_OBJECT_COLLECTION } from "../objects/constants";
 
-class MSTeamsClient {
+class MsTeamsClient {
   private instance: Knock;
 
   constructor(instance: Knock) {
@@ -57,4 +57,4 @@ class MSTeamsClient {
   }
 }
 
-export default MSTeamsClient;
+export default MsTeamsClient;

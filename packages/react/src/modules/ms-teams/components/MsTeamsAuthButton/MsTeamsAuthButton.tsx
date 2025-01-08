@@ -1,24 +1,24 @@
 import {
   useKnockClient,
-  useKnockMSTeamsClient,
-  useMSTeamsAuth,
+  useKnockMsTeamsClient,
+  useMsTeamsAuth,
   useTranslations,
 } from "@knocklabs/react-core";
 import { FunctionComponent, useEffect } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
 import "../../theme.css";
-import { MSTeamsIcon } from "../MSTeamsIcon";
+import { MsTeamsIcon } from "../MsTeamsIcon";
 
 import "./styles.css";
 
-export interface MSTeamsAuthButtonProps {
+export interface MsTeamsAuthButtonProps {
   msTeamsBotId: string;
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
 }
 
-export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
+export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
   msTeamsBotId,
   redirectUrl,
   onAuthenticationComplete,
@@ -32,9 +32,9 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
     setActionLabel,
     actionLabel,
     errorLabel,
-  } = useKnockMSTeamsClient();
+  } = useKnockMsTeamsClient();
 
-  const { buildMSTeamsAuthUrl, disconnectFromMSTeams } = useMSTeamsAuth(
+  const { buildMsTeamsAuthUrl, disconnectFromMsTeams } = useMsTeamsAuth(
     msTeamsBotId,
     redirectUrl,
   );
@@ -78,7 +78,7 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   ) {
     return (
       <div className="rtk-connect__button rtk-connect__button--loading">
-        <MSTeamsIcon height="16px" width="16px" />
+        <MsTeamsIcon height="16px" width="16px" />
         <span>
           {connectionStatus === "connecting"
             ? t("msTeamsConnecting")
@@ -92,12 +92,12 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   if (connectionStatus === "error") {
     return (
       <button
-        onClick={() => openPopupWindow(buildMSTeamsAuthUrl())}
+        onClick={() => openPopupWindow(buildMsTeamsAuthUrl())}
         className="rtk-connect__button rtk-connect__button--error"
         onMouseEnter={() => setActionLabel(reconnectLabel)}
         onMouseLeave={() => setActionLabel(null)}
       >
-        <MSTeamsIcon height="16px" width="16px" />
+        <MsTeamsIcon height="16px" width="16px" />
         <span className="rtk-connect__button__text--error">
           {actionLabel || errorLabel || t("msTeamsError")}
         </span>
@@ -109,10 +109,10 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   if (connectionStatus === "disconnected") {
     return (
       <button
-        onClick={() => openPopupWindow(buildMSTeamsAuthUrl())}
+        onClick={() => openPopupWindow(buildMsTeamsAuthUrl())}
         className="rtk-connect__button rtk-connect__button--disconnected"
       >
-        <MSTeamsIcon height="16px" width="16px" />
+        <MsTeamsIcon height="16px" width="16px" />
         <span>{t("msTeamsConnect")}</span>
       </button>
     );
@@ -121,12 +121,12 @@ export const MSTeamsAuthButton: FunctionComponent<MSTeamsAuthButtonProps> = ({
   // Connected state
   return (
     <button
-      onClick={disconnectFromMSTeams}
+      onClick={disconnectFromMsTeams}
       className="rtk-connect__button rtk-connect__button--connected"
       onMouseEnter={() => setActionLabel(disconnectLabel)}
       onMouseLeave={() => setActionLabel(null)}
     >
-      <MSTeamsIcon height="16px" width="16px" />
+      <MsTeamsIcon height="16px" width="16px" />
       <span className="rtk-connect__button__text--connected">
         {actionLabel || t("msTeamsConnected")}
       </span>

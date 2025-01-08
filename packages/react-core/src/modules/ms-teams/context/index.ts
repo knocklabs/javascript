@@ -1,1 +1,1 @@
-export * from "./KnockMSTeamsProvider";
+export * from "./KnockMsTeamsProvider";

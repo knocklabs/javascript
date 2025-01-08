@@ -1,11 +1,11 @@
 import { FunctionComponent } from "react";
 
-export interface MSTeamsIconProps {
+export interface MsTeamsIconProps {
   height: string;
   width: string;
 }
 
-export const MSTeamsIcon: FunctionComponent<MSTeamsIconProps> = ({
+export const MsTeamsIcon: FunctionComponent<MsTeamsIconProps> = ({
   height,
   width,
 }) => {

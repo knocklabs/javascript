@@ -10,7 +10,7 @@ export type ConnectionStatus =
   | "error"
   | "disconnecting";
 
-type UseMSTeamsConnectionStatusOutput = {
+type UseMsTeamsConnectionStatusOutput = {
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (status: ConnectionStatus) => void;
   errorLabel: string | null;
@@ -19,11 +19,11 @@ type UseMSTeamsConnectionStatusOutput = {
   setActionLabel: (actionLabel: string | null) => void;
 };
 
-function useMSTeamsConnectionStatus(
+function useMsTeamsConnectionStatus(
   knock: Knock,
-  knockMSTeamsChannelId: string,
+  knockMsTeamsChannelId: string,
   tenantId: string,
-): UseMSTeamsConnectionStatusOutput {
+): UseMsTeamsConnectionStatusOutput {
   const { t } = useTranslations();
 
   const [connectionStatus, setConnectionStatus] =
@@ -38,7 +38,7 @@ function useMSTeamsConnectionStatus(
       try {
         const authRes = await knock.msTeams.authCheck({
           tenant: tenantId,
-          knockChannelId: knockMSTeamsChannelId,
+          knockChannelId: knockMsTeamsChannelId,
         });
 
         if (authRes.connection?.ok === true) {
@@ -67,7 +67,7 @@ function useMSTeamsConnectionStatus(
     };
 
     checkAuthStatus();
-  }, [connectionStatus, tenantId, knockMSTeamsChannelId, knock.msTeams, t]);
+  }, [connectionStatus, tenantId, knockMsTeamsChannelId, knock.msTeams, t]);
 
   return {
     connectionStatus,
@@ -79,4 +79,4 @@ function useMSTeamsConnectionStatus(
   };
 }
 
-export default useMSTeamsConnectionStatus;
+export default useMsTeamsConnectionStatus;

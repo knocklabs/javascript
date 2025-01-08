@@ -1,2 +1,2 @@
-export * from "./components/MSTeamsAuthButton";
-export * from "./components/MSTeamsAuthContainer";
+export * from "./components/MsTeamsAuthButton";
+export * from "./components/MsTeamsAuthContainer";

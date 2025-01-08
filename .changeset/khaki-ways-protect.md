@@ -4,4 +4,4 @@
 "@knocklabs/react": minor
 ---
 
-feat: add MSTeamsAuthButton
+feat: add MsTeamsAuthButton

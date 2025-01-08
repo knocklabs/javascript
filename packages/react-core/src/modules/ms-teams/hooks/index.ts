@@ -1,2 +1,2 @@
-export { default as useMSTeamsConnectionStatus } from "./useMSTeamsConnectionStatus";
-export { default as useMSTeamsAuth } from "./useMSTeamsAuth";
+export { default as useMsTeamsConnectionStatus } from "./useMsTeamsConnectionStatus";
+export { default as useMsTeamsAuth } from "./useMsTeamsAuth";
