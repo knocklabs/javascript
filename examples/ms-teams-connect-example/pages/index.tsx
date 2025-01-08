@@ -1,8 +1,8 @@
 import {
-  KnockMSTeamsProvider,
+  KnockMsTeamsProvider,
   KnockProvider,
-  MSTeamsAuthButton,
-  MSTeamsAuthContainer,
+  MsTeamsAuthButton,
+  MsTeamsAuthContainer,
 } from "@knocklabs/react";
 
 import { useSetToken } from "../hooks";
@@ -43,8 +43,8 @@ export default function Home() {
       host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
       userToken={localStorage.getItem("knock-user-token")!}
     >
-      <KnockMSTeamsProvider
-        knockMSTeamsChannelId={
+      <KnockMsTeamsProvider
+        knockMsTeamsChannelId={
           process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_CHANNEL_ID!
         }
         tenantId={process.env.NEXT_PUBLIC_TENANT_ID!}
@@ -85,7 +85,7 @@ export default function Home() {
                 Button
               </div>
               <div style={{ margin: "10px", padding: "10px" }}>
-                <MSTeamsAuthButton
+                <MsTeamsAuthButton
                   msTeamsBotId={process.env.NEXT_PUBLIC_MS_TEAMS_BOT_ID!}
                   redirectUrl={redirectUrl}
                   onAuthenticationComplete={onAuthComplete}
@@ -104,9 +104,9 @@ export default function Home() {
               Container with button
             </div>
             <div style={{ margin: "10px", padding: "10px" }}>
-              <MSTeamsAuthContainer
+              <MsTeamsAuthContainer
                 actionButton={
-                  <MSTeamsAuthButton
+                  <MsTeamsAuthButton
                     msTeamsBotId={process.env.NEXT_PUBLIC_MS_TEAMS_BOT_ID!}
                     redirectUrl={redirectUrl}
                     onAuthenticationComplete={onAuthComplete}
@@ -116,7 +116,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </KnockMSTeamsProvider>
+      </KnockMsTeamsProvider>
     </KnockProvider>
   );
 }

@@ -1,4 +1,4 @@
-This is a demo application to showcase Knock’s Microsoft Teams connector components, `MSTeamsAuthButton` and `MSTeamsAuthContainer`.
+This is a demo application to showcase Knock’s Microsoft Teams connector components, `MsTeamsAuthButton` and `MsTeamsAuthContainer`.
 
 You'll also see how to create a user token with the proper access grants in `/set_token.ts`.
 
