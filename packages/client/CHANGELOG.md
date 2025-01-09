@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.17
+
+### Patch Changes
+
+- 26db496: fix: ensure feed can render with empty/missing userId values
+- 988aaf9: fix: engagement_status in BulkUpdateMessagesInChannelProperties type
+
 ## 0.10.16
 
 ### Patch Changes

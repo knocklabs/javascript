@@ -1,5 +1,12 @@
 # nextjs-example
 
+## 1.0.41
+
+### Patch Changes
+
+- 26db496: fix: ensure feed can render with empty/missing userId values
+  - @knocklabs/react@0.2.33
+
 ## 1.0.40
 
 ### Patch Changes
