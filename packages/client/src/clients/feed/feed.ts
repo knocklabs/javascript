@@ -124,6 +124,14 @@ class Feed {
 
     this.hasSubscribedToRealTimeUpdates = true;
 
+    // If the user is not authenticated, then do nothing
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Feed] User is not authenticated, skipping listening for updates",
+      );
+      return;
+    }
+
     const maybeSocket = this.knock.client().socket;
 
     // Connect the socket only if we don't already have a connection
@@ -318,11 +326,9 @@ class Feed {
     const shouldOptimisticallyRemoveItems =
       this.defaultOptions.archived === "exclude";
 
-    const normalizedItems = Array.isArray(itemOrItems)
-      ? itemOrItems
-      : [itemOrItems];
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
 
-    const itemIds: string[] = normalizedItems.map((item) => item.id);
+    const itemIds: string[] = items.map((item) => item.id);
 
     /*
       In the code here we want to optimistically update counts and items
@@ -354,15 +360,17 @@ class Feed {
     if (shouldOptimisticallyRemoveItems) {
       // If any of the items are unseen or unread, then capture as we'll want to decrement
       // the counts for these in the metadata we have
-      const unseenCount = normalizedItems.filter((i) => !i.seen_at).length;
-      const unreadCount = normalizedItems.filter((i) => !i.read_at).length;
+      const unseenCount = items.filter((i) => !i.seen_at).length;
+      const unreadCount = items.filter((i) => !i.read_at).length;
 
       // Build the new metadata
       const updatedMetadata = {
         ...state.metadata,
-        total_count: state.metadata.total_count - normalizedItems.length,
-        unseen_count: state.metadata.unseen_count - unseenCount,
-        unread_count: state.metadata.unread_count - unreadCount,
+        // Ensure that the counts don't ever go below 0 on archiving where the client state
+        // gets out of sync with the server state
+        total_count: Math.max(0, state.metadata.total_count - items.length),
+        unseen_count: Math.max(0, state.metadata.unseen_count - unseenCount),
+        unread_count: Math.max(0, state.metadata.unread_count - unreadCount),
       };
 
       // Remove the archiving entries
@@ -464,8 +472,15 @@ class Feed {
   async fetch(options: FetchFeedOptions = {}) {
     const { networkStatus, ...state } = this.store.getState();
 
+    // If the user is not authenticated, then do nothing
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] User is not authenticated, skipping fetch");
+      return;
+    }
+
     // If there's an existing request in flight, then do nothing
     if (isRequestInFlight(networkStatus)) {
+      this.knock.log("[Feed] Request is in flight, skipping fetch");
       return;
     }
 
@@ -750,7 +765,7 @@ class Feed {
 
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
-    if (this.hasSubscribedToRealTimeUpdates) {
+    if (this.hasSubscribedToRealTimeUpdates && this.knock.isAuthenticated()) {
       if (!maybeSocket.isConnected()) maybeSocket.connect();
       this.channel.join();
     }
