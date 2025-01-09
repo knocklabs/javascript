@@ -1,13 +1,4 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Icon,
-  Link,
-  Select,
-  Spinner,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Flex, Heading, Icon, Link, Select, Text } from "@chakra-ui/react";
 import {
   KnockFeedProvider,
   KnockProvider,
@@ -32,7 +23,7 @@ const TenantLabels = {
 };
 
 export default function Home() {
-  const { userId, isLoading, userToken } = useIdentify();
+  const { userId, userToken } = useIdentify();
   const [tenant, setTenant] = useState(Tenants.TeamA);
 
   const tokenRefreshHandler = useCallback(async () => {
@@ -42,19 +33,6 @@ export default function Home() {
 
     return json.userToken;
   }, [userId]);
-
-  if (isLoading) {
-    return (
-      <Flex
-        alignItems="center"
-        justifyContent="center"
-        width="100vw"
-        height="100vh"
-      >
-        <Spinner />
-      </Flex>
-    );
-  }
 
   return (
     <KnockProvider

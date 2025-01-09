@@ -21,7 +21,7 @@ export default async function handler(
   const { message, showToast, userId, tenant, templateType } = req.body;
 
   try {
-    await knockClient.notify(KNOCK_WORKFLOW, {
+    const response = await knockClient.workflows.trigger(KNOCK_WORKFLOW, {
       recipients: [userId],
       actor: userId,
       tenant,
@@ -32,7 +32,7 @@ export default async function handler(
       },
     });
 
-    return res.status(200).json({ error: null });
+    return res.status(200).json({ error: null, response });
   } catch (error) {
     return res.status(500).json({
       error: (error as Error).message || (error as Error).toString(),
