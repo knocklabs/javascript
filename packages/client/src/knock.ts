@@ -48,16 +48,6 @@ class Knock {
   }
 
   client() {
-    if (!this.userId) {
-      console.warn(
-        `[Knock] You must call authenticate(userId, userToken) first before trying to make a request.
-        Typically you'll see this message when you're creating a feed instance before having called
-        authenticate with a user Id and token. That means we won't know who to issue the request
-        to Knock on behalf of.
-        `,
-      );
-    }
-
     // Initiate a new API client if we don't have one yet
     if (!this.apiClient) {
       this.apiClient = this.createApiClient();
