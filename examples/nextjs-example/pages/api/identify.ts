@@ -26,14 +26,19 @@ export default async function handler(
       name: name || faker.person.fullName(),
     });
 
-    const userToken = await Knock.signUserToken(userId, {
-      expiresInSeconds: process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS
-        ? Number(process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS)
-        : 3600,
-    });
+    let userToken = undefined;
+
+    if (process.env.KNOCK_SIGNING_KEY) {
+      userToken = await Knock.signUserToken(userId, {
+        expiresInSeconds: process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS
+          ? Number(process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS)
+          : 3600,
+      });
+    }
 
     return res.status(200).json({ error: null, user: knockUser, userToken });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({
       error: (error as Error).message || (error as Error).toString(),
       user: null,
