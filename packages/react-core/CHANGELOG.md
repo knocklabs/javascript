@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+### Minor Changes
+
+- 013ad8d: feat: add MsTeamsAuthButton
+
+### Patch Changes
+
+- Updated dependencies [013ad8d]
+  - @knocklabs/client@0.11.0
+
 ## 0.2.29
 
 ### Patch Changes
