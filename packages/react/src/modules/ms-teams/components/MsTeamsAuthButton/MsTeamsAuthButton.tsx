@@ -1,30 +1,27 @@
 import {
   useKnockClient,
-  useKnockSlackClient,
-  useSlackAuth,
+  useKnockMsTeamsClient,
+  useMsTeamsAuth,
   useTranslations,
 } from "@knocklabs/react-core";
-import { FunctionComponent } from "react";
-import { useEffect } from "react";
+import { FunctionComponent, useEffect } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
 import "../../theme.css";
-import { SlackIcon } from "../SlackIcon";
+import { MsTeamsIcon } from "../MsTeamsIcon";
 
 import "./styles.css";
 
-export interface SlackAuthButtonProps {
-  slackClientId: string;
+export interface MsTeamsAuthButtonProps {
+  msTeamsBotId: string;
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
-  additionalScopes?: string[];
 }
 
-export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
-  slackClientId,
+export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
+  msTeamsBotId,
   redirectUrl,
   onAuthenticationComplete,
-  additionalScopes,
 }) => {
   const { t } = useTranslations();
   const knock = useKnockClient();
@@ -35,12 +32,11 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     setActionLabel,
     actionLabel,
     errorLabel,
-  } = useKnockSlackClient();
+  } = useKnockMsTeamsClient();
 
-  const { buildSlackAuthUrl, disconnectFromSlack } = useSlackAuth(
-    slackClientId,
+  const { buildMsTeamsAuthUrl, disconnectFromMsTeams } = useMsTeamsAuth(
+    msTeamsBotId,
     redirectUrl,
-    additionalScopes,
   );
 
   useEffect(() => {
@@ -58,9 +54,7 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
           setConnectionStatus("error");
         }
 
-        if (onAuthenticationComplete) {
-          onAuthenticationComplete(event.data);
-        }
+        onAuthenticationComplete?.(event.data);
       } catch (_error) {
         setConnectionStatus("error");
       }
@@ -74,8 +68,8 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     };
   }, [knock.host, onAuthenticationComplete, setConnectionStatus]);
 
-  const disconnectLabel = t("slackDisconnect") || null;
-  const reconnectLabel = t("slackReconnect") || null;
+  const disconnectLabel = t("msTeamsDisconnect") || null;
+  const reconnectLabel = t("msTeamsReconnect") || null;
 
   // Loading states
   if (
@@ -83,12 +77,12 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     connectionStatus === "disconnecting"
   ) {
     return (
-      <div className="rsk-connect__button rsk-connect__button--loading">
-        <SlackIcon height="16px" width="16px" />
+      <div className="rtk-connect__button rtk-connect__button--loading">
+        <MsTeamsIcon height="16px" width="16px" />
         <span>
           {connectionStatus === "connecting"
-            ? t("slackConnecting")
-            : t("slackDisconnecting")}
+            ? t("msTeamsConnecting")
+            : t("msTeamsDisconnecting")}
         </span>
       </div>
     );
@@ -98,14 +92,14 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   if (connectionStatus === "error") {
     return (
       <button
-        onClick={() => openPopupWindow(buildSlackAuthUrl())}
-        className="rsk-connect__button rsk-connect__button--error"
+        onClick={() => openPopupWindow(buildMsTeamsAuthUrl())}
+        className="rtk-connect__button rtk-connect__button--error"
         onMouseEnter={() => setActionLabel(reconnectLabel)}
         onMouseLeave={() => setActionLabel(null)}
       >
-        <SlackIcon height="16px" width="16px" />
-        <span className="rsk-connect__button__text--error">
-          {actionLabel || errorLabel || t("slackError")}
+        <MsTeamsIcon height="16px" width="16px" />
+        <span className="rtk-connect__button__text--error">
+          {actionLabel || errorLabel || t("msTeamsError")}
         </span>
       </button>
     );
@@ -115,11 +109,11 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   if (connectionStatus === "disconnected") {
     return (
       <button
-        onClick={() => openPopupWindow(buildSlackAuthUrl())}
-        className="rsk-connect__button rsk-connect__button--disconnected"
+        onClick={() => openPopupWindow(buildMsTeamsAuthUrl())}
+        className="rtk-connect__button rtk-connect__button--disconnected"
       >
-        <SlackIcon height="16px" width="16px" />
-        <span>{t("slackConnect")}</span>
+        <MsTeamsIcon height="16px" width="16px" />
+        <span>{t("msTeamsConnect")}</span>
       </button>
     );
   }
@@ -127,14 +121,14 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   // Connected state
   return (
     <button
-      onClick={disconnectFromSlack}
-      className="rsk-connect__button rsk-connect__button--connected"
+      onClick={disconnectFromMsTeams}
+      className="rtk-connect__button rtk-connect__button--connected"
       onMouseEnter={() => setActionLabel(disconnectLabel)}
       onMouseLeave={() => setActionLabel(null)}
     >
-      <SlackIcon height="16px" width="16px" />
-      <span className="rsk-connect__button__text--connected">
-        {actionLabel || t("slackConnected")}
+      <MsTeamsIcon height="16px" width="16px" />
+      <span className="rtk-connect__button__text--connected">
+        {actionLabel || t("msTeamsConnected")}
       </span>
     </button>
   );

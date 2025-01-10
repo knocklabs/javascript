@@ -66,3 +66,13 @@ export interface BulkOperation {
   inserted_at: string;
   updated_at: string;
 }
+
+export type AuthCheckInput = {
+  tenant: string;
+  knockChannelId: string;
+};
+
+export type RevokeAccessTokenInput = {
+  tenant: string;
+  knockChannelId: string;
+};

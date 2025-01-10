@@ -17,16 +17,6 @@ export type GetSlackChannelsInput = {
   };
 };
 
-export type AuthCheckInput = {
-  tenant: string;
-  knockChannelId: string;
-};
-
-export type RevokeAccessTokenInput = {
-  tenant: string;
-  knockChannelId: string;
-};
-
 export type GetSlackChannelsResponse = {
   slack_channels: SlackChannel[];
   next_cursor: string | null;

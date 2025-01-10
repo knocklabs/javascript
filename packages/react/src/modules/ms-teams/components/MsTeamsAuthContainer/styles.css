@@ -1,0 +1,28 @@
+.rtk-auth {
+	background: var(--rtk-color-white);
+	border: 1px solid var(--rtk-color-gray-100);
+	border-radius: var(--rtk-border-radius-lg);
+	font-family: var(--rtk-font-family-sanserif);
+	font-size: var(--rtk-font-size-sm);
+	font-weight: var(--rtk-font-weight-normal);
+	padding: var(--rtk-spacing-5);
+	}
+
+.rtk-auth__header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.rtk-auth__title {
+	color: rgba(26, 31, 54, 1);
+	font-size: var(--rtk-font-size-md);
+	line-height: var(--rtk-spacing-5);
+	margin-top: var(--rtk-spacing-4);
+}
+
+.rtk-auth__description {
+	color: rgba(81, 86, 105, 1);
+	font-size: var(--rtk-font-size-sm);
+	line-height: var(--rtk-spacing-5);
+}
