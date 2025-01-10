@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0
+
+### Minor Changes
+
+- 013ad8d: feat: add MsTeamsAuthButton
+
 ## 0.10.17
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # slack-connect-example
 
+## 0.2.3
+
+### Patch Changes
+
+- 49d6216: Add TeamsKit example app
+- Updated dependencies [013ad8d]
+  - @knocklabs/react@0.3.0
+
 ## 0.2.2
 
 ### Patch Changes
