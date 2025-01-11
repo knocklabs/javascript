@@ -10,12 +10,11 @@ type Options = {
 };
 
 export default function useComponentVisible(
+  ref: React.RefObject<HTMLElement | null>,
   isVisible: boolean,
   onClose: (event: Event) => void,
   options: Options,
 ) {
-  const ref = useRef<HTMLDivElement>(null);
-
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       onClose(event);
