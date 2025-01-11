@@ -1,8 +1,7 @@
+import { Placement, offset, useFloating } from "@floating-ui/react";
 import { Feed, FeedStoreState } from "@knocklabs/client";
 import { useKnockFeed } from "@knocklabs/react-core";
-import { Placement } from "@popperjs/core";
 import React, { RefObject, useEffect } from "react";
-import { usePopper } from "react-popper";
 
 import useComponentVisible from "../../../core/hooks/useComponentVisible";
 import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
@@ -43,26 +42,23 @@ export const NotificationFeedPopover: React.FC<
   const { colorMode, feedClient, useFeedStore } = useKnockFeed();
   const store = useFeedStore();
 
-  const { ref: popperRef } = useComponentVisible(isVisible, onClose, {
-    closeOnClickOutside,
+  const { refs, floatingStyles } = useFloating({
+    strategy: "fixed",
+    placement,
+    middleware: [
+      offset({
+        mainAxis: 8,
+        crossAxis: 0,
+      }),
+    ],
+    elements: {
+      reference: buttonRef.current,
+    },
   });
 
-  const { styles, attributes } = usePopper(
-    buttonRef.current,
-    popperRef.current,
-    {
-      strategy: "fixed",
-      placement,
-      modifiers: [
-        {
-          name: "offset",
-          options: {
-            offset: [0, 8],
-          },
-        },
-      ],
-    },
-  );
+  useComponentVisible(refs.floating, isVisible, onClose, {
+    closeOnClickOutside,
+  });
 
   useEffect(() => {
     // Whenever the feed is opened, we want to invoke the `onOpen` callback
@@ -76,12 +72,11 @@ export const NotificationFeedPopover: React.FC<
     <div
       className={`rnf-notification-feed-popover rnf-notification-feed-popover--${colorMode}`}
       style={{
-        ...styles.popper,
+        ...floatingStyles,
         visibility: isVisible ? "visible" : "hidden",
         opacity: isVisible ? 1 : 0,
       }}
-      ref={popperRef}
-      {...attributes.popper}
+      ref={refs.setFloating}
       role="dialog"
       tabIndex={-1}
     >
