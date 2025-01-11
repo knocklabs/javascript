@@ -3,6 +3,7 @@ import { useKnockFeed } from "@knocklabs/react-core";
 import { Placement } from "@popperjs/core";
 import React, { RefObject, useEffect } from "react";
 import { usePopper } from "react-popper";
+// import { useFloating, offset } from '@floating-ui/react';
 
 import useComponentVisible from "../../../core/hooks/useComponentVisible";
 import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
@@ -63,6 +64,18 @@ export const NotificationFeedPopover: React.FC<
       ],
     },
   );
+
+  // console.log(styles, attributes)
+  // const { refs, floatingStyles, update } = useFloating({
+  //   strategy: 'fixed',
+  //   placement,
+  //   middleware: [
+  //     offset({
+  //       mainAxis: 8,
+  //       crossAxis: 0,
+  //     }),
+  //   ],
+  // });
 
   useEffect(() => {
     // Whenever the feed is opened, we want to invoke the `onOpen` callback
