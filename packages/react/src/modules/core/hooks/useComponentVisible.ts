@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 function contains(parent: HTMLElement | null, child: HTMLElement) {
   if (!parent) return false;
