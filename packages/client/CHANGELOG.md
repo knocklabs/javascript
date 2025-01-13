@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.1
+
+### Patch Changes
+
+- b9f6712: fix: types for userId should handle undefined and null
+
 ## 0.11.0
 
 ### Minor Changes
