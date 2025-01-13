@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+
+### Patch Changes
+
+- b9f6712: fix: types for userId should handle undefined and null
+- Updated dependencies [b9f6712]
+  - @knocklabs/client@0.11.1
+
 ## 0.3.0
 
 ### Minor Changes
