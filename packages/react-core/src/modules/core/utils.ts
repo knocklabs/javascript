@@ -1,4 +1,4 @@
-import { FeedClientOptions } from "@knocklabs/client";
+import Knock, { FeedClientOptions } from "@knocklabs/client";
 import { intlFormatDistance, parseISO } from "date-fns";
 import { ReactNode } from "react";
 
@@ -39,7 +39,7 @@ export function renderNodeOrFallback(node: ReactNode, fallback: ReactNode) {
   to trigger a re-render of the context when a key property changes.
 */
 export function feedProviderKey(
-  userId: string | undefined,
+  userId: Knock["userId"],
   feedId: string,
   options: FeedClientOptions = {},
 ) {
