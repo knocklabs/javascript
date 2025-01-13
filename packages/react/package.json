@@ -81,6 +81,6 @@
     "vite": "^5.0.0",
     "vite-plugin-dts": "^4.3.0",
     "vite-plugin-no-bundle": "^4.0.0",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.8"
   }
 }
