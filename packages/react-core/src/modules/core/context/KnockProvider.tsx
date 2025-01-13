@@ -16,14 +16,12 @@ export interface KnockProviderProps {
   apiKey: string;
   host?: string;
   // Authentication props
-  userId: string;
-  userToken?: string;
+  userId: Knock["userId"];
+  userToken?: Knock["userToken"];
   onUserTokenExpiring?: AuthenticateOptions["onUserTokenExpiring"];
   timeBeforeExpirationInMs?: AuthenticateOptions["timeBeforeExpirationInMs"];
-
   // i18n translations
   i18n?: I18nContent;
-
   logLevel?: LogLevel;
 }
 

@@ -5,8 +5,8 @@ import { useStableOptions } from "../../core";
 
 function authenticateWithOptions(
   knock: Knock,
-  userId: string,
-  userToken?: string,
+  userId: Knock["userId"],
+  userToken?: Knock["userToken"],
   options: AuthenticateOptions = {},
 ) {
   knock.authenticate(userId, userToken, {
@@ -20,8 +20,8 @@ export type AuthenticatedKnockClientOptions = KnockOptions &
 
 function useAuthenticatedKnockClient(
   apiKey: string,
-  userId: string,
-  userToken?: string,
+  userId: Knock["userId"],
+  userToken?: Knock["userToken"],
   options: AuthenticatedKnockClientOptions = {},
 ) {
   const knockRef = React.useRef<Knock | undefined>();

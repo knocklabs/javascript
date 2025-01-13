@@ -19,7 +19,7 @@ const DEFAULT_HOST = "https://api.knock.app";
 class Knock {
   public host: string;
   private apiClient: ApiClient | null = null;
-  public userId: string | undefined;
+  public userId: string | undefined | null;
   public userToken?: string;
   public logLevel?: LogLevel;
   private tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
@@ -61,8 +61,8 @@ class Knock {
     the userToken must be specified.
   */
   authenticate(
-    userId: string,
-    userToken?: string,
+    userId: Knock["userId"],
+    userToken?: Knock["userToken"],
     options?: AuthenticateOptions,
   ) {
     let reinitializeApi = false;
