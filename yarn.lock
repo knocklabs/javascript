@@ -5969,7 +5969,7 @@ __metadata:
     prettier: "npm:^3.4.2"
     rimraf: "npm:^6.0.1"
     rollup: "npm:^4.27.4"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
     vite: "npm:^5.0.0"
     vitest: "npm:^2.1.8"
     zustand: "npm:^3.7.2"
@@ -5987,7 +5987,7 @@ __metadata:
     eslint-config-prettier: "npm:^9.0.0"
     eslint-config-turbo: "npm:^2.3.3"
     eslint-plugin-only-warn: "npm:^1.1.0"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -6004,7 +6004,7 @@ __metadata:
     expo-status-bar: "npm:~2.0.0"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -6033,7 +6033,7 @@ __metadata:
     react-native-render-html: "npm:^6.3.4"
     react-native-svg: "npm:^15.10.1"
     rimraf: "npm:^6.0.1"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^4.3.0"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -6099,7 +6099,7 @@ __metadata:
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
     swr: "npm:^2.2.5"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^4.3.0"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -6133,7 +6133,7 @@ __metadata:
     react-native-config: "npm:^1.5.3"
     react-native-svg: "npm:^15.10.1"
     react-test-renderer: "npm:19.0.0"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -6157,7 +6157,7 @@ __metadata:
     react-native-render-html: "npm:^6.3.4"
     react-native-svg: "npm:^15.10.1"
     rimraf: "npm:^6.0.1"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^4.3.0"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -6195,7 +6195,7 @@ __metadata:
     react-popper-tooltip: "npm:^4.4.2"
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
     vite: "npm:^5.0.0"
     vite-plugin-dts: "npm:^4.3.0"
     vite-plugin-no-bundle: "npm:^4.0.0"
@@ -6211,7 +6211,7 @@ __metadata:
   resolution: "@knocklabs/types@workspace:packages/types"
   dependencies:
     eslint: "npm:^8.56.0"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -19978,7 +19978,7 @@ __metadata:
     next: "npm:15.0.4"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -20168,7 +20168,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-icons: "npm:^5.4.0"
     swr: "npm:^2.2.5"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
     uuid: "npm:^11.0.4"
   languageName: unknown
   linkType: soft
@@ -24315,7 +24315,7 @@ __metadata:
     next: "npm:15.0.4"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -24337,7 +24337,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     tailwindcss: "npm:^3.4.17"
-    typescript: "npm:^5.6.3"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -25946,13 +25946,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.6.3":
-  version: 5.6.3
-  resolution: "typescript@npm:5.6.3"
+"typescript@npm:^5.7.3":
+  version: 5.7.3
+  resolution: "typescript@npm:5.7.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/44f61d3fb15c35359bc60399cb8127c30bae554cd555b8e2b46d68fa79d680354b83320ad419ff1b81a0bdf324197b29affe6cc28988cd6a74d4ac60c94f9799
+  checksum: 10c0/b7580d716cf1824736cc6e628ab4cd8b51877408ba2be0869d2866da35ef8366dd6ae9eb9d0851470a39be17cbd61df1126f9e211d8799d764ea7431d5435afa
   languageName: node
   linkType: hard
 
@@ -25966,13 +25966,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.6.3#optional!builtin<compat/typescript>":
-  version: 5.6.3
-  resolution: "typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=d69c25"
+"typescript@patch:typescript@npm%3A^5.7.3#optional!builtin<compat/typescript>":
+  version: 5.7.3
+  resolution: "typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=d69c25"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/ac8307bb06bbfd08ae7137da740769b7d8c3ee5943188743bb622c621f8ad61d244767480f90fbd840277fbf152d8932aa20c33f867dea1bb5e79b187ca1a92f
+  checksum: 10c0/3b56d6afa03d9f6172d0b9cdb10e6b1efc9abc1608efd7a3d2f38773d5d8cfb9bbc68dfb72f0a7de5e8db04fc847f4e4baeddcd5ad9c9feda072234f0d788896
   languageName: node
   linkType: hard
 
