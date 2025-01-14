@@ -45,12 +45,12 @@ function useSlackChannels({
   queryOptions,
 }: UseSlackChannelsProps): UseSlackChannelOutput {
   const knock = useKnockClient();
-  const { knockSlackChannelId, tenant, connectionStatus } =
+  const { knockSlackChannelId, tenantId, connectionStatus } =
     useKnockSlackClient();
 
   const fetchChannels = (queryKey: QueryKey) => {
     return knock.slack.getChannels({
-      tenant,
+      tenant: tenantId,
       knockChannelId: knockSlackChannelId,
       queryOptions: {
         ...queryOptions,
