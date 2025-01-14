@@ -8,16 +8,11 @@ import { ConnectionStatus } from "../hooks/useSlackConnectionStatus";
 
 export interface KnockSlackProviderState {
   knockSlackChannelId: string;
+  tenantId: string;
   /**
-   * @deprecated Use tenantId instead. This field will be removed in a future major release.
-   * @internal This is kept as 'tenant' for backwards compatibility with existing consumers
+   * @deprecated Use `tenantId` instead. This field will be removed in a future release.
    */
   tenant: string;
-  /**
-   * The ID of the tenant to use for Slack integration.
-   * This is the preferred field over the deprecated 'tenant' field.
-   */
-  tenantId: string;
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (connectionStatus: ConnectionStatus) => void;
   errorLabel: string | null;
@@ -33,16 +28,12 @@ export type KnockSlackProviderProps =
   | {
       knockSlackChannelId: string;
       /**
-       * @deprecated Use tenantId instead. This prop will be removed in a future major release.
+       * @deprecated Use `tenantId` instead. This field will be removed in a future release.
        */
       tenant: string;
     }
   | {
       knockSlackChannelId: string;
-      /**
-       * The ID of the tenant to use for Slack integration.
-       * This replaces the deprecated 'tenant' prop for consistency with other providers.
-       */
       tenantId: string;
     };
 
@@ -50,7 +41,6 @@ export const KnockSlackProvider: React.FC<
   PropsWithChildren<KnockSlackProviderProps>
 > = (props) => {
   const { knockSlackChannelId, children } = props;
-  // Use type guard to determine which prop is provided
   const tenantId = "tenantId" in props ? props.tenantId : props.tenant;
 
   const knock = useKnockClient();
