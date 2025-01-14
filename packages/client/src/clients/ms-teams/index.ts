@@ -47,7 +47,6 @@ class MsTeamsClient {
           $select: queryOptions.$select,
           $top: queryOptions.$top,
           $skiptoken: queryOptions.$skiptoken,
-          $count: queryOptions.$count,
         },
       },
     });

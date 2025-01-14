@@ -4,9 +4,8 @@ export type GetMsTeamsTeamsInput = {
   queryOptions?: {
     $filter?: string;
     $select?: string;
-    $top?: string;
+    $top?: number;
     $skiptoken?: string;
-    $count?: string;
   };
 };
 
