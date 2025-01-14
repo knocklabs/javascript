@@ -15,6 +15,21 @@ export type GetMsTeamsTeamsResponse = {
   next_link: string | null;
 };
 
+export type GetMsTeamsChannelsResponse = {
+  ms_teams_channels: MsTeamsChannel[];
+};
+
 export type MsTeamsTeam = {
-  id: string;
+  id?: string;
+  displayName?: string;
+  description?: string;
+};
+
+export type MsTeamsChannel = {
+  id?: string;
+  displayName?: string;
+  description?: string;
+  membershipType?: string;
+  isArchived?: boolean;
+  createdDateTime?: string;
 };
