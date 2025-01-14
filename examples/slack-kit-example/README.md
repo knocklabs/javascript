@@ -165,7 +165,7 @@ export default function Providers({
         */}
         <KnockSlackProvider
           knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
-          tenant={tenant}
+          tenantId={tenant}
         >
           {children}
         </KnockSlackProvider>
