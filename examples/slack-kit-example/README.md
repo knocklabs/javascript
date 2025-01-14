@@ -70,7 +70,7 @@ You should already have a value for `workflowKey` from a previous step, and you 
 
 #### Create a tenant
 
-In SlackKit, [tenants](https://docs.knock.app/concepts/tenants) are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include its ID as the value for the `tenantId` property (or the deprecated `tenant` property) in the `getAppDetails` function. Note that `tenantId` is the preferred property name for consistency with other providers. You can also use this cURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
+In SlackKit, [tenants](https://docs.knock.app/concepts/tenants) are used to store the access token for an organization's Slack workspace. You can create a new tenant from the dashboard and include it's ID as the value for the `tenant` property in the `getAppDetails` function. You can also use this cURL command to create a tenant by replacing the values for `tenant-id`, `KNOCK_API_KEY`, and `tenant-name`:
 
 ```
 curl --location --request PUT 'https://api.knock.app/v1/tenants/<tenant-id>' \
@@ -165,10 +165,7 @@ export default function Providers({
         */}
         <KnockSlackProvider
           knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
-          // Using tenantId prop (preferred) instead of the deprecated tenant prop
-          tenantId={tenant}
-          // The tenant prop is deprecated and will be removed in a future major release
-          // tenant={tenant}
+          tenant={tenant}
         >
           {children}
         </KnockSlackProvider>
