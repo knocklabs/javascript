@@ -21,7 +21,7 @@ export type GetMsTeamsChannelsInput = {
 
 export type GetMsTeamsTeamsResponse = {
   ms_teams_teams: MsTeamsTeam[];
-  next_link: string | null;
+  skip_token: string | null;
 };
 
 export type GetMsTeamsChannelsResponse = {
