@@ -1,5 +1,5 @@
 export type GetMsTeamsTeamsInput = {
-  tenantId: string;
+  tenant: string;
   knockChannelId: string;
   queryOptions?: {
     $filter?: string;
@@ -10,7 +10,7 @@ export type GetMsTeamsTeamsInput = {
 };
 
 export type GetMsTeamsChannelsInput = {
-  tenantId: string;
+  tenant: string;
   knockChannelId: string;
   teamId: string;
   queryOptions?: {

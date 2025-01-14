@@ -36,7 +36,7 @@ class MsTeamsClient {
   async getTeams(
     input: GetMsTeamsTeamsInput,
   ): Promise<GetMsTeamsTeamsResponse> {
-    const { knockChannelId, tenantId } = input;
+    const { knockChannelId, tenant: tenantId } = input;
     const queryOptions = input.queryOptions || {};
 
     const result = await this.instance.client().makeRequest({
@@ -62,7 +62,7 @@ class MsTeamsClient {
   async getChannels(
     input: GetMsTeamsChannelsInput,
   ): Promise<GetMsTeamsChannelsResponse> {
-    const { knockChannelId, tenantId } = input;
+    const { knockChannelId, tenant: tenantId } = input;
     const queryOptions = input.queryOptions || {};
 
     const result = await this.instance.client().makeRequest({
