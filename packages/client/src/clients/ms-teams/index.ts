@@ -3,6 +3,8 @@ import { AuthCheckInput, RevokeAccessTokenInput } from "../../interfaces";
 import Knock from "../../knock";
 import { TENANT_OBJECT_COLLECTION } from "../objects/constants";
 
+import { GetMsTeamsTeamsInput, GetMsTeamsTeamsResponse } from "./interfaces";
+
 class MsTeamsClient {
   private instance: Knock;
 
@@ -20,6 +22,33 @@ class MsTeamsClient {
           collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
+      },
+    });
+
+    return this.handleResponse(result);
+  }
+
+  async getTeams(
+    input: GetMsTeamsTeamsInput,
+  ): Promise<GetMsTeamsTeamsResponse> {
+    const { knockChannelId, tenantId } = input;
+    const queryOptions = input.queryOptions || {};
+
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `/v1/providers/ms-teams/${knockChannelId}/teams`,
+      params: {
+        ms_teams_tenant_object: {
+          object_id: tenantId,
+          collection: TENANT_OBJECT_COLLECTION,
+        },
+        query_options: {
+          $filter: queryOptions.$filter,
+          $select: queryOptions.$select,
+          $top: queryOptions.$top,
+          $skiptoken: queryOptions.$skiptoken,
+          $count: queryOptions.$count,
+        },
       },
     });
 
