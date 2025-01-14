@@ -56,7 +56,6 @@ export default function Home() {
     >
       <KnockSlackProvider
         knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
-        // Using tenantId prop (preferred) instead of the deprecated tenant prop
         tenantId={tenant}
       >
         <>

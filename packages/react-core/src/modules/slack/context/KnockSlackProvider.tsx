@@ -24,38 +24,28 @@ export interface KnockSlackProviderState {
 const SlackProviderStateContext =
   React.createContext<KnockSlackProviderState | null>(null);
 
-export interface KnockSlackProviderProps {
-  knockSlackChannelId: string;
-  /**
-   * @deprecated Use tenantId instead. This prop will be removed in a future major release.
-   */
-  tenant?: string;
-  /**
-   * The ID of the tenant to use for Slack integration.
-   * This replaces the deprecated 'tenant' prop for consistency with other providers.
-   */
-  tenantId?: string;
-}
+export type KnockSlackProviderProps =
+  | {
+      knockSlackChannelId: string;
+      /**
+       * @deprecated Use tenantId instead. This prop will be removed in a future major release.
+       */
+      tenant: string;
+    }
+  | {
+      knockSlackChannelId: string;
+      /**
+       * The ID of the tenant to use for Slack integration.
+       * This replaces the deprecated 'tenant' prop for consistency with other providers.
+       */
+      tenantId: string;
+    };
 
 export const KnockSlackProvider: React.FC<
   PropsWithChildren<KnockSlackProviderProps>
-> = ({ knockSlackChannelId, tenant, tenantId, children }) => {
-  // Use tenantId if provided; otherwise fall back to tenant
-  // At least one of tenant or tenantId must be provided
-  if (!tenant && !tenantId) {
-    throw new Error(
-      "Either tenant or tenantId must be provided to KnockSlackProvider",
-    );
-  }
-
-  // After the check above, we know that at least one of these is defined
-  // TypeScript doesn't know this though, so we need to assert it
-  const finalTenantId: string = tenantId ?? tenant ?? "";
-
-  // Double check at runtime to be extra safe
-  if (!finalTenantId) {
-    throw new Error("Internal error: tenant ID is empty");
-  }
+> = (props) => {
+  const { knockSlackChannelId, children } = props;
+  const tenantId = "tenantId" in props ? props.tenantId : props.tenant;
 
   const knock = useKnockClient();
 
@@ -66,13 +56,13 @@ export const KnockSlackProvider: React.FC<
     setErrorLabel,
     actionLabel,
     setActionLabel,
-  } = useSlackConnectionStatus(knock, knockSlackChannelId, finalTenantId);
+  } = useSlackConnectionStatus(knock, knockSlackChannelId, tenantId);
 
   return (
     <SlackProviderStateContext.Provider
       key={slackProviderKey({
         knockSlackChannelId,
-        tenant: finalTenantId,
+        tenant: tenantId,
         connectionStatus,
         errorLabel,
       })}
@@ -84,7 +74,7 @@ export const KnockSlackProvider: React.FC<
         actionLabel,
         setActionLabel,
         knockSlackChannelId,
-        tenant: finalTenantId,
+        tenant: tenantId,
       }}
     >
       {children}

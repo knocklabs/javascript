@@ -36,9 +36,8 @@ export default async function Page() {
         <code className="text-[#E95744]">access_token</code> as channel data.
         When you trigger a workflow and pass{" "}
         <code className="text-[#E95744]">{tenant}</code> for the{" "}
-        <code className="text-[#E95744]">tenantId</code> property (or the
-        deprecated <code className="text-[#E95744]">tenant</code> property),
-        Slack channel steps will use this token for any Slack messages.{" "}
+        <code className="text-[#E95744]">tenant</code> property, Slack channel
+        steps will use this token for any Slack messages.{" "}
       </p>
       <pre className="text-xs p-2 bg-zinc-900 text-white rounded-md">
         {`
