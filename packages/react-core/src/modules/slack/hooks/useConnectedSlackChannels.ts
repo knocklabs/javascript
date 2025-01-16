@@ -1,12 +1,13 @@
-import { ContainerObject, useKnockSlackClient } from "..";
+import { useKnockSlackClient } from "..";
 import { SlackChannelConnection } from "@knocklabs/client";
 import { useCallback, useEffect, useState } from "react";
 
+import { RecipientObject } from "../../..";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";
 
 type UseConnectedSlackChannelsProps = {
-  slackChannelsRecipientObject: ContainerObject;
+  slackChannelsRecipientObject: RecipientObject;
 };
 
 type UseConnectedSlackChannelOutput = {
