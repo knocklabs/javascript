@@ -38,7 +38,7 @@ function useMsTeamsChannels({
   };
 
   const { data, isLoading, isValidating, mutate } =
-    useSWR<GetMsTeamsChannelsResponse>([QUERY_KEY], fetchChannels, {});
+    useSWR<GetMsTeamsChannelsResponse>([QUERY_KEY, teamId], fetchChannels, {});
 
   return {
     data: data?.ms_teams_channels ?? [],
