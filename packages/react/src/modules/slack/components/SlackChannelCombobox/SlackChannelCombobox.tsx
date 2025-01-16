@@ -1,6 +1,6 @@
 import { SlackChannelConnection } from "@knocklabs/client";
 import {
-  ContainerObject,
+  RecipientObject,
   SlackChannelQueryOptions,
   useConnectedSlackChannels,
   useKnockSlackClient,
@@ -35,7 +35,7 @@ export type SlackChannelComboboxInputMessages = {
 };
 
 export interface SlackChannelComboboxProps {
-  slackChannelsRecipientObject: ContainerObject;
+  slackChannelsRecipientObject: RecipientObject;
   queryOptions?: SlackChannelQueryOptions;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   inputContainerProps?: React.HTMLAttributes<HTMLDivElement>;
