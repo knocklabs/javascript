@@ -6,6 +6,6 @@ export type MsTeamsTeamQueryOptions = {
 };
 
 export type MsTeamsChannelQueryOptions = {
-  $filter?: string;
-  $select?: string;
+  filter?: string;
+  select?: string;
 };

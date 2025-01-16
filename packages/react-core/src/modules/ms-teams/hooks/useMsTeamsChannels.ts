@@ -30,7 +30,10 @@ function useMsTeamsChannels({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
       teamId,
-      queryOptions,
+      queryOptions: {
+        $filter: queryOptions?.filter,
+        $select: queryOptions?.select,
+      },
     });
   };
 
