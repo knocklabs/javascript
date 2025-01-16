@@ -3,12 +3,13 @@ import useSWR from "swr";
 
 import { useKnockClient } from "../../core";
 import { useKnockMsTeamsClient } from "../context";
+import { MsTeamsChannelQueryOptions } from "../interfaces";
 
 const QUERY_KEY = "MS_TEAMS_CHANNELS";
 
 type UseMsTeamsChannelsProps = {
   teamId: string;
-  queryOptions?: {};
+  queryOptions?: MsTeamsChannelQueryOptions;
 };
 
 type UseMsTeamsChannelsOutput = {
@@ -19,6 +20,7 @@ type UseMsTeamsChannelsOutput = {
 
 function useMsTeamsChannels({
   teamId,
+  queryOptions,
 }: UseMsTeamsChannelsProps): UseMsTeamsChannelsOutput {
   const knock = useKnockClient();
   const { knockMsTeamsChannelId, tenantId } = useKnockMsTeamsClient();
@@ -28,6 +30,7 @@ function useMsTeamsChannels({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
       teamId,
+      queryOptions,
     });
   };
 
