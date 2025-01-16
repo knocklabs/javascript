@@ -41,7 +41,7 @@ function getQueryKey(
 }
 
 function useMsTeamsTeams({
-  queryOptions,
+  queryOptions = {},
 }: UseMsTeamsTeamsProps): UseMsTeamsTeamsOutput {
   const knock = useKnockClient();
   const { knockMsTeamsChannelId, tenantId, connectionStatus } =
