@@ -60,18 +60,13 @@ function useMsTeamsTeams({
     });
   };
 
-  const { data, error, isLoading, isValidating, size, setSize, mutate } =
+  const { data, error, isLoading, isValidating, setSize, mutate } =
     useSWRInfinite<GetMsTeamsTeamsResponse>(getQueryKey, fetchTeams, {
       initialSize: 0,
     });
 
-  const currentPage = data?.length || 0;
-
-  const hasNextPage =
-    currentPage === 0 ||
-    (data &&
-      data[currentPage]?.skip_token &&
-      data[currentPage]?.skip_token !== "");
+  const lastPage = data?.at(-1);
+  const hasNextPage = lastPage === undefined || !!lastPage.skip_token;
 
   const teams = useMemo(
     () =>
@@ -94,12 +89,11 @@ function useMsTeamsTeams({
     ) {
       // Fetch a page at a time until we have nothing else left to fetch
       // or we've already hit the max amount of channels to fetch
-      setSize(size + 1);
+      setSize((size) => size + 1);
     }
   }, [
     teams.length,
     setSize,
-    size,
     hasNextPage,
     isLoading,
     isValidating,
