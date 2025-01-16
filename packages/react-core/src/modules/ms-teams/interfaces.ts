@@ -1,8 +1,8 @@
 export type MsTeamsTeamQueryOptions = {
-  $filter?: string;
-  $select?: string;
-  $top?: number;
-  $skiptoken?: string;
+  maxCount?: number;
+  limitPerPage?: number;
+  filter?: string;
+  select?: string;
 };
 
 export type MsTeamsChannelQueryOptions = {

@@ -52,8 +52,10 @@ function useMsTeamsTeams({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
       queryOptions: {
-        ...queryOptions,
         $skiptoken: queryKey?.[1],
+        $top: queryOptions?.limitPerPage,
+        $filter: queryOptions?.filter,
+        $select: queryOptions?.select,
       },
     });
   };
