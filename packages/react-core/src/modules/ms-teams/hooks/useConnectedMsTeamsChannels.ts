@@ -35,8 +35,8 @@ function useConnectedMsTeamsChannels({
 
   const fetchAndSetConnectedChannels = useCallback(() => {
     setIsLoading(true);
-    const getConnectedChannels = async () =>
-      await knock.objects.getChannelData({
+    const getConnectedChannels = () =>
+      knock.objects.getChannelData({
         collection,
         objectId,
         channelId: knockMsTeamsChannelId,
