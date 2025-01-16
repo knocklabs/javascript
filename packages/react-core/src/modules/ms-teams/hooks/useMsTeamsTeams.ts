@@ -4,13 +4,14 @@ import useSWRInfinite from "swr/infinite";
 
 import { useKnockClient } from "../../core";
 import { useKnockMsTeamsClient } from "../context";
+import { MsTeamsTeamQueryOptions } from "../interfaces";
 
 const MAX_COUNT = 1000;
 
 const QUERY_KEY = "MS_TEAMS_TEAMS";
 
 type UseMsTeamsTeamsProps = {
-  queryOptions?: { maxCount?: number };
+  queryOptions?: MsTeamsTeamQueryOptions;
 };
 
 type UseMsTeamsTeamsOutput = {
@@ -51,7 +52,7 @@ function useMsTeamsTeams({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
       queryOptions: {
-        // TODO More default query options?
+        ...queryOptions,
         $skiptoken: queryKey?.[1],
       },
     });
