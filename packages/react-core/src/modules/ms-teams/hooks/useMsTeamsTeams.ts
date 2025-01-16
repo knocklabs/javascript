@@ -47,8 +47,8 @@ function useMsTeamsTeams({
   const { knockMsTeamsChannelId, tenantId, connectionStatus } =
     useKnockMsTeamsClient();
 
-  const fetchTeams = (queryKey: QueryKey) => {
-    return knock.msTeams.getTeams({
+  const fetchTeams = (queryKey: QueryKey) =>
+    knock.msTeams.getTeams({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
       queryOptions: {
@@ -58,7 +58,6 @@ function useMsTeamsTeams({
         $select: queryOptions?.select,
       },
     });
-  };
 
   const { data, error, isLoading, isValidating, setSize, mutate } =
     useSWRInfinite<GetMsTeamsTeamsResponse>(getQueryKey, fetchTeams, {
@@ -88,7 +87,7 @@ function useMsTeamsTeams({
       teams.length < maxCount
     ) {
       // Fetch a page at a time until we have nothing else left to fetch
-      // or we've already hit the max amount of channels to fetch
+      // or we've already hit the max amount of teams to fetch
       setSize((size) => size + 1);
     }
   }, [

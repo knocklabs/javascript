@@ -25,8 +25,8 @@ function useMsTeamsChannels({
   const knock = useKnockClient();
   const { knockMsTeamsChannelId, tenantId } = useKnockMsTeamsClient();
 
-  const fetchChannels = () => {
-    return knock.msTeams.getChannels({
+  const fetchChannels = () =>
+    knock.msTeams.getChannels({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
       teamId,
@@ -35,7 +35,6 @@ function useMsTeamsChannels({
         $select: queryOptions?.select,
       },
     });
-  };
 
   const { data, isLoading, isValidating, mutate } =
     useSWR<GetMsTeamsChannelsResponse>([QUERY_KEY, teamId], fetchChannels, {});
