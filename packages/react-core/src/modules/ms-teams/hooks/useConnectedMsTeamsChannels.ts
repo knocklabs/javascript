@@ -14,7 +14,7 @@ type UseConnectedMsTeamsChannelsOutput = {
   data: MsTeamsChannelConnection[] | null;
   updateConnectedChannels: (
     connectedChannels: MsTeamsChannelConnection[],
-  ) => void;
+  ) => Promise<void>;
   loading: boolean;
   error: string | null;
   updating: boolean;
