@@ -21,14 +21,14 @@ export default function Providers({
         host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
         userToken={userToken}
       >
-        {/* 
+        {/*
         The KnockProvider handles authentication with Knock, while the KnockSlackProvider
-        provides shared context to all Slack-related components. 
+        provides shared context to all Slack-related components.
         Both are required for Slack-related apps.
         */}
         <KnockSlackProvider
           knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
-          tenant={tenant}
+          tenantId={tenant}
         >
           {children}
         </KnockSlackProvider>

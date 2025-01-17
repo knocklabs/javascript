@@ -8,6 +8,10 @@ import { ConnectionStatus } from "../hooks/useSlackConnectionStatus";
 
 export interface KnockSlackProviderState {
   knockSlackChannelId: string;
+  tenantId: string;
+  /**
+   * @deprecated Use `tenantId` instead. This field will be removed in a future release.
+   */
   tenant: string;
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (connectionStatus: ConnectionStatus) => void;
@@ -20,14 +24,25 @@ export interface KnockSlackProviderState {
 const SlackProviderStateContext =
   React.createContext<KnockSlackProviderState | null>(null);
 
-export interface KnockSlackProviderProps {
-  knockSlackChannelId: string;
-  tenant: string;
-}
+export type KnockSlackProviderProps =
+  | {
+      knockSlackChannelId: string;
+      /**
+       * @deprecated Use `tenantId` instead. This field will be removed in a future release.
+       */
+      tenant: string;
+    }
+  | {
+      knockSlackChannelId: string;
+      tenantId: string;
+    };
 
 export const KnockSlackProvider: React.FC<
   PropsWithChildren<KnockSlackProviderProps>
-> = ({ knockSlackChannelId, tenant, children }) => {
+> = (props) => {
+  const { knockSlackChannelId, children } = props;
+  const tenantId = "tenantId" in props ? props.tenantId : props.tenant;
+
   const knock = useKnockClient();
 
   const {
@@ -37,13 +52,13 @@ export const KnockSlackProvider: React.FC<
     setErrorLabel,
     actionLabel,
     setActionLabel,
-  } = useSlackConnectionStatus(knock, knockSlackChannelId, tenant);
+  } = useSlackConnectionStatus(knock, knockSlackChannelId, tenantId);
 
   return (
     <SlackProviderStateContext.Provider
       key={slackProviderKey({
         knockSlackChannelId,
-        tenant,
+        tenantId,
         connectionStatus,
         errorLabel,
       })}
@@ -55,7 +70,9 @@ export const KnockSlackProvider: React.FC<
         actionLabel,
         setActionLabel,
         knockSlackChannelId,
-        tenant,
+        // Assign the same value to both tenant and tenantId for backwards compatibility
+        tenant: tenantId,
+        tenantId,
       }}
     >
       {children}

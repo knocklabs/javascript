@@ -61,16 +61,16 @@ export function feedProviderKey(
 */
 export function slackProviderKey({
   knockSlackChannelId,
-  tenant,
+  tenantId,
   connectionStatus,
   errorLabel,
 }: {
   knockSlackChannelId: string;
-  tenant: string;
+  tenantId: string;
   connectionStatus: string;
   errorLabel: string | null;
 }) {
-  return [knockSlackChannelId, tenant, connectionStatus, errorLabel]
+  return [knockSlackChannelId, tenantId, connectionStatus, errorLabel]
     .filter((f) => f !== null && f !== undefined)
     .join("-");
 }
