@@ -5,15 +5,15 @@ import { useCallback, useEffect, useState } from "react";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";
 
-type UseSlackChannelsProps = {
+type UseConnectedSlackChannelsProps = {
   slackChannelsRecipientObject: ContainerObject;
 };
 
-type UseSlackChannelOutput = {
+type UseConnectedSlackChannelOutput = {
   data: SlackChannelConnection[] | null;
   updateConnectedChannels: (
     connectedChannels: SlackChannelConnection[],
-  ) => void;
+  ) => Promise<void>;
   loading: boolean;
   error: string | null;
   updating: boolean;
@@ -21,7 +21,7 @@ type UseSlackChannelOutput = {
 
 function useConnectedSlackChannels({
   slackChannelsRecipientObject: { objectId, collection },
-}: UseSlackChannelsProps): UseSlackChannelOutput {
+}: UseConnectedSlackChannelsProps): UseConnectedSlackChannelOutput {
   const { t } = useTranslations();
   const knock = useKnockClient();
   const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
