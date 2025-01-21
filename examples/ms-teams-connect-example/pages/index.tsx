@@ -3,6 +3,7 @@ import {
   KnockProvider,
   MsTeamsAuthButton,
   MsTeamsAuthContainer,
+  MsTeamsChannelCombobox,
 } from "@knocklabs/react";
 
 import { useSetToken } from "../hooks";
@@ -66,6 +67,28 @@ export default function Home() {
           MS Teams connector examples
         </h1>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div>
+            <div
+              style={{
+                marginBottom: "10px",
+                marginTop: "40px",
+                fontFamily: "monospace",
+                fontSize: "25px",
+                color: "gray",
+              }}
+            >
+              MS Teams Channel Picker
+            </div>
+            <div style={{ margin: "10px", padding: "10px" }}>
+              <MsTeamsChannelCombobox
+                msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
+                showConnectedChannelTags={
+                  // TODO Use toggle component?
+                  true
+                }
+              />
+            </div>
+          </div>
           <div>
             <div
               style={{
