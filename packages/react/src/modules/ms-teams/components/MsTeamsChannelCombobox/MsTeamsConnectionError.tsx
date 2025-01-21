@@ -1,0 +1,30 @@
+import { useKnockMsTeamsClient, useTranslations } from "@knocklabs/react-core";
+import { FunctionComponent } from "react";
+
+// TODO Move icons
+import InfoIcon from "../../../slack/components/SlackChannelCombobox/icons/InfoIcon";
+
+const MsTeamsConnectionError: FunctionComponent = () => {
+  const { t } = useTranslations();
+  const { connectionStatus } = useKnockMsTeamsClient();
+
+  if (connectionStatus === "disconnected" || connectionStatus === "error") {
+    return (
+      <div className="rtk-combobox__error">
+        <span>
+          <InfoIcon />
+        </span>
+
+        <div className="rtk-combobox__error__text">
+          {connectionStatus === "disconnected"
+            ? t("msTeamsConnectionErrorOccurred")
+            : t("msTeamsConnectionErrorExists")}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default MsTeamsConnectionError;

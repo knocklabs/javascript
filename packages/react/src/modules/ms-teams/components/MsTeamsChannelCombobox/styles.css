@@ -1,0 +1,17 @@
+/* Error */
+.rtk-combobox__error {
+  align-items: flex-start;
+  background-color: var(--rtk-color-gray-100);
+  border-radius: var(--rtk-border-radius-md);
+  display: flex;
+  gap: var(--rtk-spacing-1);
+  justify-content: center;
+  margin-top: var(--rtk-spacing-1);
+  padding: var(--rtk-spacing-2);
+}
+
+.rtk-combobox__error__text {
+  color: var(--rtk-color-gray-700);
+  font-size: var(--rtk-font-size-xs);
+  line-height: normal;
+}

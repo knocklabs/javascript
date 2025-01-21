@@ -16,6 +16,10 @@ const en: I18nContent = {
     msTeamsConnect: "Connect to Microsoft Teams",
     msTeamsConnected: "Connected",
     msTeamsConnecting: "Connecting to Microsoft Teams…",
+    msTeamsConnectionErrorExists:
+      "Try reconnecting to Microsoft Teams to find and select channels from your teams.",
+    msTeamsConnectionErrorOccurred:
+      "There was an error connecting to Microsoft Teams. Try reconnecting to find and select channels from your teams.",
     msTeamsConnectContainerDescription:
       "Connect to get notifications in Microsoft Teams",
     msTeamsDisconnect: "Disconnect",
