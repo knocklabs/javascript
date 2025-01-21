@@ -38,13 +38,13 @@ export type GetMsTeamsChannelsResponse = {
 };
 
 export type MsTeamsTeam = {
-  id?: string;
+  id: string;
   displayName?: string;
   description?: string;
 };
 
 export type MsTeamsChannel = {
-  id?: string;
+  id: string;
   displayName?: string;
   description?: string;
   membershipType?: string;
