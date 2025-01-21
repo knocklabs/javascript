@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner, useOutsideClick } from "../../../core";
+import SearchIcon from "../../../core/icons/SearchIcon";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
@@ -20,7 +21,6 @@ import SlackChannelListBox from "./SlackChannelListBox";
 import SlackConnectedChannelTagList from "./SlackConnectedChannelTagList";
 import SlackConnectionError from "./SlackConnectionError";
 import { strContains } from "./helpers";
-import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
 const MAX_ALLOWED_CHANNELS = 1000;
