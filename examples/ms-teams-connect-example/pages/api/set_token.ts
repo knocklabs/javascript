@@ -12,7 +12,7 @@ export default async function handler(
       .json({ error: `${req.method} method is not accepted.` });
   }
 
-  const { tenant, user } = req.body;
+  const { tenant, user, msTeamsChannelsRecipientObject } = req.body;
   try {
     const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
@@ -31,6 +31,11 @@ export default async function handler(
           [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
             "ms_teams/channels_read": [{}],
           },
+          [`https://api.knock.app/v1/objects/${msTeamsChannelsRecipientObject.collection}/${msTeamsChannelsRecipientObject.objectId}`]:
+            {
+              "channel_data/read": [{}],
+              "channel_data/write": [{}],
+            },
         },
       },
       signingKey,

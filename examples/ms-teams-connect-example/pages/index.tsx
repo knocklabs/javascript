@@ -19,6 +19,11 @@ export default function Home() {
   };
   const redirectUrl = process.env.NEXT_PUBLIC_REDIRECT_URL;
 
+  const msTeamsChannelsRecipientObject = {
+    collection: process.env.NEXT_PUBLIC_CONNECTIONS_COLLECTION!,
+    objectId: process.env.NEXT_PUBLIC_CONNECTIONS_OBJECT_ID!,
+  };
+
   const onAuthComplete = (result: string) => {
     console.log("Result from MS Teams authentication:", result);
   };
@@ -26,6 +31,7 @@ export default function Home() {
   const { isLoading, isError } = useSetToken({
     tenant: process.env.NEXT_PUBLIC_TENANT_ID!,
     user,
+    msTeamsChannelsRecipientObject,
   });
 
   if (isLoading) {
