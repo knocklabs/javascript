@@ -8,17 +8,22 @@ import { FunctionComponent, useMemo } from "react";
 
 interface MsTeamsChannelSelectProps {
   teamId?: string;
-  msTeamsChannel?: MsTeamsChannel;
-  onMsTeamsChannelChange: (msTeamsChannel: MsTeamsChannel) => void;
+  msTeamsChannels: MsTeamsChannel[];
+  onMsTeamsChannelsChange: (msTeamsChannels: MsTeamsChannel[]) => void;
   queryOptions?: MsTeamsChannelQueryOptions;
 }
 
 export const MsTeamsChannelSelect: FunctionComponent<
   MsTeamsChannelSelectProps
-> = ({ teamId, msTeamsChannel, onMsTeamsChannelChange, queryOptions }) => {
+> = ({
+  teamId,
+  msTeamsChannels: selectedChannels = [],
+  onMsTeamsChannelsChange,
+  queryOptions,
+}) => {
   const { connectionStatus } = useKnockMsTeamsClient();
 
-  const { data: msTeamsChannels } = useMsTeamsChannels({
+  const { data: availableChannels } = useMsTeamsChannels({
     teamId,
     queryOptions,
   });
@@ -38,23 +43,28 @@ export const MsTeamsChannelSelect: FunctionComponent<
     <label style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       Select channels
       <select
+        multiple
         disabled={
           teamId === undefined ||
           inErrorState ||
           inLoadingState ||
-          msTeamsChannels.length === 0
+          availableChannels.length === 0
         }
-        value={msTeamsChannel?.id}
+        value={selectedChannels.map((channel) => channel.id)}
         onChange={(e) => {
-          const selectedChannel = msTeamsChannels?.find(
-            (channel) => channel.id === e.target.value,
-          );
-          if (selectedChannel) {
-            onMsTeamsChannelChange(selectedChannel);
-          }
+          const selectedOptions = Array.from(e.target.selectedOptions);
+          const selectedChannelsList = selectedOptions
+            .map((option) =>
+              availableChannels.find((channel) => channel.id === option.value),
+            )
+            .filter(
+              (channel): channel is MsTeamsChannel => channel !== undefined,
+            );
+
+          onMsTeamsChannelsChange(selectedChannelsList);
         }}
       >
-        {msTeamsChannels.map((channel) => (
+        {availableChannels.map((channel) => (
           <option key={channel.id} value={channel.id}>
             {channel.displayName}
           </option>

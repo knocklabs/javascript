@@ -16,20 +16,27 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
 }) => {
   const [selection, setSelection] = useState<{
     team?: MsTeamsTeam;
-    channel?: MsTeamsChannel;
-  }>({});
+    channels: MsTeamsChannel[];
+  }>({
+    team: undefined,
+    channels: [],
+  });
 
+  console.log(selection);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <MsTeamsTeamSelect
         team={selection.team}
-        onTeamChange={(team) => setSelection({ team, channel: undefined })}
+        onTeamChange={(team) => setSelection({ team, channels: [] })}
       />
       <MsTeamsChannelSelect
         teamId={selection.team?.id}
-        msTeamsChannel={selection.channel}
-        onMsTeamsChannelChange={(channel) =>
-          setSelection((prev) => ({ ...prev, channel }))
+        msTeamsChannels={selection.channels}
+        onMsTeamsChannelsChange={(channels) =>
+          setSelection((selection) => ({
+            ...selection,
+            channels,
+          }))
         }
       />
     </div>
