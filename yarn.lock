@@ -6118,7 +6118,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.26.0"
     "@babel/runtime": "npm:^7.26.0"
     "@knocklabs/react-native": "workspace:^"
-    "@react-native-firebase/app": "npm:^21.6.2"
+    "@react-native-firebase/app": "npm:^21.7.1"
     "@react-native-firebase/messaging": "npm:^21.6.1"
     "@react-native/babel-preset": "npm:0.76.6"
     "@react-native/metro-config": "npm:0.76.1"
@@ -7462,9 +7462,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/app@npm:^21.6.2":
-  version: 21.6.2
-  resolution: "@react-native-firebase/app@npm:21.6.2"
+"@react-native-firebase/app@npm:^21.7.1":
+  version: 21.7.1
+  resolution: "@react-native-firebase/app@npm:21.7.1"
   dependencies:
     firebase: "npm:10.13.2"
   peerDependencies:
@@ -7474,7 +7474,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 10c0/e6a6cf4543dbc240e5e19e11023f2db09ad02d2b18dd2d932e4bc3b2e3d6f642bf79805d1f7d2959fa62c91ba6a4479499990f72f6034d2ca0d8632ba36311eb
+  checksum: 10c0/96faa6692e7c17169c96153f291d4b559fb06a40275637e7e9dbdf972231c1c942ddcf3c5482debcc9c92841bce88b09b0c4da0dcc73d08ab1e6dc608c2bb868
   languageName: node
   linkType: hard
 
