@@ -15,12 +15,16 @@ interface Props {
 const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
   msTeamsChannelsRecipientObject,
 }) => {
-  const [selectedTeam, setSelectedTeam] = useState<MsTeamsTeam>();
+  const [selectedTeam, setSelectedTeam] = useState<MsTeamsTeam | null>(null);
 
   return (
     <div className="tgph rtk-combobox__grid">
       <div className="rtk-combobox__label">Team</div>
-      <MsTeamsTeamCombobox team={selectedTeam} onTeamChange={setSelectedTeam} />
+      <MsTeamsTeamCombobox
+        team={selectedTeam}
+        onTeamChange={setSelectedTeam}
+        getChannelCount={() => 12}
+      />
       <div className="rtk-combobox__label">
         <CornerDownRightIcon />
         Channel

@@ -6,17 +6,18 @@ import {
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useCallback, useMemo } from "react";
 
 interface MsTeamsTeamComboboxProps {
-  team?: MsTeamsTeam;
+  team: MsTeamsTeam | null;
   onTeamChange: (team: MsTeamsTeam) => void;
+  getChannelCount: (teamId: string) => number;
   queryOptions?: MsTeamsTeamQueryOptions;
 }
 
 export const MsTeamsTeamCombobox: FunctionComponent<
   MsTeamsTeamComboboxProps
-> = ({ team, onTeamChange, queryOptions }) => {
+> = ({ team, onTeamChange, getChannelCount, queryOptions }) => {
   const { connectionStatus } = useKnockMsTeamsClient();
 
   const { data: teams, isLoading: isLoadingTeams } = useMsTeamsTeams({
@@ -36,17 +37,24 @@ export const MsTeamsTeamCombobox: FunctionComponent<
     [connectionStatus, isLoadingTeams],
   );
 
+  const teamToOption = useCallback(
+    (team: MsTeamsTeam) => {
+      const channelCount = getChannelCount(team.id);
+      return {
+        value: team.id,
+        label:
+          channelCount > 0
+            ? `${team.displayName} (${channelCount})`
+            : team.displayName,
+      };
+    },
+    [getChannelCount],
+  );
+
   return (
     <Box w="full">
       <Combobox.Root
-        value={
-          team
-            ? {
-                value: team.id,
-                label: team.displayName,
-              }
-            : undefined
-        }
+        value={team ? teamToOption(team) : undefined}
         onValueChange={({ value: teamId }) => {
           const selectedTeam = teams.find((team) => team.id === teamId);
           if (selectedTeam) {
@@ -61,11 +69,7 @@ export const MsTeamsTeamCombobox: FunctionComponent<
           <Combobox.Search />
           <Combobox.Options>
             {teams.map((team) => (
-              <Combobox.Option
-                key={team.id}
-                value={team.id}
-                label={team.displayName}
-              />
+              <Combobox.Option key={team.id} {...teamToOption(team)} />
             ))}
           </Combobox.Options>
           <Combobox.Empty />
