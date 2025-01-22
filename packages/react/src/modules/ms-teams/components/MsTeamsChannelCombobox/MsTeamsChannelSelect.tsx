@@ -4,6 +4,8 @@ import {
   useKnockMsTeamsClient,
   useMsTeamsChannels,
 } from "@knocklabs/react-core";
+import { Combobox } from "@telegraph/combobox";
+import { Box } from "@telegraph/layout";
 import { FunctionComponent, useMemo } from "react";
 
 interface MsTeamsChannelSelectProps {
@@ -23,7 +25,7 @@ export const MsTeamsChannelSelect: FunctionComponent<
 }) => {
   const { connectionStatus } = useKnockMsTeamsClient();
 
-  const { data: availableChannels } = useMsTeamsChannels({
+  const { data: availableChannels = [] } = useMsTeamsChannels({
     teamId,
     queryOptions,
   });
@@ -39,37 +41,56 @@ export const MsTeamsChannelSelect: FunctionComponent<
     [connectionStatus],
   );
 
-  return (
-    <label style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      Select channels
-      <select
-        multiple
-        disabled={
-          teamId === undefined ||
-          inErrorState ||
-          inLoadingState ||
-          availableChannels.length === 0
-        }
-        value={selectedChannels.map((channel) => channel.id)}
-        onChange={(e) => {
-          const selectedOptions = Array.from(e.target.selectedOptions);
-          const selectedChannelsList = selectedOptions
-            .map((option) =>
-              availableChannels.find((channel) => channel.id === option.value),
-            )
-            .filter(
-              (channel): channel is MsTeamsChannel => channel !== undefined,
-            );
+  const selectedValues = useMemo(
+    () =>
+      selectedChannels.map((channel) => ({
+        value: channel.id,
+        label: channel.displayName,
+      })),
+    [selectedChannels],
+  );
 
-          onMsTeamsChannelsChange(selectedChannelsList);
-        }}
-      >
-        {availableChannels.map((channel) => (
-          <option key={channel.id} value={channel.id}>
-            {channel.displayName}
-          </option>
-        ))}
-      </select>
-    </label>
+  return (
+    <Box className="tgph">
+      <Box w="full">
+        <Combobox.Root
+          value={selectedValues}
+          onValueChange={(newValues) => {
+            const selectedChannelsList = newValues
+              .map((value) =>
+                availableChannels.find((channel) => channel.id === value.value),
+              )
+              .filter(
+                (channel): channel is MsTeamsChannel => channel !== undefined,
+              );
+
+            onMsTeamsChannelsChange(selectedChannelsList);
+          }}
+          placeholder="Select channels"
+          disabled={
+            teamId === undefined ||
+            inErrorState ||
+            inLoadingState ||
+            availableChannels.length === 0
+          }
+          closeOnSelect={false}
+        >
+          <Combobox.Trigger />
+          <Combobox.Content>
+            <Combobox.Search />
+            <Combobox.Options>
+              {availableChannels.map((channel) => (
+                <Combobox.Option
+                  key={channel.id}
+                  value={channel.id}
+                  label={channel.displayName}
+                />
+              ))}
+            </Combobox.Options>
+            <Combobox.Empty />
+          </Combobox.Content>
+        </Combobox.Root>
+      </Box>
+    </Box>
   );
 };
