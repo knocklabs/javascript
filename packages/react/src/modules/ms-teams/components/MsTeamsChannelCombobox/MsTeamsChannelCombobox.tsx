@@ -1,6 +1,9 @@
 import { MsTeamsTeam } from "@knocklabs/client";
-import { RecipientObject } from "@knocklabs/react-core";
-import { FunctionComponent, useState } from "react";
+import {
+  RecipientObject,
+  useConnectedMsTeamsChannels,
+} from "@knocklabs/react-core";
+import { FunctionComponent, useCallback, useState } from "react";
 
 import { CornerDownRightIcon } from "../../../core/components/Icons/CornerDownRightIcon";
 
@@ -17,13 +20,26 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
 }) => {
   const [selectedTeam, setSelectedTeam] = useState<MsTeamsTeam | null>(null);
 
+  const { data: currentConnections } = useConnectedMsTeamsChannels({
+    msTeamsChannelsRecipientObject,
+  });
+
+  // TODO: This doesn't fully work because MsTeamsChannelSelect uses its own useConnectedMsTeamsChannels hook
+  const getChannelCount = useCallback(
+    (teamId: string) =>
+      currentConnections?.filter(
+        (connection) => connection.ms_teams_team_id === teamId,
+      ).length ?? 0,
+    [currentConnections],
+  );
+
   return (
     <div className="tgph rtk-combobox__grid">
       <div className="rtk-combobox__label">Team</div>
       <MsTeamsTeamCombobox
         team={selectedTeam}
         onTeamChange={setSelectedTeam}
-        getChannelCount={() => 12}
+        getChannelCount={getChannelCount}
       />
       <div className="rtk-combobox__label">
         <CornerDownRightIcon />

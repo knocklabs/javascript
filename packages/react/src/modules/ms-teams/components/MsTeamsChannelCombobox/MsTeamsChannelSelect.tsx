@@ -73,6 +73,7 @@ export const MsTeamsChannelSelect: FunctionComponent<
         onValueChange={(newValues) => {
           const connectedChannelsInThisTeam =
             newValues.map<MsTeamsChannelConnection>(({ value: channelId }) => ({
+              ms_teams_team_id: teamId,
               ms_teams_channel_id: channelId,
             }));
           const connectedChannelsInOtherTeams =
