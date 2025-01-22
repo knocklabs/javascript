@@ -24,7 +24,10 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
 
   console.log(selection);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: 32 }}
+      className="tgph"
+    >
       <MsTeamsTeamCombobox
         team={selection.team}
         onTeamChange={(team) => setSelection({ team, channels: [] })}

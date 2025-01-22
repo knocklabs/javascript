@@ -37,42 +37,40 @@ export const MsTeamsTeamCombobox: FunctionComponent<
   );
 
   return (
-    <Box className="tgph">
-      <Box w="full">
-        <Combobox.Root
-          value={
-            team
-              ? {
-                  value: team.id,
-                  label: team.displayName,
-                }
-              : undefined
+    <Box w="full">
+      <Combobox.Root
+        value={
+          team
+            ? {
+                value: team.id,
+                label: team.displayName,
+              }
+            : undefined
+        }
+        onValueChange={({ value: teamId }) => {
+          const selectedTeam = teams.find((team) => team.id === teamId);
+          if (selectedTeam) {
+            onTeamChange(selectedTeam);
           }
-          onValueChange={({ value: teamId }) => {
-            const selectedTeam = teams.find((team) => team.id === teamId);
-            if (selectedTeam) {
-              onTeamChange(selectedTeam);
-            }
-          }}
-          placeholder="Select a team"
-          disabled={inErrorState || inLoadingState}
-        >
-          <Combobox.Trigger />
-          <Combobox.Content>
-            <Combobox.Search />
-            <Combobox.Options>
-              {teams.map((team) => (
-                <Combobox.Option
-                  key={team.id}
-                  value={team.id}
-                  label={team.displayName}
-                />
-              ))}
-            </Combobox.Options>
-            <Combobox.Empty />
-          </Combobox.Content>
-        </Combobox.Root>
-      </Box>
+        }}
+        placeholder="Select a team"
+        disabled={inErrorState || inLoadingState}
+      >
+        <Combobox.Trigger />
+        <Combobox.Content>
+          <Combobox.Search />
+          <Combobox.Options>
+            {teams.map((team) => (
+              <Combobox.Option
+                key={team.id}
+                value={team.id}
+                label={team.displayName}
+              />
+            ))}
+          </Combobox.Options>
+          <Combobox.Empty />
+        </Combobox.Content>
+      </Combobox.Root>
     </Box>
   );
 };

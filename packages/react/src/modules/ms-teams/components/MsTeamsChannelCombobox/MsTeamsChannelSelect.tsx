@@ -51,46 +51,44 @@ export const MsTeamsChannelSelect: FunctionComponent<
   );
 
   return (
-    <Box className="tgph">
-      <Box w="full">
-        <Combobox.Root
-          value={selectedValues}
-          onValueChange={(newValues) => {
-            const selectedChannelsList = newValues
-              .map((value) =>
-                availableChannels.find((channel) => channel.id === value.value),
-              )
-              .filter(
-                (channel): channel is MsTeamsChannel => channel !== undefined,
-              );
+    <Box w="full">
+      <Combobox.Root
+        value={selectedValues}
+        onValueChange={(newValues) => {
+          const selectedChannelsList = newValues
+            .map((value) =>
+              availableChannels.find((channel) => channel.id === value.value),
+            )
+            .filter(
+              (channel): channel is MsTeamsChannel => channel !== undefined,
+            );
 
-            onMsTeamsChannelsChange(selectedChannelsList);
-          }}
-          placeholder="Select channels"
-          disabled={
-            teamId === undefined ||
-            inErrorState ||
-            inLoadingState ||
-            availableChannels.length === 0
-          }
-          closeOnSelect={false}
-        >
-          <Combobox.Trigger />
-          <Combobox.Content>
-            <Combobox.Search />
-            <Combobox.Options>
-              {availableChannels.map((channel) => (
-                <Combobox.Option
-                  key={channel.id}
-                  value={channel.id}
-                  label={channel.displayName}
-                />
-              ))}
-            </Combobox.Options>
-            <Combobox.Empty />
-          </Combobox.Content>
-        </Combobox.Root>
-      </Box>
+          onMsTeamsChannelsChange(selectedChannelsList);
+        }}
+        placeholder="Select channels"
+        disabled={
+          teamId === undefined ||
+          inErrorState ||
+          inLoadingState ||
+          availableChannels.length === 0
+        }
+        closeOnSelect={false}
+      >
+        <Combobox.Trigger />
+        <Combobox.Content>
+          <Combobox.Search />
+          <Combobox.Options>
+            {availableChannels.map((channel) => (
+              <Combobox.Option
+                key={channel.id}
+                value={channel.id}
+                label={channel.displayName}
+              />
+            ))}
+          </Combobox.Options>
+          <Combobox.Empty />
+        </Combobox.Content>
+      </Combobox.Root>
     </Box>
   );
 };
