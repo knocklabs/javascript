@@ -3,7 +3,7 @@ import { RecipientObject } from "@knocklabs/react-core";
 import { FunctionComponent, useState } from "react";
 
 import { MsTeamsChannelSelect } from "./MsTeamsChannelSelect";
-import { MsTeamsTeamSelect } from "./MsTeamsTeamSelect";
+import { MsTeamsTeamCombobox } from "./MsTeamsTeamCombobox";
 
 interface Props {
   msTeamsChannelsRecipientObject: RecipientObject;
@@ -24,8 +24,8 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
 
   console.log(selection);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <MsTeamsTeamSelect
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+      <MsTeamsTeamCombobox
         team={selection.team}
         onTeamChange={(team) => setSelection({ team, channels: [] })}
       />
