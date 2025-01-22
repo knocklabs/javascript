@@ -53,7 +53,7 @@ export const MsTeamsTeamCombobox: FunctionComponent<
             onTeamChange(selectedTeam);
           }
         }}
-        placeholder="Select a team"
+        placeholder="Select team"
         disabled={inErrorState || inLoadingState}
       >
         <Combobox.Trigger />
