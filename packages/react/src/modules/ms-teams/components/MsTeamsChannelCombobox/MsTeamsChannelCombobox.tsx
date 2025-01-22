@@ -1,4 +1,4 @@
-import { MsTeamsChannel, MsTeamsTeam } from "@knocklabs/client";
+import { MsTeamsTeam } from "@knocklabs/client";
 import { RecipientObject } from "@knocklabs/react-core";
 import { FunctionComponent, useState } from "react";
 

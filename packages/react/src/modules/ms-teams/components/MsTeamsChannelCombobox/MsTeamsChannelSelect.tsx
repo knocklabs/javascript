@@ -1,4 +1,4 @@
-import { MsTeamsChannel, MsTeamsChannelConnection } from "@knocklabs/client";
+import { MsTeamsChannelConnection } from "@knocklabs/client";
 import {
   MsTeamsChannelQueryOptions,
   RecipientObject,
