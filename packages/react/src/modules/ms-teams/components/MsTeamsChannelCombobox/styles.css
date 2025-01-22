@@ -1,3 +1,16 @@
+.rtk-combobox__grid {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  align-items: center;
+  gap: var(--rtk-spacing-1);
+  font-size: var(--rtk-font-size-sm);
+  font-family: var(--rtk-font-family-sanserif);
+}
+
+.rtk-combobox__label {
+  padding: var(--rtk-spacing-1) 0;
+}
+
 /* Error */
 .rtk-combobox__error {
   align-items: flex-start;

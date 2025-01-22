@@ -4,6 +4,7 @@ import { FunctionComponent, useState } from "react";
 
 import { MsTeamsChannelSelect } from "./MsTeamsChannelSelect";
 import { MsTeamsTeamCombobox } from "./MsTeamsTeamCombobox";
+import "./styles.css";
 
 interface Props {
   msTeamsChannelsRecipientObject: RecipientObject;
@@ -22,16 +23,14 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
     channels: [],
   });
 
-  console.log(selection);
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", gap: 32 }}
-      className="tgph"
-    >
+    <div className="tgph rtk-combobox__grid">
+      <div className="rtk-combobox__label">Team</div>
       <MsTeamsTeamCombobox
         team={selection.team}
         onTeamChange={(team) => setSelection({ team, channels: [] })}
       />
+      <div className="rtk-combobox__label">Channel</div>
       <MsTeamsChannelSelect
         teamId={selection.team?.id}
         msTeamsChannels={selection.channels}
