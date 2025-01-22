@@ -2,6 +2,8 @@ import { MsTeamsChannel, MsTeamsTeam } from "@knocklabs/client";
 import { RecipientObject } from "@knocklabs/react-core";
 import { FunctionComponent, useState } from "react";
 
+import { CornerDownRightIcon } from "../../../core/components/Icons/CornerDownRightIcon";
+
 import { MsTeamsChannelSelect } from "./MsTeamsChannelSelect";
 import { MsTeamsTeamCombobox } from "./MsTeamsTeamCombobox";
 import "./styles.css";
@@ -30,7 +32,10 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         team={selection.team}
         onTeamChange={(team) => setSelection({ team, channels: [] })}
       />
-      <div className="rtk-combobox__label">Channel</div>
+      <div className="rtk-combobox__label">
+        <CornerDownRightIcon />
+        Channel
+      </div>
       <MsTeamsChannelSelect
         teamId={selection.team?.id}
         msTeamsChannels={selection.channels}
