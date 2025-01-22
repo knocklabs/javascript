@@ -82,10 +82,6 @@ export default function Home() {
             <div style={{ margin: "10px", padding: "10px" }}>
               <MsTeamsChannelCombobox
                 msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
-                showConnectedChannelTags={
-                  // TODO Use toggle component?
-                  true
-                }
               />
             </div>
           </div>

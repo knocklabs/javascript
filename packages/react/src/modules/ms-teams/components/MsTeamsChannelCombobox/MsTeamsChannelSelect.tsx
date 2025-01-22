@@ -1,34 +1,33 @@
-import { MsTeamsChannel } from "@knocklabs/client";
+import { MsTeamsChannel, MsTeamsChannelConnection } from "@knocklabs/client";
 import {
   MsTeamsChannelQueryOptions,
+  RecipientObject,
+  useConnectedMsTeamsChannels,
   useKnockMsTeamsClient,
   useMsTeamsChannels,
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useCallback, useMemo } from "react";
 
 interface MsTeamsChannelSelectProps {
   teamId?: string;
-  msTeamsChannels: MsTeamsChannel[];
-  onMsTeamsChannelsChange: (msTeamsChannels: MsTeamsChannel[]) => void;
+  msTeamsChannelsRecipientObject: RecipientObject;
   queryOptions?: MsTeamsChannelQueryOptions;
 }
 
 export const MsTeamsChannelSelect: FunctionComponent<
   MsTeamsChannelSelectProps
-> = ({
-  teamId,
-  msTeamsChannels: selectedChannels = [],
-  onMsTeamsChannelsChange,
-  queryOptions,
-}) => {
+> = ({ teamId, msTeamsChannelsRecipientObject, queryOptions }) => {
   const { connectionStatus } = useKnockMsTeamsClient();
 
   const { data: availableChannels = [] } = useMsTeamsChannels({
     teamId,
     queryOptions,
   });
+
+  const { data: currentConnections, updateConnectedChannels } =
+    useConnectedMsTeamsChannels({ msTeamsChannelsRecipientObject });
 
   const inErrorState = useMemo(
     () => connectionStatus === "disconnected" || connectionStatus === "error",
@@ -41,29 +40,54 @@ export const MsTeamsChannelSelect: FunctionComponent<
     [connectionStatus],
   );
 
-  const selectedValues = useMemo(
+  const isChannelInThisTeam = useCallback(
+    (channelId: string) =>
+      availableChannels.some((channel) => channel.id === channelId),
+    [availableChannels],
+  );
+
+  const comboboxValue = useMemo(
     () =>
-      selectedChannels.map((channel) => ({
-        value: channel.id,
-        label: channel.displayName,
-      })),
-    [selectedChannels],
+      currentConnections
+        ?.filter(
+          (connection) =>
+            connection.ms_teams_channel_id &&
+            isChannelInThisTeam(connection.ms_teams_channel_id),
+        )
+        .map((connection) => {
+          const channel = availableChannels.find(
+            (c) => c.id === connection.ms_teams_channel_id,
+          );
+          return {
+            value: connection.ms_teams_channel_id!,
+            label: channel?.displayName ?? "Loading…",
+          };
+        }),
+    [currentConnections, isChannelInThisTeam, availableChannels],
   );
 
   return (
     <Box w="full">
       <Combobox.Root
-        value={selectedValues}
+        value={comboboxValue}
         onValueChange={(newValues) => {
-          const selectedChannelsList = newValues
-            .map((value) =>
-              availableChannels.find((channel) => channel.id === value.value),
-            )
-            .filter(
-              (channel): channel is MsTeamsChannel => channel !== undefined,
-            );
+          const connectedChannelsInThisTeam =
+            newValues.map<MsTeamsChannelConnection>(({ value: channelId }) => ({
+              ms_teams_channel_id: channelId,
+            }));
+          const connectedChannelsInOtherTeams =
+            currentConnections?.filter(
+              (connection) =>
+                !connection.ms_teams_channel_id ||
+                !isChannelInThisTeam(connection.ms_teams_channel_id),
+            ) ?? [];
 
-          onMsTeamsChannelsChange(selectedChannelsList);
+          const updatedConnections = [
+            ...connectedChannelsInOtherTeams,
+            ...connectedChannelsInThisTeam,
+          ];
+
+          updateConnectedChannels(updatedConnections).catch(console.error);
         }}
         placeholder="Select channels"
         disabled={

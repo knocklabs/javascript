@@ -10,41 +10,24 @@ import "./styles.css";
 
 interface Props {
   msTeamsChannelsRecipientObject: RecipientObject;
-  showConnectedChannelTags: boolean;
 }
 
 const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
   msTeamsChannelsRecipientObject,
-  showConnectedChannelTags,
 }) => {
-  const [selection, setSelection] = useState<{
-    team?: MsTeamsTeam;
-    channels: MsTeamsChannel[];
-  }>({
-    team: undefined,
-    channels: [],
-  });
+  const [selectedTeam, setSelectedTeam] = useState<MsTeamsTeam>();
 
   return (
     <div className="tgph rtk-combobox__grid">
       <div className="rtk-combobox__label">Team</div>
-      <MsTeamsTeamCombobox
-        team={selection.team}
-        onTeamChange={(team) => setSelection({ team, channels: [] })}
-      />
+      <MsTeamsTeamCombobox team={selectedTeam} onTeamChange={setSelectedTeam} />
       <div className="rtk-combobox__label">
         <CornerDownRightIcon />
         Channel
       </div>
       <MsTeamsChannelSelect
-        teamId={selection.team?.id}
-        msTeamsChannels={selection.channels}
-        onMsTeamsChannelsChange={(channels) =>
-          setSelection((selection) => ({
-            ...selection,
-            channels,
-          }))
-        }
+        teamId={selectedTeam?.id}
+        msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
       />
     </div>
   );
