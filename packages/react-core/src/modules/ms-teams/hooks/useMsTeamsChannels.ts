@@ -40,7 +40,7 @@ function useMsTeamsChannels({
     useSWR<GetMsTeamsChannelsResponse>(
       teamId ? [QUERY_KEY, teamId] : null,
       fetchChannels,
-      {},
+      { revalidateOnFocus: false },
     );
 
   return {
