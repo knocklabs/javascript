@@ -60,13 +60,13 @@ export const MsTeamsTeamCombobox: FunctionComponent<
       <Combobox.Root
         value={team ? teamToOption(team) : undefined}
         onValueChange={({ value: teamId }) => {
-          const selectedTeam = teams.find((team) => team.id === teamId);
+          const selectedTeam = sortedTeams.find((team) => team.id === teamId);
           if (selectedTeam) {
             onTeamChange(selectedTeam);
           }
         }}
         placeholder="Select team"
-        disabled={inErrorState || inLoadingState}
+        disabled={inErrorState || inLoadingState || sortedTeams.length === 0}
       >
         <Combobox.Trigger />
         <Combobox.Content>
