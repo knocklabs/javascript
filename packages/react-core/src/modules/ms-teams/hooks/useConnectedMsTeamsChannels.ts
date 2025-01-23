@@ -1,10 +1,13 @@
 import { useKnockMsTeamsClient } from "..";
 import { MsTeamsChannelConnection } from "@knocklabs/client";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 
 import { RecipientObject } from "../../..";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";
+
+const QUERY_KEY = "MS_TEAMS_CONNECTED_CHANNELS";
 
 type UseConnectedMsTeamsChannelsProps = {
   msTeamsChannelsRecipientObject: RecipientObject;
@@ -26,55 +29,36 @@ function useConnectedMsTeamsChannels({
   const { t } = useTranslations();
   const knock = useKnockClient();
   const { connectionStatus, knockMsTeamsChannelId } = useKnockMsTeamsClient();
-  const [connectedChannels, setConnectedChannels] = useState<
-    null | MsTeamsChannelConnection[]
-  >(null);
+
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const fetchAndSetConnectedChannels = useCallback(() => {
-    setIsLoading(true);
-    const getConnectedChannels = () =>
-      knock.objects.getChannelData({
-        collection,
-        objectId,
-        channelId: knockMsTeamsChannelId,
-      });
-
-    getConnectedChannels()
-      .then((res) => {
-        if (res?.data?.connections) {
-          setConnectedChannels(res?.data?.connections);
-        } else {
-          setConnectedChannels([]);
-        }
-        setError(null);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setConnectedChannels([]);
-        setError(null);
-        setIsLoading(false);
-      });
-  }, [collection, knock.objects, knockMsTeamsChannelId, objectId]);
-
-  useEffect(() => {
-    if (
-      connectionStatus === "connected" &&
-      !connectedChannels &&
-      !error &&
-      !isLoading
-    ) {
-      fetchAndSetConnectedChannels();
-    }
-  }, [
-    connectedChannels,
-    fetchAndSetConnectedChannels,
+  const {
+    data: connectedChannels,
+    mutate,
+    isValidating,
     isLoading,
-    error,
-    connectionStatus,
-  ]);
+  } = useSWR<MsTeamsChannelConnection[]>(
+    // Only fetch when Microsoft Teams is connected
+    connectionStatus === "connected"
+      ? [QUERY_KEY, knockMsTeamsChannelId, collection, objectId]
+      : null,
+    async () => {
+      return knock.objects
+        .getChannelData({
+          collection,
+          objectId,
+          channelId: knockMsTeamsChannelId,
+        })
+        .then((res) => res.data?.connections ?? [])
+        .catch(() => []);
+    },
+    {
+      onSuccess: () => {
+        setError(null);
+      },
+    },
+  );
 
   const updateConnectedChannels = async (
     channelsToSendToKnock: MsTeamsChannelConnection[],
@@ -87,7 +71,7 @@ function useConnectedMsTeamsChannels({
         channelId: knockMsTeamsChannelId,
         data: { connections: channelsToSendToKnock },
       });
-      fetchAndSetConnectedChannels();
+      mutate();
     } catch (_error) {
       setError(t("msTeamsChannelSetError") || "");
     }
@@ -95,10 +79,10 @@ function useConnectedMsTeamsChannels({
   };
 
   return {
-    data: connectedChannels,
+    data: connectedChannels ?? null,
     updateConnectedChannels,
     updating: isUpdating,
-    loading: isLoading,
+    loading: isLoading || isValidating,
     error,
   };
 }

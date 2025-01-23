@@ -24,7 +24,6 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
     msTeamsChannelsRecipientObject,
   });
 
-  // TODO: This doesn't fully work because MsTeamsChannelSelect uses its own useConnectedMsTeamsChannels hook
   const getChannelCount = useCallback(
     (teamId: string) =>
       currentConnections?.filter(
