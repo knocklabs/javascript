@@ -1,5 +1,7 @@
 import { MsTeamsTeam } from "@knocklabs/client";
 import {
+  MsTeamsChannelQueryOptions,
+  MsTeamsTeamQueryOptions,
   RecipientObject,
   useConnectedMsTeamsChannels,
 } from "@knocklabs/react-core";
@@ -14,10 +16,14 @@ import "./styles.css";
 
 interface Props {
   msTeamsChannelsRecipientObject: RecipientObject;
+  teamQueryOptions?: MsTeamsTeamQueryOptions;
+  channelQueryOptions?: MsTeamsChannelQueryOptions;
 }
 
 const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
   msTeamsChannelsRecipientObject,
+  teamQueryOptions,
+  channelQueryOptions,
 }) => {
   const [selectedTeam, setSelectedTeam] = useState<MsTeamsTeam | null>(null);
 
@@ -40,6 +46,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         team={selectedTeam}
         onTeamChange={setSelectedTeam}
         getChannelCount={getChannelCount}
+        queryOptions={teamQueryOptions}
       />
       <div className="rtk-combobox__label">
         <CornerDownRightIcon />
@@ -48,6 +55,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
       <MsTeamsChannelSelect
         teamId={selectedTeam?.id}
         msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
+        queryOptions={channelQueryOptions}
       />
       <MsTeamsConnectionError />
     </div>
