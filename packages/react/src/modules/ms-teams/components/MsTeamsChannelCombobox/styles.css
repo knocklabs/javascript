@@ -7,9 +7,9 @@
 @import "@telegraph/menu/default.css";
 
 .rtk-combobox__grid {
+  width: 352px;
   display: grid;
-  grid-template-columns: 2fr 3fr;
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: min-content 1fr;
   align-items: center;
   gap: var(--rtk-spacing-1);
   font-size: var(--rtk-font-size-sm);
@@ -30,6 +30,7 @@
 
 .rtk-combobox__label {
   padding: var(--rtk-spacing-1) 0;
+  margin-right: var(--rtk-spacing-7);
   display: flex;
   align-items: center;
   gap: var(--rtk-spacing-1);
@@ -51,54 +52,4 @@
   color: var(--rtk-color-gray-700);
   font-size: var(--rtk-font-size-xs);
   line-height: normal;
-}
-
-/* Tag */
-.rtk-combobox__connected_channel_tag_list {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--rtk-spacing-2);
-  margin-top: var(--rtk-spacing-2);
-  width: 286px;
-  font-size: var(--rtk-font-size-sm);
-  font-family: var(--rtk-font-family-sanserif);
-  color: var(--rtk-color-gray-800)
-}
-
-.rtk-combobox__connected_channel_tag {
-  align-items: center;
-  background-color: var(--rtk-color-gray-100);
-  border-radius: var(--rtk-border-radius-md);
-  display: flex;
-  gap: var(--rtk-spacing-1);
-  max-width: 286px;
-  padding: var(--rtk-spacing-1) var(--rtk-spacing-2) var(--rtk-spacing-1) var(--rtk-spacing-2);
-}
-
-.rtk-combobox__connected_channel_tag__delete_button,
-.rtk-combobox__connected_channel_tag__text {
-  display: flex;
-}
-
-.rtk-combobox__connected_channel_tag__text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.rtk-combobox__connected_channel_tag__chevron svg {
-  display: block;
-}
-
-.rtk-combobox__connected_channel_tag__delete_button {
-  background-color: unset;
-  border-style: none;
-  cursor: pointer;
-  padding: 0.05rem 0rem 0rem 0rem;
-}
-
-.rtk-combobox__connected_channel_tag__delete_button:hover {
-  background-color: var(--rtk-color-gray-200);
-  border-radius: var(--rtk-border-radius-md);
 }
