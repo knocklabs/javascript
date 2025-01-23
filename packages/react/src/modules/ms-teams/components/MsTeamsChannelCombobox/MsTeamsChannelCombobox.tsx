@@ -34,7 +34,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
   );
 
   return (
-    <div className="tgph rtk-combobox__grid">
+    <div className="rtk-combobox__grid">
       <div className="rtk-combobox__label">Team</div>
       <MsTeamsTeamCombobox
         team={selectedTeam}
