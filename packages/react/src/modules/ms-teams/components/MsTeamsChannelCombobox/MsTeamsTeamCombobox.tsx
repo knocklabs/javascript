@@ -71,7 +71,12 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         <Combobox.Trigger />
         <Combobox.Content>
           <Combobox.Search />
-          <Combobox.Options>
+          <Combobox.Options
+            style={
+              // Overrides combobox defaults; using maxHeight prop on Combobox.Options does not work
+              { overflowY: "auto", maxHeight: "144px" }
+            }
+          >
             {sortedTeams.map((team) => (
               <Combobox.Option key={team.id} {...teamToOption(team)} />
             ))}
