@@ -8,6 +8,7 @@ import { FunctionComponent, useCallback, useState } from "react";
 import { CornerDownRightIcon } from "../../../core/components/Icons/CornerDownRightIcon";
 
 import { MsTeamsChannelSelect } from "./MsTeamsChannelSelect";
+import MsTeamsConnectionError from "./MsTeamsConnectionError";
 import { MsTeamsTeamCombobox } from "./MsTeamsTeamCombobox";
 import "./styles.css";
 
@@ -48,6 +49,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         teamId={selectedTeam?.id}
         msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
       />
+      <MsTeamsConnectionError />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 .rtk-combobox__grid {
   display: grid;
   grid-template-columns: 2fr 3fr;
+  grid-template-rows: repeat(3, 1fr);
   align-items: center;
   gap: var(--rtk-spacing-1);
   font-size: var(--rtk-font-size-sm);
@@ -28,13 +29,13 @@
 
 /* Error */
 .rtk-combobox__error {
+  grid-column: span 2;
   align-items: flex-start;
   background-color: var(--rtk-color-gray-100);
   border-radius: var(--rtk-border-radius-md);
   display: flex;
   gap: var(--rtk-spacing-1);
   justify-content: center;
-  margin-top: var(--rtk-spacing-1);
   padding: var(--rtk-spacing-2);
 }
 
