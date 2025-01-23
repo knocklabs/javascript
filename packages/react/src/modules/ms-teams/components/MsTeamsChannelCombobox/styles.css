@@ -1,11 +1,3 @@
-@import "@telegraph/tokens/default";
-@import "@telegraph/button/default.css";
-@import "@telegraph/icon/default.css";
-@import "@telegraph/layout/default.css";
-@import "@telegraph/input/default.css";
-@import "@telegraph/combobox/default.css";
-@import "@telegraph/menu/default.css";
-
 .rtk-combobox__grid {
   width: 352px;
   display: grid;
