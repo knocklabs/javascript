@@ -8,6 +8,8 @@ import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
+import { sortByDisplayName } from "../../utils";
+
 interface MsTeamsTeamComboboxProps {
   team: MsTeamsTeam | null;
   onTeamChange: (team: MsTeamsTeam) => void;
@@ -23,6 +25,8 @@ export const MsTeamsTeamCombobox: FunctionComponent<
   const { data: teams, isLoading: isLoadingTeams } = useMsTeamsTeams({
     queryOptions,
   });
+
+  const sortedTeams = useMemo(() => sortByDisplayName(teams), [teams]);
 
   const inErrorState = useMemo(
     () => connectionStatus === "disconnected" || connectionStatus === "error",
@@ -68,7 +72,7 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         <Combobox.Content>
           <Combobox.Search />
           <Combobox.Options>
-            {teams.map((team) => (
+            {sortedTeams.map((team) => (
               <Combobox.Option key={team.id} {...teamToOption(team)} />
             ))}
           </Combobox.Options>

@@ -10,6 +10,8 @@ import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
+import { sortByDisplayName } from "../../utils";
+
 interface MsTeamsChannelSelectProps {
   teamId?: string;
   msTeamsChannelsRecipientObject: RecipientObject;
@@ -25,6 +27,11 @@ export const MsTeamsChannelSelect: FunctionComponent<
     teamId,
     queryOptions,
   });
+
+  const sortedChannels = useMemo(
+    () => sortByDisplayName(availableChannels),
+    [availableChannels],
+  );
 
   const { data: currentConnections, updateConnectedChannels } =
     useConnectedMsTeamsChannels({ msTeamsChannelsRecipientObject });
@@ -103,7 +110,7 @@ export const MsTeamsChannelSelect: FunctionComponent<
         <Combobox.Content>
           <Combobox.Search />
           <Combobox.Options>
-            {availableChannels.map((channel) => (
+            {sortedChannels.map((channel) => (
               <Combobox.Option
                 key={channel.id}
                 value={channel.id}
