@@ -58,6 +58,7 @@
     "@radix-ui/react-visually-hidden": "1.0.3",
     "@telegraph/combobox": "^0.0.44",
     "@telegraph/tokens": "^0.0.13",
+    "downshift": "^9.0.8",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2"

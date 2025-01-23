@@ -7,6 +7,18 @@
   font-family: var(--rtk-font-family-sanserif);
 }
 
+.rtk-combobox__menu {
+  position: absolute;
+  z-index: 10;
+  background-color: var(--rtk-color-white);
+  border: 1px solid var(--rtk-color-gray-500);
+  border-radius: var(--rtk-border-radius-sm);
+  padding: var(--rtk-spacing-2);
+  list-style: none;
+  max-height: 166px;
+  overflow-y: scroll;
+}
+
 .rtk-combobox__label {
   padding: var(--rtk-spacing-1) 0;
   display: flex;
