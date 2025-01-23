@@ -6,7 +6,6 @@ import {
   useKnockMsTeamsClient,
   useMsTeamsChannels,
 } from "@knocklabs/react-core";
-import { Box } from "@telegraph/layout";
 import { useCombobox, useMultipleSelection } from "downshift";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 
@@ -166,7 +165,7 @@ export const MsTeamsChannelSelect: FunctionComponent<
     availableChannels.length === 0;
 
   return (
-    <Box w="full">
+    <div>
       <div>
         <label {...getLabelProps()}>Select channels</label>
         <div>
@@ -219,6 +218,6 @@ export const MsTeamsChannelSelect: FunctionComponent<
             </li>
           ))}
       </ul>
-    </Box>
+    </div>
   );
 };
