@@ -1,5 +1,6 @@
 import { useKnockMsTeamsClient } from "..";
 import { MsTeamsChannelConnection } from "@knocklabs/client";
+import { GenericData } from "@knocklabs/types";
 import { useState } from "react";
 import useSWR from "swr";
 
@@ -65,13 +66,22 @@ function useConnectedMsTeamsChannels({
   ) => {
     setIsUpdating(true);
     try {
-      await knock.objects.setChannelData({
-        objectId,
-        collection,
-        channelId: knockMsTeamsChannelId,
-        data: { connections: channelsToSendToKnock },
-      });
-      mutate();
+      mutate(
+        () =>
+          knock.objects
+            .setChannelData({
+              objectId,
+              collection,
+              channelId: knockMsTeamsChannelId,
+              data: { connections: channelsToSendToKnock },
+            })
+            .then((res) => (res as GenericData).data?.connections ?? []),
+        {
+          populateCache: true,
+          revalidate: false,
+          optimisticData: channelsToSendToKnock,
+        },
+      );
     } catch (_error) {
       setError(t("msTeamsChannelSetError") || "");
     }
