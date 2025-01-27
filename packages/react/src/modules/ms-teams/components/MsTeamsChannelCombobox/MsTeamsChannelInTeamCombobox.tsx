@@ -12,14 +12,14 @@ import { FunctionComponent, useCallback, useMemo } from "react";
 
 import { sortByDisplayName } from "../../utils";
 
-interface MsTeamsChannelSelectProps {
+interface MsTeamsChannelInTeamComboboxProps {
   teamId?: string;
   msTeamsChannelsRecipientObject: RecipientObject;
   queryOptions?: MsTeamsChannelQueryOptions;
 }
 
-export const MsTeamsChannelSelect: FunctionComponent<
-  MsTeamsChannelSelectProps
+export const MsTeamsChannelInTeamCombobox: FunctionComponent<
+  MsTeamsChannelInTeamComboboxProps
 > = ({ teamId, msTeamsChannelsRecipientObject, queryOptions }) => {
   const { connectionStatus } = useKnockMsTeamsClient();
 

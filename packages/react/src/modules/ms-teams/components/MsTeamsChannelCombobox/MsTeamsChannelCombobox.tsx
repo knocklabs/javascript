@@ -10,7 +10,7 @@ import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { FunctionComponent, useCallback, useState } from "react";
 
-import { MsTeamsChannelSelect } from "./MsTeamsChannelSelect";
+import { MsTeamsChannelInTeamCombobox } from "./MsTeamsChannelInTeamCombobox";
 import MsTeamsConnectionError from "./MsTeamsConnectionError";
 import { MsTeamsTeamCombobox } from "./MsTeamsTeamCombobox";
 import "./styles.css";
@@ -57,7 +57,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
           Channel
         </Text>
       </Stack>
-      <MsTeamsChannelSelect
+      <MsTeamsChannelInTeamCombobox
         teamId={selectedTeam?.id}
         msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
         queryOptions={channelQueryOptions}
