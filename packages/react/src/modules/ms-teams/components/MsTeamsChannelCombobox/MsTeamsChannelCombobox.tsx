@@ -6,7 +6,7 @@ import {
   useConnectedMsTeamsChannels,
 } from "@knocklabs/react-core";
 import { Icon, Lucide } from "@telegraph/icon";
-import { Stack } from "@telegraph/layout";
+import { Box, Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { FunctionComponent, useCallback, useState } from "react";
 
@@ -41,7 +41,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
   );
 
   return (
-    <div className="tgph rtk-combobox__grid">
+    <Stack className="tgph rtk-combobox__grid" gap="3">
       <Text color="gray" size="2" as="div">
         Team
       </Text>
@@ -52,7 +52,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         queryOptions={teamQueryOptions}
       />
       <Stack alignItems="center" gap="3">
-        <Icon size="1" icon={Lucide.CornerDownRight} aria-hidden />
+        <Icon color="gray" size="1" icon={Lucide.CornerDownRight} aria-hidden />
         <Text color="gray" size="2" as="div">
           Channel
         </Text>
@@ -63,7 +63,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         queryOptions={channelQueryOptions}
       />
       <MsTeamsConnectionError />
-    </div>
+    </Stack>
   );
 };
 
