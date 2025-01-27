@@ -1,10 +1,9 @@
 import { SlackChannel } from "@knocklabs/client";
 import { FunctionComponent } from "react";
 
-import CloseIcon from "../../../core/icons/CloseIcon";
-import HashtagIcon from "../../../core/icons/HashtagIcon";
-import LockIcon from "../../../core/icons/LockIcon";
-
+import CloseIcon from "./icons/CloseIcon";
+import HashtagIcon from "./icons/HashtagIcon";
+import LockIcon from "./icons/LockIcon";
 import "./styles.css";
 
 export interface SlackConnectedChannelTagProps {

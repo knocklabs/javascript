@@ -1,7 +1,7 @@
 import { useKnockMsTeamsClient, useTranslations } from "@knocklabs/react-core";
 import { FunctionComponent } from "react";
 
-import InfoIcon from "../../../core/icons/InfoIcon";
+import InfoIcon from "../../../slack/components/SlackChannelCombobox/icons/InfoIcon";
 
 const MsTeamsConnectionError: FunctionComponent = () => {
   const { t } = useTranslations();

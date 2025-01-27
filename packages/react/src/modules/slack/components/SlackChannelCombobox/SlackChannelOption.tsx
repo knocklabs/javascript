@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
-import CheckmarkIcon from "../../../core/icons/CheckmarkIcon";
-import HashtagIcon from "../../../core/icons/HashtagIcon";
-import LockIcon from "../../../core/icons/LockIcon";
 import "../../theme.css";
 
+import CheckmarkIcon from "./icons/CheckmarkIcon";
+import HashtagIcon from "./icons/HashtagIcon";
+import LockIcon from "./icons/LockIcon";
 import "./styles.css";
 
 export interface SlackChannelOptionProps {
