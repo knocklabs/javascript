@@ -40,13 +40,13 @@ export type GetMsTeamsChannelsResponse = {
 
 export type MsTeamsTeam = {
   id: string;
-  displayName?: string;
+  displayName: string;
   description?: string;
 };
 
 export type MsTeamsChannel = {
   id: string;
-  displayName?: string;
+  displayName: string;
   description?: string;
   membershipType?: string;
   isArchived?: boolean;
