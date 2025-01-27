@@ -15,14 +15,6 @@
   font-family: var(--rtk-font-family-sanserif);
 }
 
-.rtk-combobox__label {
-  padding: var(--rtk-spacing-1) 0;
-  margin-right: var(--rtk-spacing-7);
-  display: flex;
-  align-items: center;
-  gap: var(--rtk-spacing-1);
-}
-
 /* Error */
 .rtk-combobox__error {
   grid-column: span 2;

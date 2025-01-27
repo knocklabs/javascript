@@ -5,9 +5,10 @@ import {
   RecipientObject,
   useConnectedMsTeamsChannels,
 } from "@knocklabs/react-core";
+import { Icon, Lucide } from "@telegraph/icon";
+import { Box, Stack } from "@telegraph/layout";
+import { Text } from "@telegraph/typography";
 import { FunctionComponent, useCallback, useState } from "react";
-
-import { CornerDownRightIcon } from "../../../core/components/Icons/CornerDownRightIcon";
 
 import { MsTeamsChannelSelect } from "./MsTeamsChannelSelect";
 import MsTeamsConnectionError from "./MsTeamsConnectionError";
@@ -41,17 +42,21 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
 
   return (
     <div className="tgph rtk-combobox__grid">
-      <div className="rtk-combobox__label">Team</div>
+      <Text color="gray" size="2" as="div">
+        Team
+      </Text>
       <MsTeamsTeamCombobox
         team={selectedTeam}
         onTeamChange={setSelectedTeam}
         getChannelCount={getChannelCount}
         queryOptions={teamQueryOptions}
       />
-      <div className="rtk-combobox__label">
-        <CornerDownRightIcon />
-        Channel
-      </div>
+      <Stack alignItems="center" gap="3">
+        <Icon size="1" icon={Lucide.CornerDownRight} aria-hidden />
+        <Text color="gray" size="2" as="div">
+          Channel
+        </Text>
+      </Stack>
       <MsTeamsChannelSelect
         teamId={selectedTeam?.id}
         msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
