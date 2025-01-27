@@ -1,33 +1,33 @@
-import { useKnockSlackClient } from "..";
-import { SlackChannelConnection } from "@knocklabs/client";
+import { useKnockMsTeamsClient } from "..";
+import { MsTeamsChannelConnection } from "@knocklabs/client";
 import { useCallback, useEffect, useState } from "react";
 
 import { RecipientObject } from "../../..";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";
 
-type UseConnectedSlackChannelsProps = {
-  slackChannelsRecipientObject: RecipientObject;
+type UseConnectedMsTeamsChannelsProps = {
+  msTeamsChannelsRecipientObject: RecipientObject;
 };
 
-type UseConnectedSlackChannelOutput = {
-  data: SlackChannelConnection[] | null;
+type UseConnectedMsTeamsChannelsOutput = {
+  data: MsTeamsChannelConnection[] | null;
   updateConnectedChannels: (
-    connectedChannels: SlackChannelConnection[],
+    connectedChannels: MsTeamsChannelConnection[],
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
   updating: boolean;
 };
 
-function useConnectedSlackChannels({
-  slackChannelsRecipientObject: { objectId, collection },
-}: UseConnectedSlackChannelsProps): UseConnectedSlackChannelOutput {
+function useConnectedMsTeamsChannels({
+  msTeamsChannelsRecipientObject: { objectId, collection },
+}: UseConnectedMsTeamsChannelsProps): UseConnectedMsTeamsChannelsOutput {
   const { t } = useTranslations();
   const knock = useKnockClient();
-  const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
+  const { connectionStatus, knockMsTeamsChannelId } = useKnockMsTeamsClient();
   const [connectedChannels, setConnectedChannels] = useState<
-    null | SlackChannelConnection[]
+    null | MsTeamsChannelConnection[]
   >(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,11 +35,11 @@ function useConnectedSlackChannels({
 
   const fetchAndSetConnectedChannels = useCallback(() => {
     setIsLoading(true);
-    const getConnectedChannels = async () =>
-      await knock.objects.getChannelData({
+    const getConnectedChannels = () =>
+      knock.objects.getChannelData({
         collection,
         objectId,
-        channelId: knockSlackChannelId,
+        channelId: knockMsTeamsChannelId,
       });
 
     getConnectedChannels()
@@ -57,7 +57,7 @@ function useConnectedSlackChannels({
         setError(null);
         setIsLoading(false);
       });
-  }, [collection, knock.objects, knockSlackChannelId, objectId]);
+  }, [collection, knock.objects, knockMsTeamsChannelId, objectId]);
 
   useEffect(() => {
     if (
@@ -77,19 +77,19 @@ function useConnectedSlackChannels({
   ]);
 
   const updateConnectedChannels = async (
-    channelsToSendToKnock: SlackChannelConnection[],
+    channelsToSendToKnock: MsTeamsChannelConnection[],
   ) => {
     setIsUpdating(true);
     try {
       await knock.objects.setChannelData({
         objectId,
         collection,
-        channelId: knockSlackChannelId,
+        channelId: knockMsTeamsChannelId,
         data: { connections: channelsToSendToKnock },
       });
       fetchAndSetConnectedChannels();
     } catch (_error) {
-      setError(t("slackChannelSetError") || "");
+      setError(t("msTeamsChannelSetError") || "");
     }
     setIsUpdating(false);
   };
@@ -103,4 +103,4 @@ function useConnectedSlackChannels({
   };
 }
 
-export default useConnectedSlackChannels;
+export default useConnectedMsTeamsChannels;

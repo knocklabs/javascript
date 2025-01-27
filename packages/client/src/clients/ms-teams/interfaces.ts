@@ -1,3 +1,12 @@
+export type MsTeamsChannelConnection = {
+  ms_teams_tenant_id?: string;
+  ms_teams_channel_id?: string;
+  ms_teams_user_id?: null;
+  incoming_webhook?: {
+    url: string;
+  };
+};
+
 export type GetMsTeamsTeamsInput = {
   tenant: string;
   knockChannelId: string;

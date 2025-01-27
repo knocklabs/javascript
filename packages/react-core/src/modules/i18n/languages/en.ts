@@ -12,6 +12,7 @@ const en: I18nContent = {
     unread: "Unread",
     read: "Read",
     unseen: "Unseen",
+    msTeamsChannelSetError: "Error setting channel.",
     msTeamsConnect: "Connect to Microsoft Teams",
     msTeamsConnected: "Connected",
     msTeamsConnecting: "Connecting to Microsoft Teams…",
