@@ -1,7 +1,7 @@
 import { useKnockMsTeamsClient, useTranslations } from "@knocklabs/react-core";
+import { Icon, Lucide } from "@telegraph/icon";
+import { Text } from "@telegraph/typography";
 import { FunctionComponent } from "react";
-
-import InfoIcon from "../../../slack/components/SlackChannelCombobox/icons/InfoIcon";
 
 const MsTeamsConnectionError: FunctionComponent = () => {
   const { t } = useTranslations();
@@ -11,14 +11,13 @@ const MsTeamsConnectionError: FunctionComponent = () => {
     return (
       <div className="rtk-combobox__error">
         <span>
-          <InfoIcon />
+          <Icon icon={Lucide.Info} color="black" size="1" aria-hidden />
         </span>
-
-        <div className="rtk-combobox__error__text">
+        <Text as="div" color="black" size="1">
           {connectionStatus === "disconnected"
             ? t("msTeamsConnectionErrorOccurred")
             : t("msTeamsConnectionErrorExists")}
-        </div>
+        </Text>
       </div>
     );
   }
