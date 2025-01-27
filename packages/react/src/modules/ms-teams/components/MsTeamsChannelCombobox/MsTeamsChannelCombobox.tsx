@@ -6,7 +6,7 @@ import {
   useConnectedMsTeamsChannels,
 } from "@knocklabs/react-core";
 import { Icon, Lucide } from "@telegraph/icon";
-import { Box, Stack } from "@telegraph/layout";
+import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { FunctionComponent, useCallback, useState } from "react";
 
