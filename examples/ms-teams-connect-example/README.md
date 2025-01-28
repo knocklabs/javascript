@@ -21,6 +21,8 @@ Note: you don't have to pre-create the tenant or connections object in Knock for
 ### Knock entities
 
 - `NEXT_PUBLIC_TENANT_ID`: the ID of the tenant you want to use for holding the Microsoft Teams tenant ID
+- `NEXT_PUBLIC_CONNECTIONS_COLLECTION`: the collection of the object that will store the Microsoft Teams channel connections
+- `NEXT_PUBLIC_CONNECTIONS_OBJECT_ID`: the id of the object that will store the Microsoft Teams channel connections
 
 ### Microsoft Teams notification configuration
 
