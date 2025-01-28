@@ -74,7 +74,7 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
   );
 
   return (
-    <Box w="full">
+    <Box w="full" minW="0">
       <Combobox.Root
         value={comboboxValue}
         onValueChange={(newValues) => {
@@ -109,12 +109,7 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
         <Combobox.Trigger />
         <Combobox.Content>
           <Combobox.Search />
-          <Combobox.Options
-            style={
-              // Overrides combobox defaults; using maxHeight prop on Combobox.Options does not work
-              { overflowY: "auto", maxHeight: "144px" }
-            }
-          >
+          <Combobox.Options className="rtk-combobox__options">
             {sortedChannels.map((channel) => (
               <Combobox.Option
                 key={channel.id}

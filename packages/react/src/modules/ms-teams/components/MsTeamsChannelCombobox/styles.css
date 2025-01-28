@@ -14,6 +14,20 @@
   font-family: var(--rtk-font-family-sanserif);
 }
 
+/* Overrides Telegraph combobox defaults; using maxHeight prop on Combobox.Options does not work */
+.rtk-combobox__options {
+  overflow-y: auto !important;
+  max-height: 144px !important;
+}
+
+/* MsTeamsTeamCombobox */
+/* Prevents team name from overflowing input box */
+.rtk-combobox__team__value span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* Error */
 .rtk-combobox__error {
   grid-column: span 2;

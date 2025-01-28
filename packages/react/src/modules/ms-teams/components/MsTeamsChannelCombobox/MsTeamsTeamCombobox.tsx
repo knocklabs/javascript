@@ -56,7 +56,7 @@ export const MsTeamsTeamCombobox: FunctionComponent<
   );
 
   return (
-    <Box w="full">
+    <Box w="full" minW="0">
       <Combobox.Root
         value={team ? teamToOption(team) : undefined}
         onValueChange={({ value: teamId }) => {
@@ -68,15 +68,10 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         placeholder="Select team"
         disabled={inErrorState || inLoadingState || sortedTeams.length === 0}
       >
-        <Combobox.Trigger />
+        <Combobox.Trigger className="rtk-combobox__team__value" />
         <Combobox.Content>
           <Combobox.Search />
-          <Combobox.Options
-            style={
-              // Overrides combobox defaults; using maxHeight prop on Combobox.Options does not work
-              { overflowY: "auto", maxHeight: "144px" }
-            }
-          >
+          <Combobox.Options className="rtk-combobox__options">
             {sortedTeams.map((team) => (
               <Combobox.Option key={team.id} {...teamToOption(team)} />
             ))}
