@@ -8,7 +8,11 @@ import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
-import { sortByDisplayName } from "../../utils";
+import {
+  fromLabelSearchableOption,
+  sortByDisplayName,
+  toLabelSearchableOption,
+} from "../../utils";
 
 interface MsTeamsTeamComboboxProps {
   team: MsTeamsTeam | null;
@@ -44,13 +48,13 @@ export const MsTeamsTeamCombobox: FunctionComponent<
   const teamToOption = useCallback(
     (team: MsTeamsTeam) => {
       const channelCount = getChannelCount(team.id);
-      return {
+      return toLabelSearchableOption({
         value: team.id,
         label:
           channelCount > 0
             ? `${team.displayName} (${channelCount})`
             : team.displayName,
-      };
+      });
     },
     [getChannelCount],
   );
@@ -59,7 +63,8 @@ export const MsTeamsTeamCombobox: FunctionComponent<
     <Box w="full" minW="0">
       <Combobox.Root
         value={team ? teamToOption(team) : undefined}
-        onValueChange={({ value: teamId }) => {
+        onValueChange={(searchableOption) => {
+          const { value: teamId } = fromLabelSearchableOption(searchableOption);
           const selectedTeam = sortedTeams.find((team) => team.id === teamId);
           if (selectedTeam) {
             onTeamChange(selectedTeam);
