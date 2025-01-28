@@ -66,7 +66,7 @@ function useConnectedMsTeamsChannels({
   ) => {
     setIsUpdating(true);
     try {
-      mutate(
+      await mutate(
         () =>
           knock.objects
             .setChannelData({

@@ -1,7 +1,7 @@
 import { useKnockMsTeamsClient, useTranslations } from "@knocklabs/react-core";
-import { Icon, Lucide } from "@telegraph/icon";
-import { Text } from "@telegraph/typography";
 import { FunctionComponent } from "react";
+
+import MsTeamsErrorMessage from "./MsTeamsErrorMessage";
 
 const MsTeamsConnectionError: FunctionComponent = () => {
   const { t } = useTranslations();
@@ -9,16 +9,13 @@ const MsTeamsConnectionError: FunctionComponent = () => {
 
   if (connectionStatus === "disconnected" || connectionStatus === "error") {
     return (
-      <div className="rtk-combobox__error">
-        <span>
-          <Icon icon={Lucide.Info} color="black" size="1" aria-hidden />
-        </span>
-        <Text as="div" color="black" size="1">
-          {connectionStatus === "disconnected"
+      <MsTeamsErrorMessage
+        message={
+          connectionStatus === "disconnected"
             ? t("msTeamsConnectionErrorOccurred")
-            : t("msTeamsConnectionErrorExists")}
-        </Text>
-      </div>
+            : t("msTeamsConnectionErrorExists")
+        }
+      />
     );
   }
 

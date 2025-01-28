@@ -16,6 +16,8 @@ import {
   toLabelSearchableOption,
 } from "../../utils";
 
+import MsTeamsErrorMessage from "./MsTeamsErrorMessage";
+
 interface MsTeamsChannelInTeamComboboxProps {
   teamId?: string;
   msTeamsChannelsRecipientObject: RecipientObject;
@@ -37,12 +39,18 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
     [availableChannels],
   );
 
-  const { data: currentConnections, updateConnectedChannels } =
-    useConnectedMsTeamsChannels({ msTeamsChannelsRecipientObject });
+  const {
+    data: currentConnections,
+    updateConnectedChannels,
+    error: connectedChannelsError,
+  } = useConnectedMsTeamsChannels({ msTeamsChannelsRecipientObject });
 
   const inErrorState = useMemo(
-    () => connectionStatus === "disconnected" || connectionStatus === "error",
-    [connectionStatus],
+    () =>
+      connectionStatus === "disconnected" ||
+      connectionStatus === "error" ||
+      !!connectedChannelsError,
+    [connectionStatus, connectedChannelsError],
   );
 
   const inLoadingState = useMemo(
@@ -91,51 +99,59 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
   );
 
   return (
-    <Box w="full" minW="0">
-      <Combobox.Root
-        value={comboboxValue}
-        onValueChange={(searchableOptions) => {
-          const options = searchableOptions.map(fromLabelSearchableOption);
-          const connectedChannelsInThisTeam =
-            options.map<MsTeamsChannelConnection>(({ value: channelId }) => ({
-              ms_teams_team_id: teamId,
-              ms_teams_channel_id: channelId,
-            }));
-          const connectedChannelsInOtherTeams =
-            currentConnections?.filter(
-              (connection) =>
-                !connection.ms_teams_channel_id ||
-                !isChannelInThisTeam(connection.ms_teams_channel_id),
-            ) ?? [];
+    <>
+      <Box w="full" minW="0">
+        <Combobox.Root
+          value={comboboxValue}
+          onValueChange={(searchableOptions) => {
+            const options = searchableOptions.map(fromLabelSearchableOption);
+            const connectedChannelsInThisTeam =
+              options.map<MsTeamsChannelConnection>(({ value: channelId }) => ({
+                ms_teams_team_id: teamId,
+                ms_teams_channel_id: channelId,
+              }));
+            const connectedChannelsInOtherTeams =
+              currentConnections?.filter(
+                (connection) =>
+                  !connection.ms_teams_channel_id ||
+                  !isChannelInThisTeam(connection.ms_teams_channel_id),
+              ) ?? [];
 
-          const updatedConnections = [
-            ...connectedChannelsInOtherTeams,
-            ...connectedChannelsInThisTeam,
-          ];
+            const updatedConnections = [
+              ...connectedChannelsInOtherTeams,
+              ...connectedChannelsInThisTeam,
+            ];
 
-          updateConnectedChannels(updatedConnections).catch(console.error);
-        }}
-        placeholder="Select channels"
-        disabled={
-          teamId === undefined ||
-          inErrorState ||
-          inLoadingState ||
-          availableChannels.length === 0
-        }
-        closeOnSelect={false}
-        layout="wrap"
-      >
-        <Combobox.Trigger />
-        <Combobox.Content>
-          <Combobox.Search />
-          <Combobox.Options className="rtk-combobox__options">
-            {sortedChannels.map((channel) => (
-              <Combobox.Option key={channel.id} {...channelToOption(channel)} />
-            ))}
-          </Combobox.Options>
-          <Combobox.Empty />
-        </Combobox.Content>
-      </Combobox.Root>
-    </Box>
+            updateConnectedChannels(updatedConnections).catch(console.error);
+          }}
+          placeholder="Select channels"
+          disabled={
+            teamId === undefined ||
+            inErrorState ||
+            inLoadingState ||
+            availableChannels.length === 0
+          }
+          closeOnSelect={false}
+          layout="wrap"
+        >
+          <Combobox.Trigger />
+          <Combobox.Content>
+            <Combobox.Search />
+            <Combobox.Options className="rtk-combobox__options">
+              {sortedChannels.map((channel) => (
+                <Combobox.Option
+                  key={channel.id}
+                  {...channelToOption(channel)}
+                />
+              ))}
+            </Combobox.Options>
+            <Combobox.Empty />
+          </Combobox.Content>
+        </Combobox.Root>
+      </Box>
+      {!!connectedChannelsError && (
+        <MsTeamsErrorMessage message={connectedChannelsError} />
+      )}
+    </>
   );
 };
