@@ -51,7 +51,12 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         getChannelCount={getChannelCount}
         queryOptions={teamQueryOptions}
       />
-      <Stack alignItems="center" gap="3">
+      <Stack
+        alignItems="center"
+        gap="3"
+        minHeight="8"
+        style={{ alignSelf: "start" }}
+      >
         <Icon color="gray" size="1" icon={Lucide.CornerDownRight} aria-hidden />
         <Text color="gray" size="2" as="div">
           Channel
