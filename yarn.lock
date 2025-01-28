@@ -6165,7 +6165,7 @@ __metadata:
     "@popperjs/core": "npm:^2.11.8"
     "@radix-ui/react-popover": "npm:1.0.7"
     "@radix-ui/react-visually-hidden": "npm:1.0.3"
-    "@telegraph/combobox": "npm:^0.0.48"
+    "@telegraph/combobox": "npm:^0.0.49"
     "@telegraph/icon": "npm:^0.0.37"
     "@telegraph/layout": "npm:^0.1.3"
     "@telegraph/typography": "npm:^0.1.3"
@@ -9206,9 +9206,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/combobox@npm:^0.0.48":
-  version: 0.0.48
-  resolution: "@telegraph/combobox@npm:0.0.48"
+"@telegraph/combobox@npm:^0.0.49":
+  version: 0.0.49
+  resolution: "@telegraph/combobox@npm:0.0.49"
   dependencies:
     "@radix-ui/react-dismissable-layer": "npm:^1.1.1"
     "@radix-ui/react-use-controllable-state": "npm:^1.1.0"
@@ -9219,7 +9219,7 @@ __metadata:
     "@telegraph/icon": "npm:^0.0.37"
     "@telegraph/input": "npm:^0.0.29"
     "@telegraph/layout": "npm:^0.1.3"
-    "@telegraph/menu": "npm:^0.0.39"
+    "@telegraph/menu": "npm:^0.0.40"
     "@telegraph/motion": "npm:^0.0.2"
     "@telegraph/tag": "npm:^0.0.61"
     "@telegraph/tooltip": "npm:^0.0.30"
@@ -9227,7 +9227,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.3.1
-  checksum: 10c0/e6873c218a0a5cacb6132490d13a804fbabac821fa2841a01caa0a44f4d2b2d24928ea36ff6490ae8583f7ecb64d12e22bfd6239d6b0e77ff175a4f034a8d825
+  checksum: 10c0/f95a2b270e2e609436c29b0cc7e71ce1d4c14f96166faf7e2a6a9d77a9182162b0755093b65fa514162e909a5cb61bb32b135f8f77ba3d5bee0145dea829900d
   languageName: node
   linkType: hard
 
@@ -9298,9 +9298,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/menu@npm:^0.0.39":
-  version: 0.0.39
-  resolution: "@telegraph/menu@npm:0.0.39"
+"@telegraph/menu@npm:^0.0.40":
+  version: 0.0.40
+  resolution: "@telegraph/menu@npm:0.0.40"
   dependencies:
     "@radix-ui/react-menu": "npm:^2.0.6"
     "@radix-ui/react-use-controllable-state": "npm:^1.1.0"
@@ -9312,7 +9312,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.3.1
-  checksum: 10c0/97f296e51db7d89f833dfb27cfaed39f5f5e55497895589529ec665b26377cf32ffa49b77beaa936a155d4bdc0564412e48ded77ee542acd62500d588f9bf789
+  checksum: 10c0/562e1650285918e0c50e082ba3433216c1feab97e018f238cb83038b566bec202fa299183162260cebfcb6e3e38cc353a3d3ab9cbb1537d156a28f90ecc55e8b
   languageName: node
   linkType: hard
 
