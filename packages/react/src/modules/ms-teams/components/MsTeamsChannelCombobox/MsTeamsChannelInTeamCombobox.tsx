@@ -105,6 +105,7 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
           availableChannels.length === 0
         }
         closeOnSelect={false}
+        layout="wrap"
       >
         <Combobox.Trigger />
         <Combobox.Content>
