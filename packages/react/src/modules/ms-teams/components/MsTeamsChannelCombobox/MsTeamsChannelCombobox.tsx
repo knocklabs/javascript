@@ -35,7 +35,9 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
   const getChannelCount = useCallback(
     (teamId: string) =>
       currentConnections?.filter(
-        (connection) => connection.ms_teams_team_id === teamId,
+        (connection) =>
+          connection.ms_teams_team_id === teamId &&
+          !!connection.ms_teams_channel_id,
       ).length ?? 0,
     [currentConnections],
   );
