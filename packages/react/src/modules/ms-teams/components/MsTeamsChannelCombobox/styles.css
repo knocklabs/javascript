@@ -1,4 +1,5 @@
 @import "@telegraph/tokens/light";
+@import "@telegraph/typography/default.css";
 @import "@telegraph/button/default.css";
 @import "@telegraph/icon/default.css";
 @import "@telegraph/layout/default.css";
