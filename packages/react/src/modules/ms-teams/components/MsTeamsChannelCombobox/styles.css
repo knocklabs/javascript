@@ -37,6 +37,5 @@
   border-radius: var(--rtk-border-radius-md);
   display: flex;
   gap: var(--rtk-spacing-1);
-  justify-content: center;
   padding: var(--rtk-spacing-2);
 }
