@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.2
+
+### Patch Changes
+
+- 85418a0: rename constants.ts to interfaces.ts
+- 8cc9338: Fix types in useConnectedSlackChannels.ts
+- da84a75: deprecate tenant in favor of tenantId in KnockSlackProvider and useKnockSlackClient
+- 2161d3f: Use SWR for data fetching in useConnectedMsTeamsChannels hook
+- 1ba1393: add TeamsKit hooks for teams and channels
+- Updated dependencies [2161d3f]
+- Updated dependencies [2161d3f]
+- Updated dependencies [1ba1393]
+- Updated dependencies [b4b5c02]
+  - @knocklabs/client@0.11.2
+
 ## 0.3.1
 
 ### Patch Changes

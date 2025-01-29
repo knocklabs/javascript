@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.2
+
+### Patch Changes
+
+- 2161d3f: Make id and displayName required in MsTeamsTeam and MsTeamsChannel types
+- 2161d3f: Add `ms_teams_team_id` to MsTeamsChannelConnection type
+- 1ba1393: add TeamsKit hooks for teams and channels
+- b4b5c02: add getTeams and getChannels to MsTeamsClient
+
 ## 0.11.1
 
 ### Patch Changes
