@@ -10,6 +10,8 @@ import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { FunctionComponent, useCallback, useState } from "react";
 
+import "../../theme.css";
+
 import { MsTeamsChannelInTeamCombobox } from "./MsTeamsChannelInTeamCombobox";
 import MsTeamsConnectionError from "./MsTeamsConnectionError";
 import { MsTeamsTeamCombobox } from "./MsTeamsTeamCombobox";
