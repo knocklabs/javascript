@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- 2161d3f: Add `MsTeamsChannelCombobox` component to allow connecting Microsoft Teams channels to a Knock object
+
+### Patch Changes
+
+- 1ba1393: add TeamsKit hooks for teams and channels
+- Updated dependencies [85418a0]
+- Updated dependencies [2161d3f]
+- Updated dependencies [8cc9338]
+- Updated dependencies [da84a75]
+- Updated dependencies [2161d3f]
+- Updated dependencies [2161d3f]
+- Updated dependencies [1ba1393]
+- Updated dependencies [b4b5c02]
+  - @knocklabs/react-core@0.3.2
+  - @knocklabs/client@0.11.2
+
 ## 0.3.1
 
 ### Patch Changes
