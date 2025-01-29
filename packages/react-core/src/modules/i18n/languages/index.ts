@@ -17,6 +17,8 @@ export interface Translations {
   readonly msTeamsConnect: string;
   readonly msTeamsConnected: string;
   readonly msTeamsConnecting: string;
+  readonly msTeamsConnectionErrorExists: string;
+  readonly msTeamsConnectionErrorOccurred: string;
   readonly msTeamsConnectContainerDescription: string;
   readonly msTeamsDisconnect: string;
   readonly msTeamsDisconnecting: string;

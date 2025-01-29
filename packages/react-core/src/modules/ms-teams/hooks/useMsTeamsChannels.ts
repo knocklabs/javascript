@@ -8,7 +8,7 @@ import { MsTeamsChannelQueryOptions } from "../interfaces";
 const QUERY_KEY = "MS_TEAMS_CHANNELS";
 
 type UseMsTeamsChannelsProps = {
-  teamId: string;
+  teamId?: string;
   queryOptions?: MsTeamsChannelQueryOptions;
 };
 
@@ -29,7 +29,7 @@ function useMsTeamsChannels({
     knock.msTeams.getChannels({
       knockChannelId: knockMsTeamsChannelId,
       tenant: tenantId,
-      teamId,
+      teamId: teamId!,
       queryOptions: {
         $filter: queryOptions?.filter,
         $select: queryOptions?.select,
@@ -37,7 +37,11 @@ function useMsTeamsChannels({
     });
 
   const { data, isLoading, isValidating, mutate } =
-    useSWR<GetMsTeamsChannelsResponse>([QUERY_KEY, teamId], fetchChannels, {});
+    useSWR<GetMsTeamsChannelsResponse>(
+      teamId ? [QUERY_KEY, teamId] : null,
+      fetchChannels,
+      { revalidateOnFocus: false },
+    );
 
   return {
     data: data?.ms_teams_channels ?? [],

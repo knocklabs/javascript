@@ -1,3 +1,11 @@
+@import "@telegraph/tokens/light";
+@import "@telegraph/typography/default.css";
+@import "@telegraph/button/default.css";
+@import "@telegraph/icon/default.css";
+@import "@telegraph/layout/default.css";
+@import "@telegraph/input/default.css";
+@import "@telegraph/motion/default.css";
+
 :root {
   /* Font sizes */
   --rtk-font-size-xs: 0.75rem;

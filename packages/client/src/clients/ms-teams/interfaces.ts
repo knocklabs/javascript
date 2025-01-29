@@ -1,5 +1,6 @@
 export type MsTeamsChannelConnection = {
   ms_teams_tenant_id?: string;
+  ms_teams_team_id?: string;
   ms_teams_channel_id?: string;
   ms_teams_user_id?: null;
   incoming_webhook?: {
@@ -38,14 +39,14 @@ export type GetMsTeamsChannelsResponse = {
 };
 
 export type MsTeamsTeam = {
-  id?: string;
-  displayName?: string;
+  id: string;
+  displayName: string;
   description?: string;
 };
 
 export type MsTeamsChannel = {
-  id?: string;
-  displayName?: string;
+  id: string;
+  displayName: string;
   description?: string;
   membershipType?: string;
   isArchived?: boolean;

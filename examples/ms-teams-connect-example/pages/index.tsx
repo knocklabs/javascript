@@ -3,6 +3,7 @@ import {
   KnockProvider,
   MsTeamsAuthButton,
   MsTeamsAuthContainer,
+  MsTeamsChannelCombobox,
 } from "@knocklabs/react";
 
 import { useSetToken } from "../hooks";
@@ -19,6 +20,11 @@ export default function Home() {
   };
   const redirectUrl = process.env.NEXT_PUBLIC_REDIRECT_URL;
 
+  const msTeamsChannelsRecipientObject = {
+    collection: process.env.NEXT_PUBLIC_CONNECTIONS_COLLECTION!,
+    objectId: process.env.NEXT_PUBLIC_CONNECTIONS_OBJECT_ID!,
+  };
+
   const onAuthComplete = (result: string) => {
     console.log("Result from MS Teams authentication:", result);
   };
@@ -26,6 +32,7 @@ export default function Home() {
   const { isLoading, isError } = useSetToken({
     tenant: process.env.NEXT_PUBLIC_TENANT_ID!,
     user,
+    msTeamsChannelsRecipientObject,
   });
 
   if (isLoading) {
@@ -60,6 +67,24 @@ export default function Home() {
           MS Teams connector examples
         </h1>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div>
+            <div
+              style={{
+                marginBottom: "10px",
+                marginTop: "40px",
+                fontFamily: "monospace",
+                fontSize: "25px",
+                color: "gray",
+              }}
+            >
+              MS Teams Channel Picker
+            </div>
+            <div style={{ margin: "10px", padding: "10px" }}>
+              <MsTeamsChannelCombobox
+                msTeamsChannelsRecipientObject={msTeamsChannelsRecipientObject}
+              />
+            </div>
+          </div>
           <div>
             <div
               style={{

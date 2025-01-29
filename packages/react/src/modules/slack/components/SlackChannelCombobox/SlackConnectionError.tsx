@@ -23,7 +23,7 @@ const SlackConnectionError: FunctionComponent = () => {
     );
   }
 
-  return <div />;
+  return null;
 };
 
 export default SlackConnectionError;
