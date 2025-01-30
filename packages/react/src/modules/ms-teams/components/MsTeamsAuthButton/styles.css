@@ -1,0 +1,63 @@
+:root {
+  --rtk-connected-color: rgba(51, 163, 102, 1);
+  --rtk-disconnect-border-color: rgba(230, 71, 51, 1);
+  --rtk-disconnect-background-color: rgba(255, 245, 245, 1);
+  --rtk-error-red: rgba(205, 123, 46, 1);
+}
+
+.rtk-connect__button {
+  background-color: var(--rtk-color-white);
+  border: 1px solid var(--rtk-color-gray-200);
+  border-radius: var(--rtk-button-border-radius);
+  box-sizing: border-box;
+  color: var(--rtk-color-black);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--rtk-font-family-sanserif);
+  font-size: var(--rtk-font-size-sm);
+  font-weight: var(--rtk-font-weight-normal);
+  gap: var(--rtk-spacing-2);
+  padding: var(--rtk-spacing-1) var(--rtk-spacing-2);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.rtk-connect__button--connected {
+  border-color: var(--rtk-connected-color);
+  color: var(--rtk-connected-color);
+  width: 120px;
+}
+
+.rtk-connect__button--error {
+  border-color: var(--rtk-error-red);
+  color: var(--rtk-error-red);
+}
+
+.rtk-connect__button--loading {
+  border-color: var(--rtk-color-gray-100);
+  color: var(--rtk-color-gray-400);
+  pointer-events: none;
+}
+
+.rtk-connect__button--disconnected:hover {
+  background-color: var(--rtk-button-hover-color);
+}
+
+.rtk-connect__button--connected:hover,
+.rtk-connect__button__text--connected:hover {
+  background-color: var(--rtk-disconnect-background-color);
+  border-color: var(--rtk-disconnect-border-color);
+  color: var(--rtk-disconnect-border-color);
+}
+
+.rtk-connect__button--error:hover,
+.rtk-connect__button__text--error:hover {
+  border-color: var(--rtk-color-black);
+  color: var(--rtk-color-black);
+}
+
+.rtk-connect__button:active {
+  transform: translate(1px, 1px);
+}

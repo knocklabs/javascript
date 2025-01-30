@@ -56,7 +56,7 @@ export default function Home() {
     >
       <KnockSlackProvider
         knockSlackChannelId={process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID!}
-        tenant={tenant}
+        tenantId={tenant}
       >
         <>
           <div

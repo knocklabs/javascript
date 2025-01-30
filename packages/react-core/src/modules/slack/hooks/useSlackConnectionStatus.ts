@@ -34,7 +34,7 @@ const formatSlackErrorMessage = (errorMessage: string) => {
 function useSlackConnectionStatus(
   knock: Knock,
   knockSlackChannelId: string,
-  tenant: string,
+  tenantId: string,
 ): UseSlackConnectionStatusOutput {
   const { t } = useTranslations();
   const [connectionStatus, setConnectionStatus] =
@@ -48,7 +48,7 @@ function useSlackConnectionStatus(
 
       try {
         const authRes = await knock.slack.authCheck({
-          tenant,
+          tenant: tenantId,
           knockChannelId: knockSlackChannelId,
         });
 
@@ -81,13 +81,13 @@ function useSlackConnectionStatus(
         // This is for any Knock errors that would require a reconnect.
 
         setConnectionStatus("error");
-      } catch (error) {
+      } catch (_error) {
         setConnectionStatus("error");
       }
     };
 
     checkAuthStatus();
-  }, [connectionStatus, tenant, knockSlackChannelId, knock.slack, t]);
+  }, [connectionStatus, tenantId, knockSlackChannelId, knock.slack, t]);
 
   return {
     connectionStatus,

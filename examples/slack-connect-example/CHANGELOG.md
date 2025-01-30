@@ -1,5 +1,22 @@
 # slack-connect-example
 
+## 0.2.4
+
+### Patch Changes
+
+- da84a75: deprecate tenant in favor of tenantId in KnockSlackProvider and useKnockSlackClient
+- Updated dependencies [1ba1393]
+- Updated dependencies [2161d3f]
+  - @knocklabs/react@0.4.0
+
+## 0.2.3
+
+### Patch Changes
+
+- 49d6216: Add TeamsKit example app
+- Updated dependencies [013ad8d]
+  - @knocklabs/react@0.3.0
+
 ## 0.2.2
 
 ### Patch Changes

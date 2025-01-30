@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.11.2
+
+### Patch Changes
+
+- 2161d3f: Make id and displayName required in MsTeamsTeam and MsTeamsChannel types
+- 2161d3f: Add `ms_teams_team_id` to MsTeamsChannelConnection type
+- 1ba1393: add TeamsKit hooks for teams and channels
+- b4b5c02: add getTeams and getChannels to MsTeamsClient
+
+## 0.11.1
+
+### Patch Changes
+
+- b9f6712: fix: types for userId should handle undefined and null
+
+## 0.11.0
+
+### Minor Changes
+
+- 013ad8d: feat: add MsTeamsAuthButton
+
+## 0.10.17
+
+### Patch Changes
+
+- 26db496: fix: ensure feed can render with empty/missing userId values
+- 988aaf9: fix: engagement_status in BulkUpdateMessagesInChannelProperties type
+
+## 0.10.16
+
+### Patch Changes
+
+- bc99374: fix: bundle client package using "compat" interop
+
+## 0.10.15
+
+### Patch Changes
+
+- 26166e3: fix: update preference set types
+- Updated dependencies [26166e3]
+  - @knocklabs/types@0.1.5
+
 ## 0.10.14
 
 ### Patch Changes

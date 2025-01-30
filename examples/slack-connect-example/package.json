@@ -1,6 +1,6 @@
 {
   "name": "slack-connect-example",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,7 +13,7 @@
   "dependencies": {
     "@knocklabs/react": "*",
     "jsonwebtoken": "^9.0.2",
-    "next": "15.0.2",
+    "next": "15.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -24,6 +24,6 @@
     "@types/react-dom": "^18.2.15",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.2.13",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   }
 }

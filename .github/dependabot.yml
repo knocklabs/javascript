@@ -11,3 +11,6 @@ updates:
       - "knocklabs/product"
     versioning-strategy: increase
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "@radix-ui/react-popover"
+      - dependency-name: "@radix-ui/react-visually-hidden"

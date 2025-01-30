@@ -23,7 +23,7 @@ function useSlackAuth(
   additionalScopes?: string[],
 ): UseSlackAuthOutput {
   const knock = useKnockClient();
-  const { setConnectionStatus, knockSlackChannelId, tenant, setActionLabel } =
+  const { setConnectionStatus, knockSlackChannelId, tenantId, setActionLabel } =
     useKnockSlackClient();
 
   const combinedScopes =
@@ -36,7 +36,7 @@ function useSlackAuth(
     setConnectionStatus("disconnecting");
     try {
       const revoke = await knock.slack.revokeAccessToken({
-        tenant,
+        tenant: tenantId,
         knockChannelId: knockSlackChannelId,
       });
 
@@ -45,13 +45,13 @@ function useSlackAuth(
       } else {
         setConnectionStatus("error");
       }
-    } catch (error) {
+    } catch (_error) {
       setConnectionStatus("error");
     }
   }, [
     setConnectionStatus,
     knock.slack,
-    tenant,
+    tenantId,
     knockSlackChannelId,
     setActionLabel,
   ]);
@@ -61,7 +61,7 @@ function useSlackAuth(
       state: JSON.stringify({
         redirect_url: redirectUrl,
         access_token_object: {
-          object_id: tenant,
+          object_id: tenantId,
           collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockSlackChannelId,
@@ -74,7 +74,7 @@ function useSlackAuth(
     return `${SLACK_AUTHORIZE_URL}?${new URLSearchParams(rawParams)}`;
   }, [
     redirectUrl,
-    tenant,
+    tenantId,
     knockSlackChannelId,
     knock.apiKey,
     knock.userToken,

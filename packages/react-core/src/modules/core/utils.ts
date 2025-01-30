@@ -21,7 +21,7 @@ export function formatTimestamp(
     });
 
     return formatted;
-  } catch (e) {
+  } catch (_e) {
     return ts;
   }
 }
@@ -61,16 +61,36 @@ export function feedProviderKey(
 */
 export function slackProviderKey({
   knockSlackChannelId,
-  tenant,
+  tenantId,
   connectionStatus,
   errorLabel,
 }: {
   knockSlackChannelId: string;
-  tenant: string;
+  tenantId: string;
   connectionStatus: string;
   errorLabel: string | null;
 }) {
-  return [knockSlackChannelId, tenant, connectionStatus, errorLabel]
+  return [knockSlackChannelId, tenantId, connectionStatus, errorLabel]
+    .filter((f) => f !== null && f !== undefined)
+    .join("-");
+}
+
+/*
+  Used to build a consistent key for the KnockMsTeamsProvider so that React knows when
+  to trigger a re-render of the context when a key property changes.
+*/
+export function msTeamsProviderKey({
+  knockMsTeamsChannelId,
+  tenantId,
+  connectionStatus,
+  errorLabel,
+}: {
+  knockMsTeamsChannelId: string;
+  tenantId: string;
+  connectionStatus: string;
+  errorLabel: string | null;
+}) {
+  return [knockMsTeamsChannelId, tenantId, connectionStatus, errorLabel]
     .filter((f) => f !== null && f !== undefined)
     .join("-");
 }

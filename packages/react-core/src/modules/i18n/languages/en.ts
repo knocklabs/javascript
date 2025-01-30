@@ -12,6 +12,21 @@ const en: I18nContent = {
     unread: "Unread",
     read: "Read",
     unseen: "Unseen",
+    msTeamsChannelSetError: "Error setting channel.",
+    msTeamsConnect: "Connect to Microsoft Teams",
+    msTeamsConnected: "Connected",
+    msTeamsConnecting: "Connecting to Microsoft Teams…",
+    msTeamsConnectionErrorExists:
+      "Try reconnecting to Microsoft Teams to find and select channels from your teams.",
+    msTeamsConnectionErrorOccurred:
+      "There was an error connecting to Microsoft Teams. Try reconnecting to find and select channels from your teams.",
+    msTeamsConnectContainerDescription:
+      "Connect to get notifications in Microsoft Teams",
+    msTeamsDisconnect: "Disconnect",
+    msTeamsDisconnecting: "Disconnecting from Microsoft Teams…",
+    msTeamsError: "Error",
+    msTeamsReconnect: "Reconnect",
+    msTeamsTenantIdNotSet: "Microsoft Teams tenant ID not set.",
     slackConnectChannel: "Connect channel",
     slackChannelId: "Slack channel ID",
     slackConnecting: "Connecting to Slack...",

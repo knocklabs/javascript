@@ -1,0 +1,39 @@
+.rtk-combobox__grid {
+  width: 352px;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+  font-size: var(--rtk-font-size-sm);
+  font-family: var(--rtk-font-family-sanserif);
+}
+
+/*
+ * Overrides Telegraph combobox defaults; using maxHeight prop on Combobox.Options does not work.
+ * See KNO-7736.
+ */
+.rtk-combobox__options {
+  overflow-y: auto !important;
+  max-height: 144px !important;
+}
+
+/*
+ * MsTeamsTeamCombobox
+ * Prevents team name from overflowing input box.
+ * See KNO-7737.
+ */
+.rtk-combobox__team__value span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Error */
+.rtk-combobox__error {
+  grid-column: span 2;
+  align-items: flex-start;
+  background-color: var(--rtk-color-gray-100);
+  border-radius: var(--rtk-border-radius-md);
+  display: flex;
+  gap: var(--rtk-spacing-1);
+  padding: var(--rtk-spacing-2);
+}

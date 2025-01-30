@@ -1,5 +1,61 @@
 # Changelog
 
+## 0.5.7
+
+### Patch Changes
+
+- Updated dependencies [85418a0]
+- Updated dependencies [2161d3f]
+- Updated dependencies [8cc9338]
+- Updated dependencies [da84a75]
+- Updated dependencies [2161d3f]
+- Updated dependencies [2161d3f]
+- Updated dependencies [1ba1393]
+- Updated dependencies [b4b5c02]
+  - @knocklabs/react-core@0.3.2
+  - @knocklabs/client@0.11.2
+
+## 0.5.6
+
+### Patch Changes
+
+- Updated dependencies [b9f6712]
+  - @knocklabs/react-core@0.3.1
+  - @knocklabs/client@0.11.1
+
+## 0.5.5
+
+### Patch Changes
+
+- Updated dependencies [013ad8d]
+  - @knocklabs/react-core@0.3.0
+  - @knocklabs/client@0.11.0
+
+## 0.5.4
+
+### Patch Changes
+
+- Updated dependencies [26db496]
+- Updated dependencies [988aaf9]
+  - @knocklabs/client@0.10.17
+  - @knocklabs/react-core@0.2.29
+
+## 0.5.3
+
+### Patch Changes
+
+- Updated dependencies [bc99374]
+  - @knocklabs/client@0.10.16
+  - @knocklabs/react-core@0.2.28
+
+## 0.5.2
+
+### Patch Changes
+
+- Updated dependencies [26166e3]
+  - @knocklabs/client@0.10.15
+  - @knocklabs/react-core@0.2.27
+
 ## 0.5.1
 
 ### Patch Changes

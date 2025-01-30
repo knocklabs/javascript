@@ -1,5 +1,61 @@
 # Changelog
 
+## 0.3.2
+
+### Patch Changes
+
+- 85418a0: rename constants.ts to interfaces.ts
+- 8cc9338: Fix types in useConnectedSlackChannels.ts
+- da84a75: deprecate tenant in favor of tenantId in KnockSlackProvider and useKnockSlackClient
+- 2161d3f: Use SWR for data fetching in useConnectedMsTeamsChannels hook
+- 1ba1393: add TeamsKit hooks for teams and channels
+- Updated dependencies [2161d3f]
+- Updated dependencies [2161d3f]
+- Updated dependencies [1ba1393]
+- Updated dependencies [b4b5c02]
+  - @knocklabs/client@0.11.2
+
+## 0.3.1
+
+### Patch Changes
+
+- b9f6712: fix: types for userId should handle undefined and null
+- Updated dependencies [b9f6712]
+  - @knocklabs/client@0.11.1
+
+## 0.3.0
+
+### Minor Changes
+
+- 013ad8d: feat: add MsTeamsAuthButton
+
+### Patch Changes
+
+- Updated dependencies [013ad8d]
+  - @knocklabs/client@0.11.0
+
+## 0.2.29
+
+### Patch Changes
+
+- Updated dependencies [26db496]
+- Updated dependencies [988aaf9]
+  - @knocklabs/client@0.10.17
+
+## 0.2.28
+
+### Patch Changes
+
+- Updated dependencies [bc99374]
+  - @knocklabs/client@0.10.16
+
+## 0.2.27
+
+### Patch Changes
+
+- Updated dependencies [26166e3]
+  - @knocklabs/client@0.10.15
+
 ## 0.2.26
 
 ### Patch Changes

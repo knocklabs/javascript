@@ -1,19 +1,20 @@
-import { ContainerObject, useKnockSlackClient } from "..";
+import { useKnockSlackClient } from "..";
 import { SlackChannelConnection } from "@knocklabs/client";
 import { useCallback, useEffect, useState } from "react";
 
+import { RecipientObject } from "../../..";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";
 
-type UseSlackChannelsProps = {
-  slackChannelsRecipientObject: ContainerObject;
+type UseConnectedSlackChannelsProps = {
+  slackChannelsRecipientObject: RecipientObject;
 };
 
-type UseSlackChannelOutput = {
+type UseConnectedSlackChannelOutput = {
   data: SlackChannelConnection[] | null;
   updateConnectedChannels: (
     connectedChannels: SlackChannelConnection[],
-  ) => void;
+  ) => Promise<void>;
   loading: boolean;
   error: string | null;
   updating: boolean;
@@ -21,7 +22,7 @@ type UseSlackChannelOutput = {
 
 function useConnectedSlackChannels({
   slackChannelsRecipientObject: { objectId, collection },
-}: UseSlackChannelsProps): UseSlackChannelOutput {
+}: UseConnectedSlackChannelsProps): UseConnectedSlackChannelOutput {
   const { t } = useTranslations();
   const knock = useKnockClient();
   const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
@@ -87,7 +88,7 @@ function useConnectedSlackChannels({
         data: { connections: channelsToSendToKnock },
       });
       fetchAndSetConnectedChannels();
-    } catch (error) {
+    } catch (_error) {
       setError(t("slackChannelSetError") || "");
     }
     setIsUpdating(false);

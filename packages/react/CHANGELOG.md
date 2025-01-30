@@ -1,5 +1,76 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- 2161d3f: Add `MsTeamsChannelCombobox` component to allow connecting Microsoft Teams channels to a Knock object
+
+### Patch Changes
+
+- 1ba1393: add TeamsKit hooks for teams and channels
+- Updated dependencies [85418a0]
+- Updated dependencies [2161d3f]
+- Updated dependencies [8cc9338]
+- Updated dependencies [da84a75]
+- Updated dependencies [2161d3f]
+- Updated dependencies [2161d3f]
+- Updated dependencies [1ba1393]
+- Updated dependencies [b4b5c02]
+  - @knocklabs/react-core@0.3.2
+  - @knocklabs/client@0.11.2
+
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [b9f6712]
+  - @knocklabs/react-core@0.3.1
+  - @knocklabs/client@0.11.1
+
+## 0.3.0
+
+### Minor Changes
+
+- 013ad8d: feat: add MsTeamsAuthButton
+
+### Patch Changes
+
+- Updated dependencies [013ad8d]
+  - @knocklabs/react-core@0.3.0
+  - @knocklabs/client@0.11.0
+
+## 0.2.33
+
+### Patch Changes
+
+- Updated dependencies [26db496]
+- Updated dependencies [988aaf9]
+  - @knocklabs/client@0.10.17
+  - @knocklabs/react-core@0.2.29
+
+## 0.2.32
+
+### Patch Changes
+
+- Updated dependencies [bc99374]
+  - @knocklabs/client@0.10.16
+  - @knocklabs/react-core@0.2.28
+
+## 0.2.31
+
+### Patch Changes
+
+- Updated dependencies [26166e3]
+  - @knocklabs/client@0.10.15
+  - @knocklabs/react-core@0.2.27
+
+## 0.2.30
+
+### Patch Changes
+
+- e8dfae8: Pin Radix dependencies to support React 16
+
 ## 0.2.29
 
 ### Patch Changes
