@@ -31,7 +31,7 @@ export const KnockInAppMessagesChannelProvider: React.FC<
   let knock: Knock;
   try {
     knock = useKnockClient();
-  } catch (error) {
+  } catch (_) {
     throw new Error(
       "KnockInAppMessagesChannelProvider must be used within a KnockProvider.",
     );

@@ -41,7 +41,7 @@ export const KnockFeedProvider: React.FC<
   let knock: Knock;
   try {
     knock = useKnockClient();
-  } catch (error) {
+  } catch (_) {
     throw new Error("KnockFeedProvider must be used within a KnockProvider.");
   }
 

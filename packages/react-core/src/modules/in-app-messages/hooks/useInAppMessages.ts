@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 import { useStableOptions } from "../../core";
 import { useInAppMessagesChannel } from "../context";
 
-export interface UseInAppMessagesOptions extends InAppMessagesClientOptions {}
+type UseInAppMessagesOptions = InAppMessagesClientOptions;
 
 export interface UseInAppMessagesResponse<
   TContent extends GenericData,
