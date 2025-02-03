@@ -5852,7 +5852,7 @@ __metadata:
     eventemitter2: "npm:^6.4.5"
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
-    phoenix: "npm:1.7.14"
+    phoenix: "npm:1.7.19"
     prettier: "npm:^3.4.2"
     rimraf: "npm:^6.0.1"
     rollup: "npm:^4.27.4"
@@ -21711,10 +21711,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"phoenix@npm:1.7.14":
-  version: 1.7.14
-  resolution: "phoenix@npm:1.7.14"
-  checksum: 10c0/df1fd7c5023474f35d38dafc3185c80351de2c9b3fdba1684ef60bac71759e5b6d931811f61059eb9579b0b85fd912a31af6ddc6c25f1b23c460093cd377b72f
+"phoenix@npm:1.7.19":
+  version: 1.7.19
+  resolution: "phoenix@npm:1.7.19"
+  checksum: 10c0/0c8b819b5769d7d93882f7c59f740a67b4a9a0bd9df3076c4b04d1a2a041e5518e2345e5b3121c5cb42f830408458ba414515e17e75884e1707b978b5d01f5a3
   languageName: node
   linkType: hard
 
