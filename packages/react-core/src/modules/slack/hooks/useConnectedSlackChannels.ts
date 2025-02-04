@@ -1,10 +1,14 @@
 import { useKnockSlackClient } from "..";
 import { SlackChannelConnection } from "@knocklabs/client";
-import { useCallback, useEffect, useState } from "react";
+import { GenericData } from "@knocklabs/types";
+import { useState } from "react";
+import useSWR from "swr";
 
 import { RecipientObject } from "../../..";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";
+
+const QUERY_KEY = "SLACK_CONNECTED_CHANNELS";
 
 type UseConnectedSlackChannelsProps = {
   slackChannelsRecipientObject: RecipientObject;
@@ -26,68 +30,58 @@ function useConnectedSlackChannels({
   const { t } = useTranslations();
   const knock = useKnockClient();
   const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
-  const [connectedChannels, setConnectedChannels] = useState<
-    null | SlackChannelConnection[]
-  >(null);
+
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const fetchAndSetConnectedChannels = useCallback(() => {
-    setIsLoading(true);
-    const getConnectedChannels = async () =>
-      await knock.objects.getChannelData({
-        collection,
-        objectId,
-        channelId: knockSlackChannelId,
-      });
-
-    getConnectedChannels()
-      .then((res) => {
-        if (res?.data?.connections) {
-          setConnectedChannels(res?.data?.connections);
-        } else {
-          setConnectedChannels([]);
-        }
-        setError(null);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setConnectedChannels([]);
-        setError(null);
-        setIsLoading(false);
-      });
-  }, [collection, knock.objects, knockSlackChannelId, objectId]);
-
-  useEffect(() => {
-    if (
-      connectionStatus === "connected" &&
-      !connectedChannels &&
-      !error &&
-      !isLoading
-    ) {
-      fetchAndSetConnectedChannels();
-    }
-  }, [
-    connectedChannels,
-    fetchAndSetConnectedChannels,
+  const {
+    data: connectedChannels,
+    mutate,
+    isValidating,
     isLoading,
-    error,
-    connectionStatus,
-  ]);
+  } = useSWR<SlackChannelConnection[]>(
+    // Only fetch when Slack is connected
+    connectionStatus === "connected"
+      ? [QUERY_KEY, knockSlackChannelId, collection, objectId]
+      : null,
+    async () => {
+      return knock.objects
+        .getChannelData({
+          collection,
+          objectId,
+          channelId: knockSlackChannelId,
+        })
+        .then((res) => res.data?.connections ?? [])
+        .catch(() => []);
+    },
+    {
+      onSuccess: () => {
+        setError(null);
+      },
+    },
+  );
 
   const updateConnectedChannels = async (
     channelsToSendToKnock: SlackChannelConnection[],
   ) => {
     setIsUpdating(true);
     try {
-      await knock.objects.setChannelData({
-        objectId,
-        collection,
-        channelId: knockSlackChannelId,
-        data: { connections: channelsToSendToKnock },
-      });
-      fetchAndSetConnectedChannels();
+      await mutate(
+        () =>
+          knock.objects
+            .setChannelData({
+              objectId,
+              collection,
+              channelId: knockSlackChannelId,
+              data: { connections: channelsToSendToKnock },
+            })
+            .then((res) => (res as GenericData).data?.connections ?? []),
+        {
+          populateCache: true,
+          revalidate: false,
+          optimisticData: channelsToSendToKnock,
+        },
+      );
     } catch (_error) {
       setError(t("slackChannelSetError") || "");
     }
@@ -95,10 +89,10 @@ function useConnectedSlackChannels({
   };
 
   return {
-    data: connectedChannels,
+    data: connectedChannels ?? null,
     updateConnectedChannels,
     updating: isUpdating,
-    loading: isLoading,
+    loading: isLoading || isValidating,
     error,
   };
 }
