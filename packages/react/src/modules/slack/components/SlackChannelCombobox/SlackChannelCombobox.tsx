@@ -97,9 +97,7 @@ export const SlackChannelCombobox: FunctionComponent<
     }
   }, [comboboxListOpen]);
 
-  const currentConnectedChannels = useMemo<
-    SlackChannelConnection[] | null
-  >(() => {
+  const currentConnectedChannels = useMemo<SlackChannelConnection[]>(() => {
     // Used to make sure we're only showing currently available channels to select from.
     // There are cases where a channel is "connected" in Knock, but it wouldn't be
     // posting to it if the channel is private and the Slackbot doesn't belong to it,
