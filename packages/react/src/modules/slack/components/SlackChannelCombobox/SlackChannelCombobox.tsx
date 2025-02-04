@@ -87,10 +87,6 @@ export const SlackChannelCombobox: FunctionComponent<
     updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ slackChannelsRecipientObject });
 
-  const [currentConnectedChannels, setCurrentConnectedChannels] = useState<
-    SlackChannelConnection[] | null
-  >(null);
-
   useEffect(() => {
     if (comboboxListOpen) {
       // Timeout to allow for the state to update and the component to re-render
@@ -101,7 +97,9 @@ export const SlackChannelCombobox: FunctionComponent<
     }
   }, [comboboxListOpen]);
 
-  useEffect(() => {
+  const currentConnectedChannels = useMemo<
+    SlackChannelConnection[] | null
+  >(() => {
     // Used to make sure we're only showing currently available channels to select from.
     // There are cases where a channel is "connected" in Knock, but it wouldn't be
     // posting to it if the channel is private and the Slackbot doesn't belong to it,
@@ -110,12 +108,11 @@ export const SlackChannelCombobox: FunctionComponent<
       slackChannels.map((channel) => [channel.id, channel]),
     );
 
-    const channels =
+    return (
       connectedChannels?.filter((connectedChannel) => {
         return slackChannelsMap.has(connectedChannel.channel_id || "");
-      }) || [];
-
-    setCurrentConnectedChannels(channels);
+      }) || []
+    );
   }, [connectedChannels, slackChannels]);
 
   const inErrorState = useMemo(
@@ -220,7 +217,6 @@ export const SlackChannelCombobox: FunctionComponent<
         (connectedChannel) => connectedChannel.channel_id !== channelId,
       );
 
-      setCurrentConnectedChannels(channelsToSendToKnock);
       updateConnectedChannels(channelsToSendToKnock);
     } else {
       const channelsToSendToKnock = [
@@ -228,7 +224,6 @@ export const SlackChannelCombobox: FunctionComponent<
         { channel_id: channelId } as SlackChannelConnection,
       ];
 
-      setCurrentConnectedChannels(channelsToSendToKnock);
       updateConnectedChannels(channelsToSendToKnock);
     }
   };
