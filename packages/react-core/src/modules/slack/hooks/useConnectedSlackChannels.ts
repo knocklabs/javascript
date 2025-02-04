@@ -10,7 +10,7 @@ type UseConnectedSlackChannelsProps = {
   slackChannelsRecipientObject: RecipientObject;
 };
 
-type UseConnectedSlackChannelOutput = {
+type UseConnectedSlackChannelsOutput = {
   data: SlackChannelConnection[] | null;
   updateConnectedChannels: (
     connectedChannels: SlackChannelConnection[],
@@ -22,7 +22,7 @@ type UseConnectedSlackChannelOutput = {
 
 function useConnectedSlackChannels({
   slackChannelsRecipientObject: { objectId, collection },
-}: UseConnectedSlackChannelsProps): UseConnectedSlackChannelOutput {
+}: UseConnectedSlackChannelsProps): UseConnectedSlackChannelsOutput {
   const { t } = useTranslations();
   const knock = useKnockClient();
   const { connectionStatus, knockSlackChannelId } = useKnockSlackClient();
