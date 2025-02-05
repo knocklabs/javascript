@@ -12,7 +12,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
-import { Spinner, useOutsideClick } from "../../../core";
+import { Spinner } from "../../../core";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
@@ -64,13 +64,6 @@ export const SlackChannelCombobox: FunctionComponent<
 
   // Used to close the combobox when clicking outside of it
   const comboboxRef = useRef(null);
-  useOutsideClick({
-    ref: comboboxRef,
-    fn: () => {
-      setInputValue("");
-      setComboboxListOpen(false);
-    },
-  });
 
   // Gather API data
   const { connectionStatus, errorLabel: connectionErrorLabel } =
