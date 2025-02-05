@@ -2,7 +2,7 @@ import "./theme.css";
 
 export * from "./modules/core";
 export * from "./modules/feed";
-export * from "./modules/in-app-messages";
+export * from "./modules/guide";
 export * from "./modules/ms-teams";
 export * from "./modules/slack";
 

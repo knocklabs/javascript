@@ -17003,6 +17003,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"guide-example@workspace:examples/guide-example":
+  version: 0.0.0-use.local
+  resolution: "guide-example@workspace:examples/guide-example"
+  dependencies:
+    "@eslint/js": "npm:^9.9.0"
+    "@knocklabs/client": "workspace:^"
+    "@knocklabs/react": "workspace:^"
+    "@types/react": "npm:^18.3.6"
+    "@types/react-dom": "npm:^18.2.15"
+    "@vitejs/plugin-react": "npm:^4.3.4"
+    eslint: "npm:^8.56.0"
+    eslint-plugin-react-hooks: "npm:^5.0.0"
+    eslint-plugin-react-refresh: "npm:^0.4.14"
+    globals: "npm:^15.9.0"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    typescript: "npm:^5.7.3"
+    typescript-eslint: "npm:^8.0.1"
+    vite: "npm:^5.0.0"
+  languageName: unknown
+  linkType: soft
+
 "gzip-size@npm:^6.0.0":
   version: 6.0.0
   resolution: "gzip-size@npm:6.0.0"
@@ -17574,28 +17596,6 @@ __metadata:
   checksum: 10c0/8b51313850dd33605c6c9d3fd9638b714f4c4c40250cff658209f30d40da60f78992fb2df5dabee4acf589a6a82bbc79ad5486550754bd9ec4e3fc0d4a57d6a6
   languageName: node
   linkType: hard
-
-"in-app-message-example@workspace:examples/in-app-message-example":
-  version: 0.0.0-use.local
-  resolution: "in-app-message-example@workspace:examples/in-app-message-example"
-  dependencies:
-    "@eslint/js": "npm:^9.9.0"
-    "@knocklabs/client": "workspace:^"
-    "@knocklabs/react": "workspace:^"
-    "@types/react": "npm:^18.3.6"
-    "@types/react-dom": "npm:^18.2.15"
-    "@vitejs/plugin-react": "npm:^4.3.4"
-    eslint: "npm:^8.56.0"
-    eslint-plugin-react-hooks: "npm:^5.0.0"
-    eslint-plugin-react-refresh: "npm:^0.4.14"
-    globals: "npm:^15.9.0"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    typescript: "npm:^5.7.3"
-    typescript-eslint: "npm:^8.0.1"
-    vite: "npm:^5.0.0"
-  languageName: unknown
-  linkType: soft
 
 "indent-string@npm:^4.0.0":
   version: 4.0.0

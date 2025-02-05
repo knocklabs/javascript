@@ -3,6 +3,11 @@ import { GenericData } from "@knocklabs/types";
 import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
+import {
+  GetGuidesQueryParams,
+  GetGuidesResponse,
+  getGuidesPath,
+} from "../guide/client";
 import { InAppMessagesResponse } from "../in-app-messages";
 import {
   GetPreferencesOptions,
@@ -105,6 +110,7 @@ class UserClient {
     return this.handleResponse<ChannelData<T>>(result);
   }
 
+  // TODO(KNO-7787): Clean up in-app messages stuff.
   async getInAppMessages<
     TContent extends GenericData = GenericData,
     TData extends GenericData = GenericData,
@@ -116,6 +122,20 @@ class UserClient {
     });
 
     return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
+  }
+
+  async getGuides<T = GenericData>({
+    params,
+  }: {
+    params: GetGuidesQueryParams;
+  }) {
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: getGuidesPath(this.instance.userId),
+      params,
+    });
+
+    return this.handleResponse<GetGuidesResponse<T>>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {
