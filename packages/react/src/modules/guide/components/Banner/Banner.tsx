@@ -35,7 +35,7 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-banner", className)} {...props}>
+    <div className={clsx("knock-guide-banner", className)} {...props}>
       {children}
     </div>
   );
@@ -46,7 +46,7 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-banner__message", className)} {...props}>
+    <div className={clsx("knock-guide-banner__message", className)} {...props}>
       {children}
     </div>
   );
@@ -57,7 +57,7 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-banner__title", className)} {...props}>
+    <div className={clsx("knock-guide-banner__title", className)} {...props}>
       {title}
     </div>
   );
@@ -71,7 +71,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <div
-      className={clsx("knock-iam-banner__body", className)}
+      className={clsx("knock-guide-banner__body", className)}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -83,7 +83,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-banner__actions", className)} {...props}>
+    <div className={clsx("knock-guide-banner__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -96,7 +96,7 @@ const PrimaryAction: React.FC<
   return (
     <a
       href={action}
-      className={clsx("knock-iam-banner__action", className)}
+      className={clsx("knock-guide-banner__action", className)}
       {...props}
     >
       {text}
@@ -112,7 +112,7 @@ const SecondaryAction: React.FC<
     <a
       href={action}
       className={clsx(
-        "knock-iam-banner__action knock-iam-banner__action--secondary",
+        "knock-guide-banner__action knock-guide-banner__action--secondary",
         className,
       )}
       {...props}
@@ -128,7 +128,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button className={clsx("knock-iam-banner__close", className)} {...props}>
+    <button className={clsx("knock-guide-banner__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"

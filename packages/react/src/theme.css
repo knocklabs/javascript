@@ -361,43 +361,43 @@
 
 /* In-App Message theme */
 [data-knock-color-mode="light"] {
-  --knock-iam-surface: var(--knock-white);
-  --knock-iam-surface-2: var(--knock-gray-2);
-  --knock-iam-accent: var(--knock-gray-12);
-  --knock-iam-accent-light: var(--knock-gray-4);
-  --knock-iam-accent-dark: var(--knock-gray-12);
-  --knock-iam-secondary: var(--knock-gray-9);
-  --knock-iam-secondary-light: var(--knock-gray-3);
-  --knock-iam-secondary-dark: var(--knock-gray-11);
-  --knock-iam-content: var(--knock-gray-12);
-  --knock-iam-content-light: var(--knock-gray-11);
-  --knock-iam-content-disabled: var(--knock-gray-9);
-  --knock-iam-content-contrast: var(--knock-white);
-  --knock-iam-border: var(--knock-gray-5);
-  --knock-iam-border-light: var(--knock-gray-4);
-  --knock-iam-border-dark: var(--knock-gray-7);
-  --knock-iam-surface: var(--knock-white);
-  --knock-iam-surface-2: var(--knock-gray-2);
+  --knock-guide-surface: var(--knock-white);
+  --knock-guide-surface-2: var(--knock-gray-2);
+  --knock-guide-accent: var(--knock-gray-12);
+  --knock-guide-accent-light: var(--knock-gray-4);
+  --knock-guide-accent-dark: var(--knock-gray-12);
+  --knock-guide-secondary: var(--knock-gray-9);
+  --knock-guide-secondary-light: var(--knock-gray-3);
+  --knock-guide-secondary-dark: var(--knock-gray-11);
+  --knock-guide-content: var(--knock-gray-12);
+  --knock-guide-content-light: var(--knock-gray-11);
+  --knock-guide-content-disabled: var(--knock-gray-9);
+  --knock-guide-content-contrast: var(--knock-white);
+  --knock-guide-border: var(--knock-gray-5);
+  --knock-guide-border-light: var(--knock-gray-4);
+  --knock-guide-border-dark: var(--knock-gray-7);
+  --knock-guide-surface: var(--knock-white);
+  --knock-guide-surface-2: var(--knock-gray-2);
 }
 
 [data-knock-color-mode="dark"] {
-  --knock-iam-surface: var(--knock-white);
-  --knock-iam-surface-2: var(--knock-gray-2);
-  --knock-iam-accent: var(--knock-white);
-  --knock-iam-accent-light: var(--knock-gray-4);
-  --knock-iam-accent-dark: var(--knock-gray-12);
-  --knock-iam-secondary: var(--knock-gray-9);
-  --knock-iam-secondary-light: var(--knock-gray-3);
-  --knock-iam-secondary-dark: var(--knock-gray-11);
-  --knock-iam-content: var(--knock-gray-12);
-  --knock-iam-content-light: var(--knock-gray-11);
-  --knock-iam-content-disabled: var(--knock-gray-9);
-  --knock-iam-content-contrast: var(--knock-gray-1);
-  --knock-iam-border: var(--knock-gray-5);
-  --knock-iam-border-light: var(--knock-gray-4);
-  --knock-iam-border-dark: var(--knock-gray-7);
-  --knock-iam-surface: var(--knock-gray-2);
-  --knock-iam-surface-2: var(--knock-gray-1);
+  --knock-guide-surface: var(--knock-white);
+  --knock-guide-surface-2: var(--knock-gray-2);
+  --knock-guide-accent: var(--knock-white);
+  --knock-guide-accent-light: var(--knock-gray-4);
+  --knock-guide-accent-dark: var(--knock-gray-12);
+  --knock-guide-secondary: var(--knock-gray-9);
+  --knock-guide-secondary-light: var(--knock-gray-3);
+  --knock-guide-secondary-dark: var(--knock-gray-11);
+  --knock-guide-content: var(--knock-gray-12);
+  --knock-guide-content-light: var(--knock-gray-11);
+  --knock-guide-content-disabled: var(--knock-gray-9);
+  --knock-guide-content-contrast: var(--knock-gray-1);
+  --knock-guide-border: var(--knock-gray-5);
+  --knock-guide-border-light: var(--knock-gray-4);
+  --knock-guide-border-dark: var(--knock-gray-7);
+  --knock-guide-surface: var(--knock-gray-2);
+  --knock-guide-surface-2: var(--knock-gray-1);
 }
 
 /* Notification feed theme */

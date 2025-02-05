@@ -36,7 +36,7 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card", className)} {...props}>
+    <div className={clsx("knock-guide-card", className)} {...props}>
       {children}
     </div>
   );
@@ -47,7 +47,7 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__message", className)} {...props}>
+    <div className={clsx("knock-guide-card__message", className)} {...props}>
       {children}
     </div>
   );
@@ -58,7 +58,7 @@ const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__header", className)} {...props}>
+    <div className={clsx("knock-guide-card__header", className)} {...props}>
       {children}
     </div>
   );
@@ -69,7 +69,7 @@ const Headline: React.FC<
   { headline: string } & React.ComponentPropsWithRef<"div">
 > = ({ headline, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__headline", className)} {...props}>
+    <div className={clsx("knock-guide-card__headline", className)} {...props}>
       {headline}
     </div>
   );
@@ -80,7 +80,7 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__title", className)} {...props}>
+    <div className={clsx("knock-guide-card__title", className)} {...props}>
       {title}
     </div>
   );
@@ -94,7 +94,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <div
-      className={clsx("knock-iam-card__body", className)}
+      className={clsx("knock-guide-card__body", className)}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -106,7 +106,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-iam-card__actions", className)} {...props}>
+    <div className={clsx("knock-guide-card__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -119,7 +119,7 @@ const PrimaryAction: React.FC<
   return (
     <a
       href={action}
-      className={clsx("knock-iam-card__action", className)}
+      className={clsx("knock-guide-card__action", className)}
       {...props}
     >
       {text}
@@ -135,7 +135,7 @@ const SecondaryAction: React.FC<
     <a
       href={action}
       className={clsx(
-        "knock-iam-card__action knock-iam-card__action--secondary",
+        "knock-guide-card__action knock-guide-card__action--secondary",
         className,
       )}
       {...props}
@@ -151,7 +151,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button className={clsx("knock-iam-card__close", className)} {...props}>
+    <button className={clsx("knock-guide-card__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"

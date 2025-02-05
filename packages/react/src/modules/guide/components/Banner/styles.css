@@ -1,42 +1,42 @@
-.knock-iam-banner {
+.knock-guide-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--knock-iam-surface);
+  background: var(--knock-guide-surface);
   padding: var(--knock-spacing-4) var(--knock-spacing-6);
   border-radius: var(--knock-rounded-4);
-  border: 0.5px solid var(--knock-iam-border);
+  border: 0.5px solid var(--knock-guide-border);
   box-shadow: var(--knock-shadow-2);
   gap: var(--knock-spacing-4);
 }
-.knock-iam-banner__message {
+.knock-guide-banner__message {
   min-width: var(--knock-spacing-96);
 }
-.knock-iam-banner__title {
-  color: var(--knock-iam-content);
+.knock-guide-banner__title {
+  color: var(--knock-guide-content);
   font-size: var(--knock-text-4);
   font-weight: var(--knock-weight-medium);
   line-height: var(--knock-leading-4);
 }
-.knock-iam-banner__body {
-  color: var(--knock-iam-content-light);
+.knock-guide-banner__body {
+  color: var(--knock-guide-content-light);
   font-size: var(--knock-text-3);
   font-weight: var(--knock-weight-regular);
   line-height: var(--knock-leading-3);
 }
-.knock-iam-banner__body > :first-child {
+.knock-guide-banner__body > :first-child {
   margin-top: 0;
 }
-.knock-iam-banner__body > :last-child {
+.knock-guide-banner__body > :last-child {
   margin-bottom: 0;
 }
-.knock-iam-banner__actions {
+.knock-guide-banner__actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--knock-spacing-3);
 }
-.knock-iam-banner__action {
+.knock-guide-banner__action {
   text-decoration: none;
   font-size: var(--knock-text-3);
   font-weight: var(--knock-weight-regular);
@@ -48,16 +48,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 0.5px solid var(--knock-iam-accent);
-  background: var(--knock-iam-accent);
-  color: var(--knock-iam-content-contrast);
+  border: 0.5px solid var(--knock-guide-accent);
+  background: var(--knock-guide-accent);
+  color: var(--knock-guide-content-contrast);
 }
-.knock-iam-banner__action--secondary {
-  border-color: var(--knock-iam-border-dark);
-  background: var(--knock-iam-surface);
-  color: var(--knock-iam-content);
+.knock-guide-banner__action--secondary {
+  border-color: var(--knock-guide-border-dark);
+  background: var(--knock-guide-surface);
+  color: var(--knock-guide-content);
 }
-.knock-iam-banner__close {
+.knock-guide-banner__close {
   padding: var(--knock-spacing-3);
   border: none;
   background: none;
