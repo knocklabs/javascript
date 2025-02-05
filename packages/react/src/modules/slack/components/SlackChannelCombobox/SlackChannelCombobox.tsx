@@ -14,7 +14,11 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
-import { sortByName, toLabelSearchableOption } from "../../../ms-teams/utils";
+import {
+  fromLabelSearchableOption,
+  sortByName,
+  toLabelSearchableOption,
+} from "../../../ms-teams/utils";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
@@ -257,7 +261,16 @@ export const SlackChannelCombobox: FunctionComponent<
       <div className="tgph">
         <Combobox.Root
           value={comboboxValue}
-          onValueChange={() => {}}
+          onValueChange={(searchableOptions) => {
+            const options = searchableOptions.map(fromLabelSearchableOption);
+            const updatedConnections = options.map<SlackChannelConnection>(
+              ({ value: channelId }) => ({
+                channel_id: channelId,
+              }),
+            );
+
+            updateConnectedChannels(updatedConnections).catch(console.error);
+          }}
           closeOnSelect={false}
           layout="wrap"
         >
