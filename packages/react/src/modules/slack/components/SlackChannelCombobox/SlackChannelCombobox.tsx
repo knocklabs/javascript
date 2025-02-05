@@ -9,6 +9,7 @@ import {
 } from "@knocklabs/react-core";
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { Combobox } from "@telegraph/combobox";
 import { useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
@@ -230,70 +231,87 @@ export const SlackChannelCombobox: FunctionComponent<
   }
 
   return (
-    <div ref={comboboxRef} className="rsk-combobox">
-      <Popover.Root
-        open={connectionStatus !== "disconnected" ? comboboxListOpen : false}
-      >
-        <VisuallyHidden.Root>
-          <label htmlFor="slack-channel-search">
-            {t("slackSearchChannels")}
-          </label>
-        </VisuallyHidden.Root>
-        <Popover.Trigger asChild>
-          <div className="rsk-combobox__searchbar">
-            <div
-              className={"rsk-combobox__searchbar__input-container"}
-              {...inputContainerProps}
-            >
+    <>
+      <div className="tgph">
+        <Combobox.Root value={[]} onValueChange={() => {}} layout="wrap">
+          <Combobox.Trigger />
+          <Combobox.Content>
+            <Combobox.Search />
+            <Combobox.Options>
+              {slackChannels.map((channel) => (
+                <Combobox.Option key={channel.id} value={channel.id}>
+                  {channel.name}
+                </Combobox.Option>
+              ))}
+            </Combobox.Options>
+          </Combobox.Content>
+        </Combobox.Root>
+      </div>
+      <div ref={comboboxRef} className="rsk-combobox">
+        <Popover.Root
+          open={connectionStatus !== "disconnected" ? comboboxListOpen : false}
+        >
+          <VisuallyHidden.Root>
+            <label htmlFor="slack-channel-search">
+              {t("slackSearchChannels")}
+            </label>
+          </VisuallyHidden.Root>
+          <Popover.Trigger asChild>
+            <div className="rsk-combobox__searchbar">
               <div
-                className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
+                className={"rsk-combobox__searchbar__input-container"}
+                {...inputContainerProps}
               >
-                {inLoadingState ? (
-                  <Spinner size="15px" thickness={3} />
-                ) : (
-                  <SearchIcon />
-                )}
+                <div
+                  className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
+                >
+                  {inLoadingState ? (
+                    <Spinner size="15px" thickness={3} />
+                  ) : (
+                    <SearchIcon />
+                  )}
+                </div>
+
+                <input
+                  className={`rsk-combobox__searchbar__input-container__input ${inErrorState ? "rsk-combobox__searchbar__input-container__input--error" : ""}`}
+                  tabIndex={-1}
+                  id="slack-channel-search"
+                  type="text"
+                  onFocus={() =>
+                    slackChannels.length > 0 && setComboboxListOpen(true)
+                  }
+                  onChange={(e) => setInputValue(e.target.value)}
+                  value={inputValue}
+                  placeholder={searchPlaceholder || ""}
+                  disabled={!!inErrorState}
+                  {...inputProps}
+                />
               </div>
 
-              <input
-                className={`rsk-combobox__searchbar__input-container__input ${inErrorState ? "rsk-combobox__searchbar__input-container__input--error" : ""}`}
-                tabIndex={-1}
-                id="slack-channel-search"
-                type="text"
-                onFocus={() =>
-                  slackChannels.length > 0 && setComboboxListOpen(true)
-                }
-                onChange={(e) => setInputValue(e.target.value)}
-                value={inputValue}
-                placeholder={searchPlaceholder || ""}
-                disabled={!!inErrorState}
-                {...inputProps}
-              />
+              <SlackConnectionError />
             </div>
+          </Popover.Trigger>
 
-            <SlackConnectionError />
-          </div>
-        </Popover.Trigger>
-
-        <Popover.Content>
-          <SlackChannelListBox
-            isLoading={slackChannelsLoading || connectedChannelsLoading}
-            isUpdating={connectedChannelsUpdating}
+          <Popover.Content>
+            <SlackChannelListBox
+              isLoading={slackChannelsLoading || connectedChannelsLoading}
+              isUpdating={connectedChannelsUpdating}
+              connectedChannels={currentConnectedChannels}
+              onClick={handleOptionClick}
+              slackChannels={matchedChannels}
+              listBoxProps={listBoxProps}
+              channelOptionProps={channelOptionProps}
+            />
+          </Popover.Content>
+        </Popover.Root>
+        {showConnectedChannelTags && (
+          <SlackConnectedChannelTagList
             connectedChannels={currentConnectedChannels}
-            onClick={handleOptionClick}
-            slackChannels={matchedChannels}
-            listBoxProps={listBoxProps}
-            channelOptionProps={channelOptionProps}
+            slackChannels={slackChannels}
+            updateConnectedChannels={handleOptionClick}
           />
-        </Popover.Content>
-      </Popover.Root>
-      {showConnectedChannelTags && (
-        <SlackConnectedChannelTagList
-          connectedChannels={currentConnectedChannels}
-          slackChannels={slackChannels}
-          updateConnectedChannels={handleOptionClick}
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
