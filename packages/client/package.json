@@ -78,7 +78,7 @@
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
     "nanoid": "^3.0.0",
-    "phoenix": "1.7.14",
+    "phoenix": "1.7.19",
     "zustand": "^3.7.2"
   }
 }
