@@ -1,7 +1,6 @@
 import { useKnockSlackClient, useTranslations } from "@knocklabs/react-core";
+import { Icon, Lucide } from "@telegraph/icon";
 import { FunctionComponent } from "react";
-
-import InfoIcon from "./icons/InfoIcon";
 
 const SlackConnectionError: FunctionComponent = () => {
   const { t } = useTranslations();
@@ -11,7 +10,7 @@ const SlackConnectionError: FunctionComponent = () => {
     return (
       <div className="rsk-combobox__error">
         <span>
-          <InfoIcon />
+          <Icon icon={Lucide.Info} color="black" size="1" aria-hidden />
         </span>
 
         <div className="rsk-combobox__error__text">
