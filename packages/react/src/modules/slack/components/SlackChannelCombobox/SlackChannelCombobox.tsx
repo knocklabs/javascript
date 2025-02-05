@@ -283,6 +283,7 @@ export const SlackChannelCombobox: FunctionComponent<
                 />
               ))}
             </Combobox.Options>
+            <Combobox.Empty />
           </Combobox.Content>
         </Combobox.Root>
       </div>
