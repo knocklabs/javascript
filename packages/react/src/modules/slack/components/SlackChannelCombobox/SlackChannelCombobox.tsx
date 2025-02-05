@@ -227,6 +227,19 @@ export const SlackChannelCombobox: FunctionComponent<
     [],
   );
 
+  const comboboxValue = useMemo(
+    () =>
+      currentConnectedChannels.map((connection) => {
+        const channel = slackChannels.find(
+          (c) => c.id === connection.channel_id,
+        );
+        return channel
+          ? channelToOption(channel)
+          : { label: "Loading…", value: connection.channel_id! };
+      }),
+    [currentConnectedChannels, slackChannels, channelToOption],
+  );
+
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
       <SlackAddChannelInput
@@ -242,7 +255,11 @@ export const SlackChannelCombobox: FunctionComponent<
   return (
     <>
       <div className="tgph">
-        <Combobox.Root value={[]} onValueChange={() => {}} layout="wrap">
+        <Combobox.Root
+          value={comboboxValue}
+          onValueChange={() => {}}
+          layout="wrap"
+        >
           <Combobox.Trigger />
           <Combobox.Content>
             <Combobox.Search />
