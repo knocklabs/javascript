@@ -271,6 +271,7 @@ export const SlackChannelCombobox: FunctionComponent<
 
             updateConnectedChannels(updatedConnections).catch(console.error);
           }}
+          placeholder={searchPlaceholder ?? ""}
           closeOnSelect={false}
           layout="wrap"
         >
