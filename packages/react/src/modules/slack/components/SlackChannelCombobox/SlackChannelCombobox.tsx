@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
+import { sortByName } from "../../../ms-teams/utils";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
@@ -69,8 +70,10 @@ export const SlackChannelCombobox: FunctionComponent<
   const { connectionStatus, errorLabel: connectionErrorLabel } =
     useKnockSlackClient();
 
-  const { data: slackChannels, isLoading: slackChannelsLoading } =
+  const { data: origChannels, isLoading: slackChannelsLoading } =
     useSlackChannels({ queryOptions });
+
+  const slackChannels = useMemo(() => sortByName(origChannels), [origChannels]);
 
   const {
     data: connectedChannels,
