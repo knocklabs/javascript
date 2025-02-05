@@ -1,4 +1,4 @@
-import { MsTeamsChannel, MsTeamsChannelConnection } from "@knocklabs/client";
+import { MsTeamsChannelConnection } from "@knocklabs/client";
 import {
   MsTeamsChannelQueryOptions,
   RecipientObject,
@@ -61,14 +61,6 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
     [availableChannels],
   );
 
-  const channelToOption = useCallback(
-    (channel: MsTeamsChannel) => ({
-      value: channel.id,
-      label: channel.displayName,
-    }),
-    [],
-  );
-
   const comboboxValue = useMemo(
     () =>
       currentConnections
@@ -77,20 +69,8 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
             connection.ms_teams_channel_id &&
             isChannelInThisTeam(connection.ms_teams_channel_id),
         )
-        .map((connection) => {
-          const channel = availableChannels.find(
-            (c) => c.id === connection.ms_teams_channel_id,
-          );
-          return channel
-            ? channelToOption(channel)
-            : { label: "Loading…", value: connection.ms_teams_channel_id! };
-        }),
-    [
-      currentConnections,
-      isChannelInThisTeam,
-      availableChannels,
-      channelToOption,
-    ],
+        .map((connection) => connection.ms_teams_channel_id),
+    [currentConnections, isChannelInThisTeam],
   );
 
   return (
@@ -98,9 +78,9 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
       <Box w="full" minW="0">
         <Combobox.Root
           value={comboboxValue}
-          onValueChange={(options) => {
+          onValueChange={(channelIds) => {
             const connectedChannelsInThisTeam =
-              options.map<MsTeamsChannelConnection>(({ value: channelId }) => ({
+              channelIds.map<MsTeamsChannelConnection>((channelId) => ({
                 ms_teams_team_id: teamId,
                 ms_teams_channel_id: channelId,
               }));
@@ -133,10 +113,9 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
             <Combobox.Search />
             <Combobox.Options className="rtk-combobox__options">
               {sortedChannels.map((channel) => (
-                <Combobox.Option
-                  key={channel.id}
-                  {...channelToOption(channel)}
-                />
+                <Combobox.Option key={channel.id} value={channel.id}>
+                  {channel.displayName}
+                </Combobox.Option>
               ))}
             </Combobox.Options>
             <Combobox.Empty />
