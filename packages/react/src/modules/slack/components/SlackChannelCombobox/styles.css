@@ -126,12 +126,6 @@
   padding: var(--rsk-spacing-2);
 }
 
-.rsk-combobox__error__text {
-  color: var(--rsk-color-gray-700);
-  font-size: var(--rsk-font-size-xs);
-  line-height: normal;
-}
-
 /* Tag */
 .rsk-combobox__connected_channel_tag_list {
   align-items: center;
