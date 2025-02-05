@@ -6,13 +6,9 @@ import {
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
-import { FunctionComponent, useCallback, useMemo } from "react";
+import { FunctionComponent, useMemo } from "react";
 
-import {
-  fromLabelSearchableOption,
-  sortByDisplayName,
-  toLabelSearchableOption,
-} from "../../utils";
+import { sortByDisplayName } from "../../utils";
 
 interface MsTeamsTeamComboboxProps {
   team: MsTeamsTeam | null;
@@ -45,26 +41,11 @@ export const MsTeamsTeamCombobox: FunctionComponent<
     [connectionStatus, isLoadingTeams],
   );
 
-  const teamToOption = useCallback(
-    (team: MsTeamsTeam) => {
-      const channelCount = getChannelCount(team.id);
-      return toLabelSearchableOption({
-        value: team.id,
-        label:
-          channelCount > 0
-            ? `${team.displayName} (${channelCount})`
-            : team.displayName,
-      });
-    },
-    [getChannelCount],
-  );
-
   return (
     <Box w="full" minW="0">
       <Combobox.Root
-        value={team ? teamToOption(team) : undefined}
-        onValueChange={(searchableOption) => {
-          const { value: teamId } = fromLabelSearchableOption(searchableOption);
+        value={team?.id}
+        onValueChange={(teamId) => {
           const selectedTeam = sortedTeams.find((team) => team.id === teamId);
           if (selectedTeam) {
             onTeamChange(selectedTeam);
@@ -77,9 +58,16 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         <Combobox.Content>
           <Combobox.Search />
           <Combobox.Options className="rtk-combobox__options">
-            {sortedTeams.map((team) => (
-              <Combobox.Option key={team.id} {...teamToOption(team)} />
-            ))}
+            {sortedTeams.map((team) => {
+              const channelCount = getChannelCount(team.id);
+              return (
+                <Combobox.Option key={team.id} value={team.id}>
+                  {channelCount > 0
+                    ? `${team.displayName} (${channelCount})`
+                    : team.displayName}
+                </Combobox.Option>
+              );
+            })}
           </Combobox.Options>
           <Combobox.Empty />
         </Combobox.Content>

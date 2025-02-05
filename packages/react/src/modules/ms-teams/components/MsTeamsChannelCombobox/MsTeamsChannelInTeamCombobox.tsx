@@ -10,11 +10,7 @@ import { Combobox } from "@telegraph/combobox";
 import { Box } from "@telegraph/layout";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
-import {
-  fromLabelSearchableOption,
-  sortByDisplayName,
-  toLabelSearchableOption,
-} from "../../utils";
+import { sortByDisplayName } from "../../utils";
 
 import MsTeamsErrorMessage from "./MsTeamsErrorMessage";
 
@@ -66,11 +62,10 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
   );
 
   const channelToOption = useCallback(
-    (channel: MsTeamsChannel) =>
-      toLabelSearchableOption({
-        value: channel.id,
-        label: channel.displayName,
-      }),
+    (channel: MsTeamsChannel) => ({
+      value: channel.id,
+      label: channel.displayName,
+    }),
     [],
   );
 
@@ -103,8 +98,7 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
       <Box w="full" minW="0">
         <Combobox.Root
           value={comboboxValue}
-          onValueChange={(searchableOptions) => {
-            const options = searchableOptions.map(fromLabelSearchableOption);
+          onValueChange={(options) => {
             const connectedChannelsInThisTeam =
               options.map<MsTeamsChannelConnection>(({ value: channelId }) => ({
                 ms_teams_team_id: teamId,
