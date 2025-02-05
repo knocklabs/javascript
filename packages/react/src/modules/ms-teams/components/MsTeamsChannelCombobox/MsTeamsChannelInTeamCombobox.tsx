@@ -110,7 +110,7 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
         >
           <Combobox.Trigger />
           <Combobox.Content>
-            <Combobox.Search />
+            <Combobox.Search className="rtk-combobox__search" />
             <Combobox.Options className="rtk-combobox__options">
               {sortedChannels.map((channel) => (
                 <Combobox.Option key={channel.id} value={channel.id}>
