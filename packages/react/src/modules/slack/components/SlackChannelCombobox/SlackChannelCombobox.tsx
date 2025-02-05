@@ -1,4 +1,4 @@
-import { SlackChannelConnection } from "@knocklabs/client";
+import { SlackChannel, SlackChannelConnection } from "@knocklabs/client";
 import {
   RecipientObject,
   SlackChannelQueryOptions,
@@ -10,11 +10,11 @@ import {
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Combobox } from "@telegraph/combobox";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
-import { sortByName } from "../../../ms-teams/utils";
+import { sortByName, toLabelSearchableOption } from "../../../ms-teams/utils";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
@@ -218,6 +218,15 @@ export const SlackChannelCombobox: FunctionComponent<
     strContains(slackChannel.name, inputValue),
   );
 
+  const channelToOption = useCallback(
+    (channel: SlackChannel) =>
+      toLabelSearchableOption({
+        value: channel.id,
+        label: channel.name,
+      }),
+    [],
+  );
+
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
       <SlackAddChannelInput
@@ -239,9 +248,10 @@ export const SlackChannelCombobox: FunctionComponent<
             <Combobox.Search />
             <Combobox.Options>
               {slackChannels.map((channel) => (
-                <Combobox.Option key={channel.id} value={channel.id}>
-                  {channel.name}
-                </Combobox.Option>
+                <Combobox.Option
+                  key={channel.id}
+                  {...channelToOption(channel)}
+                />
               ))}
             </Combobox.Options>
           </Combobox.Content>
