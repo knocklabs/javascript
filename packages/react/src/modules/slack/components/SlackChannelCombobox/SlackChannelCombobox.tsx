@@ -9,7 +9,7 @@ import {
 } from "@knocklabs/react-core";
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
@@ -82,16 +82,6 @@ export const SlackChannelCombobox: FunctionComponent<
     error: connectedChannelsError,
     updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ slackChannelsRecipientObject });
-
-  useEffect(() => {
-    if (comboboxListOpen) {
-      // Timeout to allow for the state to update and the component to re-render
-      // when we change the `comboboxListOpen` state upon focus
-      setTimeout(() => {
-        document.getElementById("slack-channel-search")?.focus();
-      }, 0);
-    }
-  }, [comboboxListOpen]);
 
   const currentConnectedChannels = useMemo<SlackChannelConnection[]>(() => {
     // Used to make sure we're only showing currently available channels to select from.
