@@ -68,9 +68,6 @@ export const SlackChannelCombobox: FunctionComponent<
   const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
 
-  // Used to close the combobox when clicking outside of it
-  const comboboxRef = useRef(null);
-
   // Gather API data
   const { connectionStatus, errorLabel: connectionErrorLabel } =
     useKnockSlackClient();
@@ -289,7 +286,7 @@ export const SlackChannelCombobox: FunctionComponent<
           </Combobox.Content>
         </Combobox.Root>
       </div>
-      <div ref={comboboxRef} className="rsk-combobox">
+      <div className="rsk-combobox">
         <Popover.Root
           open={connectionStatus !== "disconnected" ? comboboxListOpen : false}
         >
