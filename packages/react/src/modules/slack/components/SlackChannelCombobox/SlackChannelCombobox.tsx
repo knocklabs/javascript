@@ -258,6 +258,7 @@ export const SlackChannelCombobox: FunctionComponent<
         <Combobox.Root
           value={comboboxValue}
           onValueChange={() => {}}
+          closeOnSelect={false}
           layout="wrap"
         >
           <Combobox.Trigger />
