@@ -26,7 +26,7 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
       >
         {children}
       </select>
-      <ChevronDown />
+      <ChevronDown aria-hidden />
     </div>
   );
 };
