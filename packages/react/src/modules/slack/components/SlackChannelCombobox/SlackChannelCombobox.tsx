@@ -27,7 +27,6 @@ const MAX_ALLOWED_CHANNELS = 1000;
 export type SlackChannelComboboxInputMessages = {
   disconnected: string;
   error: string;
-  singleChannelConnected: string;
   noChannelsConnected: string;
   noSlackChannelsFound: string;
 };
@@ -128,17 +127,6 @@ export const SlackChannelCombobox: FunctionComponent<
       return (
         inputMessages?.noChannelsConnected ||
         DEFAULT_INPUT_MESSAGES.noChannelsConnected
-      );
-    }
-
-    if (currentConnectedChannels && numberConnectedChannels === 1) {
-      const connectedChannel = slackChannels?.find(
-        (slackChannel) =>
-          slackChannel.id === currentConnectedChannels[0]?.channel_id,
-      );
-
-      return (
-        inputMessages?.singleChannelConnected || `# ${connectedChannel?.name}`
       );
     }
 
