@@ -56,7 +56,6 @@ export const SlackChannelCombobox: FunctionComponent<
   const {
     data: connectedChannels,
     updateConnectedChannels,
-    loading: connectedChannelsLoading,
     error: connectedChannelsError,
     updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ slackChannelsRecipientObject });
