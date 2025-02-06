@@ -7,7 +7,6 @@ import {
   useSlackChannels,
   useTranslations,
 } from "@knocklabs/react-core";
-import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Combobox } from "@telegraph/combobox";
 import { useMemo, useState } from "react";
@@ -55,7 +54,6 @@ export const SlackChannelCombobox: FunctionComponent<
 }) => {
   const { t } = useTranslations();
 
-  const [comboboxListOpen, setComboboxListOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
 
   // Gather API data
@@ -231,46 +229,37 @@ export const SlackChannelCombobox: FunctionComponent<
         </Combobox.Root>
       </div>
       <div className="rsk-combobox">
-        <Popover.Root
-          open={connectionStatus !== "disconnected" ? comboboxListOpen : false}
-        >
-          <VisuallyHidden.Root>
-            <label htmlFor="slack-channel-search">
-              {t("slackSearchChannels")}
-            </label>
-          </VisuallyHidden.Root>
-          <Popover.Trigger asChild>
-            <div className="rsk-combobox__searchbar">
-              <div
-                className={"rsk-combobox__searchbar__input-container"}
-                {...inputContainerProps}
-              >
-                <div
-                  className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
-                >
-                  {inLoadingState && <Spinner size="15px" thickness={3} />}
-                </div>
-
-                <input
-                  className={`rsk-combobox__searchbar__input-container__input ${inErrorState ? "rsk-combobox__searchbar__input-container__input--error" : ""}`}
-                  tabIndex={-1}
-                  id="slack-channel-search"
-                  type="text"
-                  onFocus={() =>
-                    slackChannels.length > 0 && setComboboxListOpen(true)
-                  }
-                  onChange={(e) => setInputValue(e.target.value)}
-                  value={inputValue}
-                  placeholder={searchPlaceholder || ""}
-                  disabled={!!inErrorState}
-                  {...inputProps}
-                />
-              </div>
-
-              <SlackConnectionError />
+        <VisuallyHidden.Root>
+          <label htmlFor="slack-channel-search">
+            {t("slackSearchChannels")}
+          </label>
+        </VisuallyHidden.Root>
+        <div className="rsk-combobox__searchbar">
+          <div
+            className={"rsk-combobox__searchbar__input-container"}
+            {...inputContainerProps}
+          >
+            <div
+              className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
+            >
+              {inLoadingState && <Spinner size="15px" thickness={3} />}
             </div>
-          </Popover.Trigger>
-        </Popover.Root>
+
+            <input
+              className={`rsk-combobox__searchbar__input-container__input ${inErrorState ? "rsk-combobox__searchbar__input-container__input--error" : ""}`}
+              tabIndex={-1}
+              id="slack-channel-search"
+              type="text"
+              onChange={(e) => setInputValue(e.target.value)}
+              value={inputValue}
+              placeholder={searchPlaceholder || ""}
+              disabled={!!inErrorState}
+              {...inputProps}
+            />
+          </div>
+
+          <SlackConnectionError />
+        </div>
       </div>
     </>
   );
