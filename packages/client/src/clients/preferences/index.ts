@@ -33,6 +33,8 @@ class Preferences {
    * @deprecated Use `user.getAllPreferences()` instead
    */
   async getAll() {
+    this.instance.failIfNotAuthenticated();
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.instance.userId}/preferences`,
@@ -45,6 +47,8 @@ class Preferences {
    * @deprecated Use `user.getPreferences()` instead
    */
   async get(options: PreferenceOptions = {}) {
+    this.instance.failIfNotAuthenticated();
+
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -62,6 +66,8 @@ class Preferences {
     preferenceSet: SetPreferencesProperties,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
+
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -80,6 +86,7 @@ class Preferences {
     channelTypePreferences: ChannelTypePreferences,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -99,6 +106,7 @@ class Preferences {
     setting: boolean,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -117,6 +125,7 @@ class Preferences {
     workflowPreferences: WorkflowPreferences,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -136,6 +145,8 @@ class Preferences {
     setting: WorkflowPreferenceSetting,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
+
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
     const params = buildUpdateParam(setting);
 
@@ -155,6 +166,8 @@ class Preferences {
     categoryPreferences: WorkflowPreferences,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
+
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -174,6 +187,8 @@ class Preferences {
     setting: WorkflowPreferenceSetting,
     options: PreferenceOptions = {},
   ) {
+    this.instance.failIfNotAuthenticated();
+
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
     const params = buildUpdateParam(setting);
 
