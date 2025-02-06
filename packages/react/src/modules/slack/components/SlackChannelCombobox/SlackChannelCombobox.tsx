@@ -95,7 +95,7 @@ export const SlackChannelCombobox: FunctionComponent<
     () =>
       connectionStatus === "disconnected" ||
       connectionStatus === "error" ||
-      connectedChannelsError,
+      connectedChannelsError !== null,
     [connectedChannelsError, connectionStatus],
   );
 
@@ -186,7 +186,7 @@ export const SlackChannelCombobox: FunctionComponent<
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
       <SlackAddChannelInput
-        inErrorState={!!inErrorState}
+        inErrorState={inErrorState}
         connectedChannels={currentConnectedChannels || []}
         updateConnectedChannels={updateConnectedChannels}
         connectedChannelsError={connectedChannelsError}
@@ -213,7 +213,7 @@ export const SlackChannelCombobox: FunctionComponent<
             updateConnectedChannels(updatedConnections).catch(console.error);
           }}
           placeholder={searchPlaceholder ?? ""}
-          disabled={!!inErrorState}
+          disabled={inErrorState}
           closeOnSelect={false}
           layout="wrap"
         >
@@ -260,7 +260,7 @@ export const SlackChannelCombobox: FunctionComponent<
               onChange={(e) => setInputValue(e.target.value)}
               value={inputValue}
               placeholder={searchPlaceholder || ""}
-              disabled={!!inErrorState}
+              disabled={inErrorState}
               {...inputProps}
             />
           </div>
