@@ -1,7 +1,8 @@
-import { KnockGuide } from "@knocklabs/client";
+import { KnockGuide, KnockGuideFilterParams } from "@knocklabs/client";
 import { UseGuideReturn, useGuide } from "@knocklabs/react-core";
 import React, { useCallback, useEffect } from "react";
 
+// TODO: Add a generic type variable for content.
 interface RenderProps extends UseGuideReturn {
   guide: KnockGuide;
   onInteract: () => void;
@@ -9,18 +10,12 @@ interface RenderProps extends UseGuideReturn {
 }
 
 type Props = {
-  guideKey?: string;
-  messageType?: string;
+  filters: KnockGuideFilterParams;
   children: (renderProps: RenderProps) => React.ReactElement;
 };
 
-export const Guide: React.FC<Props> = ({ guideKey, messageType, children }) => {
-  const { client, colorMode, guide } = useGuide({
-    key: guideKey,
-    message_type: messageType,
-  });
-
-  console.log("<Guide />")
+export const Guide: React.FC<Props> = ({ filters, children }) => {
+  const { client, colorMode, guide } = useGuide(filters);
 
   // Mark the guide as seen on render.
   useEffect(() => {

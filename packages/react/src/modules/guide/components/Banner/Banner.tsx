@@ -177,7 +177,7 @@ type BannerProps = {
 
 export const Banner: React.FC<BannerProps> = ({ guideKey }) => {
   return (
-    <Guide messageType={MESSAGE_TYPE} guideKey={guideKey}>
+    <Guide filters={{ key: guideKey, message_type: MESSAGE_TYPE }}>
       {({ guide, colorMode, onDismiss, onInteract }) => (
         <DefaultView
           content={guide.content as BannerContent}

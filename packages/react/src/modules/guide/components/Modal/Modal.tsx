@@ -1,36 +1,14 @@
-import {
-  ColorMode,
-  UseInAppMessageOptions,
-  useInAppMessage,
-  useInAppMessagesChannel,
-} from "@knocklabs/react-core";
+import { ColorMode } from "@knocklabs/react-core";
 import * as Dialog from "@radix-ui/react-dialog";
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React from "react";
 
+import { Guide } from "../Guide";
 import { ActionContent } from "../types";
 
 import "./styles.css";
 
 const MESSAGE_TYPE = "modal";
-
-export interface ModalProps {
-  filters?: UseInAppMessageOptions;
-}
-
-export interface ModalContent {
-  title: string;
-  body: string;
-  primary_button?: {
-    text: string;
-    action: string;
-  };
-  secondary_button?: {
-    text: string;
-    action: string;
-  };
-  dismissible?: boolean;
-}
 
 type RootProps = Omit<
   React.ComponentPropsWithoutRef<typeof Dialog.Root>,
@@ -51,7 +29,7 @@ type OverlayProps = React.ComponentPropsWithoutRef<typeof Dialog.Overlay> &
   React.ComponentPropsWithRef<"div">;
 type OverlayRef = React.ElementRef<"div">;
 
-// TODO: Causes layout shift...
+// TODO(KNO-7807): Causes layout shift...
 const Overlay = React.forwardRef<OverlayRef, OverlayProps>(
   ({ className, ...props }, forwardedRef) => {
     return (
@@ -196,6 +174,20 @@ const Close = ({ className, ...props }: CloseProps) => {
 };
 Close.displayName = "ModalView.Close";
 
+type ModalContent = {
+  title: string;
+  body: string;
+  primary_button?: {
+    text: string;
+    action: string;
+  };
+  secondary_button?: {
+    text: string;
+    action: string;
+  };
+  dismissible?: boolean;
+};
+
 const DefaultView: React.FC<{
   content: ModalContent;
   colorMode?: ColorMode;
@@ -241,50 +233,27 @@ const DefaultView: React.FC<{
 };
 DefaultView.displayName = "ModalView.Default";
 
-const Modal: React.FC<ModalProps> = ({ filters }) => {
-  const { colorMode } = useInAppMessagesChannel();
-  const { message, inAppMessagesClient } = useInAppMessage<ModalContent>(
-    MESSAGE_TYPE,
-    filters,
-  );
+type ModalProps = {
+  guideKey?: string;
+};
 
-  // Mark the message as seen on render
-  useEffect(() => {
-    if (!message || message.seen_at !== null) return;
-
-    inAppMessagesClient.markAsSeen(message);
-  }, [message, inAppMessagesClient]);
-
-  // Exclude archived messages
-  if (!message || message.archived_at) return null;
-
-  const onOpenChange = (open: boolean) => {
-    if (!open) {
-      inAppMessagesClient.markAsArchived(message);
-    }
-  };
-
-  const onDismiss = () => {
-    inAppMessagesClient.markAsArchived(message);
-  };
-
-  const onInteract = () => {
-    inAppMessagesClient.markAsInteracted(message);
-  };
-
+export const Modal: React.FC<ModalProps> = ({ guideKey }) => {
   return (
-    <DefaultView
-      content={message.content}
-      colorMode={colorMode}
-      onOpenChange={onOpenChange}
-      onDismiss={onDismiss}
-      onInteract={onInteract}
-    />
+    <Guide filters={{ key: guideKey, message_type: MESSAGE_TYPE }}>
+      {({ guide, colorMode, onDismiss, onInteract }) => (
+        <DefaultView
+          content={guide.content as ModalContent}
+          colorMode={colorMode}
+          onDismiss={onDismiss}
+          onInteract={onInteract}
+        />
+      )}
+    </Guide>
   );
 };
 Modal.displayName = "Modal";
 
-const ModalView = {} as {
+export const ModalView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Overlay: typeof Overlay;
@@ -309,5 +278,3 @@ Object.assign(ModalView, {
   SecondaryAction,
   Close,
 });
-
-export { Modal, ModalView };

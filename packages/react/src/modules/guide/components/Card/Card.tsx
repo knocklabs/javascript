@@ -1,36 +1,13 @@
-import {
-  ColorMode,
-  UseInAppMessageOptions,
-  useInAppMessage,
-  useInAppMessagesChannel,
-} from "@knocklabs/react-core";
+import { ColorMode } from "@knocklabs/react-core";
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React from "react";
 
+import { Guide } from "../Guide";
 import { ActionContent } from "../types";
 
 import "./styles.css";
 
 const MESSAGE_TYPE = "card";
-
-export interface CardProps {
-  filters?: UseInAppMessageOptions;
-}
-
-export interface CardContent {
-  headline: string;
-  title: string;
-  body: string;
-  primary_button?: {
-    text: string;
-    action: string;
-  };
-  secondary_button?: {
-    text: string;
-    action: string;
-  };
-  dismissible?: boolean;
-}
 
 const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -168,6 +145,21 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 };
 DismissButton.displayName = "CardView.DismissButton";
 
+type CardContent = {
+  headline: string;
+  title: string;
+  body: string;
+  primary_button?: {
+    text: string;
+    action: string;
+  };
+  secondary_button?: {
+    text: string;
+    action: string;
+  };
+  dismissible?: boolean;
+};
+
 const DefaultView: React.FC<{
   content: CardContent;
   colorMode?: ColorMode;
@@ -205,43 +197,27 @@ const DefaultView: React.FC<{
 };
 DefaultView.displayName = "CardView.Default";
 
-const Card: React.FC<CardProps> = ({ filters }) => {
-  const { colorMode } = useInAppMessagesChannel();
-  const { message, inAppMessagesClient } = useInAppMessage<CardContent>(
-    MESSAGE_TYPE,
-    filters,
-  );
+type CardProps = {
+  guideKey?: string;
+};
 
-  // Mark the message as seen on render
-  useEffect(() => {
-    if (!message || message.seen_at !== null) return;
-
-    inAppMessagesClient.markAsSeen(message);
-  }, [message, inAppMessagesClient]);
-
-  // Exclude archived messages
-  if (!message || message.archived_at) return null;
-
-  const onDismiss = () => {
-    inAppMessagesClient.markAsArchived(message);
-  };
-
-  const onInteract = () => {
-    inAppMessagesClient.markAsInteracted(message);
-  };
-
+export const Card: React.FC<CardProps> = ({ guideKey }) => {
   return (
-    <DefaultView
-      content={message.content}
-      colorMode={colorMode}
-      onDismiss={onDismiss}
-      onInteract={onInteract}
-    />
+    <Guide filters={{ key: guideKey, message_type: MESSAGE_TYPE }}>
+      {({ guide, colorMode, onDismiss, onInteract }) => (
+        <DefaultView
+          content={guide.content as CardContent}
+          colorMode={colorMode}
+          onDismiss={onDismiss}
+          onInteract={onInteract}
+        />
+      )}
+    </Guide>
   );
 };
 Card.displayName = "Card";
 
-const CardView = {} as {
+export const CardView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
@@ -265,5 +241,3 @@ Object.assign(CardView, {
   SecondaryAction,
   DismissButton,
 });
-
-export { Card, CardView };
