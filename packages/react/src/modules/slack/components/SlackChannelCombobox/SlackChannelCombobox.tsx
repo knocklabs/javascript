@@ -24,7 +24,6 @@ import SlackConnectionError from "./SlackConnectionError";
 import { strContains } from "./helpers";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
-import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
 const MAX_ALLOWED_CHANNELS = 1000;
@@ -287,11 +286,7 @@ export const SlackChannelCombobox: FunctionComponent<
                 <div
                   className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
                 >
-                  {inLoadingState ? (
-                    <Spinner size="15px" thickness={3} />
-                  ) : (
-                    <SearchIcon />
-                  )}
+                  {inLoadingState && <Spinner size="15px" thickness={3} />}
                 </div>
 
                 <input
