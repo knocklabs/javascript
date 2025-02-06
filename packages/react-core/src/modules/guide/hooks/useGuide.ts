@@ -1,36 +1,25 @@
-import {
-  KnockGuide,
-  KnockGuideClient,
-  KnockGuideFilterParams,
-} from "@knocklabs/client";
+import { KnockGuide, KnockGuideFilterParams } from "@knocklabs/client";
 import { useStore } from "@tanstack/react-store";
-import * as React from "react";
 
-import { KnockGuideContext } from "../context";
+import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-export interface UseGuideReturn {
+export interface UseGuideReturn extends UseGuideContextReturn {
   guide: KnockGuide | undefined;
-  client: KnockGuideClient;
-  colorMode: "light" | "dark";
 }
 
 export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
-  const context = React.useContext(KnockGuideContext);
-  if (!context) {
-    throw new Error("useGuide must be used within a KnockGuideProvider");
-  }
+  const context = useGuideContext();
 
   if (!filters.key && !filters.message_type) {
     throw new Error(
-      "useGuide must be given at least one: a guide key or a message type",
+      "useGuide must be used with at least one filter of: a guide key or a message type",
     );
   }
 
-  const { client, colorMode } = context;
-
+  const { client } = context;
   const [guide] = useStore(client.store, (state) =>
     client.select(state, filters),
   );
 
-  return { guide, client, colorMode };
+  return { ...context, guide };
 };
