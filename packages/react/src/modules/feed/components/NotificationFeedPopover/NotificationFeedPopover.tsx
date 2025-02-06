@@ -1,5 +1,5 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
-import { useKnockFeed } from "@knocklabs/react-core";
+import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
 import { Placement } from "@popperjs/core";
 import React, { RefObject, useEffect } from "react";
 import { usePopper } from "react-popper";
@@ -40,6 +40,7 @@ export const NotificationFeedPopover: React.FC<
   placement = "bottom-end",
   ...feedProps
 }) => {
+  const { t } = useTranslations();
   const { colorMode, feedClient, useFeedStore } = useKnockFeed();
   const store = useFeedStore();
 
@@ -83,6 +84,7 @@ export const NotificationFeedPopover: React.FC<
       ref={popperRef}
       {...attributes.popper}
       role="dialog"
+      aria-label={t("notifications")}
       tabIndex={-1}
     >
       <div className="rnf-notification-feed-popover__inner">
