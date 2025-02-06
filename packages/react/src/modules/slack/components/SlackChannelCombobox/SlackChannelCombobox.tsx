@@ -254,7 +254,7 @@ export const SlackChannelCombobox: FunctionComponent<
           <Combobox.Trigger />
           <Combobox.Content>
             <Combobox.Search className="rsk-combobox__search" />
-            <Combobox.Options>
+            <Combobox.Options className="rsk-combobox__options">
               {slackChannels.map((channel) => (
                 <Combobox.Option key={channel.id} value={channel.id}>
                   <span aria-hidden>
