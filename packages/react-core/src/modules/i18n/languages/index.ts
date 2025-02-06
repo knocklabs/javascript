@@ -33,7 +33,6 @@ export interface Translations {
   readonly slackConnected: string;
   readonly slackConnectContainerDescription: string;
   readonly slackSearchbarDisconnected: string;
-  readonly slackSearchbarMultipleChannels: string;
   readonly slackSearchbarNoChannelsConnected: string;
   readonly slackSearchbarNoChannelsFound: string;
   readonly slackSearchbarChannelsError: string;

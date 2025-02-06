@@ -28,7 +28,6 @@ export type SlackChannelComboboxInputMessages = {
   disconnected: string;
   error: string;
   singleChannelConnected: string;
-  multipleChannelsConnected: string;
   noChannelsConnected: string;
   noSlackChannelsFound: string;
 };
@@ -97,7 +96,6 @@ export const SlackChannelCombobox: FunctionComponent<
   const searchPlaceholder = useMemo(() => {
     const DEFAULT_INPUT_MESSAGES = {
       disconnected: t("slackSearchbarDisconnected"),
-      multipleChannelsConnected: t("slackSearchbarMultipleChannels"),
       noChannelsConnected: t("slackSearchbarNoChannelsConnected"),
       noSlackChannelsFound: t("slackSearchbarNoChannelsFound"),
       channelsError: t("slackSearchbarChannelsError"),
@@ -141,13 +139,6 @@ export const SlackChannelCombobox: FunctionComponent<
 
       return (
         inputMessages?.singleChannelConnected || `# ${connectedChannel?.name}`
-      );
-    }
-
-    if (currentConnectedChannels && numberConnectedChannels > 1) {
-      return (
-        inputMessages?.multipleChannelsConnected ||
-        `${numberConnectedChannels} channels connected`
       );
     }
 
