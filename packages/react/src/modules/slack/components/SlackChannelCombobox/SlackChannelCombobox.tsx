@@ -18,6 +18,7 @@ import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
 import SlackConnectionError from "./SlackConnectionError";
+import SlackErrorMessage from "./SlackErrorMessage";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
 import "./styles.css";
@@ -78,7 +79,7 @@ export const SlackChannelCombobox: FunctionComponent<
     () =>
       connectionStatus === "disconnected" ||
       connectionStatus === "error" ||
-      connectedChannelsError !== null,
+      !!connectedChannelsError,
     [connectedChannelsError, connectionStatus],
   );
 
@@ -117,10 +118,6 @@ export const SlackChannelCombobox: FunctionComponent<
       );
     }
 
-    if (connectedChannelsError) {
-      return connectedChannelsError;
-    }
-
     const numberConnectedChannels = currentConnectedChannels?.length || 0;
 
     if (currentConnectedChannels && numberConnectedChannels === 0) {
@@ -135,7 +132,6 @@ export const SlackChannelCombobox: FunctionComponent<
     connectionStatus,
     inLoadingState,
     slackChannels,
-    connectedChannelsError,
     currentConnectedChannels,
     inputMessages,
     connectionErrorLabel,
@@ -207,6 +203,9 @@ export const SlackChannelCombobox: FunctionComponent<
         </Combobox.Content>
       </Combobox.Root>
       <SlackConnectionError />
+      {!!connectedChannelsError && (
+        <SlackErrorMessage message={connectedChannelsError} />
+      )}
     </Stack>
   );
 };
