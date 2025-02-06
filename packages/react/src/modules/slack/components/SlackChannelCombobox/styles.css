@@ -3,6 +3,15 @@
   --rsk-error-yellow-background: rgba(255, 255, 240, 1);
 }
 
+.rsk-combobox__grid {
+  width: 352px;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+  font-size: var(--rsk-font-size-sm);
+  font-family: var(--rsk-font-family-sanserif);
+}
+
 /*
  * Overrides Telegraph combobox defaults; using maxHeight prop on Combobox.Options does not work.
  * See KNO-7736.
@@ -13,7 +22,7 @@
 }
 
 .rsk-combobox__search {
-  font-family: var(--rtk-font-family-sanserif) !important;
+  font-family: var(--rsk-font-family-sanserif) !important;
 }
 
 /* Base styles */
@@ -73,14 +82,14 @@
 .rsk-combobox__searchbar__input-container__input--error::placeholder {
   color: rgba(169, 88, 35, 1);
 }
+
 /* Error */
 .rsk-combobox__error {
+  grid-column: span 2;
   align-items: flex-start;
   background-color: var(--rsk-color-gray-100);
   border-radius: var(--rsk-border-radius-md);
   display: flex;
   gap: var(--rsk-spacing-1);
-  justify-content: center;
-  margin-top: var(--rsk-spacing-1);
   padding: var(--rsk-spacing-2);
 }

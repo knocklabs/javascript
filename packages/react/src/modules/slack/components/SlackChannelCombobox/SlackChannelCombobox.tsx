@@ -9,6 +9,8 @@ import {
 } from "@knocklabs/react-core";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Combobox } from "@telegraph/combobox";
+import { Stack } from "@telegraph/layout";
+import { Text } from "@telegraph/typography";
 import { useMemo, useState } from "react";
 import { FunctionComponent } from "react";
 
@@ -195,7 +197,10 @@ export const SlackChannelCombobox: FunctionComponent<
 
   return (
     <>
-      <div className="tgph">
+      <Stack className="tgph rsk-combobox__grid" gap="3">
+        <Text color="gray" size="2" as="div" style={{ alignSelf: "start" }}>
+          Channel
+        </Text>
         <Combobox.Root
           value={comboboxValue}
           onValueChange={(channelIds) => {
@@ -208,6 +213,7 @@ export const SlackChannelCombobox: FunctionComponent<
             updateConnectedChannels(updatedConnections).catch(console.error);
           }}
           placeholder={searchPlaceholder ?? ""}
+          disabled={!!inErrorState}
           closeOnSelect={false}
           layout="wrap"
         >
@@ -227,7 +233,8 @@ export const SlackChannelCombobox: FunctionComponent<
             <Combobox.Empty />
           </Combobox.Content>
         </Combobox.Root>
-      </div>
+        <SlackConnectionError />
+      </Stack>
       <div className="rsk-combobox">
         <VisuallyHidden.Root>
           <label htmlFor="slack-channel-search">
@@ -257,8 +264,6 @@ export const SlackChannelCombobox: FunctionComponent<
               {...inputProps}
             />
           </div>
-
-          <SlackConnectionError />
         </div>
       </div>
     </>
