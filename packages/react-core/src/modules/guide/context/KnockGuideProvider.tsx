@@ -41,10 +41,7 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   }, [knock, triggerParams]);
 
   React.useEffect(() => {
-    // Fetch all eligible guides based on the initialized trigger params.
-    knockGuideClient.fetchGuides();
-
-    // TODO(KNO-7788): Subscribe to a guide channel for real time updates.
+    knockGuideClient.init();
   }, [knockGuideClient]);
 
   return (

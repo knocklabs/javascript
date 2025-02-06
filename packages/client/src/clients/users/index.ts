@@ -124,18 +124,14 @@ class UserClient {
     return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
   }
 
-  async getGuides<T = GenericData>({
-    params,
-  }: {
-    params: GetGuidesQueryParams;
-  }) {
+  async getGuides({ params }: { params: GetGuidesQueryParams }) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: getGuidesPath(this.instance.userId),
       params,
     });
 
-    return this.handleResponse<GetGuidesResponse<T>>(result);
+    return this.handleResponse<GetGuidesResponse>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {

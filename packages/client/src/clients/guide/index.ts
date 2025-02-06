@@ -1,2 +1,6 @@
 export { KnockGuideClient } from "./client";
-export type { TriggerParams as KnockGuideTriggerParams } from "./client";
+export type {
+  KnockGuide,
+  TriggerParams as KnockGuideTriggerParams,
+  SelectFilterParams as KnockGuideFilterParams,
+} from "./client";

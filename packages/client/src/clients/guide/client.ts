@@ -7,17 +7,21 @@ import Knock from "../../knock";
 // Guides API (via User client)
 //
 
-type Guide<T = GenericData> = {
+export type KnockGuide = {
   __typename: "Guide";
   id: string;
   key: string;
-
   message_type: string;
   schema_version: string;
   schema_variant: string;
-  content: T;
+  // eslint-disable-next-line
+  content: any;
 
-  // TODO(KNO-7792): Add engagement state timestamps.
+  seen_at: string | null;
+  read_at: string | null;
+  interacted_at: string | null;
+  archived_at: string | null;
+  link_clicked_at: string | null;
   inserted_at: string;
   updated_at: string;
 };
@@ -28,11 +32,11 @@ export const getGuidesPath = (userId: string | undefined | null) =>
 export type GetGuidesQueryParams = {
   data?: string;
   tenant?: string;
-  message_type?: string[];
+  message_type?: string;
 };
 
-export type GetGuidesResponse<T = GenericData> = {
-  entries: Guide<T>[];
+export type GetGuidesResponse = {
+  entries: KnockGuide[];
 };
 
 //
@@ -47,15 +51,13 @@ type QueryStatus = {
 };
 
 type StoreState = {
-  guides: Guide[];
+  guides: KnockGuide[];
   queries: Record<QueryKey, QueryStatus>;
 };
 
-type QueryFilterParams = {
-  message_type?: string | string[];
-};
+type QueryFilterParams = Pick<GetGuidesQueryParams, "message_type">;
 
-type SelectFilterParams = QueryFilterParams & {
+export type SelectFilterParams = QueryFilterParams & {
   key?: string;
 };
 
@@ -72,7 +74,11 @@ export class KnockGuideClient {
     readonly triggerParams: TriggerParams = {},
   ) {
     this.knock = knock;
-    this.triggerParams = this.onlyTriggerParams(triggerParams);
+
+    this.triggerParams = {
+      data: triggerParams.data,
+      tenant: triggerParams.tenant,
+    };
 
     this.store = new Store<StoreState>({
       guides: [],
@@ -84,18 +90,20 @@ export class KnockGuideClient {
     this.knock.log("[Guide] Initialized a guide client");
   }
 
-  selectGuides(state: StoreState, filters: SelectFilterParams = {}) {
-    // TODO(KNO-7790): Need to consider activation rules also.
-    return state.guides.filter((guide) => {
-      const messageTypes =
-        filters.message_type && typeof filters.message_type === "string"
-          ? [filters.message_type]
-          : filters.message_type || [];
+  init() {
+    console.log("init()")
 
-      if (
-        messageTypes.length > 0 &&
-        !messageTypes.includes(guide.message_type)
-      ) {
+    // TODO(KNO-7788): Subscribe to a guide channel for real time updates.
+    // Pull down all eligible guides in order of priority and recency.
+    return this.fetch();
+  }
+
+  select(state: StoreState, filters: SelectFilterParams = {}) {
+    // TODO(KNO-7790): Need to consider activation rules also.
+    // TODO: Should exclude archived guides by default?
+
+    return state.guides.filter((guide) => {
+      if (filters.message_type && filters.message_type !== guide.message_type) {
         return false;
       }
 
@@ -107,9 +115,7 @@ export class KnockGuideClient {
     });
   }
 
-  async fetchGuides<T extends GenericData = GenericData>(opts?: {
-    filters?: QueryFilterParams;
-  }) {
+  async fetch(opts?: { filters?: QueryFilterParams }) {
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
 
@@ -127,7 +133,7 @@ export class KnockGuideClient {
 
     let queryStatus: QueryStatus;
     try {
-      const data = await this.knock.user.getGuides<T>({ params: queryParams });
+      const data = await this.knock.user.getGuides({ params: queryParams });
       queryStatus = { status: "ok" };
 
       this.store.setState((state) => ({
@@ -161,13 +167,6 @@ export class KnockGuideClient {
       ),
     );
 
-    // Handle message type(s) as an array for consistent serialization when
-    // provided.
-    params =
-      params.message_type && typeof params.message_type === "string"
-        ? { ...params, message_type: [params.message_type] }
-        : params;
-
     // Encode trigger data as a JSON string, if provided.
     params = params.data
       ? { ...params, data: JSON.stringify(params.data) }
@@ -190,10 +189,22 @@ export class KnockGuideClient {
     return queryStr ? `${basePath}?${queryStr}` : basePath;
   }
 
-  private onlyTriggerParams(params: GenericData): TriggerParams {
-    return {
-      data: params.data,
-      tenant: params.tenant,
-    };
+  //
+  // Engagement status update
+  //
+
+  async markAsSeen(_guide: KnockGuide) {
+    // TODO:
+    return;
+  }
+
+  async markAsInteracted(_guide: KnockGuide) {
+    // TODO:
+    return;
+  }
+
+  async markAsArchived(_guide: KnockGuide) {
+    // TODO:
+    return;
   }
 }
