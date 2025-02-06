@@ -1,6 +1,6 @@
 import Knock, {
   KnockGuideClient,
-  KnockGuideTriggerParams,
+  KnockGuideTargetParams,
 } from "@knocklabs/client";
 import * as React from "react";
 
@@ -16,14 +16,16 @@ export const KnockGuideContext = React.createContext<
   KnockGuideProviderValue | undefined
 >(undefined);
 
-type Props = KnockGuideTriggerParams & {
+type Props = {
   colorMode?: ColorMode;
+  targetParams?: KnockGuideTargetParams;
+  readyToTarget: boolean;
 };
 
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   colorMode = "light",
-  data,
-  tenant,
+  targetParams,
+  readyToTarget,
   children,
 }) => {
   let knock: Knock;
@@ -34,15 +36,15 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
     throw new Error("KnockGuideProvider must be used within a KnockProvider");
   }
 
-  const triggerParams = useStableOptions({ data, tenant });
+  const stableTargetParams = useStableOptions(targetParams);
 
   const knockGuideClient = React.useMemo(() => {
-    return new KnockGuideClient(knock, triggerParams);
-  }, [knock, triggerParams]);
+    return new KnockGuideClient(knock, stableTargetParams);
+  }, [knock, stableTargetParams]);
 
   React.useEffect(() => {
-    knockGuideClient.init();
-  }, [knockGuideClient]);
+    if (readyToTarget) knockGuideClient.load();
+  }, [readyToTarget, knockGuideClient]);
 
   return (
     <KnockGuideContext.Provider

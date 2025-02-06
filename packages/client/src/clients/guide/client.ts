@@ -14,6 +14,7 @@ export type KnockGuide = {
   message_type: string;
   schema_version: string;
   schema_variant: string;
+
   // eslint-disable-next-line
   content: any;
 
@@ -61,7 +62,7 @@ export type SelectFilterParams = QueryFilterParams & {
   key?: string;
 };
 
-export type TriggerParams = {
+export type TargetParams = {
   data?: GenericData;
   tenant?: string;
 };
@@ -71,7 +72,7 @@ export class KnockGuideClient {
 
   constructor(
     readonly knock: Knock,
-    readonly triggerParams: TriggerParams = {},
+    readonly triggerParams: TargetParams = {},
   ) {
     this.knock = knock;
 
@@ -90,8 +91,8 @@ export class KnockGuideClient {
     this.knock.log("[Guide] Initialized a guide client");
   }
 
-  init() {
-    console.log("init()")
+  async load() {
+    this.knock.log("[Guide] Loading all eligible guides");
 
     // TODO(KNO-7788): Subscribe to a guide channel for real time updates.
     // Pull down all eligible guides in order of priority and recency.
@@ -115,7 +116,26 @@ export class KnockGuideClient {
     });
   }
 
-  async fetch(opts?: { filters?: QueryFilterParams }) {
+  async markAsSeen(_guide: KnockGuide) {
+    // TODO:
+    return;
+  }
+
+  async markAsInteracted(_guide: KnockGuide) {
+    // TODO:
+    return;
+  }
+
+  async markAsArchived(_guide: KnockGuide) {
+    // TODO:
+    return;
+  }
+
+  //
+  // Private
+  //
+
+  private async fetch(opts?: { filters?: QueryFilterParams }) {
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
 
@@ -187,24 +207,5 @@ export class KnockGuideClient {
 
     const basePath = getGuidesPath(this.knock.userId);
     return queryStr ? `${basePath}?${queryStr}` : basePath;
-  }
-
-  //
-  // Engagement status update
-  //
-
-  async markAsSeen(_guide: KnockGuide) {
-    // TODO:
-    return;
-  }
-
-  async markAsInteracted(_guide: KnockGuide) {
-    // TODO:
-    return;
-  }
-
-  async markAsArchived(_guide: KnockGuide) {
-    // TODO:
-    return;
   }
 }
