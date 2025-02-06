@@ -18,9 +18,7 @@ import { sortByName } from "../../../ms-teams/utils";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
-import SlackChannelListBox from "./SlackChannelListBox";
 import SlackConnectionError from "./SlackConnectionError";
-import { strContains } from "./helpers";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
 import "./styles.css";
@@ -41,8 +39,6 @@ export interface SlackChannelComboboxProps {
   queryOptions?: SlackChannelQueryOptions;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   inputContainerProps?: React.HTMLAttributes<HTMLDivElement>;
-  listBoxProps?: React.HTMLAttributes<HTMLDivElement>;
-  channelOptionProps?: React.HtmlHTMLAttributes<HTMLButtonElement>;
   inputMessages?: SlackChannelComboboxInputMessages;
   showConnectedChannelTags?: boolean;
 }
@@ -54,8 +50,6 @@ export const SlackChannelCombobox: FunctionComponent<
   queryOptions,
   inputProps,
   inputContainerProps,
-  listBoxProps,
-  channelOptionProps,
   inputMessages,
   showConnectedChannelTags = false,
 }) => {
@@ -184,37 +178,6 @@ export const SlackChannelCombobox: FunctionComponent<
     t,
   ]);
 
-  // Handle channel click
-  const handleOptionClick = async (channelId: string) => {
-    if (!currentConnectedChannels) {
-      return;
-    }
-
-    const isChannelConnected = currentConnectedChannels.find(
-      (channel) => channel.channel_id === channelId,
-    );
-
-    if (isChannelConnected) {
-      const channelsToSendToKnock = currentConnectedChannels.filter(
-        (connectedChannel) => connectedChannel.channel_id !== channelId,
-      );
-
-      updateConnectedChannels(channelsToSendToKnock);
-    } else {
-      const channelsToSendToKnock = [
-        ...currentConnectedChannels,
-        { channel_id: channelId } as SlackChannelConnection,
-      ];
-
-      updateConnectedChannels(channelsToSendToKnock);
-    }
-  };
-
-  // Handle channel search
-  const matchedChannels = slackChannels.filter((slackChannel) =>
-    strContains(slackChannel.name, inputValue),
-  );
-
   const comboboxValue = useMemo(
     () => currentConnectedChannels.map((connection) => connection.channel_id),
     [currentConnectedChannels],
@@ -307,18 +270,6 @@ export const SlackChannelCombobox: FunctionComponent<
               <SlackConnectionError />
             </div>
           </Popover.Trigger>
-
-          <Popover.Content>
-            <SlackChannelListBox
-              isLoading={slackChannelsLoading || connectedChannelsLoading}
-              isUpdating={connectedChannelsUpdating}
-              connectedChannels={currentConnectedChannels}
-              onClick={handleOptionClick}
-              slackChannels={matchedChannels}
-              listBoxProps={listBoxProps}
-              channelOptionProps={channelOptionProps}
-            />
-          </Popover.Content>
         </Popover.Root>
       </div>
     </>
