@@ -9,7 +9,7 @@ type CloseCircleProps = {
 const CloseCircle: FunctionComponent<CloseCircleProps> = ({
   width = 14,
   height = 14,
-  "aria-hidden": ariaHidden = false,
+  "aria-hidden": ariaHidden,
 }) => (
   <svg
     width={width}

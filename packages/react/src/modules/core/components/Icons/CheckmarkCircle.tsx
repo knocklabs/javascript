@@ -9,7 +9,7 @@ type CheckmarkCircleProps = {
 const CheckmarkCircle: FunctionComponent<CheckmarkCircleProps> = ({
   width = 16,
   height = 16,
-  "aria-hidden": ariaHidden = false,
+  "aria-hidden": ariaHidden,
 }) => (
   <svg
     width={width}

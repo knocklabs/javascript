@@ -9,7 +9,7 @@ type ChevronDownProps = {
 const ChevronDown: FunctionComponent<ChevronDownProps> = ({
   width = 8,
   height = 6,
-  "aria-hidden": ariaHidden = false,
+  "aria-hidden": ariaHidden,
 }) => (
   <svg
     width={width}
