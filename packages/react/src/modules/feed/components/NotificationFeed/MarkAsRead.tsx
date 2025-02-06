@@ -36,7 +36,7 @@ export const MarkAsRead: React.FC<MarkAsReadProps> = ({ onClick }) => {
       type="button"
     >
       {t("markAllAsRead")}
-      <CheckmarkCircle />
+      <CheckmarkCircle aria-hidden />
     </button>
   );
 };
