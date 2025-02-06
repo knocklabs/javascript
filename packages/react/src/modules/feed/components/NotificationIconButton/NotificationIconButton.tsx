@@ -26,7 +26,7 @@ export const NotificationIconButton = React.forwardRef<
       ref={ref}
       onClick={onClick}
     >
-      <BellIcon />
+      <BellIcon aria-hidden />
       <UnseenBadge badgeCountType={badgeCountType} />
     </button>
   );
