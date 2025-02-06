@@ -203,7 +203,7 @@ export const SlackChannelCombobox: FunctionComponent<
           updateConnectedChannels(updatedConnections).catch(console.error);
         }}
         placeholder={searchPlaceholder ?? ""}
-        disabled={inErrorState}
+        disabled={inErrorState || slackChannels.length === 0}
         errored={inErrorState}
         closeOnSelect={false}
         layout="wrap"
