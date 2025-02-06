@@ -246,14 +246,12 @@ export const SlackChannelCombobox: FunctionComponent<
             className={"rsk-combobox__searchbar__input-container"}
             {...inputContainerProps}
           >
-            <div
-              className={`rsk-combobox__searchbar__input-container__icon ${inErrorState && "rsk-combobox__searchbar__input-container__icon--error"}`}
-            >
+            <div className={`rsk-combobox__searchbar__input-container__icon`}>
               {inLoadingState && <Spinner size="15px" thickness={3} />}
             </div>
 
             <input
-              className={`rsk-combobox__searchbar__input-container__input ${inErrorState ? "rsk-combobox__searchbar__input-container__input--error" : ""}`}
+              className={`rsk-combobox__searchbar__input-container__input`}
               tabIndex={-1}
               id="slack-channel-search"
               type="text"
