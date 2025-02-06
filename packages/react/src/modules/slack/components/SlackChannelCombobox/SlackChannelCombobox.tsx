@@ -7,14 +7,12 @@ import {
   useSlackChannels,
   useTranslations,
 } from "@knocklabs/react-core";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Combobox } from "@telegraph/combobox";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FunctionComponent } from "react";
 
-import { Spinner } from "../../../core";
 import { sortByName } from "../../../ms-teams/utils";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
@@ -38,8 +36,6 @@ export type SlackChannelComboboxInputMessages = {
 export interface SlackChannelComboboxProps {
   slackChannelsRecipientObject: RecipientObject;
   queryOptions?: SlackChannelQueryOptions;
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-  inputContainerProps?: React.HTMLAttributes<HTMLDivElement>;
   inputMessages?: SlackChannelComboboxInputMessages;
   showConnectedChannelTags?: boolean;
 }
@@ -49,14 +45,10 @@ export const SlackChannelCombobox: FunctionComponent<
 > = ({
   slackChannelsRecipientObject,
   queryOptions,
-  inputProps,
-  inputContainerProps,
   inputMessages,
   showConnectedChannelTags = false,
 }) => {
   const { t } = useTranslations();
-
-  const [inputValue, setInputValue] = useState("");
 
   // Gather API data
   const { connectionStatus, errorLabel: connectionErrorLabel } =
@@ -196,74 +188,46 @@ export const SlackChannelCombobox: FunctionComponent<
   }
 
   return (
-    <>
-      <Stack className="tgph rsk-combobox__grid" gap="3">
-        <Text color="gray" size="2" as="div" style={{ alignSelf: "start" }}>
-          Channel
-        </Text>
-        <Combobox.Root
-          value={comboboxValue}
-          onValueChange={(channelIds) => {
-            const updatedConnections = channelIds.map<SlackChannelConnection>(
-              (channelId) => ({
-                channel_id: channelId,
-              }),
-            );
+    <Stack className="tgph rsk-combobox__grid" gap="3">
+      <Text color="gray" size="2" as="div" style={{ alignSelf: "start" }}>
+        Channel
+      </Text>
+      <Combobox.Root
+        value={comboboxValue}
+        onValueChange={(channelIds) => {
+          const updatedConnections = channelIds.map<SlackChannelConnection>(
+            (channelId) => ({
+              channel_id: channelId,
+            }),
+          );
 
-            updateConnectedChannels(updatedConnections).catch(console.error);
-          }}
-          placeholder={searchPlaceholder ?? ""}
-          disabled={inErrorState}
-          closeOnSelect={false}
-          layout="wrap"
-        >
-          <Combobox.Trigger />
-          <Combobox.Content>
-            <Combobox.Search className="rsk-combobox__search" />
-            <Combobox.Options className="rsk-combobox__options">
-              {slackChannels.map((channel) => (
-                <Combobox.Option key={channel.id} value={channel.id}>
-                  <span aria-hidden>
-                    {channel.is_private ? <LockIcon /> : <HashtagIcon />}
-                  </span>
-                  {channel.name}
-                </Combobox.Option>
-              ))}
-            </Combobox.Options>
-            <Combobox.Empty />
-          </Combobox.Content>
-        </Combobox.Root>
-        <SlackConnectionError />
-      </Stack>
-      <div className="rsk-combobox">
-        <VisuallyHidden.Root>
-          <label htmlFor="slack-channel-search">
-            {t("slackSearchChannels")}
-          </label>
-        </VisuallyHidden.Root>
-        <div className="rsk-combobox__searchbar">
-          <div
-            className={"rsk-combobox__searchbar__input-container"}
-            {...inputContainerProps}
-          >
-            <div className={`rsk-combobox__searchbar__input-container__icon`}>
-              {inLoadingState && <Spinner size="15px" thickness={3} />}
-            </div>
-
-            <input
-              className={`rsk-combobox__searchbar__input-container__input`}
-              tabIndex={-1}
-              id="slack-channel-search"
-              type="text"
-              onChange={(e) => setInputValue(e.target.value)}
-              value={inputValue}
-              placeholder={searchPlaceholder || ""}
-              disabled={inErrorState}
-              {...inputProps}
-            />
-          </div>
-        </div>
-      </div>
-    </>
+          updateConnectedChannels(updatedConnections).catch(console.error);
+        }}
+        placeholder={searchPlaceholder ?? ""}
+        disabled={inErrorState}
+        closeOnSelect={false}
+        layout="wrap"
+      >
+        <Combobox.Trigger />
+        <Combobox.Content>
+          <Combobox.Search
+            label={t("slackSearchChannels")}
+            className="rsk-combobox__search"
+          />
+          <Combobox.Options className="rsk-combobox__options">
+            {slackChannels.map((channel) => (
+              <Combobox.Option key={channel.id} value={channel.id}>
+                <span aria-hidden>
+                  {channel.is_private ? <LockIcon /> : <HashtagIcon />}
+                </span>
+                {channel.name}
+              </Combobox.Option>
+            ))}
+          </Combobox.Options>
+          <Combobox.Empty />
+        </Combobox.Content>
+      </Combobox.Root>
+      <SlackConnectionError />
+    </Stack>
   );
 };

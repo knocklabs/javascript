@@ -54,7 +54,6 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
-    "@radix-ui/react-visually-hidden": "1.0.3",
     "@telegraph/combobox": "^0.0.57",
     "@telegraph/icon": "^0.0.39",
     "@telegraph/layout": "^0.1.5",

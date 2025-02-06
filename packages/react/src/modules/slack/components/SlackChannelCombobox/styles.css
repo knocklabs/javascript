@@ -20,46 +20,6 @@
   font-family: var(--rsk-font-family-sanserif) !important;
 }
 
-/* Base styles */
-.rsk-combobox,
-.rsk-combobox__searchbar,
-.rsk-combobox__searchbar__input-container {
-  width: 286px;
-}
-
-.rsk-combobox {
-  font-family: var(--rsk-font-family-sanserif);
-  font-size: var(--rsk-font-size-sm);
-  font-weight: var(--rsk-font-weight-normal);
-}
-
-/* Searchbar */
-.rsk-combobox__searchbar__input-container {
-  align-items: center;
-  color: var(--rsk-color-gray-200);
-  display: flex;
-  position: relative;
-}
-
-.rsk-combobox__searchbar__input-container__icon {
-  left: var(--rsk-spacing-3);
-  position: absolute;
-  top: 0.65rem;
-  z-index: 10;
-}
-
-.rsk-combobox__searchbar__input-container__input {
-  border-color: var(--rsk-color-gray-200);
-  border-radius: var(--rsk-border-radius-md);
-  border-style: solid;
-  border-width: 1px;
-  height: 32px;
-  padding-left: var(--rsk-spacing-7);
-  padding-right: var(--rsk-spacing-1);
-  position: relative;
-  width: 100%;
-}
-
 /* Error */
 .rsk-combobox__error {
   grid-column: span 2;
