@@ -205,6 +205,7 @@ export const SlackChannelCombobox: FunctionComponent<
         }}
         placeholder={searchPlaceholder ?? ""}
         disabled={inErrorState}
+        errored={inErrorState}
         closeOnSelect={false}
         layout="wrap"
       >
