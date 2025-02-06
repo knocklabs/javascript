@@ -1,4 +1,4 @@
-import { SlackChannel, SlackChannelConnection } from "@knocklabs/client";
+import { SlackChannelConnection } from "@knocklabs/client";
 import {
   RecipientObject,
   SlackChannelQueryOptions,
@@ -10,15 +10,11 @@ import {
 import * as Popover from "@radix-ui/react-popover";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { Combobox } from "@telegraph/combobox";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
-import {
-  fromLabelSearchableOption,
-  sortByName,
-  toLabelSearchableOption,
-} from "../../../ms-teams/utils";
+import { sortByName } from "../../../ms-teams/utils";
 import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
@@ -219,26 +215,9 @@ export const SlackChannelCombobox: FunctionComponent<
     strContains(slackChannel.name, inputValue),
   );
 
-  const channelToOption = useCallback(
-    (channel: SlackChannel) =>
-      toLabelSearchableOption({
-        value: channel.id,
-        label: channel.name,
-      }),
-    [],
-  );
-
   const comboboxValue = useMemo(
-    () =>
-      currentConnectedChannels.map((connection) => {
-        const channel = slackChannels.find(
-          (c) => c.id === connection.channel_id,
-        );
-        return channel
-          ? channelToOption(channel)
-          : { label: "Loading…", value: connection.channel_id! };
-      }),
-    [currentConnectedChannels, slackChannels, channelToOption],
+    () => currentConnectedChannels.map((connection) => connection.channel_id),
+    [currentConnectedChannels],
   );
 
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
@@ -258,10 +237,9 @@ export const SlackChannelCombobox: FunctionComponent<
       <div className="tgph">
         <Combobox.Root
           value={comboboxValue}
-          onValueChange={(searchableOptions) => {
-            const options = searchableOptions.map(fromLabelSearchableOption);
-            const updatedConnections = options.map<SlackChannelConnection>(
-              ({ value: channelId }) => ({
+          onValueChange={(channelIds) => {
+            const updatedConnections = channelIds.map<SlackChannelConnection>(
+              (channelId) => ({
                 channel_id: channelId,
               }),
             );
@@ -277,10 +255,9 @@ export const SlackChannelCombobox: FunctionComponent<
             <Combobox.Search />
             <Combobox.Options>
               {slackChannels.map((channel) => (
-                <Combobox.Option
-                  key={channel.id}
-                  {...channelToOption(channel)}
-                />
+                <Combobox.Option key={channel.id} value={channel.id}>
+                  {channel.name}
+                </Combobox.Option>
               ))}
             </Combobox.Options>
             <Combobox.Empty />
