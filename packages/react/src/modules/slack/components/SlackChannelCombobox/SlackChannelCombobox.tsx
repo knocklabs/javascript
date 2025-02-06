@@ -22,6 +22,8 @@ import SlackChannelListBox from "./SlackChannelListBox";
 import SlackConnectedChannelTagList from "./SlackConnectedChannelTagList";
 import SlackConnectionError from "./SlackConnectionError";
 import { strContains } from "./helpers";
+import HashtagIcon from "./icons/HashtagIcon";
+import LockIcon from "./icons/LockIcon";
 import SearchIcon from "./icons/SearchIcon";
 import "./styles.css";
 
@@ -256,6 +258,9 @@ export const SlackChannelCombobox: FunctionComponent<
             <Combobox.Options>
               {slackChannels.map((channel) => (
                 <Combobox.Option key={channel.id} value={channel.id}>
+                  <span aria-hidden>
+                    {channel.is_private ? <LockIcon /> : <HashtagIcon />}
+                  </span>
                   {channel.name}
                 </Combobox.Option>
               ))}
