@@ -15,3 +15,5 @@ In addition, we've removed the following props from `SlackChannelCombobox`:
 - `inputContainerProps`
 - `listBoxProps`
 - `channelOptionProps`
+
+The `inputMessages` prop has also been updated to remove the `singleChannelConnected` and `multipleChannelsConnected` strings.
