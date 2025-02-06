@@ -183,7 +183,13 @@ export const SlackChannelCombobox: FunctionComponent<
 
   return (
     <Stack className="tgph rsk-combobox__grid" gap="3">
-      <Text color="gray" size="2" as="div" style={{ alignSelf: "start" }}>
+      <Text
+        color="gray"
+        size="2"
+        as="div"
+        minHeight="8"
+        className="rsk-combobox__label"
+      >
         Channel
       </Text>
       <Combobox.Root

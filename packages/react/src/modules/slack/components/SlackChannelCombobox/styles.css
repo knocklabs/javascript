@@ -7,6 +7,12 @@
   font-family: var(--rsk-font-family-sanserif);
 }
 
+.rsk-combobox__label {
+  align-self: start;
+  display: flex;
+  align-items: center;
+}
+
 /*
  * Overrides Telegraph combobox defaults; using maxHeight prop on Combobox.Options does not work.
  * See KNO-7736.
