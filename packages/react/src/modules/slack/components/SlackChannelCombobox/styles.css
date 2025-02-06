@@ -3,6 +3,10 @@
   --rsk-error-yellow-background: rgba(255, 255, 240, 1);
 }
 
+.rsk-combobox__search {
+  font-family: var(--rtk-font-family-sanserif) !important;
+}
+
 /* Base styles */
 .rsk-combobox,
 .rsk-combobox__list-box,
