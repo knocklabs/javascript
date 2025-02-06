@@ -1,7 +1,6 @@
 import { SlackChannel } from "@knocklabs/client";
 import { FunctionComponent } from "react";
 
-import CloseIcon from "./icons/CloseIcon";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
 import "./styles.css";
@@ -26,7 +25,7 @@ const SlackConnectedChannelTag: FunctionComponent<
         onClick={() => updateConnectedChannels(channel.id)}
         className="rsk-combobox__connected_channel_tag__delete_button"
       >
-        <CloseIcon />
+        X
       </button>
     </div>
   );
