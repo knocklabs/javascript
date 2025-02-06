@@ -5,7 +5,6 @@ import { FunctionComponent } from "react";
 import { Spinner } from "../../../core";
 import "../../theme.css";
 
-import CheckmarkIcon from "./icons/CheckmarkIcon";
 import HashtagIcon from "./icons/HashtagIcon";
 import LockIcon from "./icons/LockIcon";
 import "./styles.css";
@@ -38,7 +37,7 @@ const SlackChannelOption: FunctionComponent<SlackChannelOptionProps> = ({
     }
 
     if (isHovered || isConnected) {
-      return <CheckmarkIcon isConnected={isConnected} />;
+      return "✅";
     }
 
     return <div className="rsk-combobox__option__text-container__empty-icon" />;
