@@ -1,30 +1,31 @@
 import {
-  CardView,
+  Banner,
+  // CardView,
   KnockGuideProvider,
   KnockProvider,
-  useGuides,
+  //useGuide,
   // ModalView,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
 
-const Banner = () => {
-  const { guides, colorMode } = useGuides("card");
-  const [guide] = guides;
-
-  if (!guide) return null;
-
-  return (
-    <CardView.Default
-      colorMode={colorMode}
-      content={{
-        title: guide.content.title,
-        body: guide.content.body,
-        dismissible: !!guide.content.dismissible,
-      }}
-    />
-  )
-}
+//const Banner = () => {
+//  const { guides, colorMode } = useGuides("card");
+//  const [guide] = guides;
+//
+//  if (!guide) return null;
+//
+//  return (
+//    <CardView.Default
+//      colorMode={colorMode}
+//      content={{
+//        title: guide.content.title,
+//        body: guide.content.body,
+//        dismissible: !!guide.content.dismissible,
+//      }}
+//    />
+//  )
+//}
 
 function App() {
   const [colorMode, setColorMode] = useState<"dark" | "light">("dark");

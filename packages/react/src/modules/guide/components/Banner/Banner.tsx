@@ -1,35 +1,13 @@
-import {
-  ColorMode,
-  UseInAppMessageOptions,
-  useInAppMessage,
-  useInAppMessagesChannel,
-} from "@knocklabs/react-core";
+import { ColorMode } from "@knocklabs/react-core";
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React from "react";
 
+import { Guide } from "../Guide";
 import { ActionContent } from "../types";
 
 import "./styles.css";
 
 const MESSAGE_TYPE = "banner";
-
-export interface BannerProps {
-  filters?: UseInAppMessageOptions;
-}
-
-export interface BannerContent {
-  title: string;
-  body: string;
-  primary_button?: {
-    text: string;
-    action: string;
-  };
-  secondary_button?: {
-    text: string;
-    action: string;
-  };
-  dismissible?: boolean;
-}
 
 const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
@@ -145,6 +123,20 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
 };
 DismissButton.displayName = "BannerView.DismissButton";
 
+type BannerContent = {
+  title: string;
+  body: string;
+  primary_button?: {
+    text: string;
+    action: string;
+  };
+  secondary_button?: {
+    text: string;
+    action: string;
+  };
+  dismissible?: boolean;
+};
+
 const DefaultView: React.FC<{
   content: BannerContent;
   colorMode?: ColorMode;
@@ -179,44 +171,27 @@ const DefaultView: React.FC<{
 };
 DefaultView.displayName = "BannerView.Default";
 
-const Banner: React.FC<BannerProps> = ({ filters }) => {
-  const { colorMode } = useInAppMessagesChannel();
+type BannerProps = {
+  guideKey?: string;
+};
 
-  const { message, inAppMessagesClient } = useInAppMessage<BannerContent>(
-    MESSAGE_TYPE,
-    filters,
-  );
-
-  // Mark the message as seen on render
-  useEffect(() => {
-    if (!message || message.seen_at !== null) return;
-
-    inAppMessagesClient.markAsSeen(message);
-  }, [message, inAppMessagesClient]);
-
-  // Exclude archived messages
-  if (!message || message.archived_at) return null;
-
-  const onDismiss = () => {
-    inAppMessagesClient.markAsArchived(message);
-  };
-
-  const onInteract = () => {
-    inAppMessagesClient.markAsInteracted(message);
-  };
-
+export const Banner: React.FC<BannerProps> = ({ guideKey }) => {
   return (
-    <DefaultView
-      content={message.content}
-      colorMode={colorMode}
-      onDismiss={onDismiss}
-      onInteract={onInteract}
-    />
+    <Guide messageType={MESSAGE_TYPE} guideKey={guideKey}>
+      {({ guide, colorMode, onDismiss, onInteract }) => (
+        <DefaultView
+          content={guide.content as BannerContent}
+          colorMode={colorMode}
+          onDismiss={onDismiss}
+          onInteract={onInteract}
+        />
+      )}
+    </Guide>
   );
 };
 Banner.displayName = "Banner";
 
-const BannerView = {} as {
+export const BannerView = {} as {
   Default: typeof DefaultView;
   Root: typeof Root;
   Content: typeof Content;
@@ -239,5 +214,3 @@ Object.assign(BannerView, {
   SecondaryAction,
   DismissButton,
 });
-
-export { Banner, BannerView };
