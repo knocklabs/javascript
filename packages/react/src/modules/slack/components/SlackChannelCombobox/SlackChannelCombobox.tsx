@@ -37,17 +37,11 @@ export interface SlackChannelComboboxProps {
   slackChannelsRecipientObject: RecipientObject;
   queryOptions?: SlackChannelQueryOptions;
   inputMessages?: SlackChannelComboboxInputMessages;
-  showConnectedChannelTags?: boolean;
 }
 
 export const SlackChannelCombobox: FunctionComponent<
   SlackChannelComboboxProps
-> = ({
-  slackChannelsRecipientObject,
-  queryOptions,
-  inputMessages,
-  showConnectedChannelTags = false,
-}) => {
+> = ({ slackChannelsRecipientObject, queryOptions, inputMessages }) => {
   const { t } = useTranslations();
 
   // Gather API data
