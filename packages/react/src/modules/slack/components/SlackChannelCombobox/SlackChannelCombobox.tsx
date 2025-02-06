@@ -19,7 +19,6 @@ import "../../theme.css";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
 import SlackChannelListBox from "./SlackChannelListBox";
-import SlackConnectedChannelTagList from "./SlackConnectedChannelTagList";
 import SlackConnectionError from "./SlackConnectionError";
 import { strContains } from "./helpers";
 import HashtagIcon from "./icons/HashtagIcon";
@@ -321,13 +320,6 @@ export const SlackChannelCombobox: FunctionComponent<
             />
           </Popover.Content>
         </Popover.Root>
-        {showConnectedChannelTags && (
-          <SlackConnectedChannelTagList
-            connectedChannels={currentConnectedChannels}
-            slackChannels={slackChannels}
-            updateConnectedChannels={handleOptionClick}
-          />
-        )}
       </div>
     </>
   );
