@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.3
+
+### Patch Changes
+
+- 12bc993: Use SWR in `useConnectedSlackChannels` hook
+
+  `useConnectedSlackChannels` now uses [SWR](https://swr.vercel.app/) under the hood. The returned array of connections (`data`) will now update optimistically when `updateConnectedChannels` is called.
+
+- Updated dependencies [4f76cd6]
+  - @knocklabs/client@0.11.3
+
 ## 0.3.2
 
 ### Patch Changes
