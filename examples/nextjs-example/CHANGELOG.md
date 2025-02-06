@@ -1,5 +1,14 @@
 # nextjs-example
 
+## 1.0.45
+
+### Patch Changes
+
+- b61c92b: Fix accessibility issues
+- Updated dependencies [12bc993]
+- Updated dependencies [b61c92b]
+  - @knocklabs/react@0.4.1
+
 ## 1.0.44
 
 ### Patch Changes

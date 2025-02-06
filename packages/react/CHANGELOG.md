@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.1
+
+### Patch Changes
+
+- 12bc993: Use SWR to update connected channels in `SlackChannelCombobox`
+
+  `SlackChannelCombobox` now uses [SWR](https://swr.vercel.app/) to retrieve and update connected Slack channels. There should be no change in the behavior of this component.
+
+- b61c92b: Improve accessibility of notification feed components
+
+  - The dialog `<div>` rendered by `NotificationFeedPopover` now has an appropriate accessible name.
+  - Decorative icons are now hidden from the accessibility tree using `aria-hidden`.
+
+- Updated dependencies [12bc993]
+- Updated dependencies [4f76cd6]
+  - @knocklabs/react-core@0.3.3
+  - @knocklabs/client@0.11.3
+
 ## 0.4.0
 
 ### Minor Changes
