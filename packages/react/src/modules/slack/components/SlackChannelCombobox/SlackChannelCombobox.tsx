@@ -8,6 +8,7 @@ import {
   useTranslations,
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
+import { Icon, Lucide } from "@telegraph/icon";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { useMemo } from "react";
@@ -19,8 +20,6 @@ import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
 import SlackConnectionError from "./SlackConnectionError";
 import SlackErrorMessage from "./SlackErrorMessage";
-import HashtagIcon from "./icons/HashtagIcon";
-import LockIcon from "./icons/LockIcon";
 import "./styles.css";
 
 const MAX_ALLOWED_CHANNELS = 1000;
@@ -192,10 +191,14 @@ export const SlackChannelCombobox: FunctionComponent<
           <Combobox.Options className="rsk-combobox__options">
             {slackChannels.map((channel) => (
               <Combobox.Option key={channel.id} value={channel.id}>
-                <span aria-hidden>
-                  {channel.is_private ? <LockIcon /> : <HashtagIcon />}
-                </span>
-                {channel.name}
+                <Stack align="center" gap="1">
+                  <Icon
+                    icon={channel.is_private ? Lucide.Lock : Lucide.Hash}
+                    size="0"
+                    aria-hidden
+                  />
+                  {channel.name}
+                </Stack>
               </Combobox.Option>
             ))}
           </Combobox.Options>
