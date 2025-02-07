@@ -14,8 +14,8 @@ import { Text } from "@telegraph/typography";
 import { useMemo } from "react";
 import { FunctionComponent } from "react";
 
-import { sortByName } from "../../../ms-teams/utils";
 import "../../theme.css";
+import { sortSlackChannelsAlphabetically } from "../../utils";
 import SlackAddChannelInput from "../SlackAddChannelInput/SlackAddChannelInput";
 
 import SlackConnectionError from "./SlackConnectionError";
@@ -46,10 +46,13 @@ export const SlackChannelCombobox: FunctionComponent<
   const { connectionStatus, errorLabel: connectionErrorLabel } =
     useKnockSlackClient();
 
-  const { data: origChannels, isLoading: slackChannelsLoading } =
+  const { data: unsortedSlackChannels, isLoading: slackChannelsLoading } =
     useSlackChannels({ queryOptions });
 
-  const slackChannels = useMemo(() => sortByName(origChannels), [origChannels]);
+  const slackChannels = useMemo(
+    () => sortSlackChannelsAlphabetically(unsortedSlackChannels),
+    [unsortedSlackChannels],
+  );
 
   const {
     data: connectedChannels,
