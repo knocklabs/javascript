@@ -20,7 +20,7 @@ export const Avatar: React.FC<AvatarProps> = ({ name, src }) => {
   return (
     <div className="rnf-avatar">
       {src ? (
-        <img src={src} alt={`Image of ${name}`} className="rnf-avatar__image" />
+        <img src={src} alt={name} className="rnf-avatar__image" />
       ) : (
         <span className="rnf-avatar__initials">{getInitials(name)}</span>
       )}
