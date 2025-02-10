@@ -108,11 +108,13 @@ export const NotificationCell = React.forwardRef<
     const actor = item.actors[0];
 
     return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         ref={ref}
         className={`rnf-notification-cell rnf-notification-cell--${colorMode}`}
         onClick={onContainerClickHandler}
         onKeyDown={onKeyDown}
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
       >
         <div className="rnf-notification-cell__inner">
