@@ -9,4 +9,9 @@ module.exports = {
   parserOptions: {
     projects: ["tsconfig.json", "tsconfig.node.json"],
   },
+  settings: {
+    "jsx-a11y": {
+      polymorphicPropName: "as",
+    },
+  },
 };
