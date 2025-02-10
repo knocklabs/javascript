@@ -46,7 +46,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
 
   return (
     <Stack className="tgph rtk-combobox__grid" gap="3">
-      <Text color="gray" size="2" as="div">
+      <Text color="gray" size="2" as="a">
         Team
       </Text>
       <MsTeamsTeamCombobox
