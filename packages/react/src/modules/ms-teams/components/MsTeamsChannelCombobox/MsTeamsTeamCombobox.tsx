@@ -57,7 +57,7 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         <Combobox.Trigger className="rtk-combobox__team__value" />
         <Combobox.Content>
           <Combobox.Search className="rtk-combobox__search" />
-          <Combobox.Options className="rtk-combobox__options">
+          <Combobox.Options maxHeight="36">
             {sortedTeams.map((team) => {
               const channelCount = getChannelCount(team.id);
               return (
