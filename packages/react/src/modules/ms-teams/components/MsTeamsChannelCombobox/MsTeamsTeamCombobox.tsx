@@ -54,7 +54,7 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         placeholder="Select team"
         disabled={inErrorState || inLoadingState || sortedTeams.length === 0}
       >
-        <Combobox.Trigger className="rtk-combobox__team__value" />
+        <Combobox.Trigger />
         <Combobox.Content>
           <Combobox.Search className="rtk-combobox__search" />
           <Combobox.Options maxHeight="36">

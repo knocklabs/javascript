@@ -11,17 +11,6 @@
   font-family: var(--rtk-font-family-sanserif) !important;
 }
 
-/*
- * MsTeamsTeamCombobox
- * Prevents team name from overflowing input box.
- * See KNO-7737.
- */
-.rtk-combobox__team__value span {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 /* Error */
 .rtk-combobox__error {
   grid-column: span 2;
