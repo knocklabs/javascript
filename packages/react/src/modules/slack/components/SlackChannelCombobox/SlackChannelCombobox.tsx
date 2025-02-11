@@ -166,7 +166,7 @@ export const SlackChannelCombobox: FunctionComponent<
         minHeight="8"
         className="rsk-combobox__label"
       >
-        Channel
+        Channels
       </Text>
       <Combobox.Root
         value={comboboxValue}
