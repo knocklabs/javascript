@@ -3,14 +3,22 @@ import { FunctionComponent } from "react";
 type BellIconProps = {
   width?: number;
   height?: number;
+  "aria-hidden"?: boolean;
 };
 
 const BellIcon: FunctionComponent<BellIconProps> = ({
   width = 24,
   height = 24,
+  "aria-hidden": ariaHidden,
 }) => {
   return (
-    <svg width={width} viewBox="0 0 24 24" fill="none" height={height}>
+    <svg
+      width={width}
+      viewBox="0 0 24 24"
+      fill="none"
+      height={height}
+      aria-hidden={ariaHidden}
+    >
       <path
         d="M20.0474 16.4728C18.8436 14.9996 17.9938 14.2496 17.9938 10.1879C17.9938 6.46832 16.0944 5.14317 14.5311 4.49957C14.3235 4.41426 14.128 4.21832 14.0647 4.00504C13.7905 3.07176 13.0217 2.24957 11.9999 2.24957C10.978 2.24957 10.2088 3.07223 9.93736 4.00598C9.87408 4.2216 9.67861 4.41426 9.47096 4.49957C7.9058 5.1441 6.0083 6.46457 6.0083 10.1879C6.00596 14.2496 5.15611 14.9996 3.95237 16.4728C3.45362 17.0832 3.89049 17.9996 4.76283 17.9996H19.2416C20.1092 17.9996 20.5433 17.0803 20.0474 16.4728Z"
         stroke="currentColor"

@@ -81,6 +81,7 @@ export default function Home() {
                   size="sm"
                   value={tenant}
                   onChange={(e) => setTenant(e.target.value)}
+                  aria-label="Team"
                 >
                   {Object.values(Tenants).map((tenant) => (
                     <option key={tenant} value={tenant}>

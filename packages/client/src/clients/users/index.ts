@@ -32,6 +32,8 @@ class UserClient {
   }
 
   async get() {
+    this.instance.failIfNotAuthenticated();
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.instance.userId}`,
@@ -41,6 +43,8 @@ class UserClient {
   }
 
   async identify(props: GenericData = {}) {
+    this.instance.failIfNotAuthenticated();
+
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/users/${this.instance.userId}`,
@@ -51,6 +55,8 @@ class UserClient {
   }
 
   async getAllPreferences() {
+    this.instance.failIfNotAuthenticated();
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.instance.userId}/preferences`,
@@ -62,6 +68,7 @@ class UserClient {
   async getPreferences(
     options: GetPreferencesOptions = {},
   ): Promise<PreferenceSet> {
+    this.instance.failIfNotAuthenticated();
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -77,6 +84,7 @@ class UserClient {
     preferenceSet: SetPreferencesProperties,
     options: PreferenceOptions = {},
   ): Promise<PreferenceSet> {
+    this.instance.failIfNotAuthenticated();
     const preferenceSetId = options.preferenceSet || DEFAULT_PREFERENCE_SET_ID;
 
     const result = await this.instance.client().makeRequest({
@@ -89,6 +97,8 @@ class UserClient {
   }
 
   async getChannelData<T = GenericData>(params: GetChannelDataInput) {
+    this.instance.failIfNotAuthenticated();
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.instance.userId}/channel_data/${params.channelId}`,
@@ -101,6 +111,8 @@ class UserClient {
     channelId,
     channelData,
   }: SetChannelDataInput) {
+    this.instance.failIfNotAuthenticated();
+
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/users/${this.instance.userId}/channel_data/${channelId}`,

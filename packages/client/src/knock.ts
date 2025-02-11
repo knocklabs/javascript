@@ -106,6 +106,12 @@ class Knock {
     return;
   }
 
+  failIfNotAuthenticated() {
+    if (!this.isAuthenticated()) {
+      throw new Error("Not authenticated. Please call `authenticate` first.");
+    }
+  }
+
   /*
     Returns whether or this Knock instance is authenticated. Passing `true` will check the presence
     of the userToken as well.

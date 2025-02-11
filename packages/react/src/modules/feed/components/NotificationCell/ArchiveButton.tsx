@@ -36,7 +36,7 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
       aria-label={t("archiveNotification")}
       className={`rnf-archive-notification-btn rnf-archive-notification-btn--${colorMode}`}
     >
-      <CloseCircle />
+      <CloseCircle aria-hidden />
 
       {visible && (
         <div

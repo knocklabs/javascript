@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -55,7 +55,7 @@
     "@types/react": "^18.3.6",
     "@types/react-native-htmlview": "^0.16.5",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
-    "@typescript-eslint/parser": "^8.16.0",
+    "@typescript-eslint/parser": "^8.24.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^5.0.0",

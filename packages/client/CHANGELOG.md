@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.3
+
+### Patch Changes
+
+- 4f76cd6: fix: raise when calling user methods before auth
+
 ## 0.11.2
 
 ### Patch Changes

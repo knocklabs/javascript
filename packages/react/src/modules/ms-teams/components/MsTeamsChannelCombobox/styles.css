@@ -16,6 +16,10 @@
   max-height: 144px !important;
 }
 
+.rtk-combobox__search {
+  font-family: var(--rtk-font-family-sanserif) !important;
+}
+
 /*
  * MsTeamsTeamCombobox
  * Prevents team name from overflowing input box.
