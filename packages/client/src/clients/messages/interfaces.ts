@@ -32,6 +32,9 @@ export interface Message<T = GenericData> {
   read_at: string | null;
   seen_at: string | null;
   archived_at: string | null;
+  clicked_at: string | null;
+  interacted_at: string | null;
+  link_clicked_at: string | null;
   tenant: string | null;
   status: MessageDeliveryStatus;
   engagement_statuses: MessageEngagementStatus[];
