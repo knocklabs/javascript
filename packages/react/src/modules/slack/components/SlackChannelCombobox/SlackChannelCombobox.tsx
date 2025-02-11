@@ -194,7 +194,6 @@ export const SlackChannelCombobox: FunctionComponent<
           <Combobox.Options maxHeight="36">
             {slackChannels.map((channel) => (
               <Combobox.Option key={channel.id} value={channel.id}>
-                {/* TODO Searching by channel name does not work; see KNO-7817 */}
                 <Stack align="center" gap="1">
                   <Icon
                     icon={channel.is_private ? Lucide.Lock : Lucide.Hash}
