@@ -13,15 +13,6 @@
   align-items: center;
 }
 
-/*
- * Overrides Telegraph combobox defaults; using maxHeight prop on Combobox.Options does not work.
- * See KNO-7736.
- */
- .rsk-combobox__options {
-  overflow-y: auto !important;
-  max-height: 144px !important;
-}
-
 .rsk-combobox__search {
   font-family: var(--rsk-font-family-sanserif) !important;
 }

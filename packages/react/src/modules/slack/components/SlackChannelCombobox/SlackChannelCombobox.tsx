@@ -191,7 +191,7 @@ export const SlackChannelCombobox: FunctionComponent<
             label={t("slackSearchChannels")}
             className="rsk-combobox__search"
           />
-          <Combobox.Options className="rsk-combobox__options">
+          <Combobox.Options maxHeight="36">
             {slackChannels.map((channel) => (
               <Combobox.Option key={channel.id} value={channel.id}>
                 {/* TODO Searching by channel name does not work; see KNO-7817 */}
