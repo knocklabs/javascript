@@ -1,8 +1,12 @@
 import React from "react";
 import { describe, expect, test } from "vitest";
+import { axe } from "vitest-axe";
+import { toHaveNoViolations } from "vitest-axe/matchers";
 
 import { Button } from "../../src";
 import { renderWithProviders } from "../test-utils";
+
+expect.extend({ toHaveNoViolations });
 
 describe("Button", () => {
   test("renders as expected", () => {
@@ -13,5 +17,15 @@ describe("Button", () => {
 
     expect(button).toHaveClass("rnf-button");
     expect(button).toHaveClass("rnf-button--primary");
+  });
+
+  test("passes a11y", async () => {
+    const { container } = renderWithProviders(
+      <Button variant="primary" onClick={() => {}}>
+        Test
+      </Button>,
+    );
+
+    expect(await axe(container)).toHaveNoViolations();
   });
 });
