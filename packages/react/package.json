@@ -54,10 +54,10 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
-    "@telegraph/combobox": "^0.0.57",
-    "@telegraph/icon": "^0.0.39",
+    "@telegraph/combobox": "^0.0.60",
+    "@telegraph/icon": "^0.0.40",
     "@telegraph/layout": "^0.1.5",
-    "@telegraph/typography": "^0.1.5",
+    "@telegraph/typography": "^0.1.6",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2"
