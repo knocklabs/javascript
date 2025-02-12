@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- 7904b65: Remove `slackSearchbarMultipleChannels` from translations strings
+
 ## 0.3.4
 
 ### Patch Changes
