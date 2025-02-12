@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.2
+
+### Patch Changes
+
+- 68f2c5c: Fix a11y issues caught by eslint-plugin-jsx-a11y
+- 96872de: Update Telegraph dependencies
+- 33c5cd8: Update Telegraph dependencies
+- 5d674c3: Update label of channel picker in `MsTeamsChannelCombobox`
+
+  The label now says "Channels" rather than "Channel".
+
+- Updated dependencies [8ea25f4]
+  - @knocklabs/client@0.11.4
+  - @knocklabs/react-core@0.3.4
+
 ## 0.4.1
 
 ### Patch Changes

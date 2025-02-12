@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.4
+
+### Patch Changes
+
+- 8ea25f4: fix: include missing timestamp fields on FeedItem and Message
+
 ## 0.11.3
 
 ### Patch Changes
