@@ -63,7 +63,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
       >
         <Icon color="gray" size="1" icon={Lucide.CornerDownRight} aria-hidden />
         <Text color="gray" size="2" as="div">
-          Channel
+          Channels
         </Text>
       </Stack>
       <MsTeamsChannelInTeamCombobox
