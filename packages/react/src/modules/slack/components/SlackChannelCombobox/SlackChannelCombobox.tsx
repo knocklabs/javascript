@@ -184,6 +184,10 @@ export const SlackChannelCombobox: FunctionComponent<
         errored={inErrorState}
         closeOnSelect={false}
         layout="wrap"
+        modal={
+          // Modal comboboxes cause page layout to shift when body has padding. See KNO-7854.
+          false
+        }
       >
         <Combobox.Trigger />
         <Combobox.Content>
