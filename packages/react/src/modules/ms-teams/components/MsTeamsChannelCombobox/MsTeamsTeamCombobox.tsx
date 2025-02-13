@@ -53,6 +53,10 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         }}
         placeholder="Select team"
         disabled={inErrorState || inLoadingState || sortedTeams.length === 0}
+        modal={
+          // Modal comboboxes cause page layout to shift when body has padding. See KNO-7854.
+          false
+        }
       >
         <Combobox.Trigger />
         <Combobox.Content>
