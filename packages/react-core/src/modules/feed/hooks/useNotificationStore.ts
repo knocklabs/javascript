@@ -1,7 +1,7 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
 import * as React from "react";
 import type { DispatchWithoutAction } from "react";
-import create, { StateSelector } from "zustand";
+import { create } from "zustand";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
@@ -9,7 +9,7 @@ const useIsomorphicLayoutEffect =
 // A hook designed to create a `UseBoundStore` instance
 function useCreateNotificationStore(feedClient: Feed) {
   const useStore = React.useMemo(
-    () => create<FeedStoreState>(feedClient.store),
+    () => create(() => feedClient.store.getState()),
     [feedClient],
   );
 
@@ -33,12 +33,12 @@ function useCreateNotificationStore(feedClient: Feed) {
 }
 
 // A hook used to access content *within* the notification store
-function useNotificationStore(
+function useNotificationStore<T = FeedStoreState>(
   feedClient: Feed,
-  selector?: StateSelector<FeedStoreState, FeedStoreState>,
+  selector?: (state: FeedStoreState) => T
 ) {
   const useStore = useCreateNotificationStore(feedClient);
-  return useStore<FeedStoreState>(selector || feedClient.store.getState);
+  return useStore(selector ?? ((state) => state as T));
 }
 
 export { useCreateNotificationStore };
