@@ -5,7 +5,7 @@ import Knock, {
 } from "@knocklabs/client";
 import * as React from "react";
 import { PropsWithChildren } from "react";
-import { UseBoundStore } from "zustand";
+import { UseBoundStore, StoreApi } from "zustand";
 
 import { useKnockClient } from "../../core";
 import { ColorMode } from "../../core/constants";
@@ -16,7 +16,7 @@ import useNotifications from "../hooks/useNotifications";
 export interface KnockFeedProviderState {
   knock: Knock;
   feedClient: Feed;
-  useFeedStore: UseBoundStore<FeedStoreState>;
+  useFeedStore: UseBoundStore<StoreApi<FeedStoreState>>;
   colorMode: ColorMode;
 }
 
