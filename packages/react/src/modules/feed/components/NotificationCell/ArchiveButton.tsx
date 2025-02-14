@@ -1,7 +1,7 @@
+import { MouseEvent, useCallback, useState, useRef, useEffect } from "react";
 import { FeedItem } from "@knocklabs/client";
 import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
-import React, { MouseEvent, useCallback } from "react";
-import { usePopperTooltip } from "react-popper-tooltip";
+import { createPopper } from "@popperjs/core";
 
 import { CloseCircle } from "../../../core/components/Icons";
 
@@ -12,6 +12,9 @@ export interface ArchiveButtonProps {
 const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
   const { colorMode, feedClient } = useKnockFeed();
   const { t } = useTranslations();
+  const [visible, setVisible] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const onClick = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -25,27 +28,44 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
     [item],
   );
 
-  const { getTooltipProps, setTooltipRef, setTriggerRef, visible } =
-    usePopperTooltip({ placement: "top-end" });
+  useEffect(() => {
+    if (triggerRef.current && tooltipRef.current && visible) {
+      const popperInstance = createPopper(triggerRef.current, tooltipRef.current, {
+        placement: "top-end",
+        modifiers: [
+          {
+            name: "offset",
+            options: {
+              offset: [0, 8],
+            },
+          },
+        ],
+      });
+
+      return () => {
+        popperInstance.destroy();
+      };
+    }
+  }, [visible]);
 
   return (
     <button
-      ref={setTriggerRef}
+      ref={triggerRef}
       onClick={onClick}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
       type="button"
       aria-label={t("archiveNotification")}
       className={`rnf-archive-notification-btn rnf-archive-notification-btn--${colorMode}`}
     >
-      <CloseCircle />
+      <CloseCircle aria-hidden />
 
       {visible && (
         <div
-          ref={setTooltipRef}
-          {...getTooltipProps({
-            className: `rnf-tooltip rnf-tooltip--${colorMode}`,
-          })}
+          ref={tooltipRef}
+          className={`rnf-tooltip rnf-tooltip--${colorMode}`}
         >
-          {t("archiveNotification")}
+          {t("archiveNotification")} NEWWW
         </div>
       )}
     </button>
