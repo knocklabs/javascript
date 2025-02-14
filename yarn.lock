@@ -6225,8 +6225,6 @@ __metadata:
     lodash.debounce: "npm:^4.0.8"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    react-popper: "npm:^2.3.0"
-    react-popper-tooltip: "npm:^4.4.2"
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
     typescript: "npm:^5.7.3"
@@ -6674,7 +6672,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2.11.5, @popperjs/core@npm:^2.11.8":
+"@popperjs/core@npm:^2.11.8":
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: 10c0/4681e682abc006d25eb380d0cf3efc7557043f53b6aea7a5057d0d1e7df849a00e281cd8ea79c902a35a414d7919621fc2ba293ecec05f413598e0b23d5a1e63
@@ -23269,7 +23267,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-fast-compare@npm:3.2.2, react-fast-compare@npm:^3.0.1":
+"react-fast-compare@npm:3.2.2":
   version: 3.2.2
   resolution: "react-fast-compare@npm:3.2.2"
   checksum: 10c0/0bbd2f3eb41ab2ff7380daaa55105db698d965c396df73e6874831dbafec8c4b5b08ba36ff09df01526caa3c61595247e3269558c284e37646241cba2b90a367
@@ -23496,34 +23494,6 @@ __metadata:
   bin:
     react-native: cli.js
   checksum: 10c0/93a752d155c82ed1e8708c86719ed25a9a6e677534b1f400defcb5c85ef9cb4cd716f645403b959966371a0e49866a9ab0a88515773ae66ae4f36abe5dd78dd1
-  languageName: node
-  linkType: hard
-
-"react-popper-tooltip@npm:^4.4.2":
-  version: 4.4.2
-  resolution: "react-popper-tooltip@npm:4.4.2"
-  dependencies:
-    "@babel/runtime": "npm:^7.18.3"
-    "@popperjs/core": "npm:^2.11.5"
-    react-popper: "npm:^2.3.0"
-  peerDependencies:
-    react: ">=16.6.0"
-    react-dom: ">=16.6.0"
-  checksum: 10c0/1a080d30027dd702b225cbad35194bea942b3f73324a838021fef415c1717be9548552a13b6862f423475407fdd58e2b5bc406af9638d297b974d2e222eb8ff2
-  languageName: node
-  linkType: hard
-
-"react-popper@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "react-popper@npm:2.3.0"
-  dependencies:
-    react-fast-compare: "npm:^3.0.1"
-    warning: "npm:^4.0.2"
-  peerDependencies:
-    "@popperjs/core": ^2.0.0
-    react: ^16.8.0 || ^17 || ^18
-    react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 10c0/23f93540537ca4c035425bb8d5e51b11131fbc921d7ac1d041d0ae557feac8c877f3a012d36b94df8787803f52ed81e6df9257ac9e58719875f7805518d6db3f
   languageName: node
   linkType: hard
 
@@ -27312,15 +27282,6 @@ __metadata:
   version: 0.1.1
   resolution: "warn-once@npm:0.1.1"
   checksum: 10c0/f531e7b2382124f51e6d8f97b8c865246db8ab6ff4e53257a2d274e0f02b97d7201eb35db481843dc155815e154ad7afb53b01c4d4db15fb5aa073562496aff7
-  languageName: node
-  linkType: hard
-
-"warning@npm:^4.0.2":
-  version: 4.0.3
-  resolution: "warning@npm:4.0.3"
-  dependencies:
-    loose-envify: "npm:^1.0.0"
-  checksum: 10c0/aebab445129f3e104c271f1637fa38e55eb25f968593e3825bd2f7a12bd58dc3738bb70dc8ec85826621d80b4acfed5a29ebc9da17397c6125864d72301b937e
   languageName: node
   linkType: hard
 

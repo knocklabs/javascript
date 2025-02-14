@@ -1,8 +1,7 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
 import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
-import { Placement } from "@popperjs/core";
+import { Placement, createPopper } from "@popperjs/core";
 import React, { RefObject, useEffect } from "react";
-import { usePopper } from "react-popper";
 
 import useComponentVisible from "../../../core/hooks/useComponentVisible";
 import { NotificationFeed, NotificationFeedProps } from "../NotificationFeed";
@@ -48,23 +47,6 @@ export const NotificationFeedPopover: React.FC<
     closeOnClickOutside,
   });
 
-  const { styles, attributes } = usePopper(
-    buttonRef.current,
-    popperRef.current,
-    {
-      strategy: "fixed",
-      placement,
-      modifiers: [
-        {
-          name: "offset",
-          options: {
-            offset: [0, 8],
-          },
-        },
-      ],
-    },
-  );
-
   useEffect(() => {
     // Whenever the feed is opened, we want to invoke the `onOpen` callback
     // function to handle any side effects.
@@ -73,16 +55,36 @@ export const NotificationFeedPopover: React.FC<
     }
   }, [isVisible, onOpen, store, feedClient]);
 
+  useEffect(() => {
+    if (buttonRef.current && popperRef.current) {
+      const popperInstance = createPopper(buttonRef.current, popperRef.current, {
+        strategy: "fixed",
+        placement,
+        modifiers: [
+          {
+            name: "offset",
+            options: {
+              offset: [0, 8],
+            },
+          },
+        ],
+      });
+
+      // Cleanup
+      return () => {
+        popperInstance.destroy();
+      };
+    }
+  }, [buttonRef.current, popperRef.current, placement]);
+
   return (
     <div
       className={`rnf-notification-feed-popover rnf-notification-feed-popover--${colorMode}`}
       style={{
-        ...styles.popper,
         visibility: isVisible ? "visible" : "hidden",
         opacity: isVisible ? 1 : 0,
       }}
       ref={popperRef}
-      {...attributes.popper}
       role="dialog"
       aria-label={t("notifications")}
       tabIndex={-1}
