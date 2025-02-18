@@ -57,7 +57,7 @@
     "@telegraph/combobox": "^0.0.60",
     "@telegraph/icon": "^0.0.40",
     "@telegraph/layout": "^0.1.5",
-    "@telegraph/typography": "^0.1.6",
+    "@telegraph/typography": "^0.1.7",
     "lodash.debounce": "^4.0.8",
     "react-popper": "^2.3.0",
     "react-popper-tooltip": "^4.4.2"
