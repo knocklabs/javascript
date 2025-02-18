@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1
+
+### Patch Changes
+
+- 9e638a2: Make `SlackChannelCombobox` and `MsTeamsChannelCombobox` non-modal
+
+  This fixes a bug whereby the page layout could shift when the combobox dropdown menu opens and the `<body>` element has non-zero padding.
+
 ## 0.5.0
 
 ### Minor Changes
