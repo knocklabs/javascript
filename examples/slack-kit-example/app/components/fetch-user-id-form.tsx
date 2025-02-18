@@ -30,7 +30,7 @@ export default function FetchUserIdForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter email address"
-          className="p-2 border rounded mr-2"
+          className="p-2 border rounded-sm mr-2"
           required
         />
         <button

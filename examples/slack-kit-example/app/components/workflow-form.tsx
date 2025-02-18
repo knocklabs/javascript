@@ -34,7 +34,7 @@ export default function WorkflowForm({
       ref={ref}
     >
       <textarea
-        className="w-full border-slate-400 rounded border shadow-sm p-2"
+        className="w-full border-slate-400 rounded-sm border shadow-xs p-2"
         name="message"
         id=""
         placeholder="Type your message here."
