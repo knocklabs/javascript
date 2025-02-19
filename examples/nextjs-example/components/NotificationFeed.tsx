@@ -17,7 +17,10 @@ const NotificationFeed = () => {
       <NotificationFeedPopover
         buttonRef={notifButtonRef}
         isVisible={isVisible}
-        onClose={() => setIsVisible(false)}
+        onClose={() => {
+          console.log("closed");
+          // setIsVisible(false);
+        }}
       />
     </>
   );
