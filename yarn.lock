@@ -6234,6 +6234,7 @@ __metadata:
     vite-plugin-dts: "npm:^4.5.0"
     vite-plugin-no-bundle: "npm:^4.0.0"
     vitest: "npm:^2.1.8"
+    vitest-axe: "npm:^1.0.0-pre.5"
   peerDependencies:
     react: ^16.11.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.11.0 || ^17.0.0 || ^18.0.0
@@ -10618,6 +10619,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vitest/pretty-format@npm:^3.0.3":
+  version: 3.0.6
+  resolution: "@vitest/pretty-format@npm:3.0.6"
+  dependencies:
+    tinyrainbow: "npm:^2.0.0"
+  checksum: 10c0/339b47598f2c77da0d0b7d373c2ceb94995d6154cd30b7de778bbf396d21c570de0be765f1d66793d2a30a6cc673a471be45f093a074acb8a1a71d7665713dd9
+  languageName: node
+  linkType: hard
+
 "@vitest/runner@npm:2.1.8":
   version: 2.1.8
   resolution: "@vitest/runner@npm:2.1.8"
@@ -11634,6 +11644,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axe-core@npm:^4.10.2":
+  version: 4.10.2
+  resolution: "axe-core@npm:4.10.2"
+  checksum: 10c0/0e20169077de96946a547fce0df39d9aeebe0077f9d3eeff4896518b96fde857f80b98f0d4279274a7178791744dd5a54bb4f322de45b4f561ffa2586ff9a09d
+  languageName: node
+  linkType: hard
+
 "axios-retry@npm:^4.5.0":
   version: 4.5.0
   resolution: "axios-retry@npm:4.5.0"
@@ -12478,6 +12495,13 @@ __metadata:
     ansi-styles: "npm:^4.1.0"
     supports-color: "npm:^7.1.0"
   checksum: 10c0/4a3fef5cc34975c898ffe77141450f679721df9dde00f6c304353fa9c8b571929123b26a0e4617bde5018977eb655b31970c297b91b63ee83bb82aeb04666880
+  languageName: node
+  linkType: hard
+
+"chalk@npm:^5.4.1":
+  version: 5.4.1
+  resolution: "chalk@npm:5.4.1"
+  checksum: 10c0/b23e88132c702f4855ca6d25cb5538b1114343e41472d5263ee8a37cccfccd9c4216d111e1097c6a27830407a1dc81fecdf2a56f2c63033d4dbbd88c10b0dcef
   languageName: node
   linkType: hard
 
@@ -19580,6 +19604,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash-es@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash-es@npm:4.17.21"
+  checksum: 10c0/fb407355f7e6cd523a9383e76e6b455321f0f153a6c9625e21a8827d10c54c2a2341bd2ae8d034358b60e07325e1330c14c224ff582d04612a46a4f0479ff2f2
+  languageName: node
+  linkType: hard
+
 "lodash.camelcase@npm:^4.3.0":
   version: 4.3.0
   resolution: "lodash.camelcase@npm:4.3.0"
@@ -26252,6 +26283,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tinyrainbow@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "tinyrainbow@npm:2.0.0"
+  checksum: 10c0/c83c52bef4e0ae7fb8ec6a722f70b5b6fa8d8be1c85792e829f56c0e1be94ab70b293c032dc5048d4d37cfe678f1f5babb04bdc65fd123098800148ca989184f
+  languageName: node
+  linkType: hard
+
 "tinyspy@npm:^3.0.2":
   version: 3.0.2
   resolution: "tinyspy@npm:3.0.2"
@@ -27205,6 +27243,20 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/0ca7ca60f71c61f3855bbabf7e33909bec32933b35914d4d281813c728183e78e7ce5be05735a7671df3a994613d3881f520a32a80715faa92effb28deee9320
+  languageName: node
+  linkType: hard
+
+"vitest-axe@npm:^1.0.0-pre.5":
+  version: 1.0.0-pre.5
+  resolution: "vitest-axe@npm:1.0.0-pre.5"
+  dependencies:
+    "@vitest/pretty-format": "npm:^3.0.3"
+    axe-core: "npm:^4.10.2"
+    chalk: "npm:^5.4.1"
+    lodash-es: "npm:^4.17.21"
+  peerDependencies:
+    vitest: ">=1"
+  checksum: 10c0/e76bd339ac7f7a492f3429b1b056ddbf3595d3880fa89f93ce7c2cd0de01c98e618009058fa3296d08d3d315ceb35c99d5cb63766e9c5a3bd3e05c8c3f34a4e1
   languageName: node
   linkType: hard
 
