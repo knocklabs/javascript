@@ -1,8 +1,8 @@
 import React from "react";
 import { describe, expect, test } from "vitest";
-import { axe } from "vitest-axe";
 
 import { EmptyFeed } from "../../src";
+import { axe, expectToHaveNoViolations } from "../axe";
 import { renderWithProviders } from "../test-utils";
 
 describe("EmptyFeed", () => {
@@ -17,6 +17,6 @@ describe("EmptyFeed", () => {
   test("has no a11y violations", async () => {
     const { container } = renderWithProviders(<EmptyFeed />);
 
-    expect(await axe(container)).toHaveNoViolations();
+    expectToHaveNoViolations(await axe(container));
   });
 });

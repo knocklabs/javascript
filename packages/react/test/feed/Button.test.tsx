@@ -1,8 +1,8 @@
 import React from "react";
 import { describe, expect, test } from "vitest";
-import { axe } from "vitest-axe";
 
 import { Button } from "../../src";
+import { axe, expectToHaveNoViolations } from "../axe";
 import { renderWithProviders } from "../test-utils";
 
 describe("Button", () => {
@@ -23,6 +23,6 @@ describe("Button", () => {
       </Button>,
     );
 
-    expect(await axe(container)).toHaveNoViolations();
+    expectToHaveNoViolations(await axe(container));
   });
 });
