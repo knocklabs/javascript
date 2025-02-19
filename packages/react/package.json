@@ -72,7 +72,6 @@
     "@typescript-eslint/parser": "^8.24.0",
     "@vitejs/plugin-react": "^4.3.4",
     "babel-plugin-react-require": "^4.0.3",
-    "canvas": "^3.1.0",
     "eslint": "^8.56.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.0.0",
