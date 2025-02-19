@@ -1,6 +1,7 @@
 import { FeedItem } from "@knocklabs/client";
 import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
 import * as React from "react";
+import { useShallow } from "zustand/shallow";
 
 import { CheckmarkCircle } from "../../../core/components/Icons";
 
@@ -14,8 +15,10 @@ export const MarkAsRead: React.FC<MarkAsReadProps> = ({ onClick }) => {
   const { useFeedStore, feedClient, colorMode } = useKnockFeed();
   const { t } = useTranslations();
 
-  const unreadItems = useFeedStore((state) =>
-    state.items.filter((item) => !item.read_at),
+  // Without useShallow, the component will get itself in a re-render loop
+  // https://zustand.docs.pmnd.rs/guides/prevent-rerenders-with-use-shallow
+  const unreadItems = useFeedStore(
+    useShallow((state) => state.items.filter((item) => !item.read_at)),
   );
 
   const unreadCount = useFeedStore((state) => state.metadata.unread_count);
