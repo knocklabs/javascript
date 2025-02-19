@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/client",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "The clientside library for interacting with Knock",
   "homepage": "https://github.com/knocklabs/javascript/tree/main/packages/client",
   "author": "@knocklabs",
@@ -63,7 +63,7 @@
     "jsonwebtoken": "^9.0.2",
     "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.27.4",
+    "rollup": "^4.34.8",
     "typescript": "^5.7.3",
     "vite": "^5.0.0",
     "vitest": "^2.1.8"

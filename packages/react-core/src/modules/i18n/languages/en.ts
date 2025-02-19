@@ -36,7 +36,6 @@ const en: I18nContent = {
     slackConnectContainerDescription:
       "Connect to get notifications in your Slack workspace.",
     slackSearchbarDisconnected: "Slack is not connected.",
-    slackSearchbarMultipleChannels: "Multiple channels connected",
     slackSearchbarNoChannelsConnected: "Search channels",
     slackSearchbarNoChannelsFound: "No slack channels.",
     slackSearchbarChannelsError: "Error fetching channels.",

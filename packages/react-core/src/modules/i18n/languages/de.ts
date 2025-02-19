@@ -22,7 +22,6 @@ const de: I18nContent = {
     slackConnectContainerDescription:
       "Verbinden, um Benachrichtigungen in Ihrem Slack-Arbeitsbereich zu erhalten.",
     slackSearchbarDisconnected: "Slack ist nicht verbunden.",
-    slackSearchbarMultipleChannels: "Mehrere Kanäle verbunden",
     slackSearchbarNoChannelsConnected: "Suchkanäle",
     slackSearchbarNoChannelsFound: "Keine schlaffen Kanäle.",
     slackSearchbarChannelsError: "Fehler beim Abrufen von Kanälen.",

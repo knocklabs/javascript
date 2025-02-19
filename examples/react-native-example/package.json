@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native-example",
-  "version": "1.4.8",
+  "version": "1.4.10",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "@knocklabs/react-native": "workspace:^",
-    "@react-native-firebase/app": "^21.7.1",
-    "@react-native-firebase/messaging": "^21.6.1",
+    "@react-native-firebase/app": "^21.10.1",
+    "@react-native-firebase/messaging": "^21.10.1",
     "react": "^18.2.0",
     "react-native": "^0.73.4",
     "react-native-config": "^1.5.3",

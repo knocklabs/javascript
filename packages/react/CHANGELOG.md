@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- 7904b65: Update design of `SlackChannelCombobox`
+
+  We've given SlackKit a facelift! 🎉
+
+  With this release, we've redone the user interface of SlackKit's `SlackChannelCombobox` component so that it uses [Telegraph](https://github.com/knocklabs/telegraph), Knock's design system. These changes improve its accessibility and make it visually consistent with TeamsKit's `MsTeamsChannelCombobox`. **We recommend manually testing this update to verify this improved version of `SlackChannelCombobox` looks as expected in your application's user interface.**
+
+  In addition, we've removed the following props from `SlackChannelCombobox`:
+
+  - `showConnectedChannelTags` (`SlackChannelCombobox` now automatically shows connected channels within the combobox itself.)
+  - `inputProps`
+  - `inputContainerProps`
+  - `listBoxProps`
+  - `channelOptionProps`
+
+  The `inputMessages` prop has also been updated to remove the `singleChannelConnected` and `multipleChannelsConnected` strings.
+
+### Patch Changes
+
+- Updated dependencies [7904b65]
+  - @knocklabs/react-core@0.4.0
+
+## 0.4.2
+
+### Patch Changes
+
+- 68f2c5c: Fix a11y issues caught by eslint-plugin-jsx-a11y
+- 96872de: Update Telegraph dependencies
+- 33c5cd8: Update Telegraph dependencies
+- 5d674c3: Update label of channel picker in `MsTeamsChannelCombobox`
+
+  The label now says "Channels" rather than "Channel".
+
+- Updated dependencies [8ea25f4]
+  - @knocklabs/client@0.11.4
+  - @knocklabs/react-core@0.3.4
+
 ## 0.4.1
 
 ### Patch Changes
