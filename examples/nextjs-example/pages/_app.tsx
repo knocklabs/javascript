@@ -1,4 +1,5 @@
 import "@knocklabs/react/dist/index.css";
+import "../styles/globals.css";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
 import { createSystem, defaultConfig, ChakraProvider } from "@chakra-ui/react"

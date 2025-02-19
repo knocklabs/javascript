@@ -1,8 +1,8 @@
+import { useRef, useState } from "react";
 import {
   NotificationFeedPopover,
   NotificationIconButton,
 } from "@knocklabs/react";
-import { useRef, useState } from "react";
 
 const NotificationFeed = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -17,7 +17,10 @@ const NotificationFeed = () => {
       <NotificationFeedPopover
         buttonRef={notifButtonRef}
         isVisible={isVisible}
-        onClose={() => setIsVisible(false)}
+        onClose={() => {
+          console.log("closed");
+          // setIsVisible(false);
+        }}
       />
     </>
   );
