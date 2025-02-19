@@ -194,15 +194,13 @@ const DefaultView: React.FC<{
   onOpenChange?: (open: boolean) => void;
   onInteract?: () => void;
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({
-  content,
-  colorMode = "light",
-  onOpenChange,
-  onInteract,
-  onDismiss,
-}) => {
+}> = ({ content, colorMode = "light", onOpenChange, onDismiss }) => {
   return (
-    <Root onOpenChange={onOpenChange} onClick={onInteract}>
+    <Root
+      onOpenChange={onOpenChange}
+      // TODO: This should be firing on action buttons?
+      // onClick={onInteract}
+    >
       <Overlay />
       {/* Must pass color mode to content for css variables to be set properly */}
       <Content data-knock-color-mode={colorMode}>
@@ -239,10 +237,10 @@ type ModalProps = {
 
 export const Modal: React.FC<ModalProps> = ({ guideKey }) => {
   return (
-    <Guide filters={{ key: guideKey, message_type: MESSAGE_TYPE }}>
-      {({ guide, colorMode, onDismiss, onInteract }) => (
+    <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
+      {({ step, colorMode, onDismiss, onInteract }) => (
         <DefaultView
-          content={guide.content as ModalContent}
+          content={step.content as ModalContent}
           colorMode={colorMode}
           onDismiss={onDismiss}
           onInteract={onInteract}

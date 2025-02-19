@@ -10,9 +10,9 @@ export interface UseGuideReturn extends UseGuideContextReturn {
 export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
   const context = useGuideContext();
 
-  if (!filters.key && !filters.message_type) {
+  if (!filters.key && !filters.type) {
     throw new Error(
-      "useGuide must be used with at least one filter of: a guide key or a message type",
+      "useGuide must be used with at least one filter: either a guide key or a guide type",
     );
   }
 

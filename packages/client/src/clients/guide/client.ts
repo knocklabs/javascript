@@ -3,41 +3,78 @@ import { Store } from "@tanstack/store";
 
 import Knock from "../../knock";
 
+import * as ksuid from "./ksuid";
+
 //
 // Guides API (via User client)
 //
 
-export type KnockGuide = {
-  __typename: "Guide";
-  id: string;
-  key: string;
-  message_type: string;
-  schema_version: string;
-  schema_variant: string;
-
-  // eslint-disable-next-line
-  content: any;
-
+type StepMessageState = {
+  id: string | null;
   seen_at: string | null;
   read_at: string | null;
   interacted_at: string | null;
   archived_at: string | null;
   link_clicked_at: string | null;
+};
+
+export type KnockGuideStep<M = StepMessageState> = {
+  ref: string;
+  schema_key: string;
+  schema_semver: string;
+  schema_variant_key: string;
+  message: M;
+  // eslint-disable-next-line
+  content: any;
+};
+
+export type KnockGuide = {
+  __typename: "Guide";
+  channel_id: string;
+  id: string;
+  key: string;
+  priority: number;
+  type: string;
+  semver: string;
+  steps: KnockGuideStep[];
   inserted_at: string;
   updated_at: string;
 };
 
-export const getGuidesPath = (userId: string | undefined | null) =>
+export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
-export type GetGuidesQueryParams = {
+type GetGuidesQueryParams = {
   data?: string;
   tenant?: string;
-  message_type?: string;
+  type?: string;
 };
 
-export type GetGuidesResponse = {
+type GetGuidesResponse = {
   entries: KnockGuide[];
+};
+
+export type GuideEngagementEventBaseParams = {
+  // Base params required for all engagement update events
+  message_id: string;
+  channel_id: string;
+  guide_key: string;
+  guide_id: string;
+  guide_step_ref: string;
+};
+
+type MarkAsSeenParams = GuideEngagementEventBaseParams & {
+  // Rendered step content seen by the recipient
+  content: GenericData;
+  // Target params
+  data?: GenericData;
+  tenant?: string;
+};
+type MarkAsInteractedParams = GuideEngagementEventBaseParams;
+type MarkAsArchivedParams = GuideEngagementEventBaseParams;
+
+type MarkGuideAsResponse = {
+  status: "ok";
 };
 
 //
@@ -56,15 +93,20 @@ type StoreState = {
   queries: Record<QueryKey, QueryStatus>;
 };
 
-type QueryFilterParams = Pick<GetGuidesQueryParams, "message_type">;
+type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
 
-export type SelectFilterParams = QueryFilterParams & {
+type EngagedStepMessageState = Omit<StepMessageState, "id"> & {
+  id: string;
+};
+
+export type SelectFilterParams = {
   key?: string;
+  type?: string;
 };
 
 export type TargetParams = {
-  data?: GenericData;
-  tenant?: string;
+  data?: GenericData | undefined;
+  tenant?: string | undefined;
 };
 
 export class KnockGuideClient {
@@ -72,13 +114,13 @@ export class KnockGuideClient {
 
   constructor(
     readonly knock: Knock,
-    readonly triggerParams: TargetParams = {},
+    readonly targetParams: TargetParams = {},
   ) {
     this.knock = knock;
 
-    this.triggerParams = {
-      data: triggerParams.data,
-      tenant: triggerParams.tenant,
+    this.targetParams = {
+      data: targetParams.data,
+      tenant: targetParams.tenant,
     };
 
     this.store = new Store<StoreState>({
@@ -100,11 +142,10 @@ export class KnockGuideClient {
   }
 
   select(state: StoreState, filters: SelectFilterParams = {}) {
-    // TODO(KNO-7790): Need to consider activation rules also.
-    // TODO: Should exclude archived guides by default?
+    // TODO(KNO-7790): Need to evaluate activation rules also.
 
     return state.guides.filter((guide) => {
-      if (filters.message_type && filters.message_type !== guide.message_type) {
+      if (filters.type && filters.type !== guide.type) {
         return false;
       }
 
@@ -116,19 +157,62 @@ export class KnockGuideClient {
     });
   }
 
-  async markAsSeen(_guide: KnockGuide) {
-    // TODO:
-    return;
+  async markAsSeen(guide: KnockGuide, step: KnockGuideStep) {
+    this.knock.log(
+      `[Guide] Marking as seen (guide key: ${guide.key}, step ref:${step.ref})`,
+    );
+
+    const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
+      seen_at: new Date().toISOString(),
+    })!;
+
+    const params = {
+      ...this.buildEngagementEventBaseParams(guide, updatedStep),
+      content: updatedStep.content,
+      data: this.targetParams.data,
+      tenant: this.targetParams.tenant,
+    };
+
+    return this.knock.user.markGuideStepAs<
+      MarkAsSeenParams,
+      MarkGuideAsResponse
+    >("seen", params);
   }
 
-  async markAsInteracted(_guide: KnockGuide) {
-    // TODO:
-    return;
+  async markAsInteracted(guide: KnockGuide, step: KnockGuideStep) {
+    this.knock.log(
+      `[Guide] Marking as interacted (guide key: ${guide.key}, step ref:${step.ref})`,
+    );
+
+    const ts = new Date().toISOString();
+    const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
+      read_at: ts,
+      interacted_at: ts,
+    })!;
+
+    const params = this.buildEngagementEventBaseParams(guide, updatedStep);
+
+    return this.knock.user.markGuideStepAs<
+      MarkAsInteractedParams,
+      MarkGuideAsResponse
+    >("interacted", params);
   }
 
-  async markAsArchived(_guide: KnockGuide) {
-    // TODO:
-    return;
+  async markAsArchived(guide: KnockGuide, step: KnockGuideStep) {
+    this.knock.log(
+      `[Guide] Marking as archived (guide key: ${guide.key}, step ref:${step.ref})`,
+    );
+
+    const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
+      archived_at: new Date().toISOString(),
+    })!;
+
+    const params = this.buildEngagementEventBaseParams(guide, updatedStep);
+
+    return this.knock.user.markGuideStepAs<
+      MarkAsArchivedParams,
+      MarkGuideAsResponse
+    >("archived", params);
   }
 
   //
@@ -153,7 +237,10 @@ export class KnockGuideClient {
 
     let queryStatus: QueryStatus;
     try {
-      const data = await this.knock.user.getGuides({ params: queryParams });
+      const data = await this.knock.user.getGuides<
+        GetGuidesQueryParams,
+        GetGuidesResponse
+      >(queryParams);
       queryStatus = { status: "ok" };
 
       this.store.setState((state) => ({
@@ -177,8 +264,8 @@ export class KnockGuideClient {
   }
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
-    // Combine the trigger params with the given filter params.
-    const combinedParams = { ...this.triggerParams, ...filterParams };
+    // Combine the target params with the given filter params.
+    const combinedParams = { ...this.targetParams, ...filterParams };
 
     // Prune out any keys that have an undefined or null value.
     let params = Object.fromEntries(
@@ -187,7 +274,7 @@ export class KnockGuideClient {
       ),
     );
 
-    // Encode trigger data as a JSON string, if provided.
+    // Encode target data as a JSON string, if provided.
     params = params.data
       ? { ...params, data: JSON.stringify(params.data) }
       : params;
@@ -205,7 +292,57 @@ export class KnockGuideClient {
       )
       .join("&");
 
-    const basePath = getGuidesPath(this.knock.userId);
+    const basePath = guidesApiRootPath(this.knock.userId);
     return queryStr ? `${basePath}?${queryStr}` : basePath;
+  }
+
+  private setStepMessageAttrs(
+    guideKey: string,
+    stepRef: string,
+    attrs: Partial<StepMessageState>,
+  ) {
+    //let updatedStep: KnockGuideStep<SetStepMessageAttrs>;
+    let updatedStep: KnockGuideStep<EngagedStepMessageState> | undefined;
+
+    this.store.setState((state) => {
+      const guides = state.guides.map((guide) => {
+        if (guide.key !== guideKey) return guide;
+
+        const steps = guide.steps.map((step) => {
+          if (step.ref !== stepRef) return step;
+
+          updatedStep = {
+            ...step,
+            message: {
+              ...step.message,
+              // Generate a message id to use for an engagement event call if
+              // no message exists yet for the given guide and the step, as a
+              // message is generated lazily at the first engagement event.
+              id: step.message.id || ksuid.generate(),
+              ...attrs,
+            },
+          } as KnockGuideStep<EngagedStepMessageState>;
+
+          return updatedStep;
+        });
+        return { ...guide, steps };
+      });
+      return { ...state, guides };
+    });
+
+    return updatedStep;
+  }
+
+  private buildEngagementEventBaseParams(
+    guide: KnockGuide,
+    step: KnockGuideStep<EngagedStepMessageState>,
+  ) {
+    return {
+      message_id: step.message.id,
+      channel_id: guide.channel_id,
+      guide_key: guide.key,
+      guide_id: guide.id,
+      guide_step_ref: step.ref,
+    };
   }
 }

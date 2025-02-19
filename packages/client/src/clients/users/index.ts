@@ -4,9 +4,8 @@ import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
 import {
-  GetGuidesQueryParams,
-  GetGuidesResponse,
-  getGuidesPath,
+  GuideEngagementEventBaseParams,
+  guidesApiRootPath,
 } from "../guide/client";
 import { InAppMessagesResponse } from "../in-app-messages";
 import {
@@ -136,14 +135,29 @@ class UserClient {
     return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
   }
 
-  async getGuides({ params }: { params: GetGuidesQueryParams }) {
+  async getGuides<P, R>(params: P) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
-      url: getGuidesPath(this.instance.userId),
+      url: guidesApiRootPath(this.instance.userId),
       params,
     });
 
-    return this.handleResponse<GetGuidesResponse>(result);
+    return this.handleResponse<R>(result);
+  }
+
+  async markGuideStepAs<P extends GuideEngagementEventBaseParams, R>(
+    status: "seen" | "interacted" | "archived",
+    params: P,
+  ) {
+    console.log("markGuideStepAs request", status, params);
+
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `${guidesApiRootPath(this.instance.userId)}/messages/${params.message_id}/${status}`,
+      data: params,
+    });
+
+    return this.handleResponse<R>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {

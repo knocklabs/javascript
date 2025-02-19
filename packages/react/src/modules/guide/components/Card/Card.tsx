@@ -165,9 +165,13 @@ const DefaultView: React.FC<{
   colorMode?: ColorMode;
   onInteract?: () => void;
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
+}> = ({ content, colorMode = "light", onDismiss }) => {
   return (
-    <Root data-knock-color-mode={colorMode} onClick={onInteract}>
+    <Root
+      data-knock-color-mode={colorMode}
+      // TODO: This should be firing on action buttons?
+      // onClick={onInteract}
+    >
       <Content>
         <Header>
           <Headline headline={content.headline} />
@@ -203,10 +207,10 @@ type CardProps = {
 
 export const Card: React.FC<CardProps> = ({ guideKey }) => {
   return (
-    <Guide filters={{ key: guideKey, message_type: MESSAGE_TYPE }}>
-      {({ guide, colorMode, onDismiss, onInteract }) => (
+    <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
+      {({ step, colorMode, onDismiss, onInteract }) => (
         <DefaultView
-          content={guide.content as CardContent}
+          content={step.content as CardContent}
           colorMode={colorMode}
           onDismiss={onDismiss}
           onInteract={onInteract}

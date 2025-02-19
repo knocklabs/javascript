@@ -142,9 +142,13 @@ const DefaultView: React.FC<{
   colorMode?: ColorMode;
   onInteract?: () => void;
   onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onInteract, onDismiss }) => {
+}> = ({ content, colorMode = "light", onDismiss }) => {
   return (
-    <Root data-knock-color-mode={colorMode} onClick={onInteract}>
+    <Root
+      data-knock-color-mode={colorMode}
+      // TODO: This should be firing on action buttons?
+      // onClick={onInteract}
+    >
       <Content>
         <Title title={content.title} />
         <Body body={content.body} />
@@ -177,10 +181,10 @@ type BannerProps = {
 
 export const Banner: React.FC<BannerProps> = ({ guideKey }) => {
   return (
-    <Guide filters={{ key: guideKey, message_type: MESSAGE_TYPE }}>
-      {({ guide, colorMode, onDismiss, onInteract }) => (
+    <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
+      {({ step, colorMode, onDismiss, onInteract }) => (
         <DefaultView
-          content={guide.content as BannerContent}
+          content={step.content as BannerContent}
           colorMode={colorMode}
           onDismiss={onDismiss}
           onInteract={onInteract}
