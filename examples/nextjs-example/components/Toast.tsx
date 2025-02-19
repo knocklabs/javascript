@@ -62,7 +62,7 @@ const Toast = ({ title, description, status = "success", onClose }: Props) => {
             color="gray.600"
             mt={1}
             dangerouslySetInnerHTML={{ __html: description }}
-            __css={{
+            css={{
               blockquote: {
                 borderLeftWidth: "3px",
                 borderLeftColor: "gray.300",
@@ -75,10 +75,10 @@ const Toast = ({ title, description, status = "success", onClose }: Props) => {
       </Flex>
       <IconButton
         display="flex"
-        icon={<Icon as={IoClose} boxSize="12px" />}
+        // icon={<Icon as={IoClose} boxSize="12px" />}
         color="gray.600"
         aria-label="Close button"
-        variant="unstyled"
+        variant="ghost"
         ml="auto"
         size="xs"
         width="16px"
