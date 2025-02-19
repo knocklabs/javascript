@@ -1,12 +1,9 @@
 import React from "react";
 import { describe, expect, test } from "vitest";
 import { axe } from "vitest-axe";
-import { toHaveNoViolations } from "vitest-axe/matchers";
 
 import { Button } from "../../src";
 import { renderWithProviders } from "../test-utils";
-
-expect.extend({ toHaveNoViolations });
 
 describe("Button", () => {
   test("renders as expected", () => {
