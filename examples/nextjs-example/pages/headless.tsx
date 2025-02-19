@@ -1,4 +1,4 @@
-import { Flex, Select, Spinner } from "@chakra-ui/react";
+import { Flex, NativeSelect, Spinner } from "@chakra-ui/react";
 import {
   useAuthenticatedKnockClient,
   useNotificationStore,
@@ -49,18 +49,18 @@ const HeadlessFeed = ({
 
   return (
     <div className="notifications">
-      <Select
+      <NativeSelect.Root
         mr={3}
         size="sm"
-        value={tenant}
-        onChange={(e) => setTenant(e.target.value)}
       >
-        {Object.values(Tenants).map((tenant) => (
-          <option key={tenant} value={tenant}>
-            {TenantLabels[tenant]}
-          </option>
-        ))}
-      </Select>
+        <NativeSelect.Field value={tenant} onChange={(e) => setTenant(e.target.value)}>
+          {Object.values(Tenants).map((tenant) => (
+            <option key={tenant} value={tenant}>
+              {TenantLabels[tenant]}
+            </option>
+          ))}
+        </NativeSelect.Field>
+      </NativeSelect.Root>
 
       <span>You have {metadata.unread_count} unread items</span>
 

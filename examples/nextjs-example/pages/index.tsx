@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Icon, Link, Select, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Icon, Link, NativeSelect, Text } from "@chakra-ui/react";
 import {
   KnockFeedProvider,
   KnockProvider,
@@ -6,6 +6,7 @@ import {
 } from "@knocklabs/react";
 import { useCallback, useState } from "react";
 import { IoDocument, IoLogoGithub } from "react-icons/io5";
+import { Toaster } from "sonner";
 
 import NotificationFeed from "../components/NotificationFeed";
 import NotificationToasts from "../components/NotificationToasts";
@@ -76,29 +77,29 @@ export default function Home() {
               </Heading>
 
               <Flex ml="auto" alignItems="center">
-                <Select
+                <NativeSelect.Root
                   mr={3}
                   size="sm"
-                  value={tenant}
-                  onChange={(e) => setTenant(e.target.value)}
                   aria-label="Team"
                 >
-                  {Object.values(Tenants).map((tenant) => (
-                    <option key={tenant} value={tenant}>
-                      {TenantLabels[tenant]}
-                    </option>
-                  ))}
-                </Select>
+                  <NativeSelect.Field value={tenant} onChange={(e) => setTenant(e.target.value)}>
+                    {Object.values(Tenants).map((tenant) => (
+                      <option key={tenant} value={tenant}>
+                        {TenantLabels[tenant]}
+                      </option>
+                    ))}
+                  </NativeSelect.Field>
+                </NativeSelect.Root>
 
-                <NotificationFeed />
+                {/* <NotificationFeed /> */}
               </Flex>
             </Flex>
 
-            <SendNotificationForm
+            {/* <SendNotificationForm
               userId={userId as unknown as string}
               tenant={tenant}
-            />
-            <NotificationToasts />
+            /> */}
+            {/* <NotificationToasts /> */}
 
             <Flex mt={6} borderTopWidth={1} borderTopColor="gray.100" py={2}>
               <Link

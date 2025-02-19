@@ -1,9 +1,6 @@
 import {
   Button,
-  Checkbox,
-  FormControl,
-  FormLabel,
-  Select,
+  NativeSelect,
   Textarea,
 } from "@chakra-ui/react";
 import { FormEvent, useState } from "react";
@@ -52,26 +49,23 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
       </FormControl>
       <FormControl mb={4}>
         <FormLabel fontSize={14}>Template type</FormLabel>
-        <Select
+        <NativeSelect.Root
           mr={3}
           size="sm"
-          value={templateType}
-          onChange={(e) => setTemplateType(e.target.value as TemplateType)}
         >
-          <option value={TemplateType.Standard}>Standard</option>
-          <option value={TemplateType.SingleAction}>Single-action</option>
-          <option value={TemplateType.MultiAction}>Multi-action</option>
-        </Select>
+          <NativeSelect.Field
+            value={templateType}
+            onChange={(e) => setTemplateType(e.target.value as TemplateType)}
+          >
+            <option value={TemplateType.Standard}>Standard</option>
+            <option value={TemplateType.SingleAction}>Single-action</option>
+            <option value={TemplateType.MultiAction}>Multi-action</option>
+          </NativeSelect.Field>
+        </NativeSelect.Root>
       </FormControl>
       <FormControl mb={4}>
         <FormLabel fontSize={14} display="flex" alignItems="center">
-          <Checkbox
-            name="showToast"
-            size="sm"
-            isChecked={showToast}
-            onChange={(e) => setShowToast(e.target.checked)}
-            mr={2}
-          />{" "}
+          <input type="checkbox" name="showToast" checked={showToast} onChange={(e) => setShowToast(e.target.checked)} />
           Show a toast?{" "}
         </FormLabel>
       </FormControl>
@@ -81,8 +75,8 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
         variant="solid"
         colorScheme="gray"
         size="sm"
-        isDisabled={message === ""}
-        isLoading={isLoading}
+        disabled={message === ""}
+        loading={isLoading}
       >
         Send notification
       </Button>
