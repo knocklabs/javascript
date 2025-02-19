@@ -19,7 +19,7 @@ describe("Button", () => {
     expect(button).toHaveClass("rnf-button--primary");
   });
 
-  test("passes a11y", async () => {
+  test("has no a11y violations", async () => {
     const { container } = renderWithProviders(
       <Button variant="primary" onClick={() => {}}>
         Test
