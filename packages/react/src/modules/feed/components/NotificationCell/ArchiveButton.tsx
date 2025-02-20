@@ -65,7 +65,7 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
           ref={tooltipRef}
           className={`rnf-tooltip rnf-tooltip--${colorMode}`}
         >
-          {t("archiveNotification")} NEWWW
+          {t("archiveNotification")}
         </div>
       )}
     </button>
