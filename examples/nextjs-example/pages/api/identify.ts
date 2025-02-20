@@ -18,12 +18,12 @@ export default async function handler(
       .json({ error: `${req.method} method is not accepted.` });
   }
 
-  const { name, id } = req.body;
+  const { id } = req.body;
   const userId = id || uuidv4();
 
   try {
     const knockUser = await knockClient.users.identify(userId, {
-      name: name || faker.person.fullName(),
+      name: id ? undefined : faker.person.fullName(), // only set name if no user yet
     });
 
     let userToken = undefined;

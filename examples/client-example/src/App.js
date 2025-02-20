@@ -1,6 +1,6 @@
 import Knock from "@knocklabs/client";
 import { useEffect, useMemo } from "react";
-import create from "zustand";
+import { create } from "zustand";
 
 import "./App.css";
 

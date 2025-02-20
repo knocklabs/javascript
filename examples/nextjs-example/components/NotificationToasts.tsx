@@ -1,35 +1,54 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useToast } from "@chakra-ui/react";
-import { useKnockFeed } from "@knocklabs/react";
 import { useCallback, useEffect } from "react";
+import { toast as sonnerToast } from "sonner";
+import { TextContentBlock, type FeedItem } from "@knocklabs/client";
+import { useKnockFeed } from "@knocklabs/react";
+import { Stack } from "@telegraph/layout";
+import { Button } from "@telegraph/button";
 
-import Toast from "./Toast";
+import { Toast, type ToastProps } from "./Toast";
+
+/** Abstracting the toast function
+ *  so that you can call it without having to use toast.custom everytime. */
+function toast(toastProps: Omit<ToastProps, 'id'>) {
+  return sonnerToast.custom(() => (
+    <Toast {...toastProps} />
+  ));
+}
 
 const NotificationToasts = () => {
   const { feedClient } = useKnockFeed();
-  const toast = useToast();
 
   const onNotificationsReceived = useCallback(
-    ({ items }: any) => {
+    ({ items }: { items: FeedItem[] }) => {
       // Whenever we receive a new notification from our real-time stream, show a toast
       // (note here that we can receive > 1 items in a batch)
-      items.forEach((notification: any) => {
-        if (notification.data.showToast === false) return;
+      items.forEach((notification) => {
+        if (notification.data?.showToast === false) return;
 
-        toast({
-          render: (props) => (
-            // @ts-expect-error - difference in status type
-            <Toast
-              {...props}
-              title={"New notification received"}
-              description={notification.blocks[0].rendered}
-              onClose={() => {
-                feedClient.markAsSeen(notification);
-                props.onClose();
-              }}
-            />
-          ),
-          position: "bottom-right",
+        const useRenderedDescription = false; // Optionally, you can use the HTML from your template
+        const notificationBlock = notification.blocks[0] as TextContentBlock;
+        const description = useRenderedDescription ? notificationBlock.rendered : notification.data?.message;
+
+        const showActions = notification.data?.templateType !== "standard";
+        const isMultiAction = notification.data?.templateType === "multi-action";
+
+        const toastId = toast({
+          title: "New Notification Received",
+          description: description,
+          useRenderedDescription,
+          onClose: () => {
+            sonnerToast.dismiss(toastId);
+            feedClient.markAsSeen(notification);
+          },
+          actions: showActions && (
+            <Stack marginTop="4">
+              <Button variant="solid" size="1">View More</Button>
+              {isMultiAction && (
+                <Button marginLeft="2" variant="outline" size="1">Cancel Action</Button>
+              )}
+            </Stack>
+          )
         });
       });
     },
