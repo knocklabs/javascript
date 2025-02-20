@@ -9,7 +9,7 @@ import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
 
 function App() {
-  const [colorMode, setColorMode] = useState<"dark" | "light">("dark");
+  const [colorMode, setColorMode] = useState<"dark" | "light">("light");
 
   return (
     <KnockProvider
@@ -22,7 +22,7 @@ function App() {
         readyToTarget={true}
         colorMode={colorMode}
       >
-        <>
+        <div style={{ padding: "1rem 2rem" }}>
           <h1>Knock Guide Example</h1>
           <button
             onClick={() =>
@@ -38,7 +38,7 @@ function App() {
           <Card />
           <div style={{ marginTop: "20px" }} />
           <Modal />
-        </>
+        </div>
       </KnockGuideProvider>
     </KnockProvider>
   );
