@@ -149,8 +149,6 @@ class UserClient {
     status: "seen" | "interacted" | "archived",
     params: P,
   ) {
-    console.log("markGuideStepAs request", status, params);
-
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `${guidesApiRootPath(this.instance.userId)}/messages/${params.message_id}/${status}`,
