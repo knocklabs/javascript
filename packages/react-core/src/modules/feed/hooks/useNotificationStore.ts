@@ -1,17 +1,12 @@
 import { Feed, FeedStoreState } from "@knocklabs/client";
 import * as React from "react";
 import type { DispatchWithoutAction } from "react";
-import { create } from "zustand";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
 
 // A hook designed to create a `UseBoundStore` instance
 function useCreateNotificationStore(feedClient: Feed) {
-  const useStore = React.useMemo(
-    () => create(() => feedClient.store.getState()),
-    [feedClient],
-  );
 
   // Warning: this is a hack that will cause any components downstream to re-render
   // as a result of the store updating.
@@ -29,16 +24,22 @@ function useCreateNotificationStore(feedClient: Feed) {
     return unsubscribe;
   }, [feedClient]);
 
-  return useStore;
+  return feedClient.store;
 }
 
+// Maintain type flexibility from older Zustand versions
+// I don't know how important or "correct" this is, but it maintains functionality
+// and typing from our older SDK versions.
+type StateSelector<T, U> = (state: T) => U;
+type FeedStoreStateSelector = StateSelector<FeedStoreState, FeedStoreState>;
+
 // A hook used to access content *within* the notification store
-function useNotificationStore<T = FeedStoreState>(
+function useNotificationStore(
   feedClient: Feed,
-  selector?: (state: FeedStoreState) => T
-) {
+  selector?: FeedStoreStateSelector,
+): FeedStoreState {
   const useStore = useCreateNotificationStore(feedClient);
-  return useStore(selector ?? ((state) => state as T));
+  return selector ? selector(useStore()) : useStore();
 }
 
 export { useCreateNotificationStore };
