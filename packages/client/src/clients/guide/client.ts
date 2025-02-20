@@ -141,6 +141,10 @@ export class KnockGuideClient {
     return this.fetch();
   }
 
+  //
+  // Selector for the store
+  //
+
   select(state: StoreState, filters: SelectFilterParams = {}) {
     // TODO(KNO-7790): Need to evaluate activation rules also.
 
@@ -157,9 +161,16 @@ export class KnockGuideClient {
     });
   }
 
+  //
+  // Engagement event handlers
+  //
+  // Make an optimistic update on the client side first, then send an engagement
+  // event to the backend.
+  //
+
   async markAsSeen(guide: KnockGuide, step: KnockGuideStep) {
     this.knock.log(
-      `[Guide] Marking as seen (guide key: ${guide.key}, step ref:${step.ref})`,
+      `[Guide] Marking as seen (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
 
     const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
@@ -179,9 +190,13 @@ export class KnockGuideClient {
     >("seen", params);
   }
 
-  async markAsInteracted(guide: KnockGuide, step: KnockGuideStep) {
+  async markAsInteracted(
+    guide: KnockGuide,
+    step: KnockGuideStep,
+    metadata?: GenericData,
+  ) {
     this.knock.log(
-      `[Guide] Marking as interacted (guide key: ${guide.key}, step ref:${step.ref})`,
+      `[Guide] Marking as interacted (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
 
     const ts = new Date().toISOString();
@@ -190,7 +205,10 @@ export class KnockGuideClient {
       interacted_at: ts,
     })!;
 
-    const params = this.buildEngagementEventBaseParams(guide, updatedStep);
+    const params = {
+      ...this.buildEngagementEventBaseParams(guide, updatedStep),
+      metadata,
+    };
 
     return this.knock.user.markGuideStepAs<
       MarkAsInteractedParams,
@@ -200,7 +218,7 @@ export class KnockGuideClient {
 
   async markAsArchived(guide: KnockGuide, step: KnockGuideStep) {
     this.knock.log(
-      `[Guide] Marking as archived (guide key: ${guide.key}, step ref:${step.ref})`,
+      `[Guide] Marking as archived (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
 
     const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
@@ -216,7 +234,7 @@ export class KnockGuideClient {
   }
 
   //
-  // Private
+  // Private helpers
   //
 
   private async fetch(opts?: { filters?: QueryFilterParams }) {
@@ -301,7 +319,6 @@ export class KnockGuideClient {
     stepRef: string,
     attrs: Partial<StepMessageState>,
   ) {
-    //let updatedStep: KnockGuideStep<SetStepMessageAttrs>;
     let updatedStep: KnockGuideStep<EngagedStepMessageState> | undefined;
 
     this.store.setState((state) => {
