@@ -45,6 +45,7 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
               as="textarea"
               display="block"
               id="message"
+              height="20"
               name="message"
               placeholder="Message to be shown in the notification"
               size="2"

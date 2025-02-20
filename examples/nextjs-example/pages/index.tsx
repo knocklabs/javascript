@@ -99,7 +99,7 @@ export default function Home() {
             </Stack>
             <SendNotificationForm userId={userId} tenant={tenant} />
             <NotificationToasts />
-            <Box marginTop="36" borderTopWidth="1" bordertopcolor="gray" paddingTop="4">
+            <Box marginTop="12" borderTopWidth="1" bordertopcolor="gray" paddingTop="4">
               <Stack justifyContent="space-between" alignItems="center">
                 <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
                   <Stack direction="row" alignItems="center" gap="1">
