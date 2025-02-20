@@ -214,13 +214,13 @@ type CardProps = {
 export const Card: React.FC<CardProps> = ({ guideKey, onButtonClick }) => {
   return (
     <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
-      {({ guide, step, colorMode, onDismiss, onInteract }) => (
+      {({ guide, step, colorMode, markAsInteracted, markAsArchived }) => (
         <DefaultView
           content={step.content as CardContent}
           colorMode={colorMode}
-          onDismiss={onDismiss}
+          onDismiss={markAsArchived}
           onButtonClick={(e, button) => {
-            onInteract({ ...button, type: "button_click" });
+            markAsInteracted({ ...button, type: "button_click" });
 
             return onButtonClick
               ? onButtonClick(e, { button, step, guide })
