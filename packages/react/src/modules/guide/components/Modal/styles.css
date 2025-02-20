@@ -71,6 +71,7 @@
   background: var(--knock-guide-accent);
   color: var(--knock-guide-content-contrast);
   width: 100%;
+  cursor: pointer;
 }
 .knock-guide-modal__action--secondary {
   border-color: var(--knock-guide-border-dark);

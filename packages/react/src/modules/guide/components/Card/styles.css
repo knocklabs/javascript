@@ -66,6 +66,7 @@
   border: 0.5px solid var(--knock-guide-accent);
   background: var(--knock-guide-accent);
   color: var(--knock-guide-content-contrast);
+  cursor: pointer;
 }
 .knock-guide-card__action--secondary {
   border-color: var(--knock-guide-border-dark);

@@ -4,7 +4,12 @@ import clsx from "clsx";
 import React from "react";
 
 import { Guide } from "../Guide";
-import { ActionContent } from "../types";
+import { maybeNavigateToUrlWithDelay } from "../helpers";
+import {
+  ButtonContent,
+  TargetButton,
+  TargetButtonWithGuideContext,
+} from "../types";
 
 import "./styles.css";
 
@@ -29,7 +34,6 @@ type OverlayProps = React.ComponentPropsWithoutRef<typeof Dialog.Overlay> &
   React.ComponentPropsWithRef<"div">;
 type OverlayRef = React.ElementRef<"div">;
 
-// TODO(KNO-7807): Causes layout shift...
 const Overlay = React.forwardRef<OverlayRef, OverlayProps>(
   ({ className, ...props }, forwardedRef) => {
     return (
@@ -116,27 +120,22 @@ const Actions: React.FC<
 };
 Actions.displayName = "ModalView.Actions";
 
-const PrimaryAction: React.FC<
-  ActionContent & React.ComponentPropsWithRef<"a">
+const PrimaryButton: React.FC<
+  ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <a
-      href={action}
-      className={clsx("knock-guide-modal__action", className)}
-      {...props}
-    >
+    <button className={clsx("knock-guide-modal__action", className)} {...props}>
       {text}
-    </a>
+    </button>
   );
 };
-PrimaryAction.displayName = "ModalView.PrimaryAction";
+PrimaryButton.displayName = "ModalView.PrimaryButton";
 
-const SecondaryAction: React.FC<
-  ActionContent & React.ComponentPropsWithRef<"a">
+const SecondaryButton: React.FC<
+  ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <a
-      href={action}
+    <button
       className={clsx(
         "knock-guide-modal__action knock-guide-modal__action--secondary",
         className,
@@ -144,10 +143,10 @@ const SecondaryAction: React.FC<
       {...props}
     >
       {text}
-    </a>
+    </button>
   );
 };
-SecondaryAction.displayName = "ModalView.SecondaryAction";
+SecondaryButton.displayName = "ModalView.SecondaryButton";
 
 type CloseProps = React.ComponentPropsWithoutRef<typeof Dialog.Close> &
   React.ComponentPropsWithRef<"button">;
@@ -177,14 +176,8 @@ Close.displayName = "ModalView.Close";
 type ModalContent = {
   title: string;
   body: string;
-  primary_button?: {
-    text: string;
-    action: string;
-  };
-  secondary_button?: {
-    text: string;
-    action: string;
-  };
+  primary_button?: ButtonContent;
+  secondary_button?: ButtonContent;
   dismissible?: boolean;
 };
 
@@ -192,18 +185,23 @@ const DefaultView: React.FC<{
   content: ModalContent;
   colorMode?: ColorMode;
   onOpenChange?: (open: boolean) => void;
-  onInteract?: () => void;
-  onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onOpenChange, onDismiss }) => {
+  onDismiss?: () => void;
+  onButtonClick?: (e: React.MouseEvent, button: TargetButton) => void;
+}> = ({
+  content,
+  colorMode = "light",
+  onOpenChange,
+  onDismiss,
+  onButtonClick,
+}) => {
   return (
-    <Root
-      onOpenChange={onOpenChange}
-      // TODO: This should be firing on action buttons?
-      // onClick={onInteract}
-    >
+    <Root onOpenChange={onOpenChange}>
       <Overlay />
       {/* Must pass color mode to content for css variables to be set properly */}
-      <Content data-knock-color-mode={colorMode}>
+      <Content
+        data-knock-color-mode={colorMode}
+        onPointerDownOutside={onDismiss}
+      >
         <Header>
           <Title title={content.title} />
           {content.dismissible && <Close onClick={onDismiss} />}
@@ -213,15 +211,27 @@ const DefaultView: React.FC<{
 
         <Actions>
           {content.secondary_button && (
-            <SecondaryAction
+            <SecondaryButton
               text={content.secondary_button.text}
               action={content.secondary_button.action}
+              onClick={(e) => {
+                if (onButtonClick) {
+                  const { text, action } = content.secondary_button!;
+                  onButtonClick(e, { name: "secondary_button", text, action });
+                }
+              }}
             />
           )}
           {content.primary_button && (
-            <PrimaryAction
+            <PrimaryButton
               text={content.primary_button.text}
               action={content.primary_button.action}
+              onClick={(e) => {
+                if (onButtonClick) {
+                  const { text, action } = content.primary_button!;
+                  onButtonClick(e, { name: "primary_button", text, action });
+                }
+              }}
             />
           )}
         </Actions>
@@ -233,17 +243,27 @@ DefaultView.displayName = "ModalView.Default";
 
 type ModalProps = {
   guideKey?: string;
+  onButtonClick?: (
+    e: React.MouseEvent,
+    target: TargetButtonWithGuideContext,
+  ) => void;
 };
 
-export const Modal: React.FC<ModalProps> = ({ guideKey }) => {
+export const Modal: React.FC<ModalProps> = ({ guideKey, onButtonClick }) => {
   return (
     <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
-      {({ step, colorMode, onDismiss, onInteract }) => (
+      {({ guide, step, colorMode, onDismiss, onInteract }) => (
         <DefaultView
           content={step.content as ModalContent}
           colorMode={colorMode}
           onDismiss={onDismiss}
-          onInteract={onInteract}
+          onButtonClick={(e, button) => {
+            onInteract({ ...button, type: "button_click" });
+
+            return onButtonClick
+              ? onButtonClick(e, { button, step, guide })
+              : maybeNavigateToUrlWithDelay(button.action);
+          }}
         />
       )}
     </Guide>
@@ -259,8 +279,8 @@ export const ModalView = {} as {
   Title: typeof Title;
   Body: typeof Body;
   Actions: typeof Actions;
-  PrimaryAction: typeof PrimaryAction;
-  SecondaryAction: typeof SecondaryAction;
+  PrimaryButton: typeof PrimaryButton;
+  SecondaryButton: typeof SecondaryButton;
   Close: typeof Close;
 };
 
@@ -272,7 +292,7 @@ Object.assign(ModalView, {
   Title,
   Body,
   Actions,
-  PrimaryAction,
-  SecondaryAction,
+  PrimaryButton,
+  SecondaryButton,
   Close,
 });

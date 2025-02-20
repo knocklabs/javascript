@@ -3,7 +3,12 @@ import clsx from "clsx";
 import React from "react";
 
 import { Guide } from "../Guide";
-import { ActionContent } from "../types";
+import { maybeNavigateToUrlWithDelay } from "../helpers";
+import {
+  ButtonContent,
+  TargetButton,
+  TargetButtonWithGuideContext,
+} from "../types";
 
 import "./styles.css";
 
@@ -68,27 +73,25 @@ const Actions: React.FC<
 };
 Actions.displayName = "BannerView.Actions";
 
-const PrimaryAction: React.FC<
-  ActionContent & React.ComponentPropsWithRef<"a">
+const PrimaryButton: React.FC<
+  ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <a
-      href={action}
+    <button
       className={clsx("knock-guide-banner__action", className)}
       {...props}
     >
       {text}
-    </a>
+    </button>
   );
 };
-PrimaryAction.displayName = "BannerView.PrimaryAction";
+PrimaryButton.displayName = "BannerView.PrimaryButton";
 
-const SecondaryAction: React.FC<
-  ActionContent & React.ComponentPropsWithRef<"a">
+const SecondaryButton: React.FC<
+  ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <a
-      href={action}
+    <button
       className={clsx(
         "knock-guide-banner__action knock-guide-banner__action--secondary",
         className,
@@ -96,10 +99,10 @@ const SecondaryAction: React.FC<
       {...props}
     >
       {text}
-    </a>
+    </button>
   );
 };
-SecondaryAction.displayName = "BannerView.SecondaryAction";
+SecondaryButton.displayName = "BannerView.SecondaryButton";
 
 const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   className,
@@ -126,45 +129,47 @@ DismissButton.displayName = "BannerView.DismissButton";
 type BannerContent = {
   title: string;
   body: string;
-  primary_button?: {
-    text: string;
-    action: string;
-  };
-  secondary_button?: {
-    text: string;
-    action: string;
-  };
+  primary_button?: ButtonContent;
+  secondary_button?: ButtonContent;
   dismissible?: boolean;
 };
 
 const DefaultView: React.FC<{
   content: BannerContent;
   colorMode?: ColorMode;
-  onInteract?: () => void;
-  onDismiss?: React.MouseEventHandler<HTMLButtonElement>;
-}> = ({ content, colorMode = "light", onDismiss }) => {
+  onDismiss?: () => void;
+  onButtonClick?: (e: React.MouseEvent, button: TargetButton) => void;
+}> = ({ content, colorMode = "light", onDismiss, onButtonClick }) => {
   return (
-    <Root
-      data-knock-color-mode={colorMode}
-      // TODO: This should be firing on action buttons?
-      // onClick={onInteract}
-    >
+    <Root data-knock-color-mode={colorMode}>
       <Content>
         <Title title={content.title} />
         <Body body={content.body} />
       </Content>
       <Actions>
         {content.secondary_button && (
-          <SecondaryAction
+          <SecondaryButton
             text={content.secondary_button.text}
             action={content.secondary_button.action}
+            onClick={(e) => {
+              if (onButtonClick) {
+                const { text, action } = content.secondary_button!;
+                onButtonClick(e, { name: "secondary_button", text, action });
+              }
+            }}
           />
         )}
 
         {content.primary_button && (
-          <PrimaryAction
+          <PrimaryButton
             text={content.primary_button.text}
             action={content.primary_button.action}
+            onClick={(e) => {
+              if (onButtonClick) {
+                const { text, action } = content.primary_button!;
+                onButtonClick(e, { name: "primary_button", text, action });
+              }
+            }}
           />
         )}
 
@@ -177,17 +182,27 @@ DefaultView.displayName = "BannerView.Default";
 
 type BannerProps = {
   guideKey?: string;
+  onButtonClick?: (
+    e: React.MouseEvent,
+    target: TargetButtonWithGuideContext,
+  ) => void;
 };
 
-export const Banner: React.FC<BannerProps> = ({ guideKey }) => {
+export const Banner: React.FC<BannerProps> = ({ guideKey, onButtonClick }) => {
   return (
     <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
-      {({ step, colorMode, onDismiss, onInteract }) => (
+      {({ guide, step, colorMode, onDismiss, onInteract }) => (
         <DefaultView
           content={step.content as BannerContent}
           colorMode={colorMode}
           onDismiss={onDismiss}
-          onInteract={onInteract}
+          onButtonClick={(e, button) => {
+            onInteract({ ...button, type: "button_click" });
+
+            return onButtonClick
+              ? onButtonClick(e, { button, step, guide })
+              : maybeNavigateToUrlWithDelay(button.action);
+          }}
         />
       )}
     </Guide>
@@ -202,8 +217,8 @@ export const BannerView = {} as {
   Title: typeof Title;
   Body: typeof Body;
   Actions: typeof Actions;
-  PrimaryAction: typeof PrimaryAction;
-  SecondaryAction: typeof SecondaryAction;
+  PrimaryButton: typeof PrimaryButton;
+  SecondaryButton: typeof SecondaryButton;
   DismissButton: typeof DismissButton;
 };
 
@@ -214,7 +229,7 @@ Object.assign(BannerView, {
   Title,
   Body,
   Actions,
-  PrimaryAction,
-  SecondaryAction,
+  PrimaryButton,
+  SecondaryButton,
   DismissButton,
 });
