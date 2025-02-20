@@ -23,9 +23,11 @@ export default async function handler(
   try {
     const response = await knockClient.workflows.trigger(KNOCK_WORKFLOW, {
       recipients: [userId],
+      // Actor is not required for the workflow to trigger.
+      // If the actor's userId matches the recipient userId, workflow won't be triggered.
+      // Use this field if you want to specify a different actor for the workflow.
       // actor: userId,
-      actor: "d47f3c00-0a13-4802-91de-a448c907a202",
-      // tenant,
+      tenant,
       data: {
         message,
         showToast,
