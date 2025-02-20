@@ -1,10 +1,11 @@
-import { Flex, NativeSelect, Spinner } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Select } from "@telegraph/select";
+import { Box, Stack } from "@telegraph/layout";
 import {
   useAuthenticatedKnockClient,
   useNotificationStore,
   useNotifications,
 } from "@knocklabs/react";
-import { useEffect, useState } from "react";
 
 import { MarkdownContentBlock } from "../../../packages/client/dist/types/clients/feed/interfaces";
 import useIdentify from "../hooks/useIdentify";
@@ -49,18 +50,19 @@ const HeadlessFeed = ({
 
   return (
     <div className="notifications">
-      <NativeSelect.Root
-        mr={3}
-        size="sm"
-      >
-        <NativeSelect.Field value={tenant} onChange={(e) => setTenant(e.target.value)}>
+      <Box marginRight="2">
+        <Select.Root
+          size="2"
+          value={tenant}
+          onValueChange={(value) => setTenant(value as typeof tenant)}
+        >
           {Object.values(Tenants).map((tenant) => (
-            <option key={tenant} value={tenant}>
+            <Select.Option key={tenant} value={tenant}>
               {TenantLabels[tenant]}
-            </option>
+            </Select.Option>
           ))}
-        </NativeSelect.Field>
-      </NativeSelect.Root>
+        </Select.Root>
+      </Box>
 
       <span>You have {metadata.unread_count} unread items</span>
 
@@ -82,14 +84,16 @@ export default function Headless() {
 
   if (isLoading || !userId) {
     return (
-      <Flex
+      <Stack
         alignItems="center"
         justifyContent="center"
-        width="100vw"
-        height="100vh"
+        style={{
+          width: "100vw",
+          height: "100vh",
+        }}
       >
-        <Spinner />
-      </Flex>
+        <div className="spinner" aria-label="Loading..." />
+      </Stack>
     );
   }
 

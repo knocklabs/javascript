@@ -1,96 +1,107 @@
-import { Box, Flex, Icon, IconButton, Text } from "@chakra-ui/react";
-import { IoAlert, IoCheckmark, IoClose, IoInformation } from "react-icons/io5";
+import { Box, Stack } from "@telegraph/layout";
+import { Icon, Lucide } from "@telegraph/icon";
+import { Button } from "@telegraph/button";
+import { Text } from "@telegraph/typography";
 
 const IconType = {
-  info: IoInformation,
-  warning: IoAlert,
-  success: IoCheckmark,
-  error: IoAlert,
+  info: Lucide.Info,
+  warning: Lucide.AlertTriangle,
+  success: Lucide.Check,
+  error: Lucide.X,
 };
 
 const IconColors = {
-  info: ["gray.100", "gray.900"],
-  warning: ["yellow.100", "yellow.900"],
-  success: ["green.100", "green.900"],
-  error: ["red.100", "red.900"],
-};
+  info: ["gray-3", "gray"],
+  warning: ["yellow-3", "yellow"],
+  success: ["green-3", "green"],
+  error: ["red-3", "red"],
+} as const;
 
-interface Props {
+export interface ToastProps {
   title: string;
   description: string;
   status?: keyof typeof IconColors;
   onClose: () => void;
+  useRenderedDescription?: boolean;
+  actions?: React.ReactNode;
 }
 
-const Toast = ({ title, description, status = "success", onClose }: Props) => {
+const Toast = ({ title, description, status = "success", onClose, useRenderedDescription = false, actions }: ToastProps) => {
   const [bgColor, fgColor] = IconColors[status];
   const alignment = description ? "top" : "center";
 
   return (
-    <Flex
-      bgColor="white"
-      p={3}
-      borderColor="gray.100"
-      borderWidth={1}
-      width="354px"
-      borderRadius="md"
+    <Stack
       alignItems={alignment === "top" ? "flex-start" : "center"}
-      filter="drop-shadow(0px 2px 16px rgba(102, 102, 102, 0.08))"
+      backgroundColor={bgColor}
+      flexDirection="column"
+      maxWidth="96"
+      paddingBottom="4"
+      paddingLeft="2"
+      paddingTop="4"
+      style={{
+        boxShadow: "0px 2px 16px rgba(102, 102, 102, 0.08)",
+      }}
+      width="full"
     >
-      <Icon
-        as={IconType[status]}
-        backgroundColor={bgColor}
-        color={fgColor}
-        borderRadius="full"
-        p={1}
-        boxSize="20px"
-      />
-      <Flex ml={3} flexDir="column" textAlign="left" mr={1}>
-        <Text
-          fontSize={14}
-          mt={alignment === "top" ? -0.5 : 0}
-          fontWeight="medium"
-          color="gray.900"
-        >
-          {title}
-        </Text>
-        {description && (
+      <Stack marginLeft="3" flexDirection="row" marginRight="1" alignItems="flex-start">
+        <Icon
+          as={IconType[status]}
+          icon={IconType[status]}
+          color={fgColor}
+          borderRadius="full"
+          aria-hidden={true}
+          width="6"
+          height="6"
+        />
+        <Stack flexDirection="column" marginLeft="2" maxWidth="72">
+          <Text
+            as="span"
+            fontSize="3"
+            color={fgColor}
+            style={{ lineHeight: "1.2" }}
+          >
+            {title}
+          </Text>
+          {description && useRenderedDescription ? (
           <Box
-            display="block"
-            fontSize={14}
-            fontWeight="medium"
-            color="gray.600"
-            mt={1}
-            dangerouslySetInnerHTML={{ __html: description }}
-            css={{
-              blockquote: {
-                borderLeftWidth: "3px",
-                borderLeftColor: "gray.300",
-                marginTop: 2,
-                paddingLeft: 3,
-              },
+              marginTop="1"
+              dangerouslySetInnerHTML={{ __html: description }}
+          />
+          ) : (
+            <Text
+              as="span"
+              marginTop="2"
+              color="gray"
+              style={{ lineHeight: "1.1" }}
+            >
+              {description}
+            </Text>
+          )}
+          {actions && actions}
+        </Stack>
+        {onClose && (
+          <Button
+            icon={{
+              icon: Lucide.X,
+              "aria-hidden": true,
             }}
+            color="gray"
+            aria-label="Close button"
+            aria-hidden={true}
+            variant="ghost"
+            size="2"
+            width="16px"
+            marginLeft="4"
+            minWidth="auto"
+            height="16px"
+            padding={0}
+            onClick={onClose}
           />
         )}
-      </Flex>
-      <IconButton
-        display="flex"
-        // icon={<Icon as={IoClose} boxSize="12px" />}
-        color="gray.600"
-        aria-label="Close button"
-        variant="ghost"
-        ml="auto"
-        size="xs"
-        width="16px"
-        minW="auto"
-        height="16px"
-        p={0}
-        paddingInline={0}
-        mt={alignment === "top" ? -0.5 : 0}
-        onClick={onClose}
-      />
-    </Flex>
+      </Stack>
+    </Stack>
   );
 };
 
-export default Toast;
+export { Toast };
