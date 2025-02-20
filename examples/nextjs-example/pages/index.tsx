@@ -72,7 +72,7 @@ export default function Home() {
               </Stack>
             </Stack>
             <Stack flexDirection="row" alignItems="center" justifyContent="space-between">
-              <Heading size="1" as="h2">
+              <Heading size="4" as="h2">
                 Send an in-app notification
               </Heading>
               <Stack alignItems="center">
@@ -97,38 +97,33 @@ export default function Home() {
                 </Box>
               </Stack>
             </Stack>
-
-            {/* <SendNotificationForm
-              userId={userId as unknown as string}
-              tenant={tenant}
-            /> */}
-            {/* <NotificationToasts /> */}
-
-            <Stack mt="6" borderTopWidth="1" borderTopColor="gray" py="2" justifyContent="space-between" alignItems="center">
-              <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
-                <Stack direction="row" alignItems="center" gap="1">
-                  <Icon aria-hidden={true} alt="GitHub" icon={Lucide.Github} color="gray" />
+            <SendNotificationForm userId={userId} tenant={tenant} />
+            <NotificationToasts />
+            <Box marginTop="36" borderTopWidth="1" bordertopcolor="gray" paddingTop="4">
+              <Stack justifyContent="space-between" alignItems="center">
+                <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
+                  <Stack direction="row" alignItems="center" gap="1">
+                    <Icon aria-hidden={true} alt="GitHub" icon={Lucide.Github} color="gray" />
+                    <Text as="span" color="gray">
+                      Github repo
+                    </Text>
+                  </Stack>
+                </a>
+                <a href="https://docs.knock.app/in-app-ui/react/overview">
+                  <Stack direction="row" alignItems="center" gap="1">
+                    <Icon aria-hidden={true} alt="GitHub" icon={Lucide.FileCode} color="gray" />
+                    <Text as="span" color="gray">
+                      Documentation
+                    </Text>
+                  </Stack>
+                </a>
+                <a href="https://knock.app">
                   <Text as="span" color="gray">
-                    Github repo
+                    Powered by <Text as="span" color="accent">Knock</Text>
                   </Text>
-                </Stack>
-              </a>
-
-              <a href="https://docs.knock.app/in-app-ui/react/overview">
-                <Stack direction="row" alignItems="center" gap="1">
-                  <Icon aria-hidden={true} alt="GitHub" icon={Lucide.FileCode} color="gray" />
-                  <Text as="span" color="gray">
-                    Documentation
-                  </Text>
-                </Stack>
-              </a>
-
-              <a href="https://knock.app">
-                <Text as="span" color="gray">
-                  Powered by Knock
-                </Text>
-              </a>
-            </Stack>
+                </a>
+              </Stack>
+            </Box>
           </Box>
         </NotificationFeedContainer>
       </KnockFeedProvider>
