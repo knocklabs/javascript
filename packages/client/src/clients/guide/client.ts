@@ -3,14 +3,12 @@ import { Store } from "@tanstack/store";
 
 import Knock from "../../knock";
 
-import * as ksuid from "./ksuid";
-
 //
 // Guides API (via User client)
 //
 
 type StepMessageState = {
-  id: string | null;
+  id: string;
   seen_at: string | null;
   read_at: string | null;
   interacted_at: string | null;
@@ -18,12 +16,12 @@ type StepMessageState = {
   link_clicked_at: string | null;
 };
 
-export type KnockGuideStep<M = StepMessageState> = {
+export type KnockGuideStep = {
   ref: string;
   schema_key: string;
   schema_semver: string;
   schema_variant_key: string;
-  message: M;
+  message: StepMessageState;
   // eslint-disable-next-line
   content: any;
 };
@@ -94,10 +92,6 @@ type StoreState = {
 };
 
 type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
-
-type EngagedStepMessageState = Omit<StepMessageState, "id"> & {
-  id: string;
-};
 
 export type SelectFilterParams = {
   key?: string;
@@ -319,7 +313,7 @@ export class KnockGuideClient {
     stepRef: string,
     attrs: Partial<StepMessageState>,
   ) {
-    let updatedStep: KnockGuideStep<EngagedStepMessageState> | undefined;
+    let updatedStep: KnockGuideStep | undefined;
 
     this.store.setState((state) => {
       const guides = state.guides.map((guide) => {
@@ -330,15 +324,8 @@ export class KnockGuideClient {
 
           updatedStep = {
             ...step,
-            message: {
-              ...step.message,
-              // Generate a message id to use for an engagement event call if
-              // no message exists yet for the given guide and the step, as a
-              // message is generated lazily at the first engagement event.
-              id: step.message.id || ksuid.generate(),
-              ...attrs,
-            },
-          } as KnockGuideStep<EngagedStepMessageState>;
+            message: { ...step.message, ...attrs },
+          } as KnockGuideStep;
 
           return updatedStep;
         });
@@ -352,7 +339,7 @@ export class KnockGuideClient {
 
   private buildEngagementEventBaseParams(
     guide: KnockGuide,
-    step: KnockGuideStep<EngagedStepMessageState>,
+    step: KnockGuideStep,
   ) {
     return {
       message_id: step.message.id,
