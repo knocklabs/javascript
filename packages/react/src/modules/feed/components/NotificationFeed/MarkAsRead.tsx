@@ -16,7 +16,7 @@ export const MarkAsRead: React.FC<MarkAsReadProps> = ({ onClick }) => {
   const { t } = useTranslations();
 
   // Without useShallow, the component will get itself in a re-render loop
-  // https://zustand.docs.pmnd.rs/guides/prevent-rerenders-with-use-shallow
+  // https://zustand.docs.pmnd.rs/migrations/migrating-to-v5#requiring-stable-selector-outputs
   const unreadItems = useFeedStore(
     useShallow((state) => state.items.filter((item) => !item.read_at)),
   );
