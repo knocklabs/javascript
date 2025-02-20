@@ -1,6 +1,6 @@
 import { SlackChannelConnection } from "@knocklabs/client";
 import { useTranslations } from "@knocklabs/react-core";
-import { useState } from "react";
+import { useState, useId } from "react";
 import { FunctionComponent } from "react";
 
 import { Spinner } from "../../../core";
@@ -28,6 +28,7 @@ const SlackAddChannelInput: FunctionComponent<SlackAddChannelInputProps> = ({
   const { t } = useTranslations();
   const [value, setValue] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+  const inputId = useId();
 
   const submitChannel = () => {
     if (!value) {
@@ -57,7 +58,7 @@ const SlackAddChannelInput: FunctionComponent<SlackAddChannelInputProps> = ({
       <input
         className={`rsk-connect-channel__input ${(inErrorState || !!localError) && !value && "rsk-connect-channel__input--error"}`}
         tabIndex={-1}
-        id="slack-channel-search"
+        id={inputId}
         type="text"
         placeholder={
           localError || connectedChannelsError || t("slackChannelId")
