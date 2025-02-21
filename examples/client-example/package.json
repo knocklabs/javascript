@@ -10,8 +10,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^4.2.4",
-    "zustand": "^5.0.3"
+    "web-vitals": "^4.2.4"
   },
   "scripts": {
     "dev": "PORT=3001 BROWSER=none react-scripts start",

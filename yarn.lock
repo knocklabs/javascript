@@ -10877,7 +10877,6 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-scripts: "npm:5.0.1"
     web-vitals: "npm:^4.2.4"
-    zustand: "npm:^5.0.3"
   languageName: unknown
   linkType: soft
 

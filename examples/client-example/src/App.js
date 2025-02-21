@@ -1,6 +1,5 @@
 import Knock from "@knocklabs/client";
 import { useEffect, useMemo } from "react";
-// import { create } from "zustand";
 
 import "./App.css";
 
@@ -17,7 +16,6 @@ const useNotificationFeed = (knockClient, feedId) => {
       auto_manage_socket_connection: true,
       auto_manage_socket_connection_delay: 500,
     });
-
     const notificationStore = notificationFeed.store;
     notificationFeed.fetch();
 
