@@ -1,9 +1,9 @@
-import { type FormEvent, useState } from "react";
 import { Button } from "@telegraph/button";
-import { Select } from "@telegraph/select";
 import { Box, Stack } from "@telegraph/layout";
-import { Text } from "@telegraph/typography";
+import { Select } from "@telegraph/select";
 import { TextArea } from "@telegraph/textarea";
+import { Text } from "@telegraph/typography";
+import { type FormEvent, useState } from "react";
 
 import { notify } from "../lib/api";
 
@@ -55,16 +55,26 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
         </Box>
         <Box marginBottom="3">
           <Stack direction="column" gap="1">
-            <Text as="label" size="2">Template type</Text>
+            <Text as="label" size="2">
+              Template type
+            </Text>
             <Box marginRight="2">
               <Select.Root
                 size="2"
                 value={templateType}
-                onValueChange={(value) => setTemplateType(value as TemplateType)}
+                onValueChange={(value) =>
+                  setTemplateType(value as TemplateType)
+                }
               >
-                <Select.Option value={TemplateType.Standard}>Standard</Select.Option>
-                <Select.Option value={TemplateType.SingleAction}>Single-action</Select.Option>
-                <Select.Option value={TemplateType.MultiAction}>Multi-action</Select.Option>
+                <Select.Option value={TemplateType.Standard}>
+                  Standard
+                </Select.Option>
+                <Select.Option value={TemplateType.SingleAction}>
+                  Single-action
+                </Select.Option>
+                <Select.Option value={TemplateType.MultiAction}>
+                  Multi-action
+                </Select.Option>
               </Select.Root>
             </Box>
           </Stack>
@@ -78,7 +88,9 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
                 checked={showToast}
                 onChange={(e) => setShowToast(e.target.checked)}
               />
-              <Text as="span" size="2" marginLeft="1">Show a toast?</Text>
+              <Text as="span" size="2" marginLeft="1">
+                Show a toast?
+              </Text>
             </Stack>
           </Text>
         </Box>

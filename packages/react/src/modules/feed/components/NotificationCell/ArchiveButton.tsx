@@ -1,7 +1,7 @@
-import { MouseEvent, useCallback, useState, useRef, useEffect } from "react";
 import { FeedItem } from "@knocklabs/client";
 import { useKnockFeed, useTranslations } from "@knocklabs/react-core";
 import { createPopper } from "@popperjs/core";
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { CloseCircle } from "../../../core/components/Icons";
 
@@ -30,17 +30,21 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({ item }) => {
 
   useEffect(() => {
     if (triggerRef.current && tooltipRef.current && visible) {
-      const popperInstance = createPopper(triggerRef.current, tooltipRef.current, {
-        placement: "top-end",
-        modifiers: [
-          {
-            name: "offset",
-            options: {
-              offset: [0, 8],
+      const popperInstance = createPopper(
+        triggerRef.current,
+        tooltipRef.current,
+        {
+          placement: "top-end",
+          modifiers: [
+            {
+              name: "offset",
+              options: {
+                offset: [0, 8],
+              },
             },
-          },
-        ],
-      });
+          ],
+        },
+      );
 
       return () => {
         popperInstance.destroy();

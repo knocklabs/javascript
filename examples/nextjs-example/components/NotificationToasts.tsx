@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from "react";
-import { toast } from "sonner";
 import { type FeedItem } from "@knocklabs/client";
 import { useKnockFeed } from "@knocklabs/react";
+import { useCallback, useEffect } from "react";
+import { toast } from "sonner";
 
 const NotificationToasts = () => {
   const { feedClient } = useKnockFeed();
@@ -23,7 +23,7 @@ const NotificationToasts = () => {
           dismissible: true,
           onDismiss: () => {
             feedClient.markAsSeen(notification);
-          }
+          },
         });
       });
     },

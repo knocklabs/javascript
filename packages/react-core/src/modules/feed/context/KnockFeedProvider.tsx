@@ -5,7 +5,7 @@ import Knock, {
 } from "@knocklabs/client";
 import * as React from "react";
 import { PropsWithChildren } from "react";
-import type { UseBoundStore, StoreApi } from "zustand";
+import type { StoreApi, UseBoundStore } from "zustand";
 
 import { useKnockClient } from "../../core";
 import { ColorMode } from "../../core/constants";

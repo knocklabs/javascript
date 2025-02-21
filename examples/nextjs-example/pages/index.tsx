@@ -1,13 +1,13 @@
-import { useCallback, useState } from "react";
 import {
   KnockFeedProvider,
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
+import { Icon, Lucide } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
 import { Select } from "@telegraph/select";
 import { Heading, Text } from "@telegraph/typography";
-import { Icon, Lucide } from "@telegraph/icon";
+import { useCallback, useState } from "react";
 
 import NotificationFeed from "../components/NotificationFeed";
 import NotificationToasts from "../components/NotificationToasts";
@@ -60,10 +60,7 @@ export default function Home() {
                 <Text as="p">
                   This is an example application to show in-app notifications{" "}
                   <Text as="span" color="blue">
-                    <a
-                      href="https://knock.app"
-                      color="accent"
-                    >
+                    <a href="https://knock.app" color="accent">
                       powered by Knock
                     </a>
                   </Text>
@@ -71,7 +68,11 @@ export default function Home() {
                 </Text>
               </Stack>
             </Stack>
-            <Stack flexDirection="row" alignItems="center" justifyContent="space-between">
+            <Stack
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
               <Heading size="4" as="h2">
                 Send an in-app notification
               </Heading>
@@ -88,9 +89,9 @@ export default function Home() {
                 >
                   {Object.values(Tenants).map((tenant) => (
                     <Select.Option key={tenant} value={tenant}>
-                        {TenantLabels[tenant]}
+                      {TenantLabels[tenant]}
                     </Select.Option>
-                    ))}
+                  ))}
                 </Select.Root>
                 <Box marginLeft="2">
                   <NotificationFeed />
@@ -99,11 +100,21 @@ export default function Home() {
             </Stack>
             <SendNotificationForm userId={userId} tenant={tenant} />
             <NotificationToasts />
-            <Box marginTop="12" borderTopWidth="1" bordertopcolor="gray" paddingTop="4">
+            <Box
+              marginTop="12"
+              borderTopWidth="1"
+              bordertopcolor="gray"
+              paddingTop="4"
+            >
               <Stack justifyContent="space-between" alignItems="center">
                 <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon aria-hidden={true} alt="GitHub" icon={Lucide.Github} color="gray" />
+                    <Icon
+                      aria-hidden={true}
+                      alt="GitHub"
+                      icon={Lucide.Github}
+                      color="gray"
+                    />
                     <Text as="span" color="gray">
                       Github repo
                     </Text>
@@ -111,7 +122,12 @@ export default function Home() {
                 </a>
                 <a href="https://docs.knock.app/in-app-ui/react/overview">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon aria-hidden={true} alt="GitHub" icon={Lucide.FileCode} color="gray" />
+                    <Icon
+                      aria-hidden={true}
+                      alt="GitHub"
+                      icon={Lucide.FileCode}
+                      color="gray"
+                    />
                     <Text as="span" color="gray">
                       Documentation
                     </Text>
@@ -119,7 +135,10 @@ export default function Home() {
                 </a>
                 <a href="https://knock.app">
                   <Text as="span" color="gray">
-                    Powered by <Text as="span" color="accent">Knock</Text>
+                    Powered by{" "}
+                    <Text as="span" color="accent">
+                      Knock
+                    </Text>
                   </Text>
                 </a>
               </Stack>

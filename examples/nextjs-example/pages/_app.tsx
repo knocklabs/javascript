@@ -1,8 +1,9 @@
 import "@knocklabs/react/dist/index.css";
-import "../styles/globals.css";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
 import { Toaster } from "sonner";
+
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

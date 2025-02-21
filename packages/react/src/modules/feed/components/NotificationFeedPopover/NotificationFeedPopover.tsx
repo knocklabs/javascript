@@ -57,18 +57,22 @@ export const NotificationFeedPopover: React.FC<
 
   useEffect(() => {
     if (buttonRef.current && popperRef.current) {
-      const popperInstance = createPopper(buttonRef.current, popperRef.current, {
-        strategy: "fixed",
-        placement,
-        modifiers: [
-          {
-            name: "offset",
-            options: {
-              offset: [0, 8],
+      const popperInstance = createPopper(
+        buttonRef.current,
+        popperRef.current,
+        {
+          strategy: "fixed",
+          placement,
+          modifiers: [
+            {
+              name: "offset",
+              options: {
+                offset: [0, 8],
+              },
             },
-          },
-        ],
-      });
+          ],
+        },
+      );
 
       // Cleanup
       return () => {

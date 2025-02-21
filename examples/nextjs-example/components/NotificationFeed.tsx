@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
 import {
   NotificationFeedPopover,
   NotificationIconButton,
 } from "@knocklabs/react";
+import { useRef, useState } from "react";
 
 const NotificationFeed = () => {
   const [isVisible, setIsVisible] = useState(false);
