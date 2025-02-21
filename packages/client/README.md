@@ -112,7 +112,7 @@ const { items } = feedClient.store.getState();
 
 ```typescript
 // The feed store uses zustand
-import create from "zustand";
+import { create } from "zustand";
 
 // Initialize the feed as in above examples
 const feedClient = knockClient.feeds.initialize(
