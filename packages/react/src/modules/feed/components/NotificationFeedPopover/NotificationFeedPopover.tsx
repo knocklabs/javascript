@@ -75,7 +75,7 @@ export const NotificationFeedPopover: React.FC<
         popperInstance.destroy();
       };
     }
-  }, [buttonRef.current, popperRef.current, placement]);
+  }, [buttonRef, popperRef, placement]);
 
   return (
     <div

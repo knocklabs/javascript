@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { type FeedItem } from "@knocklabs/client";

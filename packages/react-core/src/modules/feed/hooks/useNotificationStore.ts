@@ -1,7 +1,6 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
 import * as React from "react";
 import type { DispatchWithoutAction } from "react";
-import type { UseBoundStore, StoreApi } from "zustand";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
@@ -42,7 +41,8 @@ function useNotificationStore(
   selector?: FeedStoreStateSelector,
 ): FeedStoreState {
   const useStore = useCreateNotificationStore(feedClient);
-  return selector ? selector(useStore()) : useStore();
+  const storeState = useStore();
+  return selector ? selector(storeState) : storeState;
 }
 
 export { useCreateNotificationStore };
