@@ -48,7 +48,7 @@ class Feed {
   private visibilityChangeListenerConnected: boolean = false;
 
   // The raw store instance, used for binding in React and other environments
-  public store: StoreApi<FeedStoreState>;
+  public store: UseBoundStore<StoreApi<FeedStoreState>>;
 
   constructor(
     readonly knock: Knock,
