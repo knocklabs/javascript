@@ -42,7 +42,11 @@ const HeadlessFeed = ({
     { tenant },
   );
 
-  const { items, metadata } = useNotificationStore(feedClient);
+  // Example of using a selector to access a subset of the store state.
+  const { items, metadata } = useNotificationStore(feedClient, (state) => ({
+    items: state.items,
+    metadata: state.metadata,
+  }));
 
   useEffect(() => {
     feedClient.fetch();
