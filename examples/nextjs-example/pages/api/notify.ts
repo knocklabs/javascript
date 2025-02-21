@@ -5,7 +5,7 @@ const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY, {
   host: process.env.NEXT_PUBLIC_KNOCK_HOST,
 });
 
-const KNOCK_WORKFLOW = "react-sdk-upgrade-test";
+const KNOCK_WORKFLOW = process.env.NEXT_PUBLIC_WORKFLOW_KEY!;
 
 export default async function handler(
   req: NextApiRequest,
