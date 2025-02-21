@@ -18627,7 +18627,6 @@ __metadata:
     eslint-config-next: "npm:14.2.13"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:15.0.4"
-    next-seo: "npm:^6.6.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     typescript: "npm:^5.7.3"
