@@ -1,11 +1,12 @@
-import { ChakraProvider } from "@chakra-ui/react";
 import "@knocklabs/react/dist/index.css";
+import "../styles/globals.css";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
+import { Toaster } from "sonner";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider>
+    <>
       <NextSeo
         title="React in-app notifications example | Powered by Knock"
         description="In-app notification feed and toasts, powered by Knock"
@@ -21,7 +22,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <Component {...pageProps} />
-    </ChakraProvider>
+      <Toaster position="bottom-right" />
+    </>
   );
 }
 
