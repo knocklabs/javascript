@@ -51,13 +51,10 @@ function useNotificationStore<T>(
  * A hook used to access content within the notification store.
  *
  * A selector can be used to access a subset of the store state.
- * You can specify a specific subset type by importing `FeedStoreState` from the client package.
  *
  * @example
  *
  * ```ts
- * import { type FeedStoreState } from "@knocklabs/client";
- *
  * const { items, metadata } = useNotificationStore(feedClient, (state) => ({
  *   items: state.items,
  *   metadata: state.metadata,
