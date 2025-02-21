@@ -1,7 +1,7 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
 import { Channel } from "phoenix";
-import { type StoreApi, type UseBoundStore } from "zustand";
+import type { StoreApi, UseBoundStore } from "zustand";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";

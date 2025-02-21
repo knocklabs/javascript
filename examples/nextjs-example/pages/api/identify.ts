@@ -23,7 +23,8 @@ export default async function handler(
 
   try {
     const knockUser = await knockClient.users.identify(userId, {
-      name: id ? undefined : faker.person.fullName(), // only set name if no user yet
+      // Create a user for the demo, we'll only set the name if we don't have a user yet
+      name: id ? undefined : faker.person.fullName(),
     });
 
     let userToken = undefined;
