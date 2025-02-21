@@ -1,12 +1,21 @@
-import { Feed, FeedStoreState } from "@knocklabs/client";
+import { Feed, type FeedStoreState } from "@knocklabs/client";
 import * as React from "react";
 import type { DispatchWithoutAction } from "react";
+import { create } from "zustand";
+import type { UseBoundStore, StoreApi } from "zustand";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
 
 // A hook designed to create a `UseBoundStore` instance
-function useCreateNotificationStore(feedClient: Feed) {
+function useCreateNotificationStore(
+  feedClient: Feed,
+): UseBoundStore<StoreApi<FeedStoreState>> {
+
+  const useStore = React.useMemo(
+    () => create<FeedStoreState>(() => feedClient.store.getState()),
+    [feedClient],
+  );
 
   // Warning: this is a hack that will cause any components downstream to re-render
   // as a result of the store updating.
@@ -24,7 +33,7 @@ function useCreateNotificationStore(feedClient: Feed) {
     return unsubscribe;
   }, [feedClient]);
 
-  return feedClient.store;
+  return useStore;
 }
 
 // Maintain type flexibility from older Zustand versions
