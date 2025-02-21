@@ -54,13 +54,14 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
-    "@telegraph/combobox": "^0.0.70",
-    "@telegraph/icon": "^0.0.45",
-    "@telegraph/layout": "^0.1.11",
-    "@telegraph/typography": "^0.1.11",
+    "@telegraph/combobox": "^0.0.72",
+    "@telegraph/icon": "^0.0.46",
+    "@telegraph/layout": "^0.1.12",
+    "@telegraph/typography": "^0.1.12",
     "lodash.debounce": "^4.0.8"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/eslint-plugin-jsx-a11y": "^6",
     "@types/lodash.debounce": "^4.0.9",
