@@ -71,6 +71,8 @@ function App() {
         <div key={item.id} className="feed-item">
           ID: {item.id}
           <br />
+          Has been read: {item.read_at ? "true" : "false"}
+          <br />
           Actor ID: {item.actors?.[0]?.id}
           <br />
           Actor email: {item.actors?.[0]?.email}
