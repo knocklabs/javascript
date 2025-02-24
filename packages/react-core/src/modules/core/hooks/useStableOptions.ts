@@ -7,7 +7,10 @@ export default function useStableOptions<T>(options: T): T {
   return useMemo(() => {
     const currentOptions = optionsRef.current;
 
-    const objectsHaventChanged = deepEqual(options, currentOptions);
+    const objectsHaventChanged = deepEqual(options, currentOptions, {
+      // use strict equality (===) to compare leaf nodes
+      strict: true,
+    });
 
     if (currentOptions && objectsHaventChanged) {
       return currentOptions;
