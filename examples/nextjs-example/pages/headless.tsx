@@ -1,3 +1,4 @@
+import { MarkdownContentBlock } from "@knocklabs/client";
 import {
   useAuthenticatedKnockClient,
   useNotificationStore,
@@ -7,7 +8,6 @@ import { Box, Stack } from "@telegraph/layout";
 import { Select } from "@telegraph/select";
 import { useEffect, useState } from "react";
 
-import { MarkdownContentBlock } from "@knocklabs/client";
 import useIdentify from "../hooks/useIdentify";
 
 const Tenants = {
