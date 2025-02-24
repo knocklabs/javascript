@@ -1,5 +1,5 @@
+import deepEqual from "deep-equal";
 import { useMemo, useRef } from "react";
-import { shallow } from "zustand/shallow";
 
 export default function useStableOptions<T>(options: T): T {
   const optionsRef = useRef<T>();
@@ -7,7 +7,12 @@ export default function useStableOptions<T>(options: T): T {
   return useMemo(() => {
     const currentOptions = optionsRef.current;
 
-    if (currentOptions && shallow(options, currentOptions)) {
+    const objectsHaventChanged = deepEqual(options, currentOptions, {
+      // use strict equality (===) to compare leaf nodes
+      strict: true,
+    });
+
+    if (currentOptions && objectsHaventChanged) {
       return currentOptions;
     }
 

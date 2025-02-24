@@ -16,6 +16,7 @@ import {
   FeedMetadata,
   FeedResponse,
   FetchFeedOptions,
+  FetchFeedOptionsForRequest,
 } from "./interfaces";
 import createStore from "./store";
 import {
@@ -28,6 +29,7 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
+import { getFormattedTriggerData } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -487,10 +489,16 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
-    // Always include the default params, if they have been set
-    const queryParams = {
+    const formattedTriggerData = getFormattedTriggerData({
       ...this.defaultOptions,
       ...options,
+    });
+
+    // Always include the default params, if they have been set
+    const queryParams: FetchFeedOptionsForRequest = {
+      ...this.defaultOptions,
+      ...options,
+      trigger_data: formattedTriggerData,
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
