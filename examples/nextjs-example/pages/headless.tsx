@@ -7,7 +7,7 @@ import { Box, Stack } from "@telegraph/layout";
 import { Select } from "@telegraph/select";
 import { useEffect, useState } from "react";
 
-import { MarkdownContentBlock } from "../../../packages/client/dist/types/clients/feed/interfaces";
+import { MarkdownContentBlock } from "@knocklabs/client";
 import useIdentify from "../hooks/useIdentify";
 
 const Tenants = {
@@ -42,7 +42,7 @@ const HeadlessFeed = ({
     { tenant },
   );
 
-  // Example of using a selector to access a subset of the store state.
+  // Example of using a selector to access a subset of the store state (not required)
   const { items, metadata } = useNotificationStore(feedClient, (state) => ({
     items: state.items,
     metadata: state.metadata,
