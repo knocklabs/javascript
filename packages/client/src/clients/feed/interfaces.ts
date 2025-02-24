@@ -6,7 +6,8 @@ import { NotificationSource } from "../messages/interfaces";
 
 // Specific feed interfaces
 
-// trigger_data may only specify flat key-value pairs, not nested objects
+// `trigger_data` may only specify flat key-value pairs, not nested objects
+// Specifying a nested object will result in a 422 "invalid_params" error
 export interface TriggerData extends GenericData {
   [key: string]: string | number | boolean;
 }
