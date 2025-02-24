@@ -6,6 +6,11 @@ import { NotificationSource } from "../messages/interfaces";
 
 // Specific feed interfaces
 
+// trigger_data may only specify flat key-value pairs, not nested objects
+export interface TriggerData extends GenericData {
+  [key: string]: string | number | boolean;
+}
+
 export interface FeedClientOptions {
   before?: string;
   after?: string;
@@ -22,7 +27,7 @@ export interface FeedClientOptions {
   // Optionally scope to a given archived status (defaults to `exclude`)
   archived?: "include" | "exclude" | "only";
   // Optionally scope all notifications that contain this argument as part of their trigger payload
-  trigger_data?: GenericData;
+  trigger_data?: TriggerData;
   // Optionally enable cross browser feed updates for this feed
   __experimentalCrossBrowserUpdates?: boolean;
   // Optionally automatically manage socket connections on changes to tab visibility (defaults to `false`)
