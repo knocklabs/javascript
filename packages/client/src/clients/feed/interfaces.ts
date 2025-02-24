@@ -39,7 +39,10 @@ export type FetchFeedOptions = {
 
 // The final data shape that is sent to the API
 // Should match types here: https://docs.knock.app/reference#get-feed
-export type FetchFeedOptionsForRequest = Omit<FeedClientOptions, 'trigger_data'> & {
+export type FetchFeedOptionsForRequest = Omit<
+  FeedClientOptions,
+  "trigger_data"
+> & {
   __loadingType: undefined;
   __fetchSource?: undefined;
   __experimentalCrossBrowserUpdates?: undefined;

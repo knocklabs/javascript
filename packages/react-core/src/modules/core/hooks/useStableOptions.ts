@@ -1,5 +1,5 @@
-import { useMemo, useRef } from "react";
 import deepEqual from "deep-equal";
+import { useMemo, useRef } from "react";
 
 export default function useStableOptions<T>(options: T): T {
   const optionsRef = useRef<T>();

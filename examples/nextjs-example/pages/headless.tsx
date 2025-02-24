@@ -41,7 +41,7 @@ const HeadlessFeed = ({
     process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!,
     {
       tenant,
-      trigger_data: { "isEnterprise": true }
+      trigger_data: { isEnterprise: true },
     },
   );
 

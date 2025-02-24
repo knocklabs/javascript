@@ -29,6 +29,7 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
+import { getFormattedTriggerData } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -488,30 +489,16 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
-    // If the trigger data is an object, stringify it to conform to API expectations
-    // BEFORE:  { isEnterprise: true } 
-    // AFTER:  "{\"isEnterprise\":true}"
-    // https://docs.knock.app/reference#get-feed
-    // We also want to be careful to check for string values already,
-    // because this was a bug and customers had to manually stringify their trigger data
-    let stringifiedTriggerData;
-    if (typeof options?.trigger_data === "object") {
-      stringifiedTriggerData = JSON.stringify(options.trigger_data);
-    } else if (typeof this.defaultOptions?.trigger_data === "object") {
-      stringifiedTriggerData = JSON.stringify(this.defaultOptions.trigger_data);
-    } else if (typeof options?.trigger_data === "string") {
-      stringifiedTriggerData = options.trigger_data;
-    } else if (typeof this.defaultOptions?.trigger_data === "string") {
-      stringifiedTriggerData = this.defaultOptions.trigger_data;
-    } else {
-      stringifiedTriggerData = undefined;
-    }
+    const formattedTriggerData = getFormattedTriggerData({
+      ...this.defaultOptions,
+      ...options,
+    });
 
     // Always include the default params, if they have been set
     const queryParams: FetchFeedOptionsForRequest = {
       ...this.defaultOptions,
       ...options,
-      trigger_data: stringifiedTriggerData,
+      trigger_data: formattedTriggerData,
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
