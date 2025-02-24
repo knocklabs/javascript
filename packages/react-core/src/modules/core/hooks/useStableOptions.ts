@@ -1,5 +1,4 @@
 import { useMemo, useRef } from "react";
-import { shallow } from "zustand/shallow";
 import deepEqual from "deep-equal";
 
 export default function useStableOptions<T>(options: T): T {
