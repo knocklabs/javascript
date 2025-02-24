@@ -43,12 +43,14 @@ export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
   "trigger_data"
 > & {
-  __loadingType: undefined;
-  __fetchSource?: undefined;
-  __experimentalCrossBrowserUpdates?: undefined;
-  auto_manage_socket_connection?: undefined;
-  auto_manage_socket_connection_delay?: undefined;
+  // Formatted trigger data into a string
   trigger_data?: string;
+  // Unset options that should not be sent to the API
+  __loadingType: undefined;
+  __fetchSource: undefined;
+  __experimentalCrossBrowserUpdates: undefined;
+  auto_manage_socket_connection: undefined;
+  auto_manage_socket_connection_delay: undefined;
 };
 
 export interface ContentBlockBase {
