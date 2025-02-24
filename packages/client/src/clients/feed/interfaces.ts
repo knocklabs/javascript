@@ -37,6 +37,17 @@ export type FetchFeedOptions = {
   __fetchSource?: "socket" | "http";
 } & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
 
+// The final data shape that is sent to the API
+// Should match types here: https://docs.knock.app/reference#get-feed
+export type FetchFeedOptionsForRequest = Omit<FeedClientOptions, 'trigger_data'> & {
+  __loadingType: undefined;
+  __fetchSource?: undefined;
+  __experimentalCrossBrowserUpdates?: undefined;
+  auto_manage_socket_connection?: undefined;
+  auto_manage_socket_connection_delay?: undefined;
+  trigger_data?: string;
+};
+
 export interface ContentBlockBase {
   name: string;
   type: "markdown" | "text" | "button_set";

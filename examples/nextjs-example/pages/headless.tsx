@@ -39,7 +39,10 @@ const HeadlessFeed = ({
   const feedClient = useNotifications(
     knockClient,
     process.env.NEXT_PUBLIC_KNOCK_FEED_CHANNEL_ID!,
-    { tenant },
+    {
+      tenant,
+      trigger_data: { "isEnterprise": true }
+    },
   );
 
   // Example of using a selector to access a subset of the store state (not required)
@@ -47,6 +50,8 @@ const HeadlessFeed = ({
     items: state.items,
     metadata: state.metadata,
   }));
+
+  console.log(items);
 
   useEffect(() => {
     feedClient.fetch();

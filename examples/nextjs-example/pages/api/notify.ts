@@ -30,6 +30,7 @@ export default async function handler(
       // actor: userId,
       tenant,
       data: {
+        isEnterprise: true,
         message,
         showToast,
         templateType,
@@ -38,6 +39,7 @@ export default async function handler(
 
     return res.status(200).json({ error: null, response });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({
       error: (error as Error).message || (error as Error).toString(),
       user: null,

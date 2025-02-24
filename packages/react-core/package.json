@@ -51,12 +51,14 @@
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "date-fns": "^4.0.0",
+    "deep-equal": "^2.2.3",
     "swr": "^2.3.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
+    "@types/deep-equal": "^1.0.4",
     "@types/react": "^18.3.6",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.24.0",
