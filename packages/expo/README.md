@@ -115,7 +115,6 @@ Alternatively, if you don't want to use our components you can render the feed i
 
 ```jsx
 import { useAuthenticatedKnockClient, useNotifications } from "@knocklabs/expo";
-import create from "zustand";
 
 const YourAppLayout = () => {
   const knockClient = useAuthenticatedKnockClient(
@@ -128,8 +127,8 @@ const YourAppLayout = () => {
     process.env.KNOCK_FEED_ID,
   );
 
-  const useNotificationStore = create(notificationFeed.store);
-  const { metadata } = useNotificationStore();
+  const notificationStore = notificationFeed.store;
+  const { metadata } = notificationStore.getState();
 
   useEffect(() => {
     notificationFeed.fetch();

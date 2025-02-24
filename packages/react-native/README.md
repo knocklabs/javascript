@@ -64,7 +64,6 @@ import {
   useAuthenticatedKnockClient,
   useNotifications,
 } from "@knocklabs/react-native";
-import create from "zustand";
 
 const YourAppLayout = () => {
   const knockClient = useAuthenticatedKnockClient(
@@ -77,8 +76,8 @@ const YourAppLayout = () => {
     process.env.KNOCK_FEED_ID,
   );
 
-  const useNotificationStore = create(notificationFeed.store);
-  const { metadata } = useNotificationStore();
+  const notificationStore = notificationFeed.store;
+  const { metadata } = notificationStore.getState();
 
   useEffect(() => {
     notificationFeed.fetch();
