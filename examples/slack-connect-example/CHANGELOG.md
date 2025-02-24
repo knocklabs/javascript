@@ -1,5 +1,13 @@
 # slack-connect-example
 
+## 0.3.1
+
+### Patch Changes
+
+- 9e638a2: Add padding to `<body>` element of example app
+- Updated dependencies [9e638a2]
+  - @knocklabs/react@0.5.1
+
 ## 0.3.0
 
 ### Minor Changes

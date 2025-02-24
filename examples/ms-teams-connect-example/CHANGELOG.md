@@ -1,5 +1,13 @@
 # ms-teams-connect-example
 
+## 0.0.3
+
+### Patch Changes
+
+- 9e638a2: Add padding to `<body>` element of example app
+- Updated dependencies [9e638a2]
+  - @knocklabs/react@0.5.1
+
 ## 0.0.2
 
 ### Patch Changes
