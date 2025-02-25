@@ -11,14 +11,14 @@ This update impacts the following packages:
 
 ## Breaking changes
 
-As part of this update, we've upgraded our dependency on `zustand` to use the latest version. This means that we've had to make some breaking changes to the API around accessing the data store.
+As part of this update, we've upgraded our dependency on `zustand` to use version [`4.5.6`](https://github.com/pmndrs/zustand/tree/v4.5.6). This means that we've had to make some potentially breaking changes to the API around accessing the data store.
 
 > [!IMPORTANT]  
 > If you only accessed the store through the `useNotificationStore` hook, you can continue to use the `useNotificationStore` hook as before without changes. **These breaking changes only affect consumers who were accessing the store directly through `feedClient.store`.**
 
 ### Changes to `feedClient.store`
 
-Consumers no longer need to use their own Zustand dependency to access the store directly. You can now access the store directly using the `store` property on the `feedClient` object.
+You no longer need to use your own Zustand dependency to access the store directly. You can now access the store directly using the `store` property on the `feedClient` object.
 
 #### Example One
 **Before:**
