@@ -1,33 +1,13 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
+import { useStore, type StoreApi, type UseBoundStore } from "zustand";
 
 // A hook designed to create a `UseBoundStore` instance.
-// We used to have to do some extra work to do this, but
-// with zustand updated we can just use the feedClient.store
-// directly.
-function useCreateNotificationStore(feedClient: Feed) {
-  return feedClient.store;
+// https://zustand.docs.pmnd.rs/guides/typescript#bounded-usestore-hook-for-vanilla-stores
+function useCreateNotificationStore(feedClient: Feed): UseBoundStore<StoreApi<FeedStoreState>>;
+function useCreateNotificationStore<T>(feedClient: Feed, selector: (state: FeedStoreState) => T): T;
+function useCreateNotificationStore<T, U = T>(feedClient: Feed, selector?: (state: FeedStoreState) => U) {
+  return useStore(feedClient.store, selector!)
 }
-
-/**
- * Below we do some typing to specify that if a selector is provided,
- * the return type will be the type returned by the selector.
- *
- * This is important because the store state type is not always the same as the
- * return type of the selector.
- *
- */
-
-type StateSelector<T, U> = (state: T) => U;
-type FeedStoreStateSelector<T> = StateSelector<FeedStoreState, T>;
-
-// Function overload for when no selector is provided
-function useNotificationStore(feedClient: Feed): FeedStoreState;
-
-// Function overload for when a selector is provided
-function useNotificationStore<T>(
-  feedClient: Feed,
-  selector: FeedStoreStateSelector<T>,
-): T;
 
 /**
  * A hook used to access content within the notification store.
@@ -43,13 +23,11 @@ function useNotificationStore<T>(
  * }));
  * ```
  */
-function useNotificationStore<T>(
-  feedClient: Feed,
-  selector?: FeedStoreStateSelector<T>,
-): T | FeedStoreState {
-  const useStore = useCreateNotificationStore(feedClient);
-  const storeState = useStore();
-  return selector ? selector(storeState) : storeState;
+
+function useNotificationStore(feedClient: Feed): UseBoundStore<StoreApi<FeedStoreState>>;
+function useNotificationStore<T>(feedClient: Feed, selector: (state: FeedStoreState) => T): T;
+function useNotificationStore<T, U = T>(feedClient: Feed, selector?: (state: FeedStoreState) => U) {
+  return useCreateNotificationStore(feedClient, selector!);
 }
 
 export { useCreateNotificationStore };
