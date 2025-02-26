@@ -10,6 +10,11 @@ function useCreateNotificationStore<T, U = T>(
   feedClient: Feed,
   externalSelector: (state: FeedStoreState) => U,
 ): U;
+/**
+ * Access a Bounded Store instance
+ * Allow passing a selector down from useCreateNotificationStore OR useNotificationStore
+ * We'll favor the the one passed later outside of useCreateNotificationStore instantiation
+ */
 function useCreateNotificationStore<T, U = T>(
   feedClient: Feed,
   externalSelector?: (state: FeedStoreState) => U,
@@ -17,8 +22,6 @@ function useCreateNotificationStore<T, U = T>(
   const store = useStore(feedClient.store);
 
   return (selector?: (state: FeedStoreState) => U) => {
-    // Allow passing a selector down from useCreateNotificationStore OR useNotificationStore
-    // We'll favor the the one passed later outside of useCreateNotificationStore instantiation
     const innerSelector = selector ?? externalSelector;
     return innerSelector ? innerSelector(store) : store;
   };
@@ -38,7 +41,6 @@ function useCreateNotificationStore<T, U = T>(
  * }));
  * ```
  */
-
 function useNotificationStore(
   feedClient: Feed,
 ): UseBoundStore<StoreApi<FeedStoreState>>;

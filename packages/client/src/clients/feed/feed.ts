@@ -136,11 +136,13 @@ class Feed {
 
     // Connect the socket only if we don't already have a connection
     if (maybeSocket && !maybeSocket.isConnected()) {
+      console.log("connectedddd");
       maybeSocket.connect();
     }
 
     // Only join the channel if we're not already in a joining state
     if (this.channel && ["closed", "errored"].includes(this.channel.state)) {
+      console.log("joining channel");
       this.channel.join();
     }
   }
@@ -150,6 +152,7 @@ class Feed {
     eventName: BindableFeedEvent,
     callback: FeedEventCallback | FeedRealTimeCallback,
   ) {
+    console.log("on", eventName);
     this.broadcaster.on(eventName, callback);
   }
 
@@ -577,7 +580,7 @@ class Feed {
     metadata,
   }: FeedMessagesReceivedPayload) {
     this.knock.log("[Feed] Received new real-time message");
-
+    console.log("onNewMessageReceived", metadata);
     // Handle the new message coming in
     const { items, ...state } = this.store.getState();
     const currentHead: FeedItem | undefined = items[0];
