@@ -1,67 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-/* Toggle component */
-.slk-connect__toggle_switch {
-	position: relative;
-	display: inline-block;
-	width: 30px;
-	height: 17px;
+@theme {
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  );
 }
 
-.slk-connect__toggle_switch__container {
-	display: flex;
-	align-items: center;
-}
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-.slk-connect__toggle_switch__checkbox {
-	opacity: 0;
-	width: 0;
-	height: 0;
-}
-
-.slk-connect__toggle_switch__toggle-background {
-	position: absolute;
-	cursor: pointer;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	transition: 0.4s;
-	border-radius: 17px;
-}
-
-.slk-connect__toggle_switch__toggle-background--toggled {
-	background-color: rgba(51, 163, 102, 1);
-}
-
-.slk-connect__toggle_switch__toggle-background--untoggled {
-	background-color: #ccc;
-}
-
-.slk-connect__toggle_switch__switch {
-	position: absolute;
-	height: 13px;
-	width: 13px;
-	left: 2px;
-	bottom: 2px;
-	background-color: white;
-	transition: 0.4s;
-	border-radius: 50%;
-}
-
-.slk-connect__toggle_switch__switch--toggled {
-	transform: translateX(13px);
-}
-
-.slk-connect__toggle_switch__switch--untoggled {
-	transform: translateX(0);
-}
-
-
-.slk-connect__toggle_switch__text {
-	padding-left: 4px;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: small;
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }

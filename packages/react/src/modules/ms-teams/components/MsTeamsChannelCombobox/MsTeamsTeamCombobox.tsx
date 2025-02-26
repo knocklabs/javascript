@@ -53,11 +53,15 @@ export const MsTeamsTeamCombobox: FunctionComponent<
         }}
         placeholder="Select team"
         disabled={inErrorState || inLoadingState || sortedTeams.length === 0}
+        modal={
+          // Modal comboboxes cause page layout to shift when body has padding. See KNO-7854.
+          false
+        }
       >
-        <Combobox.Trigger className="rtk-combobox__team__value" />
+        <Combobox.Trigger />
         <Combobox.Content>
           <Combobox.Search className="rtk-combobox__search" />
-          <Combobox.Options className="rtk-combobox__options">
+          <Combobox.Options maxHeight="36">
             {sortedTeams.map((team) => {
               const channelCount = getChannelCount(team.id);
               return (

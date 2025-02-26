@@ -1,5 +1,18 @@
 # slack-kit-example
 
+## 0.3.0
+
+### Minor Changes
+
+- 7904b65: Remove toggle switch used to control `showConnectedChannelTags` prop passed to `SlackChannelCombobox`
+
+  The `showConnectedChannelTags` prop has been removed from `SlackChannelCombobox`, so a toggle switch is no longer needed.
+
+### Patch Changes
+
+- Updated dependencies [7904b65]
+  - @knocklabs/react@0.5.0
+
 ## 0.2.4
 
 ### Patch Changes

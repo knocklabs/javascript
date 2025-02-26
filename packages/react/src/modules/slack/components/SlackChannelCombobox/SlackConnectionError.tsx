@@ -1,7 +1,7 @@
 import { useKnockSlackClient, useTranslations } from "@knocklabs/react-core";
 import { FunctionComponent } from "react";
 
-import InfoIcon from "./icons/InfoIcon";
+import SlackErrorMessage from "./SlackErrorMessage";
 
 const SlackConnectionError: FunctionComponent = () => {
   const { t } = useTranslations();
@@ -9,17 +9,13 @@ const SlackConnectionError: FunctionComponent = () => {
 
   if (connectionStatus === "disconnected" || connectionStatus === "error") {
     return (
-      <div className="rsk-combobox__error">
-        <span>
-          <InfoIcon />
-        </span>
-
-        <div className="rsk-combobox__error__text">
-          {connectionStatus === "disconnected"
+      <SlackErrorMessage
+        message={
+          connectionStatus === "disconnected"
             ? t("slackConnectionErrorOccurred")
-            : t("slackConnectionErrorExists")}
-        </div>
-      </div>
+            : t("slackConnectionErrorExists")
+        }
+      />
     );
   }
 

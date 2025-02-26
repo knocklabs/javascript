@@ -11,6 +11,10 @@ updates:
       - "knocklabs/product"
     versioning-strategy: increase
     open-pull-requests-limit: 5
+    groups:
+      telegraph-packages:
+        patterns:
+          - "@telegraph/*"
     ignore:
       - dependency-name: "@radix-ui/react-popover"
       - dependency-name: "@radix-ui/react-visually-hidden"
