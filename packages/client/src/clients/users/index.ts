@@ -135,10 +135,10 @@ class UserClient {
     return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
   }
 
-  async getGuides<P, R>(params: P) {
+  async getGuides<P, R>(channelId: string, params: P) {
     const result = await this.instance.client().makeRequest({
       method: "GET",
-      url: guidesApiRootPath(this.instance.userId),
+      url: `${guidesApiRootPath(this.instance.userId)}/${channelId}`,
       params,
     });
 

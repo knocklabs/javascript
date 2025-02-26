@@ -19,6 +19,7 @@ function App() {
       logLevel="debug"
     >
       <KnockGuideProvider
+        channelId={import.meta.env.VITE_KNOCK_GUIDE_CHANNEL_ID}
         readyToTarget={true}
         colorMode={colorMode}
       >

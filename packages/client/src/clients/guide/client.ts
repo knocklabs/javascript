@@ -108,15 +108,9 @@ export class KnockGuideClient {
 
   constructor(
     readonly knock: Knock,
+    readonly channelId: string,
     readonly targetParams: TargetParams = {},
   ) {
-    this.knock = knock;
-
-    this.targetParams = {
-      data: targetParams.data,
-      tenant: targetParams.tenant,
-    };
-
     this.store = new Store<StoreState>({
       guides: [],
       queries: {},
@@ -252,7 +246,7 @@ export class KnockGuideClient {
       const data = await this.knock.user.getGuides<
         GetGuidesQueryParams,
         GetGuidesResponse
-      >(queryParams);
+      >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
       this.store.setState((state) => ({

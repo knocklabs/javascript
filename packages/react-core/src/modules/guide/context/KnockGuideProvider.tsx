@@ -17,15 +17,17 @@ export const KnockGuideContext = React.createContext<
 >(undefined);
 
 type Props = {
+  channelId: string;
+  readyToTarget: boolean;
   colorMode?: ColorMode;
   targetParams?: KnockGuideTargetParams;
-  readyToTarget: boolean;
 };
 
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
+  channelId,
+  readyToTarget,
   colorMode = "light",
   targetParams,
-  readyToTarget,
   children,
 }) => {
   let knock: Knock;
@@ -39,8 +41,8 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   const stableTargetParams = useStableOptions(targetParams);
 
   const knockGuideClient = React.useMemo(() => {
-    return new KnockGuideClient(knock, stableTargetParams);
-  }, [knock, stableTargetParams]);
+    return new KnockGuideClient(knock, channelId, stableTargetParams);
+  }, [knock, channelId, stableTargetParams]);
 
   React.useEffect(() => {
     if (readyToTarget) knockGuideClient.load();
