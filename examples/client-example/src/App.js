@@ -45,8 +45,8 @@ function App() {
   useEffect(() => {
     const render = (state) => {
       setFeedState(state);
-    }
-    render(feedStore.getInitialState(), feedStore.getInitialState())
+    };
+    render(feedStore.getInitialState(), feedStore.getInitialState());
     feedStore.subscribe(render);
   }, [feedStore]);
 
@@ -57,7 +57,7 @@ function App() {
       console.log(data);
     });
 
-    feedClient.on("items.received.*", (data) => {      
+    feedClient.on("items.received.*", (data) => {
       console.log(data);
     });
 
