@@ -1,5 +1,5 @@
 import Knock from "@knocklabs/client";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import "./App.css";
 
@@ -16,10 +16,10 @@ const useNotificationFeed = (knockClient, feedId) => {
       auto_manage_socket_connection: true,
       auto_manage_socket_connection_delay: 500,
     });
-    const notificationStore = notificationFeed.store;
+
     notificationFeed.fetch();
 
-    return [notificationFeed, notificationStore];
+    return [notificationFeed, notificationFeed.store];
   }, [knockClient, feedId]);
 };
 
@@ -28,6 +28,7 @@ function App() {
     knockClient,
     process.env.REACT_APP_KNOCK_CHANNEL_ID,
   );
+  const [feedState, setFeedState] = useState(feedStore.getState());
 
   useEffect(() => {
     knockClient.preferences
@@ -40,6 +41,15 @@ function App() {
       });
   }, []);
 
+  // Consume the store
+  useEffect(() => {
+    const render = (state) => {
+      setFeedState(state);
+    }
+    render(feedStore.getInitialState(), feedStore.getInitialState())
+    feedStore.subscribe(render);
+  }, [feedStore]);
+
   useEffect(() => {
     const teardown = feedClient.listenForUpdates();
 
@@ -47,7 +57,7 @@ function App() {
       console.log(data);
     });
 
-    feedClient.on("items.received.*", (data) => {
+    feedClient.on("items.received.*", (data) => {      
       console.log(data);
     });
 
@@ -58,7 +68,7 @@ function App() {
     return () => teardown?.();
   }, [feedClient]);
 
-  const { loading, items, pageInfo } = feedStore((state) => state);
+  const { loading, items, pageInfo } = feedState;
 
   return (
     <div className="App">
