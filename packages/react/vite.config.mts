@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react";
-import { resolve } from "path";
+import path from "path";
 import execute from "rollup-plugin-execute";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
 import dts from "vite-plugin-dts";
@@ -9,7 +9,8 @@ import noBundlePlugin from "vite-plugin-no-bundle";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const CJS = env.BUILD_TARGET?.toLocaleLowerCase()?.match("cjs");
+  const buildTarget = env.BUILD_TARGET?.toLocaleLowerCase() ?? "cjs";
+  const CJS = buildTarget.match("cjs");
   const formats: LibraryFormats[] = CJS ? ["cjs"] : ["es"];
 
   return {
@@ -23,13 +24,13 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
-      noBundlePlugin({ root: resolve(__dirname, "src") }),
+      noBundlePlugin({ root: path.resolve(__dirname, "src") }),
     ],
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
-        entry: resolve(__dirname, "src"),
+        entry: path.resolve(__dirname, "src"),
         fileName: "[name]",
         formats,
         name: "react",
