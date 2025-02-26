@@ -14,9 +14,9 @@ This update impacts the following packages:
 As part of this update, we've upgraded our dependency on `zustand` to use version [`4.5.6`](https://github.com/pmndrs/zustand/tree/v4.5.6). This means that we've had to make some potentially breaking changes to the API around accessing the data store.
 
 > [!IMPORTANT]  
-> If you only accessed the store through the `useNotificationStore` hook, you can continue to use the `useNotificationStore` hook as before without changes. **These breaking changes only affect consumers who were accessing the store directly through `feedClient.store`.**
+> If you only accessed the store through the `useNotificationStore` hook, you can continue to use the `useNotificationStore` hook as before without changes. **These breaking changes only affect consumers who were accessing the store directly through `feedClient.store`.** We recommend using the [`useNotificationStore` hook](https://docs.knock.app/sdks/react/reference#usenotificationstore) instead of accessing the store directly.
 
-### Changes to `feedClient.store`
+### Changes to accessing `feedClient.store` directly
 
 You no longer need to use your own Zustand dependency to access the store directly. You can now access the store directly using the `store` property on the `feedClient` object.
 
