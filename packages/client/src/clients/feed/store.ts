@@ -1,5 +1,5 @@
 import { GenericData } from "@knocklabs/types";
-import { create } from "zustand";
+import { createStore as createVanillaZustandStore } from "zustand";
 
 import { NetworkStatus } from "../../networkStatus";
 
@@ -34,7 +34,7 @@ const initialStoreState = {
 };
 
 export default function createStore() {
-  return create<FeedStoreState>((set) => ({
+  return createVanillaZustandStore<FeedStoreState>()((set) => ({
     // Keeps track of all of the items loaded
     ...initialStoreState,
     // The network status indicates what's happening with the request
