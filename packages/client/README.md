@@ -111,21 +111,18 @@ const { items } = feedClient.store.getState();
 ### Reading the feed store state (in React)
 
 ```typescript
-// The feed store uses zustand
-import create from "zustand";
-
 // Initialize the feed as in above examples
 const feedClient = knockClient.feeds.initialize(
   process.env.KNOCK_FEED_CHANNEL_ID,
 );
 
-const useFeedStore = create(feedClient.store);
+const feedStore = feedClient.store;
 
 // Retrieves all of the items
-const items = useFeedStore((state) => state.items);
+const items = feedStore.getState().items;
 
 // Retrieve the badge counts
-const meta = useFeedStore((state) => state.metadata);
+const meta = feedStore.getState().metadata;
 ```
 
 ### Marking items as read, seen, or archived

@@ -1,6 +1,5 @@
 import Knock from "@knocklabs/client";
 import { useEffect, useMemo } from "react";
-import create from "zustand";
 
 import "./App.css";
 
@@ -17,7 +16,7 @@ const useNotificationFeed = (knockClient, feedId) => {
       auto_manage_socket_connection: true,
       auto_manage_socket_connection_delay: 500,
     });
-    const notificationStore = create(notificationFeed.store);
+    const notificationStore = notificationFeed.store;
     notificationFeed.fetch();
 
     return [notificationFeed, notificationStore];
@@ -71,6 +70,8 @@ function App() {
       {items.map((item) => (
         <div key={item.id} className="feed-item">
           ID: {item.id}
+          <br />
+          Has been read: {item.read_at ? "true" : "false"}
           <br />
           Actor ID: {item.actors?.[0]?.id}
           <br />
