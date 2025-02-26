@@ -43,10 +43,15 @@ function App() {
 
   // Consume the store
   useEffect(() => {
+    // What to do on updates
     const render = (state) => {
       setFeedState(state);
     };
-    render(feedStore.getInitialState(), feedStore.getInitialState());
+
+    // What to do on initial load
+    render(feedStore.getInitialState());
+
+    // Subscribe to updates
     feedStore.subscribe(render);
   }, [feedStore]);
 
