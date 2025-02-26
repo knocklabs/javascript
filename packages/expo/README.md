@@ -4,6 +4,8 @@ A set of components for integrating [Knock](https://knock.app) in-app notificati
 
 > Not using Expo? See our vanilla [React Native SDK](../react-native/README.md).
 
+You can find more information about the [Expo SDK in the Knock documentation](https://docs.knock.app/sdks/expo/overview).
+
 ## Installation
 
 Via NPM:
@@ -114,7 +116,7 @@ const YourAppLayout = () => {
 Alternatively, if you don't want to use our components you can render the feed in a headless mode using our hooks:
 
 ```jsx
-import { useAuthenticatedKnockClient, useNotifications } from "@knocklabs/expo";
+import { useAuthenticatedKnockClient, useNotifications, useNotificationStore } from "@knocklabs/expo";
 
 const YourAppLayout = () => {
   const knockClient = useAuthenticatedKnockClient(
@@ -127,8 +129,7 @@ const YourAppLayout = () => {
     process.env.KNOCK_FEED_ID,
   );
 
-  const notificationStore = notificationFeed.store;
-  const { metadata } = notificationStore.getState();
+  const { metadata } = useNotificationStore(notificationFeed);
 
   useEffect(() => {
     notificationFeed.fetch();
@@ -143,3 +144,4 @@ const YourAppLayout = () => {
 - [Signup for Knock](https://knock.app)
 - [Knock documentation](https://docs.knock.app)
 - [Knock dashboard](https://dashboard.knock.app)
+- [Expo SDK documentation](https://docs.knock.app/sdks/expo/overview)

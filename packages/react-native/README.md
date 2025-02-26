@@ -63,6 +63,7 @@ Alternatively, if you don't want to use our components you can render the feed i
 import {
   useAuthenticatedKnockClient,
   useNotifications,
+  useNotificationStore,
 } from "@knocklabs/react-native";
 
 const YourAppLayout = () => {
@@ -76,8 +77,7 @@ const YourAppLayout = () => {
     process.env.KNOCK_FEED_ID,
   );
 
-  const notificationStore = notificationFeed.store;
-  const { metadata } = notificationStore.getState();
+  const { metadata } = useNotificationStore(notificationFeed);
 
   useEffect(() => {
     notificationFeed.fetch();
@@ -92,3 +92,5 @@ const YourAppLayout = () => {
 - [Signup for Knock](https://knock.app)
 - [Knock documentation](https://docs.knock.app)
 - [Knock dashboard](https://dashboard.knock.app)
+- [React Native SDK documentation](https://docs.knock.app/sdks/react-native/overview)
+
