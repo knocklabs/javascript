@@ -23,7 +23,8 @@ export default async function Page() {
         <code className="text-[#E95744]">access_token</code> and Slack channel
         connections as channel data on the{" "}
         <code className="text-[#E95744]">{tenant}</code> tenant and{" "}
-        <code className="text-[#E95744]">{objectId}</code> object recipient.{" "}
+        <code className="text-[#E95744]">{objectId}</code> object
+        recipient.{" "}
       </p>
       <p className="mb-4">
         We&apos;ve fetched this channel data for you from the resources you
