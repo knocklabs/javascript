@@ -72,7 +72,7 @@
     "@babel/runtime": "^7.26.0",
     "@knocklabs/types": "workspace:^",
     "@types/phoenix": "^1.6.6",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
