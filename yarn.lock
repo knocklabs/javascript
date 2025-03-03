@@ -15402,7 +15402,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:^5.0.0, eslint-plugin-react-hooks@npm:^5.2.0":
+"eslint-plugin-react-hooks@npm:^5.2.0":
   version: 5.2.0
   resolution: "eslint-plugin-react-hooks@npm:5.2.0"
   peerDependencies:
@@ -17063,7 +17063,7 @@ __metadata:
     "@types/react-dom": "npm:^18.2.15"
     "@vitejs/plugin-react": "npm:^4.3.4"
     eslint: "npm:^8.56.0"
-    eslint-plugin-react-hooks: "npm:^5.0.0"
+    eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.14"
     globals: "npm:^15.9.0"
     react: "npm:^18.2.0"
