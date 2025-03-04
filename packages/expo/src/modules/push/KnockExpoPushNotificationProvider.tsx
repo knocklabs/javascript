@@ -237,6 +237,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     notificationReceivedHandler,
     notificationTappedHandler,
     customNotificationHandler,
+    autoRegister,
     expoPushToken,
     knockExpoChannelId,
     knockClient,
