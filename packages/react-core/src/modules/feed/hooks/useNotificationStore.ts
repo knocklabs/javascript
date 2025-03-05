@@ -1,5 +1,5 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
-import { useStore, type StoreApi, type UseBoundStore } from "zustand";
+import { type StoreApi, type UseBoundStore, useStore } from "zustand";
 
 export type Selector<T> = (state: FeedStoreState) => T;
 
@@ -10,12 +10,13 @@ export type Selector<T> = (state: FeedStoreState) => T;
  * We'll favor the the one passed later outside of useCreateNotificationStore instantiation
  */
 function useCreateNotificationStore<T>(
-  feedClient: Feed
+  feedClient: Feed,
 ): UseBoundStore<StoreApi<FeedStoreState>> {
   // Keep selector optional for external use
   // useStore requires a selector so we'll pass in a default one when not provided
-  const storeHook = (selector?: Selector<T>) => useStore(feedClient.store, selector ?? ((state) => state as T));
-  return storeHook as UseBoundStore<StoreApi<FeedStoreState>>;
+  const useBoundedStore = (selector?: Selector<T>) =>
+    useStore(feedClient.store, selector ?? ((state) => state as T));
+  return useBoundedStore as UseBoundStore<StoreApi<FeedStoreState>>;
 }
 
 /**
@@ -38,13 +39,8 @@ function useCreateNotificationStore<T>(
  * }));
  * ```
  */
-function useNotificationStore(
-  feedClient: Feed,
-): FeedStoreState;
-function useNotificationStore<T>(
-  feedClient: Feed,
-  selector: Selector<T>,
-): T;
+function useNotificationStore(feedClient: Feed): FeedStoreState;
+function useNotificationStore<T>(feedClient: Feed, selector: Selector<T>): T;
 function useNotificationStore<T>(
   feedClient: Feed,
   selector?: Selector<T>,
