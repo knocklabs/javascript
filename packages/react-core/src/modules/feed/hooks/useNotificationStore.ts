@@ -1,6 +1,8 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
 import { useStore, type StoreApi, type UseBoundStore } from "zustand";
 
+export type Selector<T> = (state: FeedStoreState) => T;
+
 /**
  * Access a Bounded Store instance by converting our vanilla store to a UseBoundStore
  * https://zustand.docs.pmnd.rs/guides/typescript#bounded-usestore-hook-for-vanilla-stores
@@ -10,8 +12,9 @@ import { useStore, type StoreApi, type UseBoundStore } from "zustand";
 function useCreateNotificationStore<T>(
   feedClient: Feed
 ): UseBoundStore<StoreApi<FeedStoreState>> {
-  // useStore type: useStore<StoreApi<T>, U = T>(store: StoreApi<T>, selectorFn?: (state: T) => U) => UseBoundStore<StoreApi<T>>
-  const storeHook = (selector?: (state: FeedStoreState) => T) => useStore(feedClient.store, selector!);
+  // Keep selector optional for external use
+  // useStore requires a selector so we'll pass in a default one when not provided
+  const storeHook = (selector?: Selector<T>) => useStore(feedClient.store, selector ?? ((state) => state as T));
   return storeHook as UseBoundStore<StoreApi<FeedStoreState>>;
 }
 
@@ -40,11 +43,11 @@ function useNotificationStore(
 ): FeedStoreState;
 function useNotificationStore<T>(
   feedClient: Feed,
-  selector: (state: FeedStoreState) => T,
+  selector: Selector<T>,
 ): T;
 function useNotificationStore<T>(
   feedClient: Feed,
-  selector?: (state: FeedStoreState) => T,
+  selector?: Selector<T>,
 ): T | FeedStoreState {
   const useStoreLocal = useCreateNotificationStore(feedClient);
   return useStoreLocal(selector ?? ((state) => state as T));
