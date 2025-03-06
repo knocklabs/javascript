@@ -68,11 +68,13 @@ function useSlackChannels({
 
   const currentPage = data?.length || 0;
 
+  // Check if we have data and if the last page has a next cursor
   const hasNextPage =
     currentPage === 0 ||
     (data &&
-      data[currentPage]?.next_cursor &&
-      data[currentPage]?.next_cursor !== "");
+      currentPage > 0 &&
+      data[currentPage - 1]?.next_cursor &&
+      data[currentPage - 1]?.next_cursor !== "");
 
   const slackChannels: SlackChannel[] = useMemo(
     () =>
