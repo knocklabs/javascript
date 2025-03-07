@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+### Patch Changes
+
+- 1b86a0c: fix: correct pagination logic in useSlackChannels hook (KNO-7995)
+
 ## 0.4.0
 
 ### Minor Changes
