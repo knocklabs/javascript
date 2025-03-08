@@ -4,13 +4,22 @@ import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
 import {
+  GuideEngagementEventBaseParams,
+  guidesApiRootPath,
+} from "../guide/client";
+import { InAppMessagesResponse } from "../in-app-messages";
+import {
   GetPreferencesOptions,
   PreferenceOptions,
   PreferenceSet,
   SetPreferencesProperties,
 } from "../preferences/interfaces";
 
-import { GetChannelDataInput, SetChannelDataInput } from "./interfaces";
+import {
+  GetChannelDataInput,
+  GetInAppMessagesInput,
+  SetChannelDataInput,
+} from "./interfaces";
 
 const DEFAULT_PREFERENCE_SET_ID = "default";
 
@@ -110,6 +119,43 @@ class UserClient {
     });
 
     return this.handleResponse<ChannelData<T>>(result);
+  }
+
+  // TODO(KNO-7787): Clean up in-app messages stuff.
+  async getInAppMessages<
+    TContent extends GenericData = GenericData,
+    TData extends GenericData = GenericData,
+  >({ channelId, messageType, params }: GetInAppMessagesInput) {
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `/v1/users/${this.instance.userId}/in-app-messages/${channelId}/${messageType}`,
+      params,
+    });
+
+    return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
+  }
+
+  async getGuides<P, R>(channelId: string, params: P) {
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `${guidesApiRootPath(this.instance.userId)}/${channelId}`,
+      params,
+    });
+
+    return this.handleResponse<R>(result);
+  }
+
+  async markGuideStepAs<P extends GuideEngagementEventBaseParams, R>(
+    status: "seen" | "interacted" | "archived",
+    params: P,
+  ) {
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `${guidesApiRootPath(this.instance.userId)}/messages/${params.message_id}/${status}`,
+      data: params,
+    });
+
+    return this.handleResponse<R>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {
