@@ -64,7 +64,9 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
       if (action === TopHeaderAction.MARK_ALL_AS_READ) {
         feedClient.markAllAsRead();
       } else {
-        feedClient.markAllReadAsArchived();
+        feedClient.markAllReadAsArchived().then(() => {
+          feedClient.fetch({ status });
+        });
       }
     },
     [feedClient],
