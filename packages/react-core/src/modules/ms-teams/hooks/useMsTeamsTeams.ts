@@ -63,6 +63,7 @@ function useMsTeamsTeams({
     useSWRInfinite<GetMsTeamsTeamsResponse>(getQueryKey, fetchTeams, {
       initialSize: 0,
       revalidateOnFocus: false,
+      revalidateFirstPage: false,
     });
 
   const lastPage = data?.at(-1);
