@@ -10,7 +10,7 @@ const MAX_COUNT = 1000;
 
 const QUERY_KEY = "MS_TEAMS_TEAMS";
 
-type UseMsTeamsTeamsProps = {
+type UseMsTeamsTeamsOptions = {
   queryOptions?: MsTeamsTeamQueryOptions;
 };
 
@@ -42,7 +42,7 @@ function getQueryKey(
 
 function useMsTeamsTeams({
   queryOptions = {},
-}: UseMsTeamsTeamsProps): UseMsTeamsTeamsOutput {
+}: UseMsTeamsTeamsOptions): UseMsTeamsTeamsOutput {
   const knock = useKnockClient();
   const { knockMsTeamsChannelId, tenantId, connectionStatus } =
     useKnockMsTeamsClient();

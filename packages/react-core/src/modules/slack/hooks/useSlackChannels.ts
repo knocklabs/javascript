@@ -6,12 +6,12 @@ import useSWRInfinite from "swr/infinite";
 import { useKnockClient } from "../../core";
 
 const MAX_COUNT = 1000;
-const LIMIT_PER_PAGE = 4;
+const LIMIT_PER_PAGE = 200;
 const CHANNEL_TYPES = "private_channel,public_channel";
 
 const QUERY_KEY = "SLACK_CHANNELS";
 
-type UseSlackChannelsProps = {
+type UseSlackChannelsOptions = {
   queryOptions?: SlackChannelQueryOptions;
 };
 
@@ -43,7 +43,7 @@ function getQueryKey(
 
 function useSlackChannels({
   queryOptions,
-}: UseSlackChannelsProps): UseSlackChannelOutput {
+}: UseSlackChannelsOptions): UseSlackChannelOutput {
   const knock = useKnockClient();
   const { knockSlackChannelId, tenantId, connectionStatus } =
     useKnockSlackClient();
