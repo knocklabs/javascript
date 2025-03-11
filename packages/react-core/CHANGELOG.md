@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.2
+
+### Patch Changes
+
+- 226e319: Fix unnecessary refetches of first page by `useSlackChannels` and `useMsTeamsTeams` hooks
+
+  Previously, both the `useSlackChannels` and `useMsTeamsTeams` hooks would unnecessarily refetch the first page of data whenever multiple pages of data were loaded. This has been fixed.
+
+## 0.4.1
+
+### Patch Changes
+
+- 1b86a0c: fix: correct pagination logic in useSlackChannels hook (KNO-7995)
+
 ## 0.4.0
 
 ### Minor Changes
