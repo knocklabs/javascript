@@ -64,6 +64,7 @@ function useSlackChannels({
   const { data, error, isLoading, isValidating, setSize, mutate } =
     useSWRInfinite<GetSlackChannelsResponse>(getQueryKey, fetchChannels, {
       initialSize: 0,
+      revalidateFirstPage: false,
     });
 
   const lastPage = data?.at(-1);
