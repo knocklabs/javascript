@@ -11,7 +11,7 @@ const CHANNEL_TYPES = "private_channel,public_channel";
 
 const QUERY_KEY = "SLACK_CHANNELS";
 
-type UseSlackChannelsProps = {
+type UseSlackChannelsOptions = {
   queryOptions?: SlackChannelQueryOptions;
 };
 
@@ -43,7 +43,7 @@ function getQueryKey(
 
 function useSlackChannels({
   queryOptions,
-}: UseSlackChannelsProps): UseSlackChannelOutput {
+}: UseSlackChannelsOptions): UseSlackChannelOutput {
   const knock = useKnockClient();
   const { knockSlackChannelId, tenantId, connectionStatus } =
     useKnockSlackClient();
@@ -54,27 +54,21 @@ function useSlackChannels({
       knockChannelId: knockSlackChannelId,
       queryOptions: {
         ...queryOptions,
-        cursor: queryKey ? queryKey[1] : "",
+        cursor: queryKey?.[1],
         limit: queryOptions?.limitPerPage || LIMIT_PER_PAGE,
         types: queryOptions?.types || CHANNEL_TYPES,
       },
     });
   };
 
-  const { data, error, isLoading, isValidating, size, setSize, mutate } =
+  const { data, error, isLoading, isValidating, setSize, mutate } =
     useSWRInfinite<GetSlackChannelsResponse>(getQueryKey, fetchChannels, {
       initialSize: 0,
+      revalidateFirstPage: false,
     });
 
-  const currentPage = data?.length || 0;
-
-  // Check if we have data and if the last page has a next cursor
-  const hasNextPage =
-    currentPage === 0 ||
-    (data &&
-      currentPage > 0 &&
-      data[currentPage - 1]?.next_cursor &&
-      data[currentPage - 1]?.next_cursor !== "");
+  const lastPage = data?.at(-1);
+  const hasNextPage = lastPage === undefined || !!lastPage.next_cursor;
 
   const slackChannels: SlackChannel[] = useMemo(
     () =>
@@ -97,12 +91,11 @@ function useSlackChannels({
     ) {
       // Fetch a page at a time until we have nothing else left to fetch
       // or we've already hit the max amount of channels to fetch
-      setSize(size + 1);
+      setSize((size) => size + 1);
     }
   }, [
     slackChannels.length,
     setSize,
-    size,
     hasNextPage,
     isLoading,
     isValidating,
