@@ -19,6 +19,7 @@ export const KnockGuideContext = React.createContext<
 type Props = {
   channelId: string;
   readyToTarget: boolean;
+  listenForUpdates?: boolean;
   colorMode?: ColorMode;
   targetParams?: KnockGuideTargetParams;
 };
@@ -26,6 +27,7 @@ type Props = {
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   channelId,
   readyToTarget,
+  listenForUpdates,
   colorMode = "light",
   targetParams,
   children,
@@ -45,8 +47,12 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   }, [knock, channelId, stableTargetParams]);
 
   React.useEffect(() => {
-    if (readyToTarget) knockGuideClient.load();
-  }, [readyToTarget, knockGuideClient]);
+    if (readyToTarget) {
+      knockGuideClient.fetch();
+      if (listenForUpdates) knockGuideClient.subscribe();
+    }
+    return () => knockGuideClient.unsubscribe();
+  }, [readyToTarget, listenForUpdates, knockGuideClient]);
 
   return (
     <KnockGuideContext.Provider

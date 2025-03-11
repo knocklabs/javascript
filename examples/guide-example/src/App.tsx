@@ -21,6 +21,7 @@ function App() {
       <KnockGuideProvider
         channelId={import.meta.env.VITE_KNOCK_GUIDE_CHANNEL_ID}
         readyToTarget={true}
+        listenForUpdates={true}
         colorMode={colorMode}
       >
         <div style={{ padding: "1rem 2rem" }}>

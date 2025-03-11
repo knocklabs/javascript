@@ -1,11 +1,23 @@
 import { GenericData } from "@knocklabs/types";
 import { Store } from "@tanstack/store";
+import { Channel, Socket } from "phoenix";
 
 import Knock from "../../knock";
+
+const sortGuides = (guides: KnockGuide[]) => {
+  return [...guides].sort(
+    (a, b) =>
+      b.priority - a.priority ||
+      new Date(b.inserted_at).getTime() - new Date(a.inserted_at).getTime(),
+  );
+};
 
 //
 // Guides API (via User client)
 //
+
+export const guidesApiRootPath = (userId: string | undefined | null) =>
+  `/v1/users/${userId}/guides`;
 
 type StepMessageState = {
   id: string;
@@ -38,9 +50,6 @@ export type KnockGuide = {
   inserted_at: string;
   updated_at: string;
 };
-
-export const guidesApiRootPath = (userId: string | undefined | null) =>
-  `/v1/users/${userId}/guides`;
 
 type GetGuidesQueryParams = {
   data?: string;
@@ -75,6 +84,31 @@ type MarkGuideAsResponse = {
   status: "ok";
 };
 
+type SocketEventType = "guide.added" | "guide.updated" | "guide.removed";
+
+type SocketEventPayload<E extends SocketEventType, D> = {
+  topic: string;
+  event: E;
+  data: D;
+};
+
+type GuideAddedEvent = SocketEventPayload<
+  "guide.added",
+  { guide: KnockGuide; eligible: true }
+>;
+
+type GuideUpdatedEvent = SocketEventPayload<
+  "guide.updated",
+  { guide: KnockGuide; eligible: boolean }
+>;
+
+type GuideRemovedEvent = SocketEventPayload<
+  "guide.removed",
+  { guide: Pick<KnockGuide, "key"> }
+>;
+
+type GuideSocketEvent = GuideAddedEvent | GuideUpdatedEvent | GuideRemovedEvent;
+
 //
 // Guides client
 //
@@ -106,6 +140,12 @@ export type TargetParams = {
 export class KnockGuideClient {
   public store: Store<StoreState, (state: StoreState) => StoreState>;
 
+  // Phoenix channels for real time guide updates over websocket
+  private socket: Socket | undefined;
+  private socketChannel: Channel | undefined;
+  private socketChannelTopic: string;
+  private socketEventTypes = ["guide.added", "guide.updated", "guide.removed"];
+
   constructor(
     readonly knock: Knock,
     readonly channelId: string,
@@ -116,21 +156,129 @@ export class KnockGuideClient {
       queries: {},
     });
 
-    // TODO(KNO-7788): Set up and attach a socket manager.
+    // In server environments we might not have a socket connection.
+    const { socket: maybeSocket } = this.knock.client();
+    this.socket = maybeSocket;
+    this.socketChannelTopic = `guides:${channelId}`;
 
     this.knock.log("[Guide] Initialized a guide client");
   }
 
-  async load() {
+  async fetch(opts?: { filters?: QueryFilterParams }) {
+    this.knock.failIfNotAuthenticated();
     this.knock.log("[Guide] Loading all eligible guides");
 
-    // TODO(KNO-7788): Subscribe to a guide channel for real time updates.
-    // Pull down all eligible guides in order of priority and recency.
-    return this.fetch();
+    const queryParams = this.buildQueryParams(opts?.filters);
+    const queryKey = this.formatQueryKey(queryParams);
+
+    // If already fetched before, then noop.
+    const maybeQueryStatus = this.store.state.queries[queryKey];
+    if (maybeQueryStatus) {
+      return maybeQueryStatus;
+    }
+
+    // Mark this query status as loading.
+    this.store.setState((state) => ({
+      ...state,
+      queries: { ...state.queries, [queryKey]: { status: "loading" } },
+    }));
+
+    let queryStatus: QueryStatus;
+    try {
+      const data = await this.knock.user.getGuides<
+        GetGuidesQueryParams,
+        GetGuidesResponse
+      >(this.channelId, queryParams);
+      queryStatus = { status: "ok" };
+
+      this.store.setState((state) => ({
+        ...state,
+        // For now assume a single fetch to get all eligible guides. When/if
+        // we implement incremental loads, then this will need to be a merge
+        // and sort operation.
+        guides: data.entries,
+        queries: { ...state.queries, [queryKey]: queryStatus },
+      }));
+    } catch (e) {
+      queryStatus = { status: "error", error: e as Error };
+
+      this.store.setState((state) => ({
+        ...state,
+        queries: { ...state.queries, [queryKey]: queryStatus },
+      }));
+    }
+
+    return queryStatus;
+  }
+
+  subscribe() {
+    if (!this.socket) return;
+    this.knock.failIfNotAuthenticated();
+    this.knock.log("[Guide] Subscribing to real time updates");
+
+    // Ensure a live socket connection if not yet connected.
+    if (!this.socket.isConnected()) {
+      this.socket.connect();
+    }
+
+    // If there's an existing connected channel, then disconnect.
+    if (this.socketChannel) {
+      this.unsubscribe();
+    }
+
+    // Join the channel topic and subscribe to supported events.
+    const params = { ...this.targetParams, user_id: this.knock.userId };
+    const newChannel = this.socket.channel(this.socketChannelTopic, params);
+
+    for (const eventType of this.socketEventTypes) {
+      newChannel.on(eventType, (payload) => this.handleSocketEvent(payload));
+    }
+
+    if (["closed", "errored"].includes(newChannel.state)) {
+      newChannel.join();
+    }
+
+    // Track the joined channel.
+    this.socketChannel = newChannel;
+  }
+
+  unsubscribe() {
+    if (!this.socketChannel) return;
+    this.knock.log("[Guide] Unsubscribing from real time updates");
+
+    // Unsubscribe from the socket events and leave the channel.
+    for (const eventType of this.socketEventTypes) {
+      this.socketChannel.off(eventType);
+    }
+    this.socketChannel.leave();
+
+    // Unset the channel.
+    this.socketChannel = undefined;
+  }
+
+  private handleSocketEvent(payload: GuideSocketEvent) {
+    const { event, data } = payload;
+    console.log(payload);
+
+    switch (event) {
+      case "guide.added":
+        return this.addGuide(data.guide);
+
+      case "guide.updated":
+        return data.eligible
+          ? this.replaceOrAddGuide(data.guide)
+          : this.removeGuide(data.guide);
+
+      case "guide.removed":
+        return this.removeGuide(data.guide);
+
+      default:
+        return;
+    }
   }
 
   //
-  // Selector for the store
+  // Store selector
   //
 
   select(state: StoreState, filters: SelectFilterParams = {}) {
@@ -222,52 +370,8 @@ export class KnockGuideClient {
   }
 
   //
-  // Private helpers
+  // Helpers
   //
-
-  private async fetch(opts?: { filters?: QueryFilterParams }) {
-    const queryParams = this.buildQueryParams(opts?.filters);
-    const queryKey = this.formatQueryKey(queryParams);
-
-    // If already fetched before, then noop.
-    const maybeQueryStatus = this.store.state.queries[queryKey];
-    if (maybeQueryStatus) {
-      return maybeQueryStatus;
-    }
-
-    // Mark this query status as loading.
-    this.store.setState((state) => ({
-      ...state,
-      queries: { ...state.queries, [queryKey]: { status: "loading" } },
-    }));
-
-    let queryStatus: QueryStatus;
-    try {
-      const data = await this.knock.user.getGuides<
-        GetGuidesQueryParams,
-        GetGuidesResponse
-      >(this.channelId, queryParams);
-      queryStatus = { status: "ok" };
-
-      this.store.setState((state) => ({
-        ...state,
-        // For now assume a single fetch to get all eligible guides. When/if
-        // we implement incremental loads, then this will need to be a merge
-        // and sort operation.
-        guides: data.entries,
-        queries: { ...state.queries, [queryKey]: queryStatus },
-      }));
-    } catch (e) {
-      queryStatus = { status: "error", error: e as Error };
-
-      this.store.setState((state) => ({
-        ...state,
-        queries: { ...state.queries, [queryKey]: queryStatus },
-      }));
-    }
-
-    return queryStatus;
-  }
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
     // Combine the target params with the given filter params.
@@ -342,5 +446,35 @@ export class KnockGuideClient {
       guide_id: guide.id,
       guide_step_ref: step.ref,
     };
+  }
+
+  private addGuide(guide: KnockGuide) {
+    this.store.setState((state) => {
+      return { ...state, guides: sortGuides([...state.guides, guide]) };
+    });
+  }
+
+  private replaceOrAddGuide(guide: KnockGuide) {
+    this.store.setState((state) => {
+      let replaced = false;
+
+      const guides = state.guides.map((g) => {
+        if (g.key !== guide.key) return g;
+        replaced = true;
+        return guide;
+      });
+
+      return {
+        ...state,
+        guides: replaced ? sortGuides(guides) : sortGuides([...guides, guide]),
+      };
+    });
+  }
+
+  private removeGuide(guide: Pick<KnockGuide, "key">) {
+    this.store.setState((state) => {
+      const guides = state.guides.filter((g) => g.key !== guide.key);
+      return { ...state, guides };
+    });
   }
 }
