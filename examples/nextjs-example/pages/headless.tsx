@@ -1,12 +1,13 @@
-import { Flex, Select, Spinner } from "@chakra-ui/react";
+import { MarkdownContentBlock } from "@knocklabs/client";
 import {
   useAuthenticatedKnockClient,
   useNotificationStore,
   useNotifications,
 } from "@knocklabs/react";
+import { Box, Stack } from "@telegraph/layout";
+import { Select } from "@telegraph/select";
 import { useEffect, useState } from "react";
 
-import { MarkdownContentBlock } from "../../../packages/client/dist/types/clients/feed/interfaces";
 import useIdentify from "../hooks/useIdentify";
 
 const Tenants = {
@@ -41,7 +42,11 @@ const HeadlessFeed = ({
     { tenant },
   );
 
-  const { items, metadata } = useNotificationStore(feedClient);
+  // Example of using a selector to access a subset of the store state (not required)
+  const { items, metadata } = useNotificationStore(feedClient, (state) => ({
+    items: state.items,
+    metadata: state.metadata,
+  }));
 
   useEffect(() => {
     feedClient.fetch();
@@ -49,18 +54,19 @@ const HeadlessFeed = ({
 
   return (
     <div className="notifications">
-      <Select
-        mr={3}
-        size="sm"
-        value={tenant}
-        onChange={(e) => setTenant(e.target.value)}
-      >
-        {Object.values(Tenants).map((tenant) => (
-          <option key={tenant} value={tenant}>
-            {TenantLabels[tenant]}
-          </option>
-        ))}
-      </Select>
+      <Box marginRight="2">
+        <Select.Root
+          size="2"
+          value={tenant}
+          onValueChange={(value) => setTenant(value as typeof tenant)}
+        >
+          {Object.values(Tenants).map((tenant) => (
+            <Select.Option key={tenant} value={tenant}>
+              {TenantLabels[tenant]}
+            </Select.Option>
+          ))}
+        </Select.Root>
+      </Box>
 
       <span>You have {metadata.unread_count} unread items</span>
 
@@ -82,14 +88,16 @@ export default function Headless() {
 
   if (isLoading || !userId) {
     return (
-      <Flex
+      <Stack
         alignItems="center"
         justifyContent="center"
-        width="100vw"
-        height="100vh"
+        style={{
+          width: "100vw",
+          height: "100vh",
+        }}
       >
-        <Spinner />
-      </Flex>
+        <div className="spinner" aria-label="Loading..." />
+      </Stack>
     );
   }
 
