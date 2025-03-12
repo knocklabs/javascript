@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.2
+
+### Patch Changes
+
+- Updated dependencies [226e319]
+  - @knocklabs/react-core@0.4.2
+
+## 0.5.1
+
+### Patch Changes
+
+- 9e638a2: Make `SlackChannelCombobox` and `MsTeamsChannelCombobox` non-modal
+
+  This fixes a bug whereby the page layout could shift when the combobox dropdown menu opens and the `<body>` element has non-zero padding.
+
+- Updated dependencies [1b86a0c]
+  - @knocklabs/react-core@0.4.1
+
 ## 0.5.0
 
 ### Minor Changes
