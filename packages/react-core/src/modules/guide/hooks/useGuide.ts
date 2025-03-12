@@ -13,7 +13,7 @@ export interface UseGuideReturn extends UseGuideContextReturn {
   guide: KnockGuide | undefined;
   step: KnockGuideStep | undefined;
   markAsSeen: () => void;
-  markAsInteracted: (metadata?: GenericData) => void;
+  markAsInteracted: (params?: { metadata?: GenericData }) => void;
   markAsArchived: () => void;
 }
 
@@ -41,7 +41,7 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
   }, [client, guide, step]);
 
   const markAsInteracted = useCallback(
-    (metadata?: GenericData) => {
+    ({ metadata }: { metadata?: GenericData } = {}) => {
       // Always send an interaction event through.
       if (!step) return;
       client.markAsInteracted(guide, step, metadata);

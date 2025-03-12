@@ -258,7 +258,8 @@ export const Modal: React.FC<ModalProps> = ({ guideKey, onButtonClick }) => {
           colorMode={colorMode}
           onDismiss={markAsArchived}
           onButtonClick={(e, button) => {
-            markAsInteracted({ ...button, type: "button_click" });
+            const metadata = { ...button, type: "button_click" };
+            markAsInteracted({ metadata });
 
             return onButtonClick
               ? onButtonClick(e, { button, step, guide })
