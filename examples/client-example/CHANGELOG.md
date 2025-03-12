@@ -1,5 +1,16 @@
 # client-example
 
+## 0.2.0
+
+### Minor Changes
+
+- 8ba5dcb: [JS] Support React 19 in React SDKs
+
+### Patch Changes
+
+- Updated dependencies [8ba5dcb]
+  - @knocklabs/client@0.12.0
+
 ## 0.1.32
 
 ### Patch Changes
