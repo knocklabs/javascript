@@ -7201,7 +7201,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/combobox@npm:0.0.72, @telegraph/combobox@npm:^0.0.72":
+"@telegraph/combobox@npm:0.0.72":
   version: 0.0.72
   resolution: "@telegraph/combobox@npm:0.0.72"
   dependencies:
@@ -18940,14 +18940,14 @@ __metadata:
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.2.1"
     "@telegraph/button": "npm:^0.0.72"
-    "@telegraph/combobox": "npm:^0.0.72"
-    "@telegraph/icon": "npm:^0.0.46"
+    "@telegraph/combobox": "npm:^0.0.73"
+    "@telegraph/icon": "npm:^0.0.47"
     "@telegraph/input": "npm:^0.0.38"
-    "@telegraph/layout": "npm:^0.1.12"
+    "@telegraph/layout": "npm:^0.1.13"
     "@telegraph/select": "npm:^0.0.34"
     "@telegraph/textarea": "npm:^0.0.15"
     "@telegraph/tokens": "npm:^0.0.19"
-    "@telegraph/typography": "npm:^0.1.12"
+    "@telegraph/typography": "npm:^0.1.13"
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^22"
     "@types/react": "npm:^18.3.6"
