@@ -4,7 +4,7 @@ import { Channel, Socket } from "phoenix";
 
 import Knock from "../../knock";
 
-const sortGuides = (guides: KnockGuide[]) => {
+const sortGuides = (guides: KnockGuide<WithStepHandlers>[]) => {
   return [...guides].sort(
     (a, b) =>
       b.priority - a.priority ||
@@ -28,7 +28,7 @@ type StepMessageState = {
   link_clicked_at: string | null;
 };
 
-export type KnockGuideStep = {
+export type KnockGuideStep<H = unknown> = H & {
   ref: string;
   schema_key: string;
   schema_semver: string;
@@ -38,7 +38,7 @@ export type KnockGuideStep = {
   content: any;
 };
 
-export type KnockGuide = {
+export type KnockGuide<H = unknown> = {
   __typename: "Guide";
   channel_id: string;
   id: string;
@@ -46,10 +46,20 @@ export type KnockGuide = {
   priority: number;
   type: string;
   semver: string;
-  steps: KnockGuideStep[];
+  steps: KnockGuideStep<H>[];
   inserted_at: string;
   updated_at: string;
 };
+
+type WithStepHandlers = {
+  markAsSeen: () => void;
+  markAsInteracted: (params?: { metadata?: GenericData }) => void;
+  markAsArchived: () => void;
+};
+
+// TODO: Make these type defs more succinct and streamlined.
+export type KnockGuideWithHandlers = KnockGuide<WithStepHandlers>;
+export type KnockGuideStepWithHandlers = KnockGuideStep<WithStepHandlers>;
 
 type GetGuidesQueryParams = {
   data?: string;
@@ -121,7 +131,7 @@ type QueryStatus = {
 };
 
 type StoreState = {
-  guides: KnockGuide[];
+  guides: KnockGuideWithHandlers[];
   queries: Record<QueryKey, QueryStatus>;
 };
 
@@ -196,7 +206,7 @@ export class KnockGuideClient {
         // For now assume a single fetch to get all eligible guides. When/if
         // we implement incremental loads, then this will need to be a merge
         // and sort operation.
-        guides: data.entries,
+        guides: data.entries.map((g) => this.localCopy(g)),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
     } catch (e) {
@@ -258,19 +268,18 @@ export class KnockGuideClient {
 
   private handleSocketEvent(payload: GuideSocketEvent) {
     const { event, data } = payload;
-    console.log(payload);
 
     switch (event) {
       case "guide.added":
-        return this.addGuide(data.guide);
+        return this.addGuide(payload);
 
       case "guide.updated":
         return data.eligible
-          ? this.replaceOrAddGuide(data.guide)
-          : this.removeGuide(data.guide);
+          ? this.replaceOrAddGuide(payload)
+          : this.removeGuide(payload);
 
       case "guide.removed":
-        return this.removeGuide(data.guide);
+        return this.removeGuide(payload);
 
       default:
         return;
@@ -311,7 +320,8 @@ export class KnockGuideClient {
 
     const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
       seen_at: new Date().toISOString(),
-    })!;
+    });
+    if (!updatedStep) return;
 
     const params = {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
@@ -320,10 +330,12 @@ export class KnockGuideClient {
       tenant: this.targetParams.tenant,
     };
 
-    return this.knock.user.markGuideStepAs<
-      MarkAsSeenParams,
-      MarkGuideAsResponse
-    >("seen", params);
+    this.knock.user.markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>(
+      "seen",
+      params,
+    );
+
+    return updatedStep;
   }
 
   async markAsInteracted(
@@ -339,17 +351,20 @@ export class KnockGuideClient {
     const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
       read_at: ts,
       interacted_at: ts,
-    })!;
+    });
+    if (!updatedStep) return;
 
     const params = {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
       metadata,
     };
 
-    return this.knock.user.markGuideStepAs<
+    this.knock.user.markGuideStepAs<
       MarkAsInteractedParams,
       MarkGuideAsResponse
     >("interacted", params);
+
+    return updatedStep;
   }
 
   async markAsArchived(guide: KnockGuide, step: KnockGuideStep) {
@@ -359,19 +374,61 @@ export class KnockGuideClient {
 
     const updatedStep = this.setStepMessageAttrs(guide.key, step.ref, {
       archived_at: new Date().toISOString(),
-    })!;
+    });
+    if (!updatedStep) return;
 
     const params = this.buildEngagementEventBaseParams(guide, updatedStep);
 
-    return this.knock.user.markGuideStepAs<
-      MarkAsArchivedParams,
-      MarkGuideAsResponse
-    >("archived", params);
+    this.knock.user.markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>(
+      "archived",
+      params,
+    );
+
+    return updatedStep;
   }
 
   //
   // Helpers
   //
+
+  private localCopy(remoteGuide: KnockGuide) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+
+    // Build a local copy with helper methods added.
+    const localGuide = { ...remoteGuide };
+
+    localGuide.steps = remoteGuide.steps.map(({ message, ...rest }) => {
+      const localStep = {
+        ...rest,
+        message: { ...message },
+        markAsSeen() {
+          // Send a seen event if it has not been previously seen.
+          if (this.message.seen_at) return;
+          return self.markAsSeen(localGuide, this);
+        },
+        markAsInteracted({ metadata }: { metadata?: GenericData } = {}) {
+          // Always send an interaction event through.
+          return self.markAsInteracted(localGuide, this, metadata);
+        },
+        markAsArchived() {
+          // Send an archived event if it has not been previously archived.
+          if (this.message.archived_at) return;
+          return self.markAsArchived(localGuide, this);
+        },
+      };
+
+      // Bind all engagement action handler methods to the local step object so
+      // they can operate on itself.
+      localStep.markAsSeen = localStep.markAsSeen.bind(localStep);
+      localStep.markAsInteracted = localStep.markAsInteracted.bind(localStep);
+      localStep.markAsArchived = localStep.markAsArchived.bind(localStep);
+
+      return localStep;
+    });
+
+    return localGuide as KnockGuideWithHandlers;
+  }
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
     // Combine the target params with the given filter params.
@@ -411,7 +468,7 @@ export class KnockGuideClient {
     stepRef: string,
     attrs: Partial<StepMessageState>,
   ) {
-    let updatedStep: KnockGuideStep | undefined;
+    let updatedStep: KnockGuideStep<WithStepHandlers> | undefined;
 
     this.store.setState((state) => {
       const guides = state.guides.map((guide) => {
@@ -420,12 +477,12 @@ export class KnockGuideClient {
         const steps = guide.steps.map((step) => {
           if (step.ref !== stepRef) return step;
 
-          updatedStep = {
-            ...step,
-            message: { ...step.message, ...attrs },
-          } as KnockGuideStep;
+          // Mutate in place and maintain the same obj ref so to make it easier
+          // to use in hook deps.
+          step.message = { ...step.message, ...attrs };
+          updatedStep = step;
 
-          return updatedStep;
+          return step;
         });
         return { ...guide, steps };
       });
@@ -437,7 +494,7 @@ export class KnockGuideClient {
 
   private buildEngagementEventBaseParams(
     guide: KnockGuide,
-    step: KnockGuideStep,
+    step: KnockGuideStep<WithStepHandlers>,
   ) {
     return {
       message_id: step.message.id,
@@ -448,13 +505,17 @@ export class KnockGuideClient {
     };
   }
 
-  private addGuide(guide: KnockGuide) {
+  private addGuide({ data }: GuideAddedEvent) {
+    const guide = this.localCopy(data.guide);
+
     this.store.setState((state) => {
       return { ...state, guides: sortGuides([...state.guides, guide]) };
     });
   }
 
-  private replaceOrAddGuide(guide: KnockGuide) {
+  private replaceOrAddGuide({ data }: GuideUpdatedEvent) {
+    const guide = this.localCopy(data.guide);
+
     this.store.setState((state) => {
       let replaced = false;
 
@@ -471,9 +532,9 @@ export class KnockGuideClient {
     });
   }
 
-  private removeGuide(guide: Pick<KnockGuide, "key">) {
+  private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
     this.store.setState((state) => {
-      const guides = state.guides.filter((g) => g.key !== guide.key);
+      const guides = state.guides.filter((g) => g.key !== data.guide.key);
       return { ...state, guides };
     });
   }

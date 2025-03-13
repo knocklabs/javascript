@@ -1,20 +1,15 @@
 import {
-  KnockGuide,
   KnockGuideFilterParams,
-  KnockGuideStep,
+  KnockGuideStepWithHandlers,
+  KnockGuideWithHandlers,
 } from "@knocklabs/client";
-import { GenericData } from "@knocklabs/types";
 import { useStore } from "@tanstack/react-store";
-import { useCallback } from "react";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-export interface UseGuideReturn extends UseGuideContextReturn {
-  guide: KnockGuide | undefined;
-  step: KnockGuideStep | undefined;
-  markAsSeen: () => void;
-  markAsInteracted: (params?: { metadata?: GenericData }) => void;
-  markAsArchived: () => void;
+interface UseGuideReturn extends UseGuideContextReturn {
+  guide: KnockGuideWithHandlers | undefined;
+  step: KnockGuideStepWithHandlers | undefined;
 }
 
 export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
@@ -34,34 +29,5 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
 
   const step = guide && guide.steps.find((s) => !s.message.archived_at);
 
-  const markAsSeen = useCallback(() => {
-    // Send a seen event if it has not been previously seen.
-    if (!step || !!step.message.seen_at) return;
-    client.markAsSeen(guide, step);
-  }, [client, guide, step]);
-
-  const markAsInteracted = useCallback(
-    ({ metadata }: { metadata?: GenericData } = {}) => {
-      // Always send an interaction event through.
-      if (!step) return;
-      client.markAsInteracted(guide, step, metadata);
-    },
-    [client, guide, step],
-  );
-
-  const markAsArchived = useCallback(() => {
-    // Send an archived event if it has not been previously archived.
-    if (!step || !!step.message.archived_at) return;
-    client.markAsArchived(guide, step);
-  }, [client, guide, step]);
-
-  return {
-    client,
-    colorMode,
-    guide,
-    step,
-    markAsSeen,
-    markAsInteracted,
-    markAsArchived,
-  };
+  return { client, colorMode, guide, step };
 };

@@ -1,8 +1,7 @@
-import { ColorMode } from "@knocklabs/react-core";
+import { ColorMode, useGuide } from "@knocklabs/react-core";
 import clsx from "clsx";
 import React from "react";
 
-import { Guide } from "../Guide";
 import { maybeNavigateToUrlWithDelay } from "../helpers";
 import {
   ButtonContent,
@@ -212,24 +211,29 @@ type CardProps = {
 };
 
 export const Card: React.FC<CardProps> = ({ guideKey, onButtonClick }) => {
-  return (
-    <Guide filters={{ key: guideKey, type: MESSAGE_TYPE }}>
-      {({ guide, step, colorMode, markAsInteracted, markAsArchived }) => (
-        <DefaultView
-          content={step.content as CardContent}
-          colorMode={colorMode}
-          onDismiss={markAsArchived}
-          onButtonClick={(e, button) => {
-            const metadata = { ...button, type: "button_click" };
-            markAsInteracted({ metadata });
+  const { guide, step, colorMode } = useGuide({
+    key: guideKey,
+    type: MESSAGE_TYPE,
+  });
 
-            return onButtonClick
-              ? onButtonClick(e, { button, step, guide })
-              : maybeNavigateToUrlWithDelay(button.action);
-          }}
-        />
-      )}
-    </Guide>
+  React.useEffect(() => step && step.markAsSeen(), [step]);
+
+  if (!guide || !step) return null;
+
+  return (
+    <DefaultView
+      content={step.content as CardContent}
+      colorMode={colorMode}
+      onDismiss={() => step.markAsArchived()}
+      onButtonClick={(e, button) => {
+        const metadata = { ...button, type: "button_click" };
+        step.markAsInteracted({ metadata });
+
+        return onButtonClick
+          ? onButtonClick(e, { button, step, guide })
+          : maybeNavigateToUrlWithDelay(button.action);
+      }}
+    />
   );
 };
 Card.displayName = "Card";
