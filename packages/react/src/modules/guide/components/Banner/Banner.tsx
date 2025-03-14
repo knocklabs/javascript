@@ -193,7 +193,9 @@ export const Banner: React.FC<BannerProps> = ({ guideKey, onButtonClick }) => {
     type: MESSAGE_TYPE,
   });
 
-  React.useEffect(() => step && step.markAsSeen(), [step]);
+  React.useEffect(() => {
+    if (step) step.markAsSeen();
+  }, [step]);
 
   if (!guide || !step) return null;
 
