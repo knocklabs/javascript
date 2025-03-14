@@ -16,10 +16,10 @@ const useIdentify = () => {
 
   useEffect(() => {
     if (!userId && data?.user && userId != data?.user.id) {
-      setUserId!(data?.user?.id);
+      setUserId(data?.user?.id);
     }
     if (!userToken && data?.userToken && userToken != data?.userToken) {
-      setUserToken!(data?.userToken);
+      setUserToken(data?.userToken);
     }
   }, [userId, data, setUserId]);
 

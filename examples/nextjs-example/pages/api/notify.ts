@@ -5,7 +5,7 @@ const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY, {
   host: process.env.NEXT_PUBLIC_KNOCK_HOST,
 });
 
-const KNOCK_WORKFLOW = "in-app";
+const KNOCK_WORKFLOW = process.env.NEXT_PUBLIC_WORKFLOW_KEY!;
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,7 +23,11 @@ export default async function handler(
   try {
     const response = await knockClient.workflows.trigger(KNOCK_WORKFLOW, {
       recipients: [userId],
-      actor: userId,
+      // Actor is not required for the workflow to trigger.
+      // We leave this commented out for the demo, because
+      // if the actor's userId === the only recipient userId, the workflow won't be triggered.
+      // Use this field if you want to specify a different actor for the workflow.
+      // actor: userId,
       tenant,
       data: {
         message,

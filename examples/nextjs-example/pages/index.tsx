@@ -1,11 +1,13 @@
-import { Box, Flex, Heading, Icon, Link, Select, Text } from "@chakra-ui/react";
 import {
   KnockFeedProvider,
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
+import { Icon, Lucide } from "@telegraph/icon";
+import { Box, Stack } from "@telegraph/layout";
+import { Select } from "@telegraph/select";
+import { Heading, Text } from "@telegraph/typography";
 import { useCallback, useState } from "react";
-import { IoDocument, IoLogoGithub } from "react-icons/io5";
 
 import NotificationFeed from "../components/NotificationFeed";
 import NotificationToasts from "../components/NotificationToasts";
@@ -49,86 +51,98 @@ export default function Home() {
         defaultFeedOptions={{ tenant }}
       >
         <NotificationFeedContainer>
-          <Box maxW="520px" mx="auto" py={12}>
-            <Flex mb={8}>
-              <Box>
-                <Heading size="md" mb={2}>
+          <Box style={{ maxWidth: "500px" }} mx="auto" py="12">
+            <Stack mb="8">
+              <Stack flexDirection="column" gap="2">
+                <Heading size="6" as="h1">
                   React in-app notifications example
                 </Heading>
-
-                <Text>
+                <Text as="p">
                   This is an example application to show in-app notifications{" "}
-                  <Link
-                    href="https://knock.app"
-                    color="blue.600"
-                    fontWeight="semibold"
-                  >
-                    powered by Knock
-                  </Link>
+                  <Text as="span" color="blue">
+                    <a href="https://knock.app" color="accent">
+                      powered by Knock
+                    </a>
+                  </Text>
                   .
                 </Text>
-              </Box>
-            </Flex>
-
-            <Flex>
-              <Heading size="sm" mb={3}>
+              </Stack>
+            </Stack>
+            <Stack
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Heading size="4" as="h2">
                 Send an in-app notification
               </Heading>
-
-              <Flex ml="auto" alignItems="center">
-                <Select
-                  mr={3}
-                  size="sm"
-                  value={tenant}
-                  onChange={(e) => setTenant(e.target.value)}
+              <Stack alignItems="center">
+                <Select.Root
+                  size="3"
                   aria-label="Team"
+                  value={tenant}
+                  onValueChange={(value) => {
+                    if (typeof value === "string") {
+                      setTenant(value);
+                    }
+                  }}
                 >
                   {Object.values(Tenants).map((tenant) => (
-                    <option key={tenant} value={tenant}>
+                    <Select.Option key={tenant} value={tenant}>
                       {TenantLabels[tenant]}
-                    </option>
+                    </Select.Option>
                   ))}
-                </Select>
-
-                <NotificationFeed />
-              </Flex>
-            </Flex>
-
-            <SendNotificationForm
-              userId={userId as unknown as string}
-              tenant={tenant}
-            />
+                </Select.Root>
+                <Box marginLeft="2">
+                  <NotificationFeed />
+                </Box>
+              </Stack>
+            </Stack>
+            <SendNotificationForm userId={userId} tenant={tenant} />
             <NotificationToasts />
-
-            <Flex mt={6} borderTopWidth={1} borderTopColor="gray.100" py={2}>
-              <Link
-                href="https://github.com/knocklabs/in-app-notifications-example-nextjs"
-                fontSize={14}
-                color="gray.600"
-                mr={3}
-              >
-                <Icon as={IoLogoGithub} mr={1} />
-                Github repo
-              </Link>
-
-              <Link
-                href="https://docs.knock.app/in-app-ui/react/overview"
-                fontSize={14}
-                color="gray.600"
-              >
-                <Icon as={IoDocument} mr={1} />
-                Documentation
-              </Link>
-
-              <Link
-                href="https://knock.app"
-                fontSize={14}
-                color="gray.600"
-                ml="auto"
-              >
-                Powered by Knock
-              </Link>
-            </Flex>
+            <Box
+              marginTop="12"
+              borderTopWidth="1"
+              bordertopcolor="gray"
+              paddingTop="4"
+            >
+              <Stack justifyContent="space-between" alignItems="center">
+                <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
+                  <Stack direction="row" alignItems="center" gap="1">
+                    <Icon
+                      aria-hidden={true}
+                      alt="GitHub"
+                      icon={Lucide.Github}
+                      color="gray"
+                    />
+                    <Text as="span" color="gray">
+                      Github repo
+                    </Text>
+                  </Stack>
+                </a>
+                <a href="https://docs.knock.app/in-app-ui/react/overview">
+                  <Stack direction="row" alignItems="center" gap="1">
+                    <Icon
+                      aria-hidden={true}
+                      alt="GitHub"
+                      icon={Lucide.FileCode}
+                      color="gray"
+                    />
+                    <Text as="span" color="gray">
+                      Documentation
+                    </Text>
+                  </Stack>
+                </a>
+                <a href="https://knock.app">
+                  <Text as="span" color="gray">
+                    Powered by{" "}
+                    <Text as="span" color="accent">
+                      Knock
+                    </Text>
+                  </Text>
+                </a>
+              </Stack>
+            </Box>
           </Box>
         </NotificationFeedContainer>
       </KnockFeedProvider>

@@ -1,6 +1,6 @@
 {
   "name": "nextjs-example",
-  "version": "1.0.49",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,18 +11,27 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.10.3",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@faker-js/faker": "^9.3.0",
     "@knocklabs/node": "^0.6.15",
     "@knocklabs/react": "workspace:^",
+    "@telegraph/button": "^0.0.72",
+    "@telegraph/combobox": "^0.0.73",
+    "@telegraph/icon": "^0.0.47",
+    "@telegraph/input": "^0.0.38",
+    "@telegraph/layout": "^0.1.13",
+    "@telegraph/select": "^0.0.34",
+    "@telegraph/textarea": "^0.0.15",
+    "@telegraph/tokens": "^0.0.19",
+    "@telegraph/typography": "^0.1.13",
     "framer-motion": "^12.4.10",
     "next": "15.0.4",
-    "next-seo": "^6.4.0",
+    "next-seo": "^6.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.4.0",
+    "sonner": "^2.0.0",
     "swr": "^2.3.3",
     "uuid": "^11.1.0"
   },

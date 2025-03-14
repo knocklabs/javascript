@@ -1,44 +1,52 @@
-import { Feed, FeedStoreState } from "@knocklabs/client";
-import * as React from "react";
-import type { DispatchWithoutAction } from "react";
-import create, { StateSelector } from "zustand";
+import { Feed, type FeedStoreState } from "@knocklabs/client";
+import { type StoreApi, type UseBoundStore, useStore } from "zustand";
 
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
+export type Selector<T> = (state: FeedStoreState) => T;
 
-// A hook designed to create a `UseBoundStore` instance
-function useCreateNotificationStore(feedClient: Feed) {
-  const useStore = React.useMemo(
-    () => create<FeedStoreState>(feedClient.store),
-    [feedClient],
-  );
-
-  // Warning: this is a hack that will cause any components downstream to re-render
-  // as a result of the store updating.
-  const [, forceUpdate] = React.useReducer((c) => c + 1, 0) as [
-    never,
-    () => void,
-  ];
-
-  useIsomorphicLayoutEffect(() => {
-    const rerender = forceUpdate as DispatchWithoutAction;
-    const unsubscribe = feedClient.store.subscribe(rerender);
-
-    rerender();
-
-    return unsubscribe;
-  }, [feedClient]);
-
-  return useStore;
+/**
+ * Access a Bounded Store instance by converting our vanilla store to a UseBoundStore
+ * https://zustand.docs.pmnd.rs/guides/typescript#bounded-usestore-hook-for-vanilla-stores
+ * Allow passing a selector down from useCreateNotificationStore OR useNotificationStore
+ * We'll favor the the one passed later outside of useCreateNotificationStore instantiation
+ */
+function useCreateNotificationStore<T>(
+  feedClient: Feed,
+): UseBoundStore<StoreApi<FeedStoreState>> {
+  // Keep selector optional for external use
+  // useStore requires a selector so we'll pass in a default one when not provided
+  const useBoundedStore = (selector?: Selector<T>) =>
+    useStore(feedClient.store, selector ?? ((state) => state as T));
+  return useBoundedStore as UseBoundStore<StoreApi<FeedStoreState>>;
 }
 
-// A hook used to access content *within* the notification store
-function useNotificationStore(
+/**
+ * A hook used to access content within the notification store.
+ *
+ * @example
+ *
+ * ```ts
+ * const { items, metadata } = useNotificationStore(feedClient);
+ * ```
+ *
+ * A selector can be used to access a subset of the store state.
+ *
+ * @example
+ *
+ * ```ts
+ * const { items, metadata } = useNotificationStore(feedClient, (state) => ({
+ *   items: state.items,
+ *   metadata: state.metadata,
+ * }));
+ * ```
+ */
+function useNotificationStore(feedClient: Feed): FeedStoreState;
+function useNotificationStore<T>(feedClient: Feed, selector: Selector<T>): T;
+function useNotificationStore<T>(
   feedClient: Feed,
-  selector?: StateSelector<FeedStoreState, FeedStoreState>,
-) {
-  const useStore = useCreateNotificationStore(feedClient);
-  return useStore<FeedStoreState>(selector || feedClient.store.getState);
+  selector?: Selector<T>,
+): T | FeedStoreState {
+  const useStoreLocal = useCreateNotificationStore(feedClient);
+  return useStoreLocal(selector ?? ((state) => state as T));
 }
 
 export { useCreateNotificationStore };
