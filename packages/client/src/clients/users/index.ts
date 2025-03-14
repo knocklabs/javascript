@@ -7,7 +7,6 @@ import {
   GuideEngagementEventBaseParams,
   guidesApiRootPath,
 } from "../guide/client";
-import { InAppMessagesResponse } from "../in-app-messages";
 import {
   GetPreferencesOptions,
   PreferenceOptions,
@@ -15,11 +14,7 @@ import {
   SetPreferencesProperties,
 } from "../preferences/interfaces";
 
-import {
-  GetChannelDataInput,
-  GetInAppMessagesInput,
-  SetChannelDataInput,
-} from "./interfaces";
+import { GetChannelDataInput, SetChannelDataInput } from "./interfaces";
 
 const DEFAULT_PREFERENCE_SET_ID = "default";
 
@@ -119,20 +114,6 @@ class UserClient {
     });
 
     return this.handleResponse<ChannelData<T>>(result);
-  }
-
-  // TODO(KNO-7787): Clean up in-app messages stuff.
-  async getInAppMessages<
-    TContent extends GenericData = GenericData,
-    TData extends GenericData = GenericData,
-  >({ channelId, messageType, params }: GetInAppMessagesInput) {
-    const result = await this.instance.client().makeRequest({
-      method: "GET",
-      url: `/v1/users/${this.instance.userId}/in-app-messages/${channelId}/${messageType}`,
-      params,
-    });
-
-    return this.handleResponse<InAppMessagesResponse<TContent, TData>>(result);
   }
 
   async getGuides<P, R>(channelId: string, params: P) {
