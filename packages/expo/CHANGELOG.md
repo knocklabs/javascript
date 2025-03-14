@@ -1,5 +1,34 @@
 # @knocklabs/expo
 
+## 0.3.0
+
+### Minor Changes
+
+- 8ba5dcb: [JS] Support React 19 in React SDKs
+
+### Patch Changes
+
+- Updated dependencies [8ba5dcb]
+  - @knocklabs/client@0.12.0
+  - @knocklabs/react-core@0.5.0
+  - @knocklabs/react-native@0.6.0
+
+## 0.2.12
+
+### Patch Changes
+
+- Updated dependencies [226e319]
+  - @knocklabs/react-core@0.4.2
+  - @knocklabs/react-native@0.5.12
+
+## 0.2.11
+
+### Patch Changes
+
+- Updated dependencies [1b86a0c]
+  - @knocklabs/react-core@0.4.1
+  - @knocklabs/react-native@0.5.11
+
 ## 0.2.10
 
 ### Patch Changes

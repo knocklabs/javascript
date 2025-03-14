@@ -1,35 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useToast } from "@chakra-ui/react";
+import { type FeedItem } from "@knocklabs/client";
 import { useKnockFeed } from "@knocklabs/react";
 import { useCallback, useEffect } from "react";
-
-import Toast from "./Toast";
+import { toast } from "sonner";
 
 const NotificationToasts = () => {
   const { feedClient } = useKnockFeed();
-  const toast = useToast();
 
   const onNotificationsReceived = useCallback(
-    ({ items }: any) => {
+    ({ items }: { items: FeedItem[] }) => {
       // Whenever we receive a new notification from our real-time stream, show a toast
       // (note here that we can receive > 1 items in a batch)
-      items.forEach((notification: any) => {
-        if (notification.data.showToast === false) return;
+      items.forEach((notification) => {
+        if (notification.data?.showToast === false) return;
 
-        toast({
-          render: (props) => (
-            // @ts-expect-error - difference in status type
-            <Toast
-              {...props}
-              title={"New notification received"}
-              description={notification.blocks[0].rendered}
-              onClose={() => {
-                feedClient.markAsSeen(notification);
-                props.onClose();
-              }}
-            />
-          ),
-          position: "bottom-right",
+        // You can access the Knock notification data
+        const description = notification.data?.message;
+
+        // Handle the notification however you want
+        toast.success("New Notification Received", {
+          description: description,
+          closeButton: true,
+          dismissible: true,
+          onDismiss: () => {
+            feedClient.markAsSeen(notification);
+          },
         });
       });
     },

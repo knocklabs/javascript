@@ -2,7 +2,7 @@
   "name": "@knocklabs/react-core",
   "description": "A set of React components to build notification experiences powered by Knock",
   "author": "@knocklabs",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
@@ -46,26 +46,28 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
-    "react": "^16.11.0 || ^17.0.0 || ^18.0.0"
+    "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "date-fns": "^4.0.0",
-    "swr": "^2.2.5",
-    "zustand": "^3.7.2"
+    "swr": "^2.3.3",
+    "zustand": "^4.5.6"
   },
   "devDependencies": {
-    "@testing-library/react": "^14.2.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.2.0",
     "@types/react": "^18.3.6",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.24.0",
     "@vitejs/plugin-react": "^4.3.4",
     "babel-plugin-react-require": "^4.0.3",
     "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "jsdom": "^25.0.1",
     "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "rimraf": "^6.0.1",
     "rollup-plugin-execute": "^1.1.1",
     "typescript": "^5.7.3",

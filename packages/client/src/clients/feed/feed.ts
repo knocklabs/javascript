@@ -1,7 +1,7 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
 import { Channel } from "phoenix";
-import { StoreApi } from "zustand";
+import type { StoreApi } from "zustand";
 
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
@@ -577,7 +577,6 @@ class Feed {
     metadata,
   }: FeedMessagesReceivedPayload) {
     this.knock.log("[Feed] Received new real-time message");
-
     // Handle the new message coming in
     const { items, ...state } = this.store.getState();
     const currentHead: FeedItem | undefined = items[0];

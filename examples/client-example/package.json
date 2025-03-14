@@ -1,17 +1,16 @@
 {
   "name": "client-example",
-  "version": "0.1.32",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^14.2.0",
+    "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^4.2.4",
-    "zustand": "^3.7.2"
+    "web-vitals": "^4.2.4"
   },
   "scripts": {
     "dev": "PORT=3001 BROWSER=none react-scripts start",
@@ -37,5 +36,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.0"
   }
 }
