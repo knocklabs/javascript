@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import "./App.css";
 
-const knockClient = new Knock(process.env.REACT_APP_KNOCK_API_KEY, {
-  host: process.env.REACT_APP_KNOCK_HOST,
+const knockClient = new Knock(import.meta.env.VITE_KNOCK_API_KEY, {
+  host: import.meta.env.VITE_KNOCK_HOST,
 });
 
-knockClient.authenticate(process.env.REACT_APP_KNOCK_USER_ID);
+knockClient.authenticate(import.meta.env.VITE_KNOCK_USER_ID);
 
 const useNotificationFeed = (knockClient, feedId) => {
   return useMemo(() => {
@@ -26,7 +26,7 @@ const useNotificationFeed = (knockClient, feedId) => {
 function App() {
   const [feedClient, feedStore] = useNotificationFeed(
     knockClient,
-    process.env.REACT_APP_KNOCK_CHANNEL_ID,
+    import.meta.env.VITE_KNOCK_CHANNEL_ID,
   );
   const [feedState, setFeedState] = useState(feedStore.getState());
 
@@ -78,7 +78,7 @@ function App() {
   return (
     <div className="App">
       <h1>Feed items</h1>
-      <pre>{JSON.stringify(process.env, null, 2)}</pre>
+      <pre>{JSON.stringify(import.meta.env, null, 2)}</pre>
 
       {loading && <span>Loading...</span>}
 
