@@ -9154,6 +9154,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.3.4"
     "@vitejs/plugin-react-swc": "npm:^3.8.0"
     jsdom: "npm:^25.0.1"
+    prettier: "npm:^3.5.3"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     vite: "npm:^5.0.0"
