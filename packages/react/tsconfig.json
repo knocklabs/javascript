@@ -1,6 +1,6 @@
 {
   "extends": "@knocklabs/typescript-config/react-library.json",
-  "include": ["src", "test", "setupTest.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
