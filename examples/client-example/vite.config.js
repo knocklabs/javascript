@@ -14,10 +14,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@knocklabs/client'],
-    esbuildOptions: {
-      loader: {
-        '.js': 'jsx',
-      },
-    },
+  },
+  resolve: {
+    extensions: ['.js', '.jsx', '.json'],
   },
 });

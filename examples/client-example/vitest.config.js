@@ -8,4 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.js'],
   },
+  resolve: {
+    extensions: ['.js', '.jsx', '.json'],
+  },
 });
