@@ -6,7 +6,6 @@ export default defineConfig({
   server: {
     port: 3001,
   },
-  envPrefix: 'VITE_',
   build: {
     commonjsOptions: {
       include: [/node_modules/],
