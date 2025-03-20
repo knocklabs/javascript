@@ -13,7 +13,7 @@ describe("EmptyFeed", () => {
     expect(emptyFeed).toHaveTextContent("No notifications yet");
   });
 
-  test("has no a11y violations", async () => {
+  test("is accessible", async () => {
     const { container } = renderWithProviders(<EmptyFeed />);
 
     expectToHaveNoViolations(await axe(container));
