@@ -11,9 +11,6 @@ export default defineConfig({
       include: [/node_modules/],
     },
   },
-  optimizeDeps: {
-    include: ['@knocklabs/client'],
-  },
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
   },
