@@ -497,12 +497,42 @@ class Feed {
       __experimentalCrossBrowserUpdates: undefined,
       auto_manage_socket_connection: undefined,
       auto_manage_socket_connection_delay: undefined,
+      inserted_at_date_range: undefined,
     };
+
+    // If the user has set a date range, transform it to the backend's expected format
+    const dateRange = options.inserted_at_date_range;
+    let finalQueryParams = { ...queryParams };
+
+    if (dateRange) {
+      // Create a properly typed object for our date filter parameters
+      const dateRangeParams: Record<string, string> = {};
+
+      // Determine which operators to use based on the inclusive flag
+      const isInclusive = dateRange.inclusive ?? false;
+
+      // For start date: use gte if inclusive, gt if not
+      if (dateRange.start) {
+        const startOperator = isInclusive
+          ? "inserted_at.gte"
+          : "inserted_at.gt";
+        dateRangeParams[startOperator] = dateRange.start;
+      }
+
+      // For end date: use lte if inclusive, lt if not
+      if (dateRange.end) {
+        const endOperator = isInclusive ? "inserted_at.lte" : "inserted_at.lt";
+        dateRangeParams[endOperator] = dateRange.end;
+      }
+
+      // Create a new object combining queryParams and dateRangeParams
+      finalQueryParams = { ...queryParams, ...dateRangeParams };
+    }
 
     const result = await this.knock.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.knock.userId}/feeds/${this.feedId}`,
-      params: queryParams,
+      params: finalQueryParams,
     });
 
     if (result.statusCode === "error" || !result.body) {
@@ -623,7 +653,7 @@ class Feed {
         }
       });
 
-      // Tnis is a hack to determine the direction of whether we're
+      // This is a hack to determine the direction of whether we're
       // adding or removing from the badge count
       const direction = type.startsWith("un")
         ? itemsToUpdate.length

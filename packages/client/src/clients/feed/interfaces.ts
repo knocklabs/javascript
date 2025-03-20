@@ -30,6 +30,15 @@ export interface FeedClientOptions {
   // Optionally set the delay amount in milliseconds when automatically disconnecting sockets from inactive tabs (defaults to `2000`)
   // Requires `auto_manage_socket_connection` to be `true`
   auto_manage_socket_connection_delay?: number;
+  // Optionally scope notifications to a given date range
+  inserted_at_date_range?: {
+    // Optionally set the start date with a string in ISO 8601 format
+    start?: string;
+    // Optionally set the end date with a string in ISO 8601 format
+    end?: string;
+    // Optionally set whether to be inclusive of the start and end dates
+    inclusive?: boolean;
+  };
 }
 
 export type FetchFeedOptions = {
