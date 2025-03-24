@@ -68,7 +68,7 @@
     "@types/react": "^18.3.6",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
-    "@typescript-eslint/parser": "^8.24.0",
+    "@typescript-eslint/parser": "^8.27.0",
     "@vitejs/plugin-react": "^4.3.4",
     "babel-plugin-react-require": "^4.0.3",
     "eslint": "^8.56.0",
