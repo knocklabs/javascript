@@ -35,12 +35,12 @@
       "INTERNAL_MISMATCH"
     ]
   },
-  "dependencies": {
+  "devDependencies": {
     "@changesets/cli": "^2.27.8",
     "@knocklabs/eslint-config": "workspace:^",
     "@knocklabs/prettier-config": "workspace:^",
     "@knocklabs/typescript-config": "workspace:^",
-    "@manypkg/cli": "^0.22.0",
+    "@manypkg/cli": "^0.23.0",
     "prettier": "^3.5.3",
     "turbo": "^2.3.3"
   }
