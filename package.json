@@ -35,7 +35,7 @@
       "INTERNAL_MISMATCH"
     ]
   },
-  "dependencies": {
+  "devDependencies": {
     "@changesets/cli": "^2.27.8",
     "@knocklabs/eslint-config": "workspace:^",
     "@knocklabs/prettier-config": "workspace:^",
