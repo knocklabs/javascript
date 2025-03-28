@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.1
+
+### Patch Changes
+
+- 187abc1: Allows the feed to accept date range options upon initialization.
+
 ## 0.13.0
 
 ### Minor Changes
