@@ -36,9 +36,7 @@ export function mergeDateRangeParams(options: FeedClientOptions) {
 
   // For start date: use gte if inclusive, gt if not
   if (inserted_at_date_range.start) {
-    const startOperator = isInclusive
-      ? "inserted_at.gte"
-      : "inserted_at.gt";
+    const startOperator = isInclusive ? "inserted_at.gte" : "inserted_at.gt";
     dateRangeParams[startOperator] = inserted_at_date_range.start;
   }
 
@@ -48,5 +46,5 @@ export function mergeDateRangeParams(options: FeedClientOptions) {
     dateRangeParams[endOperator] = inserted_at_date_range.end;
   }
 
-  return { ...rest, ...dateRangeParams }
+  return { ...rest, ...dateRangeParams };
 }

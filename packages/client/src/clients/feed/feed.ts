@@ -60,7 +60,10 @@ class Feed {
     this.userFeedId = this.buildUserFeedId();
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
-    this.defaultOptions = { ...feedClientDefaults, ...mergeDateRangeParams(options) };
+    this.defaultOptions = {
+      ...feedClientDefaults,
+      ...mergeDateRangeParams(options),
+    };
     this.knock.log(`[Feed] Initialized a feed on channel ${feedId}`);
 
     // Attempt to setup a realtime connection (does not join)
@@ -496,7 +499,7 @@ class Feed {
       __fetchSource: undefined,
       __experimentalCrossBrowserUpdates: undefined,
       auto_manage_socket_connection: undefined,
-      auto_manage_socket_connection_delay: undefined
+      auto_manage_socket_connection_delay: undefined,
     };
 
     const result = await this.knock.client().makeRequest({
