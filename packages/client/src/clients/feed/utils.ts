@@ -26,7 +26,7 @@ export function mergeDateRangeParams(options: FeedClientOptions) {
   const { inserted_at_date_range, ...rest } = options;
 
   if (!inserted_at_date_range) {
-    return {};
+    return rest;
   }
 
   const dateRangeParams: Record<string, string> = {};
