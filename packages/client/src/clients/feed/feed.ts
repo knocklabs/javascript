@@ -28,6 +28,7 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
+import { mergeDateRangeParams } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -59,8 +60,10 @@ class Feed {
     this.userFeedId = this.buildUserFeedId();
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
-    this.defaultOptions = { ...feedClientDefaults, ...options };
-
+    this.defaultOptions = {
+      ...feedClientDefaults,
+      ...mergeDateRangeParams(options),
+    };
     this.knock.log(`[Feed] Initialized a feed on channel ${feedId}`);
 
     // Attempt to setup a realtime connection (does not join)
@@ -490,49 +493,19 @@ class Feed {
     // Always include the default params, if they have been set
     const queryParams = {
       ...this.defaultOptions,
-      ...options,
+      ...mergeDateRangeParams(options),
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
       __experimentalCrossBrowserUpdates: undefined,
       auto_manage_socket_connection: undefined,
       auto_manage_socket_connection_delay: undefined,
-      inserted_at_date_range: undefined,
     };
-
-    // If the user has set a date range, transform it to the backend's expected format
-    const dateRange = options.inserted_at_date_range;
-    let finalQueryParams = { ...queryParams };
-
-    if (dateRange) {
-      // Create a properly typed object for our date filter parameters
-      const dateRangeParams: Record<string, string> = {};
-
-      // Determine which operators to use based on the inclusive flag
-      const isInclusive = dateRange.inclusive ?? false;
-
-      // For start date: use gte if inclusive, gt if not
-      if (dateRange.start) {
-        const startOperator = isInclusive
-          ? "inserted_at.gte"
-          : "inserted_at.gt";
-        dateRangeParams[startOperator] = dateRange.start;
-      }
-
-      // For end date: use lte if inclusive, lt if not
-      if (dateRange.end) {
-        const endOperator = isInclusive ? "inserted_at.lte" : "inserted_at.lt";
-        dateRangeParams[endOperator] = dateRange.end;
-      }
-
-      // Create a new object combining queryParams and dateRangeParams
-      finalQueryParams = { ...queryParams, ...dateRangeParams };
-    }
 
     const result = await this.knock.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.knock.userId}/feeds/${this.feedId}`,
-      params: finalQueryParams,
+      params: queryParams,
     });
 
     if (result.statusCode === "error" || !result.body) {
