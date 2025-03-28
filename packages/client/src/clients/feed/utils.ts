@@ -22,38 +22,31 @@ export function sortItems(items: FeedItem[]) {
   });
 }
 
-function formatInsertedAtDateRange(insertedAtDateRange?: { start?: string, end?: string, inclusive?: boolean }) {
-  if (!insertedAtDateRange) {
+export function mergeDateRangeParams(options: FeedClientOptions) {
+  const { inserted_at_date_range, ...rest } = options;
+
+  if (!inserted_at_date_range) {
     return {};
   }
 
-  // Create a properly typed object for our date filter parameters
   const dateRangeParams: Record<string, string> = {};
 
   // Determine which operators to use based on the inclusive flag
-  const isInclusive = insertedAtDateRange.inclusive ?? false;
+  const isInclusive = inserted_at_date_range.inclusive ?? false;
 
   // For start date: use gte if inclusive, gt if not
-  if (insertedAtDateRange.start) {
+  if (inserted_at_date_range.start) {
     const startOperator = isInclusive
       ? "inserted_at.gte"
       : "inserted_at.gt";
-    dateRangeParams[startOperator] = insertedAtDateRange.start;
+    dateRangeParams[startOperator] = inserted_at_date_range.start;
   }
 
   // For end date: use lte if inclusive, lt if not
-  if (insertedAtDateRange.end) {
+  if (inserted_at_date_range.end) {
     const endOperator = isInclusive ? "inserted_at.lte" : "inserted_at.lt";
-    dateRangeParams[endOperator] = insertedAtDateRange.end;
+    dateRangeParams[endOperator] = inserted_at_date_range.end;
   }
 
-  return dateRangeParams;
-}
-
-export function formatOptionsForApi(options: FeedClientOptions) {
-  const { inserted_at_date_range, ...rest } = options;
-
-  const dateRangeParams = formatInsertedAtDateRange(inserted_at_date_range);
-
-  return { ...rest, ...dateRangeParams };
+  return { ...rest, ...dateRangeParams }
 }

@@ -28,7 +28,7 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
-import { formatOptionsForApi } from "./utils";
+import { mergeDateRangeParams } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -60,7 +60,7 @@ class Feed {
     this.userFeedId = this.buildUserFeedId();
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
-    this.defaultOptions = { ...feedClientDefaults, ...formatOptionsForApi(options) };
+    this.defaultOptions = { ...feedClientDefaults, ...mergeDateRangeParams(options) };
     this.knock.log(`[Feed] Initialized a feed on channel ${feedId}`);
 
     // Attempt to setup a realtime connection (does not join)
@@ -470,7 +470,6 @@ class Feed {
 
   /* Fetches the feed content, appending it to the store */
   async fetch(options: FetchFeedOptions = {}) {
-    const formattedOptions = formatOptionsForApi(options);
     const { networkStatus, ...state } = this.store.getState();
 
     // If the user is not authenticated, then do nothing
@@ -491,7 +490,7 @@ class Feed {
     // Always include the default params, if they have been set
     const queryParams = {
       ...this.defaultOptions,
-      ...formattedOptions,
+      ...mergeDateRangeParams(options),
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
