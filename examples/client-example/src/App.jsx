@@ -15,11 +15,6 @@ const useNotificationFeed = (knockClient, feedId) => {
     const notificationFeed = knockClient.feeds.initialize(feedId, {
       auto_manage_socket_connection: true,
       auto_manage_socket_connection_delay: 500,
-      inserted_at_date_range: {
-        start: "2025-03-28T14:00:10.432Z",
-        end: "2025-03-28T16:53:10.432Z",
-        inclusive: true,
-      },
     });
 
     notificationFeed.fetch();
