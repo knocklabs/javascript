@@ -10,7 +10,7 @@
     "@knocklabs/react-native": "workspace:^",
     "@react-native-firebase/app": "^21.10.1",
     "@react-native-firebase/messaging": "^21.10.1",
-    "react": "^18.2.0",
+    "react": "^19.1.0",
     "react-native": "^0.73.4",
     "react-native-config": "^1.5.5",
     "react-native-svg": "^15.10.1"
@@ -22,7 +22,7 @@
     "@react-native/babel-preset": "0.76.6",
     "@react-native/metro-config": "0.76.1",
     "@react-native/typescript-config": "0.78.1",
-    "@types/react": "^18.3.6",
+    "@types/react": "^19.0.12",
     "@types/react-test-renderer": "^19.0.0",
     "babel-jest": "^29.6.3",
     "eslint": "^8.56.0",
