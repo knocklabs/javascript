@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, TextStyle, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 
 import { BellIcon } from "../../../../assets/BellIcon";
 
@@ -13,6 +19,8 @@ export interface NotificationIconButtonProps {
 
 export interface NotificationIconButtonStyle {
   textStyle?: TextStyle;
+  bellIconStyle?: ViewStyle;
+  bellIconColor?: string;
 }
 
 export const NotificationIconButton: React.FC<NotificationIconButtonProps> = ({
@@ -28,7 +36,10 @@ export const NotificationIconButton: React.FC<NotificationIconButtonProps> = ({
       onPress={onClick}
     >
       <View style={styles.iconContainer}>
-        <BellIcon />
+        <BellIcon
+          style={styleOverride.bellIconStyle}
+          strokeColor={styleOverride.bellIconColor}
+        />
         <View style={styles.badgeContainer}>
           <UnseenBadge
             badgeCountType={badgeCountType}
