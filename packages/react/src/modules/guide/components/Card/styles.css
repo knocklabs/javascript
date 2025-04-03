@@ -1,0 +1,82 @@
+.knock-guide-card {
+  background: var(--knock-guide-surface);
+  padding: var(--knock-spacing-4);
+  border-radius: var(--knock-rounded-2);
+  border: 0.5px solid var(--knock-guide-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--knock-spacing-4);
+  max-width: var(--knock-spacing-96);
+}
+.knock-guide-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: var(--knock-spacing-2);
+}
+.knock-guide-card__headline {
+  color: var(--knock-guide-accent-dark);
+  font-size: var(--knock-text-1);
+  font-weight: var(--knock-weight-medium);
+  line-height: var(--knock-leading-1);
+  letter-spacing: var(--knock-tracking-1);
+}
+.knock-guide-card__message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+.knock-guide-card__title {
+  color: var(--knock-guide-content);
+  font-size: var(--knock-text-4);
+  font-weight: var(--knock-weight-medium);
+  line-height: var(--knock-leading-4);
+}
+.knock-guide-card__body {
+  color: var(--knock-guide-content-light);
+  font-size: var(--knock-text-3);
+  font-weight: var(--knock-weight-regular);
+  line-height: var(--knock-leading-3);
+}
+.knock-guide-card__body > :first-child {
+  margin-top: 0;
+}
+.knock-guide-card__body > :last-child {
+  margin-bottom: 0;
+}
+.knock-guide-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--knock-spacing-3);
+}
+.knock-guide-card__action {
+  text-decoration: none;
+  font-size: var(--knock-text-3);
+  font-weight: var(--knock-weight-medium);
+  line-height: var(--knock-leading-3);
+  border-radius: var(--knock-rounded-3);
+  padding: 0 var(--knock-spacing-4);
+  box-sizing: border-box;
+  height: var(--knock-spacing-10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid var(--knock-guide-accent);
+  background: var(--knock-guide-accent);
+  color: var(--knock-guide-content-contrast);
+  cursor: pointer;
+}
+.knock-guide-card__action--secondary {
+  border-color: var(--knock-guide-border-dark);
+  background: var(--knock-guide-surface);
+  color: var(--knock-guide-content);
+}
+.knock-guide-card__close {
+  padding: var(--knock-spacing-3);
+  border: none;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+}

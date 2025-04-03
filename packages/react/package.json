@@ -33,6 +33,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
+    "gen:tokens": "node ./scripts/generateCssTokens.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "type:check": "tsc --noEmit",
@@ -54,10 +55,13 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
+    "@radix-ui/react-dialog": "^1.1.6",
     "@telegraph/combobox": "^0.0.74",
     "@telegraph/icon": "^0.0.47",
     "@telegraph/layout": "^0.1.13",
+    "@telegraph/tokens": "^0.0.19",
     "@telegraph/typography": "^0.1.13",
+    "clsx": "^2.1.1",
     "lodash.debounce": "^4.0.8"
   },
   "devDependencies": {
