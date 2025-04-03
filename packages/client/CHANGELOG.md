@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0
+
+### Minor Changes
+
+- 711948c: feat: add guide client, hooks, provider, and components
+
 ## 0.13.1
 
 ### Patch Changes

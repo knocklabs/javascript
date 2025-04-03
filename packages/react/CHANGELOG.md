@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- 711948c: feat: add guide client, hooks, provider, and components
+
+### Patch Changes
+
+- Updated dependencies [711948c]
+  - @knocklabs/react-core@0.6.0
+  - @knocklabs/client@0.14.0
+
 ## 0.6.2
 
 ### Patch Changes
