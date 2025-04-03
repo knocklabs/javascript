@@ -1,5 +1,24 @@
 # client-example
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [187abc1]
+  - @knocklabs/client@0.13.1
+
+## 0.3.0
+
+### Minor Changes
+
+- c24cddc: Migrate from Create React App to Vite
+
+### Patch Changes
+
+- 4cd1b1e: add support for filtering by date in the feed client
+- Updated dependencies [4cd1b1e]
+  - @knocklabs/client@0.13.0
+
 ## 0.2.0
 
 ### Minor Changes

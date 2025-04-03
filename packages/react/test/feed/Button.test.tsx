@@ -1,7 +1,7 @@
-import React from "react";
 import { describe, expect, test } from "vitest";
 
 import { Button } from "../../src";
+import { axe, expectToHaveNoViolations } from "../axe";
 import { renderWithProviders } from "../test-utils";
 
 describe("Button", () => {
@@ -13,5 +13,15 @@ describe("Button", () => {
 
     expect(button).toHaveClass("rnf-button");
     expect(button).toHaveClass("rnf-button--primary");
+  });
+
+  test("is accessible", async () => {
+    const { container } = renderWithProviders(
+      <Button variant="primary" onClick={() => {}}>
+        Test
+      </Button>,
+    );
+
+    expectToHaveNoViolations(await axe(container));
   });
 });

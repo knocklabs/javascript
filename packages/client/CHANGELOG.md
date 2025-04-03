@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.13.1
+
+### Patch Changes
+
+- 187abc1: Allows the feed to accept date range options upon initialization.
+
+## 0.13.0
+
+### Minor Changes
+
+- 4cd1b1e: add support for filtering by date in the feed client
+
 ## 0.12.0
 
 ### Minor Changes

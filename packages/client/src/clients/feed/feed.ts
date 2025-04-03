@@ -28,6 +28,7 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
+import { mergeDateRangeParams } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -59,8 +60,10 @@ class Feed {
     this.userFeedId = this.buildUserFeedId();
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
-    this.defaultOptions = { ...feedClientDefaults, ...options };
-
+    this.defaultOptions = {
+      ...feedClientDefaults,
+      ...mergeDateRangeParams(options),
+    };
     this.knock.log(`[Feed] Initialized a feed on channel ${feedId}`);
 
     // Attempt to setup a realtime connection (does not join)
@@ -490,7 +493,7 @@ class Feed {
     // Always include the default params, if they have been set
     const queryParams = {
       ...this.defaultOptions,
-      ...options,
+      ...mergeDateRangeParams(options),
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
@@ -623,7 +626,7 @@ class Feed {
         }
       });
 
-      // Tnis is a hack to determine the direction of whether we're
+      // This is a hack to determine the direction of whether we're
       // adding or removing from the badge count
       const direction = type.startsWith("un")
         ? itemsToUpdate.length

@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native-example",
-  "version": "1.4.13",
+  "version": "1.4.15",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -18,10 +18,10 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
-    "@babel/runtime": "^7.26.0",
+    "@babel/runtime": "^7.27.0",
     "@react-native/babel-preset": "0.76.6",
     "@react-native/metro-config": "0.76.1",
-    "@react-native/typescript-config": "0.73.1",
+    "@react-native/typescript-config": "0.78.1",
     "@types/react": "^18.3.6",
     "@types/react-test-renderer": "^19.0.0",
     "babel-jest": "^29.6.3",

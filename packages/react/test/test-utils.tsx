@@ -18,14 +18,14 @@ const defaultKnockFeedProviderProps: KnockFeedProviderProps = {
 };
 
 export function renderWithProviders(
-  ui,
+  ui: React.ReactNode,
   {
     knockProviderProps = {},
     knockFeedProviderProps = {},
     ...renderOptions
   } = {},
 ) {
-  function Wrapper({ children }) {
+  function Wrapper({ children }: { children: React.ReactNode }) {
     const actualKnockProviderProps = {
       ...defaultKnockProviderProps,
       ...knockProviderProps,
