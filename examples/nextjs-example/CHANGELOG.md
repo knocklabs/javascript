@@ -1,5 +1,12 @@
 # nextjs-example
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [711948c]
+  - @knocklabs/react@0.7.0
+
 ## 1.1.2
 
 ### Patch Changes
