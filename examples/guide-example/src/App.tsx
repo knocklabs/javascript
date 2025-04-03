@@ -25,7 +25,7 @@ function App() {
         colorMode={colorMode}
       >
         <div style={{ padding: "1rem 2rem" }}>
-          <h1>Knock Guide Example</h1>
+          <h1>Knock In-App Guide Example</h1>
           <button
             onClick={() =>
               setColorMode(colorMode === "dark" ? "light" : "dark")

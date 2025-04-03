@@ -1,4 +1,4 @@
-# Knock In-App Guides Example
+# Knock In-App Guide Example
 
 This example app demonstrates how to use the Knock Guide client.
 
