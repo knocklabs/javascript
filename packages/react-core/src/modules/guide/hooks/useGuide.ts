@@ -1,15 +1,15 @@
 import {
+  KnockGuide,
   KnockGuideFilterParams,
-  KnockGuideStepWithHandlers,
-  KnockGuideWithHandlers,
+  KnockGuideStep,
 } from "@knocklabs/client";
 import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
 interface UseGuideReturn extends UseGuideContextReturn {
-  guide: KnockGuideWithHandlers | undefined;
-  step: KnockGuideStepWithHandlers | undefined;
+  guide: KnockGuide | undefined;
+  step: KnockGuideStep | undefined;
 }
 
 export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {

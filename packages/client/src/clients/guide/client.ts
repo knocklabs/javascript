@@ -4,7 +4,7 @@ import { Channel, Socket } from "phoenix";
 
 import Knock from "../../knock";
 
-const sortGuides = (guides: KnockGuide<WithStepHandlers>[]) => {
+const sortGuides = (guides: KnockGuide[]) => {
   return [...guides].sort(
     (a, b) =>
       b.priority - a.priority ||
@@ -19,16 +19,16 @@ const sortGuides = (guides: KnockGuide<WithStepHandlers>[]) => {
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
-type StepMessageState = {
+interface StepMessageState {
   id: string;
   seen_at: string | null;
   read_at: string | null;
   interacted_at: string | null;
   archived_at: string | null;
   link_clicked_at: string | null;
-};
+}
 
-export type KnockGuideStep<H = unknown> = H & {
+interface GuideStepData {
   ref: string;
   schema_key: string;
   schema_semver: string;
@@ -36,9 +36,9 @@ export type KnockGuideStep<H = unknown> = H & {
   message: StepMessageState;
   // eslint-disable-next-line
   content: any;
-};
+}
 
-export type KnockGuide<H = unknown> = {
+interface GuideData {
   __typename: "Guide";
   channel_id: string;
   id: string;
@@ -46,20 +46,20 @@ export type KnockGuide<H = unknown> = {
   priority: number;
   type: string;
   semver: string;
-  steps: KnockGuideStep<H>[];
+  steps: GuideStepData[];
   inserted_at: string;
   updated_at: string;
-};
+}
 
-type WithStepHandlers = {
+export interface KnockGuideStep extends GuideStepData {
   markAsSeen: () => void;
   markAsInteracted: (params?: { metadata?: GenericData }) => void;
   markAsArchived: () => void;
-};
+}
 
-// TODO: Make these type defs more succinct and streamlined.
-export type KnockGuideWithHandlers = KnockGuide<WithStepHandlers>;
-export type KnockGuideStepWithHandlers = KnockGuideStep<WithStepHandlers>;
+export interface KnockGuide extends GuideData {
+  steps: KnockGuideStep[];
+}
 
 type GetGuidesQueryParams = {
   data?: string;
@@ -68,7 +68,7 @@ type GetGuidesQueryParams = {
 };
 
 type GetGuidesResponse = {
-  entries: KnockGuide[];
+  entries: GuideData[];
 };
 
 export type GuideEngagementEventBaseParams = {
@@ -104,17 +104,17 @@ type SocketEventPayload<E extends SocketEventType, D> = {
 
 type GuideAddedEvent = SocketEventPayload<
   "guide.added",
-  { guide: KnockGuide; eligible: true }
+  { guide: GuideData; eligible: true }
 >;
 
 type GuideUpdatedEvent = SocketEventPayload<
   "guide.updated",
-  { guide: KnockGuide; eligible: boolean }
+  { guide: GuideData; eligible: boolean }
 >;
 
 type GuideRemovedEvent = SocketEventPayload<
   "guide.removed",
-  { guide: Pick<KnockGuide, "key"> }
+  { guide: Pick<GuideData, "key"> }
 >;
 
 type GuideSocketEvent = GuideAddedEvent | GuideUpdatedEvent | GuideRemovedEvent;
@@ -131,7 +131,7 @@ type QueryStatus = {
 };
 
 type StoreState = {
-  guides: KnockGuideWithHandlers[];
+  guides: KnockGuide[];
   queries: Record<QueryKey, QueryStatus>;
 };
 
@@ -313,7 +313,7 @@ export class KnockGuideClient {
   // event to the backend.
   //
 
-  async markAsSeen(guide: KnockGuide, step: KnockGuideStep) {
+  async markAsSeen(guide: GuideData, step: GuideStepData) {
     this.knock.log(
       `[Guide] Marking as seen (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -339,8 +339,8 @@ export class KnockGuideClient {
   }
 
   async markAsInteracted(
-    guide: KnockGuide,
-    step: KnockGuideStep,
+    guide: GuideData,
+    step: GuideStepData,
     metadata?: GenericData,
   ) {
     this.knock.log(
@@ -367,7 +367,7 @@ export class KnockGuideClient {
     return updatedStep;
   }
 
-  async markAsArchived(guide: KnockGuide, step: KnockGuideStep) {
+  async markAsArchived(guide: GuideData, step: GuideStepData) {
     this.knock.log(
       `[Guide] Marking as archived (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -391,7 +391,7 @@ export class KnockGuideClient {
   // Helpers
   //
 
-  private localCopy(remoteGuide: KnockGuide) {
+  private localCopy(remoteGuide: GuideData) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
@@ -427,7 +427,7 @@ export class KnockGuideClient {
       return localStep;
     });
 
-    return localGuide as KnockGuideWithHandlers;
+    return localGuide as KnockGuide;
   }
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
@@ -468,7 +468,7 @@ export class KnockGuideClient {
     stepRef: string,
     attrs: Partial<StepMessageState>,
   ) {
-    let updatedStep: KnockGuideStep<WithStepHandlers> | undefined;
+    let updatedStep: KnockGuideStep | undefined;
 
     this.store.setState((state) => {
       const guides = state.guides.map((guide) => {
@@ -493,8 +493,8 @@ export class KnockGuideClient {
   }
 
   private buildEngagementEventBaseParams(
-    guide: KnockGuide,
-    step: KnockGuideStep<WithStepHandlers>,
+    guide: GuideData,
+    step: GuideStepData,
   ) {
     return {
       message_id: step.message.id,
