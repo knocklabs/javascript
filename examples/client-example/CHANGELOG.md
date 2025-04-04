@@ -1,5 +1,13 @@
 # client-example
 
+## 0.3.3
+
+### Patch Changes
+
+- 4c41841: feat: accept options in the fetchNextPage method
+- Updated dependencies [4c41841]
+  - @knocklabs/client@0.14.1
+
 ## 0.3.2
 
 ### Patch Changes

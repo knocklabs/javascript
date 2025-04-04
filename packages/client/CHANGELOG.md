@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.1
+
+### Patch Changes
+
+- 4c41841: feat: accept options in the fetchNextPage method
+
 ## 0.14.0
 
 ### Minor Changes
