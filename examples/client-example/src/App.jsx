@@ -125,7 +125,6 @@ function App() {
       <button
         disabled={!pageInfo.after || loading}
         onClick={() => feedClient.fetchNextPage({ status })}
-        onClick={() => feedClient.fetchNextPage({ status })}
       >
         Load more items
       </button>
