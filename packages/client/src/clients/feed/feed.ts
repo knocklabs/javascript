@@ -553,7 +553,7 @@ class Feed {
     return { data: response, status: result.statusCode };
   }
 
-  async fetchNextPage() {
+  async fetchNextPage(options: FetchFeedOptions = {}) {
     // Attempts to fetch the next page of results (if we have any)
     const { pageInfo } = this.store.getState();
 
@@ -563,6 +563,7 @@ class Feed {
     }
 
     this.fetch({
+      ...options,
       after: pageInfo.after,
       __loadingType: NetworkStatus.fetchMore,
     });

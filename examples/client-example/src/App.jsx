@@ -13,17 +13,17 @@ const useNotificationFeed = (knockClient, feedId) => {
   return useMemo(() => {
     // Create the notification feed instance
     const notificationFeed = knockClient.feeds.initialize(feedId, {
+      page_size: 10,
       auto_manage_socket_connection: true,
       auto_manage_socket_connection_delay: 500,
     });
-
-    notificationFeed.fetch();
 
     return [notificationFeed, notificationFeed.store];
   }, [knockClient, feedId]);
 };
 
 function App() {
+  const [status, setStatus] = useState("all");
   const [feedClient, feedStore] = useNotificationFeed(
     knockClient,
     import.meta.env.VITE_KNOCK_CHANNEL_ID,
@@ -40,6 +40,11 @@ function App() {
         console.error(e);
       });
   }, []);
+
+  // Initial fetch with status
+  useEffect(() => {
+    feedClient.fetch({ status });
+  }, [status, feedClient]);
 
   // Consume the store
   useEffect(() => {
@@ -73,12 +78,21 @@ function App() {
     return () => teardown?.();
   }, [feedClient]);
 
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+  };
+
   const { loading, items, pageInfo } = feedState;
 
   return (
     <div className="App">
       <h1>Feed items</h1>
-      <pre>{JSON.stringify(import.meta.env, null, 2)}</pre>
+
+      <select value={status} onChange={handleStatusChange}>
+        <option value="all">All</option>
+        <option value="unread">Unread</option>
+        <option value="read">Read</option>
+      </select>
 
       {loading && <span>Loading...</span>}
 
@@ -110,7 +124,8 @@ function App() {
 
       <button
         disabled={!pageInfo.after || loading}
-        onClick={() => feedClient.fetchNextPage()}
+        onClick={() => feedClient.fetchNextPage({ status })}
+        onClick={() => feedClient.fetchNextPage({ status })}
       >
         Load more items
       </button>
