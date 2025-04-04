@@ -1,7 +1,7 @@
 import { FeedMetadata } from "@knocklabs/client";
 import { formatBadgeCount, useKnockFeed } from "@knocklabs/react-core";
 import React from "react";
-import { StyleSheet, Text, TextStyle, View } from "react-native";
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 
 import { useTheme } from "../../../../theme/useTheme";
 
@@ -10,6 +10,7 @@ export type BadgeCountType = "unseen" | "unread" | "all";
 export type UnseenBadgeProps = {
   badgeCountType?: BadgeCountType;
   textStyle?: TextStyle;
+  containerStyle?: ViewStyle;
 };
 
 function selectBadgeCount(
@@ -29,6 +30,7 @@ function selectBadgeCount(
 export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
   badgeCountType = "unread",
   textStyle = {},
+  containerStyle = {},
 }) => {
   const { useFeedStore } = useKnockFeed();
   const theme = useTheme();
@@ -40,7 +42,11 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
 
   return (
     <View
-      style={[styles.badgeContainer, { backgroundColor: theme.colors.accent9 }]}
+      style={[
+        styles.badgeContainer,
+        { backgroundColor: theme.colors.accent9 },
+        containerStyle,
+      ]}
     >
       <Text
         style={[
