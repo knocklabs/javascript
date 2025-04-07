@@ -6,6 +6,15 @@ import { NotificationSource } from "../messages/interfaces";
 
 // Specific feed interfaces
 
+/**
+ * `trigger_data` may only specify flat key-value pairs, not nested objects
+ * Specifying a nested object will result in a 422 "invalid_params" error
+ * https://docs.knock.app/reference#trigger-data-filtering
+ */
+export interface TriggerData extends GenericData {
+  [key: string]: string | number | boolean | null;
+}
+
 export interface FeedClientOptions {
   before?: string;
   after?: string;
@@ -22,7 +31,7 @@ export interface FeedClientOptions {
   // Optionally scope to a given archived status (defaults to `exclude`)
   archived?: "include" | "exclude" | "only";
   // Optionally scope all notifications that contain this argument as part of their trigger payload
-  trigger_data?: GenericData;
+  trigger_data?: TriggerData;
   // Optionally enable cross browser feed updates for this feed
   __experimentalCrossBrowserUpdates?: boolean;
   // Optionally automatically manage socket connections on changes to tab visibility (defaults to `false`)
@@ -45,6 +54,22 @@ export type FetchFeedOptions = {
   __loadingType?: NetworkStatus.loading | NetworkStatus.fetchMore;
   __fetchSource?: "socket" | "http";
 } & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
+
+// The final data shape that is sent to the API
+// Should match types here: https://docs.knock.app/reference#get-feed
+export type FetchFeedOptionsForRequest = Omit<
+  FeedClientOptions,
+  "trigger_data"
+> & {
+  // Formatted trigger data into a string
+  trigger_data?: string;
+  // Unset options that should not be sent to the API
+  __loadingType: undefined;
+  __fetchSource: undefined;
+  __experimentalCrossBrowserUpdates: undefined;
+  auto_manage_socket_connection: undefined;
+  auto_manage_socket_connection_delay: undefined;
+};
 
 export interface ContentBlockBase {
   name: string;

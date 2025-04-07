@@ -16,6 +16,7 @@ import {
   FeedMetadata,
   FeedResponse,
   FetchFeedOptions,
+  FetchFeedOptionsForRequest,
 } from "./interfaces";
 import createStore from "./store";
 import {
@@ -28,7 +29,7 @@ import {
   FeedRealTimeCallback,
   FeedStoreState,
 } from "./types";
-import { mergeDateRangeParams } from "./utils";
+import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
@@ -490,10 +491,19 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
+    // trigger_data should be a JSON string for the API
+    // this function will format the trigger data if it's an object
+    // https://docs.knock.app/reference#get-feed
+    const formattedTriggerData = getFormattedTriggerData({
+      ...this.defaultOptions,
+      ...options,
+    });
+
     // Always include the default params, if they have been set
-    const queryParams = {
+    const queryParams: FetchFeedOptionsForRequest = {
       ...this.defaultOptions,
       ...mergeDateRangeParams(options),
+      trigger_data: formattedTriggerData,
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
