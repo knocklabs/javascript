@@ -1,6 +1,6 @@
-import { FeedItem } from "@knocklabs/client";
 import {
   ActionButton,
+  FeedItem,
   NetworkStatus,
   isRequestInFlight,
 } from "@knocklabs/client";
@@ -9,14 +9,15 @@ import {
   useFeedSettings,
   useKnockFeed,
 } from "@knocklabs/react-core";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
+  StyleProp,
   StyleSheet,
   View,
+  ViewStyle,
 } from "react-native";
 
 import { PoweredByKnockIcon } from "../../../../assets/PoweredByKnockIcon";
@@ -35,6 +36,7 @@ import NotificationFeedHeader, {
 } from "./NotificationFeedHeader";
 
 export interface NotificationFeedProps {
+  containerStyle?: StyleProp<ViewStyle>;
   notificationRowStyle?: NotificationFeedCellStyle; // Customize style of the NotificationRows
   headerConfig?: NotificationFeedHeaderConfig; // Customize the top filters and buttons
   emptyFeedStyle?: EmptyNotificationFeedStyle;
@@ -46,6 +48,7 @@ export interface NotificationFeedProps {
 }
 
 export const NotificationFeed: React.FC<NotificationFeedProps> = ({
+  containerStyle = undefined,
   notificationRowStyle = undefined,
   headerConfig = undefined,
   emptyFeedStyle = undefined,
@@ -121,6 +124,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
       style={[
         styles.container,
         { backgroundColor: useTheme().colors.surface1 },
+        containerStyle,
       ]}
     >
       <View>
