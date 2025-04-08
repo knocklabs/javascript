@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.6
+
+### Patch Changes
+
+- b80a656: Add `containerStyle` prop to the `NotificationFeed` component
+
 ## 0.6.5
 
 ### Patch Changes
