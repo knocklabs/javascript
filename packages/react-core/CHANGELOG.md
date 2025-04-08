@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.6.2
+
+### Patch Changes
+
+- Updated dependencies [00439a2]
+  - @knocklabs/client@0.14.2
+
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [4c41841]
+  - @knocklabs/client@0.14.1
+
+## 0.6.0
+
+### Minor Changes
+
+- 711948c: feat: add guide client, hooks, provider, and components
+
+### Patch Changes
+
+- Updated dependencies [711948c]
+  - @knocklabs/client@0.14.0
+
 ## 0.5.2
 
 ### Patch Changes

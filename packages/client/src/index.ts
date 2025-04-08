@@ -2,6 +2,7 @@ import FeedClient, { Feed } from "./clients/feed";
 import Knock from "./knock";
 
 export * from "./interfaces";
+export * from "./clients/guide";
 export * from "./clients/feed/types";
 export * from "./clients/feed/interfaces";
 export * from "./clients/objects";

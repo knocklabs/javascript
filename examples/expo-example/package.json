@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/expo-example",
-  "version": "0.1.15",
+  "version": "0.1.19",
   "main": "src/index.ts",
   "scripts": {
     "start": "expo start",
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.3"
   },
   "private": true
 }

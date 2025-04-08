@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.6.6
+
+### Patch Changes
+
+- b80a656: Add `containerStyle` prop to the `NotificationFeed` component
+
+## 0.6.5
+
+### Patch Changes
+
+- Updated dependencies [00439a2]
+  - @knocklabs/client@0.14.2
+  - @knocklabs/react-core@0.6.2
+
+## 0.6.4
+
+### Patch Changes
+
+- Updated dependencies [4c41841]
+  - @knocklabs/client@0.14.1
+  - @knocklabs/react-core@0.6.1
+
+## 0.6.3
+
+### Patch Changes
+
+- Updated dependencies [711948c]
+  - @knocklabs/react-core@0.6.0
+  - @knocklabs/client@0.14.0
+
 ## 0.6.2
 
 ### Patch Changes

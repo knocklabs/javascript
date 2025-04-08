@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.14.2
+
+### Patch Changes
+
+- 00439a2: fix(KNO-7843): Fix types and stringify trigger_data for feed API requests
+
+## 0.14.1
+
+### Patch Changes
+
+- 4c41841: feat: accept options in the fetchNextPage method
+
+## 0.14.0
+
+### Minor Changes
+
+- 711948c: feat: add guide client, hooks, provider, and components
+
 ## 0.13.1
 
 ### Patch Changes

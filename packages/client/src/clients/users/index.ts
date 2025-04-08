@@ -4,6 +4,10 @@ import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
 import {
+  GuideEngagementEventBaseParams,
+  guidesApiRootPath,
+} from "../guide/client";
+import {
   GetPreferencesOptions,
   PreferenceOptions,
   PreferenceSet,
@@ -110,6 +114,29 @@ class UserClient {
     });
 
     return this.handleResponse<ChannelData<T>>(result);
+  }
+
+  async getGuides<P, R>(channelId: string, params: P) {
+    const result = await this.instance.client().makeRequest({
+      method: "GET",
+      url: `${guidesApiRootPath(this.instance.userId)}/${channelId}`,
+      params,
+    });
+
+    return this.handleResponse<R>(result);
+  }
+
+  async markGuideStepAs<P extends GuideEngagementEventBaseParams, R>(
+    status: "seen" | "interacted" | "archived",
+    params: P,
+  ) {
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `${guidesApiRootPath(this.instance.userId)}/messages/${params.message_id}/${status}`,
+      data: params,
+    });
+
+    return this.handleResponse<R>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {
