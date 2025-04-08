@@ -32,6 +32,7 @@ const NotificationFeedContainer: React.FC<NotificationFeedContainerProps> = ({
       <NotificationFeed
         onCellActionButtonTap={onCellActionButtonTap}
         onRowTap={onRowTap}
+        style={styles.notificationFeed}
       />
     </View>
   );
@@ -63,5 +64,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#000000",
+  },
+  notificationFeed: {
+    backgroundColor: "#ff99ff",
   },
 });
