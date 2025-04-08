@@ -9,8 +9,8 @@ export type BadgeCountType = "unseen" | "unread" | "all";
 
 export type UnseenBadgeProps = {
   badgeCountType?: BadgeCountType;
-  textStyle?: TextStyle;
   containerStyle?: ViewStyle;
+  textStyle?: TextStyle;
 };
 
 function selectBadgeCount(
@@ -29,8 +29,8 @@ function selectBadgeCount(
 
 export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
   badgeCountType = "unread",
-  textStyle = {},
   containerStyle = {},
+  textStyle = {},
 }) => {
   const { useFeedStore } = useKnockFeed();
   const theme = useTheme();
