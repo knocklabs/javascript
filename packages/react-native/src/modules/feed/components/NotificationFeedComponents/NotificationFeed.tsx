@@ -36,6 +36,7 @@ import NotificationFeedHeader, {
 } from "./NotificationFeedHeader";
 
 export interface NotificationFeedProps {
+  containerStyle?: StyleProp<ViewStyle>;
   notificationRowStyle?: NotificationFeedCellStyle; // Customize style of the NotificationRows
   headerConfig?: NotificationFeedHeaderConfig; // Customize the top filters and buttons
   emptyFeedStyle?: EmptyNotificationFeedStyle;
@@ -44,16 +45,15 @@ export interface NotificationFeedProps {
     item: FeedItem;
   }) => void;
   onRowTap?: (item: FeedItem) => void;
-  style?: StyleProp<ViewStyle>;
 }
 
 export const NotificationFeed: React.FC<NotificationFeedProps> = ({
+  containerStyle = undefined,
   notificationRowStyle = undefined,
   headerConfig = undefined,
   emptyFeedStyle = undefined,
   onCellActionButtonTap = () => {},
   onRowTap = () => {},
-  style = undefined,
 }) => {
   const { feedClient, useFeedStore } = useKnockFeed();
   const { settings } = useFeedSettings(feedClient);
@@ -124,7 +124,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
       style={[
         styles.container,
         { backgroundColor: useTheme().colors.surface1 },
-        style,
+        containerStyle,
       ]}
     >
       <View>

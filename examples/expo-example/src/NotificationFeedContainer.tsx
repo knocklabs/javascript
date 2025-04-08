@@ -32,7 +32,7 @@ const NotificationFeedContainer: React.FC<NotificationFeedContainerProps> = ({
       <NotificationFeed
         onCellActionButtonTap={onCellActionButtonTap}
         onRowTap={onRowTap}
-        style={styles.notificationFeed}
+        containerStyle={styles.notificationFeed}
       />
     </View>
   );
