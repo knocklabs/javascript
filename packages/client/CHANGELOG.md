@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.2
+
+### Patch Changes
+
+- 00439a2: fix(KNO-7843): Fix types and stringify trigger_data for feed API requests
+
 ## 0.14.1
 
 ### Patch Changes
