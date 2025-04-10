@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.3
+
+### Patch Changes
+
+- c97a1d9: Update TanStack Store
+- Updated dependencies [c97a1d9]
+  - @knocklabs/client@0.14.3
+
 ## 0.6.2
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # slack-connect-example
 
+## 0.3.2
+
+### Patch Changes
+
+- 7c6ba00: Add scopes required for [email-based user ID resolution](https://docs.knock.app/integrations/chat/slack/sending-a-direct-message#enabling-email-based-user-id-resolution)
+  - @knocklabs/react@0.7.3
+
 ## 0.3.1
 
 ### Patch Changes
