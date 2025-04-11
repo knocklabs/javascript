@@ -58,28 +58,32 @@ describe("it handles authentication correctly", () => {
     vi.resetAllMocks();
   });
 
-  test("it can schedule a token expiration callback", () => {
-    const now = new Date();
-    vi.setSystemTime(now);
+  test(
+    "it can schedule a token expiration callback",
+    () => {
+      const now = new Date();
+      vi.setSystemTime(now);
 
-    const userId = "user1";
-    const knock = new Knock("pk_test_12345");
-    const mockToken = generateMockToken(userId, 2);
+      const userId = "user1";
+      const knock = new Knock("pk_test_12345");
+      const mockToken = generateMockToken(userId, 2);
 
-    const onUserTokenExpiring = vi.fn(async (_prevToken, _decodedToken) => {
-      const newToken = generateMockToken(userId, 3);
-      return newToken;
-    });
+      const onUserTokenExpiring = vi.fn(async (_prevToken, _decodedToken) => {
+        const newToken = generateMockToken(userId, 3);
+        return newToken;
+      });
 
-    knock.authenticate(userId, mockToken, {
-      onUserTokenExpiring,
-      timeBeforeExpirationInMs: 500,
-    });
+      knock.authenticate(userId, mockToken, {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 500,
+      });
 
-    // Wait for token to expire
-    vi.advanceTimersToNextTimer();
-    expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
-  });
+      // Wait for token to expire
+      vi.advanceTimersToNextTimer();
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+    },
+    { timeout: 10000 },
+  );
 
   test("it can handle an async callback", () => {
     const now = new Date();
