@@ -1,5 +1,13 @@
 # @knocklabs/expo
 
+## 0.3.8
+
+### Patch Changes
+
+- 43f9724: Allow styling bell icon and badge using `styleOverride` prop of `<NotificationIconButton>`
+- Updated dependencies [43f9724]
+  - @knocklabs/react-native@0.6.8
+
 ## 0.3.7
 
 ### Patch Changes

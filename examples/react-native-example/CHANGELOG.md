@@ -1,5 +1,12 @@
 # @knocklabs/react-native-example
 
+## 1.4.21
+
+### Patch Changes
+
+- Updated dependencies [43f9724]
+  - @knocklabs/react-native@0.6.8
+
 ## 1.4.20
 
 ### Patch Changes
