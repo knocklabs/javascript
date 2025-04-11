@@ -114,6 +114,7 @@ export default function Home() {
                     slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                     redirectUrl={redirectUrl}
                     onAuthenticationComplete={onAuthComplete}
+                    additionalScopes={["users:read", "users:read.email"]}
                   />
                 </div>
               </div>
@@ -135,6 +136,7 @@ export default function Home() {
                     <SlackAuthButton
                       slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                       redirectUrl={redirectUrl}
+                      additionalScopes={["users:read", "users:read.email"]}
                     />
                   }
                 />

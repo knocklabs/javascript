@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.3
+
+### Patch Changes
+
+- c97a1d9: Update TanStack Store
+
 ## 0.14.2
 
 ### Patch Changes
