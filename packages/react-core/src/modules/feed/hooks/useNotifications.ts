@@ -3,24 +3,37 @@ import { useEffect, useState } from "react";
 
 import { useStableOptions } from "../../core";
 
+function initializeFeedClient(
+  knock: Knock,
+  feedChannelId: string,
+  options: FeedClientOptions = {},
+) {
+  const feedClient = knock.feeds.initialize(feedChannelId, options);
+  feedClient.store.subscribe((t) => feedClient.store.setState(t));
+  feedClient.listenForUpdates();
+  return feedClient;
+}
+
 function useNotifications(
   knock: Knock,
   feedChannelId: string,
   options: FeedClientOptions = {},
 ) {
-  const [feedClient, setFeedClient] = useState<Feed>();
+  const [feedClient, setFeedClient] = useState<Feed>(
+    initializeFeedClient(knock, feedChannelId, options),
+  );
   const stableOptions = useStableOptions(options);
 
   useEffect(() => {
-    const newFeedClient = knock.feeds.initialize(feedChannelId, stableOptions);
-
-    newFeedClient.store.subscribe((t) => newFeedClient.store.setState(t));
-
-    newFeedClient.listenForUpdates();
-    setFeedClient(newFeedClient);
+    const feedClient = initializeFeedClient(
+      knock,
+      feedChannelId,
+      stableOptions,
+    );
+    setFeedClient(feedClient);
 
     return () => {
-      newFeedClient.dispose();
+      feedClient.dispose();
     };
   }, [knock, feedChannelId, stableOptions]);
 
