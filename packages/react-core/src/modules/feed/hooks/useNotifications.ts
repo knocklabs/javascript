@@ -1,5 +1,5 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { useStableOptions } from "../../core";
 
@@ -19,25 +19,24 @@ function useNotifications(
   feedChannelId: string,
   options: FeedClientOptions = {},
 ) {
-  const [feedClient, setFeedClient] = useState<Feed>(
+  const feedClientRef = useRef<Feed>(
     initializeFeedClient(knock, feedChannelId, options),
   );
   const stableOptions = useStableOptions(options);
 
   useEffect(() => {
-    const feedClient = initializeFeedClient(
+    feedClientRef.current = initializeFeedClient(
       knock,
       feedChannelId,
       stableOptions,
     );
-    setFeedClient(feedClient);
 
     return () => {
-      feedClient.dispose();
+      feedClientRef.current.dispose();
     };
   }, [knock, feedChannelId, stableOptions]);
 
-  return feedClient;
+  return feedClientRef.current;
 }
 
 export default useNotifications;
