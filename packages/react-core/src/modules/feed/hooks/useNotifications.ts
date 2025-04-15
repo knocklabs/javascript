@@ -1,36 +1,42 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useStableOptions } from "../../core";
+
+function initializeFeedClient(
+  knock: Knock,
+  feedChannelId: string,
+  options: FeedClientOptions = {},
+) {
+  const feedClient = knock.feeds.initialize(feedChannelId, options);
+  feedClient.store.subscribe((t) => feedClient.store.setState(t));
+  feedClient.listenForUpdates();
+  return feedClient;
+}
 
 function useNotifications(
   knock: Knock,
   feedChannelId: string,
   options: FeedClientOptions = {},
 ) {
-  const feedClientRef = useRef<Feed>();
   const stableOptions = useStableOptions(options);
+  const feedClientRef = useRef<Feed>();
 
-  return useMemo(() => {
-    if (feedClientRef.current) {
-      feedClientRef.current.dispose();
-    }
-
-    feedClientRef.current = knock.feeds.initialize(
+  if (!feedClientRef.current) {
+    feedClientRef.current = initializeFeedClient(
+      knock,
       feedChannelId,
       stableOptions,
     );
+  }
 
-    // In development, we need to introduce this extra set state to force a render
-    // for Zustand as otherwise the state doesn't get reflected correctly
-    feedClientRef.current.store.subscribe((t) =>
-      feedClientRef?.current?.store.setState(t),
-    );
+  useEffect(() => {
+    return () => {
+      feedClientRef.current?.dispose();
+    };
+  }, []);
 
-    feedClientRef.current.listenForUpdates();
-
-    return feedClientRef.current;
-  }, [knock, feedChannelId, stableOptions]);
+  return feedClientRef.current;
 }
 
 export default useNotifications;
