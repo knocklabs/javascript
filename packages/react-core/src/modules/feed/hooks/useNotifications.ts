@@ -19,22 +19,22 @@ function useNotifications(
   feedChannelId: string,
   options: FeedClientOptions = {},
 ) {
-  const feedClientRef = useRef<Feed>(
-    initializeFeedClient(knock, feedChannelId, options),
-  );
   const stableOptions = useStableOptions(options);
+  const feedClientRef = useRef<Feed>();
 
-  useEffect(() => {
+  if (!feedClientRef.current) {
     feedClientRef.current = initializeFeedClient(
       knock,
       feedChannelId,
       stableOptions,
     );
+  }
 
+  useEffect(() => {
     return () => {
-      feedClientRef.current.dispose();
+      feedClientRef.current?.dispose();
     };
-  }, [knock, feedChannelId, stableOptions]);
+  }, []);
 
   return feedClientRef.current;
 }
