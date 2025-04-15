@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.9
+
+### Patch Changes
+
+- 1fb7094: Allow styling stroke width of the bell icon
+
 ## 0.6.8
 
 ### Patch Changes

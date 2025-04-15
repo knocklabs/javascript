@@ -1,5 +1,13 @@
 # @knocklabs/expo
 
+## 0.3.9
+
+### Patch Changes
+
+- 1fb7094: Allow styling stroke width of the bell icon
+- Updated dependencies [1fb7094]
+  - @knocklabs/react-native@0.6.9
+
 ## 0.3.8
 
 ### Patch Changes
