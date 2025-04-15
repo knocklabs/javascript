@@ -21,6 +21,7 @@ export interface NotificationIconButtonStyle {
   textStyle?: TextStyle;
   bellIconStyle?: ViewStyle;
   bellIconColor?: string;
+  bellIconStrokeWidth?: number;
   badgeStyle?: ViewStyle;
 }
 
@@ -40,6 +41,7 @@ export const NotificationIconButton: React.FC<NotificationIconButtonProps> = ({
         <BellIcon
           style={styleOverride.bellIconStyle}
           strokeColor={styleOverride.bellIconColor}
+          strokeWidth={styleOverride.bellIconStrokeWidth}
         />
         <View style={styles.badgeContainer}>
           <UnseenBadge
