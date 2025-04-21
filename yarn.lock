@@ -4635,21 +4635,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/eslint-plugin-next@npm:15.3.1":
+"@next/eslint-plugin-next@npm:15.3.1, @next/eslint-plugin-next@npm:^15.3.1":
   version: 15.3.1
   resolution: "@next/eslint-plugin-next@npm:15.3.1"
   dependencies:
     fast-glob: "npm:3.3.1"
   checksum: 10c0/b25938a2a8ff7d5a4267f39cf8dd686026ce853e2cb73e2b3e2b398d135a4913a97f773f7d3f3382dc2f6287772ea0728af9935735a95f52d9f6d2beba7b8201
-  languageName: node
-  linkType: hard
-
-"@next/eslint-plugin-next@npm:^15.2.4":
-  version: 15.2.4
-  resolution: "@next/eslint-plugin-next@npm:15.2.4"
-  dependencies:
-    fast-glob: "npm:3.3.1"
-  checksum: 10c0/13fb1da543d1f930fca4b4b26b5e26bd173ffada4128bb8606f16f6466b8db145e1d5892bb69e337832784476ae33255dfc3a553a6036bbf75ec38717975749c
   languageName: node
   linkType: hard
 
@@ -15929,7 +15920,7 @@ __metadata:
     "@knocklabs/node": "npm:^0.6.15"
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
-    "@next/eslint-plugin-next": "npm:^15.2.4"
+    "@next/eslint-plugin-next": "npm:^15.3.1"
     "@telegraph/button": "npm:^0.0.77"
     "@telegraph/combobox": "npm:^0.0.79"
     "@telegraph/icon": "npm:^0.0.50"
