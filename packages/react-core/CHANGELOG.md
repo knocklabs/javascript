@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.4
+
+### Patch Changes
+
+- 96d70bc: fixes memory leak when unmounting the useNotifications hook
+
 ## 0.6.3
 
 ### Patch Changes

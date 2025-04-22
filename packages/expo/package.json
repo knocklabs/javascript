@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/expo",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.4
+
+### Patch Changes
+
+- Updated dependencies [96d70bc]
+  - @knocklabs/react-core@0.6.4
+
 ## 0.7.3
 
 ### Patch Changes
