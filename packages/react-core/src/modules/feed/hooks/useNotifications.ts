@@ -1,5 +1,5 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useStableOptions } from "../../core";
 
@@ -10,6 +10,14 @@ function useNotifications(
 ) {
   const feedClientRef = useRef<Feed>();
   const stableOptions = useStableOptions(options);
+
+  useEffect(() => {
+    return () => {
+      if (feedClientRef.current) {
+        feedClientRef.current.dispose();
+      }
+    };
+  }, []);
 
   return useMemo(() => {
     if (feedClientRef.current) {
