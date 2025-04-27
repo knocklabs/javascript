@@ -51,7 +51,8 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
       knockGuideClient.fetch();
       if (listenForUpdates) knockGuideClient.subscribe();
     }
-    return () => knockGuideClient.unsubscribe();
+
+    return () => knockGuideClient.cleanup();
   }, [readyToTarget, listenForUpdates, knockGuideClient]);
 
   return (
