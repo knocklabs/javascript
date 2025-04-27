@@ -1,6 +1,7 @@
 import { GenericData } from "@knocklabs/types";
 import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
+import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
 
@@ -38,6 +39,11 @@ interface GuideStepData {
   content: any;
 }
 
+interface GuideActivationLocationRuleData {
+  directive: "allow" | "block";
+  pathname: string;
+}
+
 interface GuideData {
   __typename: "Guide";
   channel_id: string;
@@ -47,6 +53,7 @@ interface GuideData {
   type: string;
   semver: string;
   steps: GuideStepData[];
+  activation_location_rules: GuideActivationLocationRuleData[];
   inserted_at: string;
   updated_at: string;
 }
@@ -57,8 +64,14 @@ export interface KnockGuideStep extends GuideStepData {
   markAsArchived: () => void;
 }
 
+interface KnockGuideActivationLocationRule
+  extends GuideActivationLocationRuleData {
+  pattern: URLPattern;
+}
+
 export interface KnockGuide extends GuideData {
   steps: KnockGuideStep[];
+  activation_location_rules: KnockGuideActivationLocationRule[];
 }
 
 type GetGuidesQueryParams = {
@@ -133,6 +146,7 @@ type QueryStatus = {
 type StoreState = {
   guides: KnockGuide[];
   queries: Record<QueryKey, QueryStatus>;
+  href: string | undefined;
 };
 
 type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
@@ -156,6 +170,10 @@ export class KnockGuideClient {
   private socketChannelTopic: string;
   private socketEventTypes = ["guide.added", "guide.updated", "guide.removed"];
 
+  // Original history methods to monkey patch, or restore in cleanups.
+  private pushStateFn: History["pushState"] | undefined;
+  private replaceStateFn: History["replaceState"] | undefined;
+
   constructor(
     readonly knock: Knock,
     readonly channelId: string,
@@ -164,6 +182,7 @@ export class KnockGuideClient {
     this.store = new Store<StoreState>({
       guides: [],
       queries: {},
+      href: window?.location.href,
     });
 
     // In server environments we might not have a socket connection.
@@ -171,7 +190,15 @@ export class KnockGuideClient {
     this.socket = maybeSocket;
     this.socketChannelTopic = `guides:${channelId}`;
 
+    // Set up event listeners for location changes.
+    this.addEventListeners();
+
     this.knock.log("[Guide] Initialized a guide client");
+  }
+
+  cleanup() {
+    this.unsubscribe();
+    this.removeEventListeners();
   }
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
@@ -291,8 +318,6 @@ export class KnockGuideClient {
   //
 
   select(state: StoreState, filters: SelectFilterParams = {}) {
-    // TODO(KNO-7790): Need to evaluate activation rules also.
-
     return state.guides.filter((guide) => {
       if (filters.type && filters.type !== guide.type) {
         return false;
@@ -300,6 +325,30 @@ export class KnockGuideClient {
 
       if (filters.key && filters.key !== guide.key) {
         return false;
+      }
+
+      const locationRules = guide.activation_location_rules;
+      if (locationRules.length > 0 && state.href) {
+        const allowed = locationRules.reduce<boolean | undefined>(
+          (acc, rule) => {
+            // If already matched to block, then no need to evaluate further.
+            if (acc === false) return false;
+
+            switch (rule.directive) {
+              case "allow": {
+                if (acc === true) return true;
+                return rule.pattern.test(state.href);
+              }
+
+              case "block": {
+                return !rule.pattern.test(state.href);
+              }
+            }
+          },
+          undefined,
+        );
+
+        if (!allowed) return false;
       }
 
       return true;
@@ -427,6 +476,14 @@ export class KnockGuideClient {
       return localStep;
     });
 
+    localGuide.activation_location_rules =
+      remoteGuide.activation_location_rules.map((rule) => {
+        return {
+          ...rule,
+          pattern: new URLPattern({ pathname: rule.pathname }),
+        };
+      });
+
     return localGuide as KnockGuide;
   }
 
@@ -537,5 +594,70 @@ export class KnockGuideClient {
       const guides = state.guides.filter((g) => g.key !== data.guide.key);
       return { ...state, guides };
     });
+  }
+
+  private handleLocationChange() {
+    const href = window.location.href;
+    if (this.store.state.href === href) return;
+
+    this.knock.log(`[Guide] Handle Location change: ${href}`);
+
+    this.store.setState((state) => ({ ...state, href }));
+  }
+
+  private addEventListeners() {
+    // const self = this;
+
+    if (window?.history) {
+      // 1. Listen for browser back/forward button clicks.
+      window.addEventListener("popstate", this.handleLocationChange);
+
+      // 2. Listen for hash changes in case it's used for routing.
+      window.addEventListener("hashchange", this.handleLocationChange);
+
+      // 3. Monkey-patch history methods to catch programmatic navigation.
+      const pushStateFn = window.history.pushState;
+      const replaceStateFn = window.history.replaceState;
+
+      // Use setTimeout to allow the browser state to potentially settle.
+      window.history.pushState = new Proxy(pushStateFn, {
+        apply: (target, history, args) => {
+          Reflect.apply(target, history, args);
+          setTimeout(() => {
+            this.handleLocationChange();
+          }, 0);
+        },
+      });
+      window.history.replaceState = new Proxy(replaceStateFn, {
+        apply: (target, history, args) => {
+          Reflect.apply(target, history, args);
+          setTimeout(() => {
+            this.handleLocationChange();
+          }, 0);
+        },
+      });
+
+      // 4. Keep refs to the original handlers so we can restore during cleanup.
+      this.pushStateFn = pushStateFn;
+      this.replaceStateFn = replaceStateFn;
+    } else {
+      this.knock.log(
+        "[Guide] Unable to access the `history` object to detect location changes",
+      );
+    }
+  }
+
+  private removeEventListeners() {
+    window.removeEventListener("popstate", this.handleLocationChange);
+    window.removeEventListener("hashchange", this.handleLocationChange);
+
+    if (this.pushStateFn) {
+      window.history.pushState = this.pushStateFn;
+      this.pushStateFn = undefined;
+    }
+    if (this.replaceStateFn) {
+      window.history.replaceState = this.replaceStateFn;
+      this.replaceStateFn = undefined;
+    }
   }
 }
