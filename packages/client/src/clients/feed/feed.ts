@@ -3,6 +3,7 @@ import EventEmitter from "eventemitter2";
 import { Channel } from "phoenix";
 import type { StoreApi } from "zustand";
 
+import { isValidUuid } from "../../helpers";
 import Knock from "../../knock";
 import { NetworkStatus, isRequestInFlight } from "../../networkStatus";
 import {
@@ -57,6 +58,13 @@ class Feed {
     readonly feedId: string,
     options: FeedClientOptions,
   ) {
+    if (!feedId || !isValidUuid(feedId)) {
+      this.knock.log(
+        "[Feed] Invalid or missing feedId provided to the Feed constructor. The feed should be a UUID of an in-app feed channel (`in_app_feed`) found in the Knock dashboard. Please provide a valid feedId to the Feed constructor.",
+        true,
+      );
+    }
+
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
     this.store = createStore();
