@@ -26,7 +26,7 @@ const KnockFeedContext = React.createContext<
 
 export interface KnockFeedProviderProps {
   // Feed props
-  feedId: string;
+  feedId: string | undefined;
 
   // Extra options
   colorMode?: ColorMode;
@@ -45,12 +45,12 @@ export const KnockFeedProvider: React.FC<
     throw new Error("KnockFeedProvider must be used within a KnockProvider.");
   }
 
-  const feedClient = useNotifications(knock, feedId, defaultFeedOptions);
+  const feedClient = useNotifications(knock, feedId ?? "", defaultFeedOptions);
   const useFeedStore = useCreateNotificationStore(feedClient);
 
   return (
     <KnockFeedContext.Provider
-      key={feedProviderKey(knock.userId, feedId, defaultFeedOptions)}
+      key={feedProviderKey(knock.userId, feedId ?? "", defaultFeedOptions)}
       value={{
         knock,
         feedClient,

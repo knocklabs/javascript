@@ -23,7 +23,7 @@ export interface NotificationFeedPopoverProps extends NotificationFeedProps {
   isVisible: boolean;
   onOpen?: (arg: OnOpenOptions) => void;
   onClose: (e: Event) => void;
-  buttonRef: RefObject<HTMLElement>;
+  buttonRef: RefObject<HTMLElement | null>;
   closeOnClickOutside?: boolean;
   placement?: Placement;
 }
