@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.5
+
+### Patch Changes
+
+- e800896: feat: typescript fixes + quality of life improvements
+- Updated dependencies [e800896]
+  - @knocklabs/client@0.14.4
+
 ## 0.6.4
 
 ### Patch Changes
