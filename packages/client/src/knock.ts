@@ -130,8 +130,8 @@ class Knock {
     }
   }
 
-  log(message: string) {
-    if (this.logLevel === "debug") {
+  log(message: string, force = false) {
+    if (this.logLevel === "debug" || force) {
       console.log(`[Knock] ${message}`);
     }
   }

@@ -13,7 +13,7 @@ const KnockContext = React.createContext<KnockProviderState | null>(null);
 
 export interface KnockProviderProps {
   // Knock client props
-  apiKey: string;
+  apiKey: string | undefined;
   host?: string;
   // Authentication props
   userId: Knock["userId"];
@@ -48,18 +48,14 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   );
 
   const knock = useAuthenticatedKnockClient(
-    apiKey,
+    apiKey ?? "",
     userId,
     userToken,
     authenticateOptions,
   );
 
   return (
-    <KnockContext.Provider
-      value={{
-        knock,
-      }}
-    >
+    <KnockContext.Provider value={{ knock }}>
       <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
     </KnockContext.Provider>
   );
