@@ -108,7 +108,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.11.6, @babel/core@npm:^7.12.3, @babel/core@npm:^7.13.16, @babel/core@npm:^7.20.0, @babel/core@npm:^7.24.0, @babel/core@npm:^7.24.7, @babel/core@npm:^7.25.2, @babel/core@npm:^7.26.0":
+"@babel/core@npm:^7.11.6, @babel/core@npm:^7.12.3, @babel/core@npm:^7.13.16, @babel/core@npm:^7.20.0, @babel/core@npm:^7.24.0, @babel/core@npm:^7.24.7, @babel/core@npm:^7.25.2, @babel/core@npm:^7.26.0, @babel/core@npm:^7.26.10":
   version: 7.26.10
   resolution: "@babel/core@npm:7.26.10"
   dependencies:
@@ -4234,7 +4234,7 @@ __metadata:
     "@types/react-native-htmlview": "npm:^0.16.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.19.1"
     "@typescript-eslint/parser": "npm:^8.27.0"
-    "@vitejs/plugin-react": "npm:^4.3.4"
+    "@vitejs/plugin-react": "npm:^4.4.1"
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.14"
@@ -4305,7 +4305,7 @@ __metadata:
     "@types/react": "npm:^18.3.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.19.1"
     "@typescript-eslint/parser": "npm:^8.27.0"
-    "@vitejs/plugin-react": "npm:^4.3.4"
+    "@vitejs/plugin-react": "npm:^4.4.1"
     babel-plugin-react-require: "npm:^4.0.3"
     date-fns: "npm:^4.0.0"
     eslint: "npm:^8.56.0"
@@ -4366,7 +4366,7 @@ __metadata:
     "@types/react-native-htmlview": "npm:^0.16.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.19.1"
     "@typescript-eslint/parser": "npm:^8.27.0"
-    "@vitejs/plugin-react": "npm:^4.3.4"
+    "@vitejs/plugin-react": "npm:^4.4.1"
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.14"
@@ -4407,7 +4407,7 @@ __metadata:
     "@types/react-dom": "npm:^18.2.15"
     "@typescript-eslint/eslint-plugin": "npm:^8.19.1"
     "@typescript-eslint/parser": "npm:^8.27.0"
-    "@vitejs/plugin-react": "npm:^4.3.4"
+    "@vitejs/plugin-react": "npm:^4.4.1"
     babel-plugin-react-require: "npm:^4.0.3"
     clsx: "npm:^2.1.1"
     eslint: "npm:^8.56.0"
@@ -8557,18 +8557,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^4.3.4":
-  version: 4.3.4
-  resolution: "@vitejs/plugin-react@npm:4.3.4"
+"@vitejs/plugin-react@npm:^4.4.1":
+  version: 4.4.1
+  resolution: "@vitejs/plugin-react@npm:4.4.1"
   dependencies:
-    "@babel/core": "npm:^7.26.0"
+    "@babel/core": "npm:^7.26.10"
     "@babel/plugin-transform-react-jsx-self": "npm:^7.25.9"
     "@babel/plugin-transform-react-jsx-source": "npm:^7.25.9"
     "@types/babel__core": "npm:^7.20.5"
-    react-refresh: "npm:^0.14.2"
+    react-refresh: "npm:^0.17.0"
   peerDependencies:
     vite: ^4.2.0 || ^5.0.0 || ^6.0.0
-  checksum: 10c0/38a47a1dbafae0b97142943d83ee3674cb3331153a60b1a3fd29d230c12c9dfe63b7c345b231a3450168ed8a9375a9a1a253c3d85e9efdc19478c0d56b98496c
+  checksum: 10c0/0eda45f2026cdfff4b172b1b2148824e5ac41ce65f1f1ce108f3ce4de2f0024caf79c811c1305a782168a269b0b1bc58d4cf8eaf164e4ef19954f05428ba7077
   languageName: node
   linkType: hard
 
@@ -10089,7 +10089,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:^6.6.3"
     "@testing-library/react": "npm:^16.2.0"
     "@testing-library/user-event": "npm:^14.5.2"
-    "@vitejs/plugin-react": "npm:^4.3.4"
+    "@vitejs/plugin-react": "npm:^4.4.1"
     "@vitejs/plugin-react-swc": "npm:^3.8.1"
     jsdom: "npm:^26.1.0"
     prettier: "npm:^3.5.3"
@@ -13139,7 +13139,7 @@ __metadata:
     "@knocklabs/react": "workspace:^"
     "@types/react": "npm:^18.3.6"
     "@types/react-dom": "npm:^18.2.15"
-    "@vitejs/plugin-react": "npm:^4.3.4"
+    "@vitejs/plugin-react": "npm:^4.4.1"
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.14"
@@ -17813,6 +17813,13 @@ __metadata:
   version: 0.14.2
   resolution: "react-refresh@npm:0.14.2"
   checksum: 10c0/875b72ef56b147a131e33f2abd6ec059d1989854b3ff438898e4f9310bfcc73acff709445b7ba843318a953cb9424bcc2c05af2b3d80011cee28f25aef3e2ebb
+  languageName: node
+  linkType: hard
+
+"react-refresh@npm:^0.17.0":
+  version: 0.17.0
+  resolution: "react-refresh@npm:0.17.0"
+  checksum: 10c0/002cba940384c9930008c0bce26cac97a9d5682bc623112c2268ba0c155127d9c178a9a5cc2212d560088d60dfd503edd808669a25f9b377f316a32361d0b23c
   languageName: node
   linkType: hard
 
