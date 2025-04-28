@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.5
+
+### Patch Changes
+
+- e800896: feat: typescript fixes + quality of life improvements
+- Updated dependencies [e800896]
+  - @knocklabs/react-core@0.6.5
+  - @knocklabs/client@0.14.4
+
 ## 0.7.4
 
 ### Patch Changes

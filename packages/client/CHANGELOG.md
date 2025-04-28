@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.4
+
+### Patch Changes
+
+- e800896: feat: typescript fixes + quality of life improvements
+
 ## 0.14.3
 
 ### Patch Changes
