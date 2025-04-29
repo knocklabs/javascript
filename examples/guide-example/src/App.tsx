@@ -11,11 +11,14 @@ import { Routes, Route, Link } from 'react-router';
 
 const Navigation = () => {
   return (
-    <nav style={{ display: "flex", gap: "8px", }}>
+    <nav style={{ display: "flex", gap: "12px", }}>
       <Link to="/">Home</Link>
       <Link to="/produce">Produce</Link>
       <Link to="/meat">Meat</Link>
       <Link to="/seafood">Seafood</Link>
+      <Link to="/dairy/butter">Dairy &gt; Butter</Link>
+      <Link to="/dairy/cheese">Dairy &gt; Cheese</Link>
+      <Link to="/dairy/eggs">Dairy &gt; Eggs</Link>
     </nav>
   );
 };
@@ -66,9 +69,12 @@ function App() {
 
           <Routes>
             <Route index element={<Page title="home" />} />
-            <Route path="produce" element={<Page title="Produce" />} />
-            <Route path="meat" element={<Page title="Meat" />} />
-            <Route path="seafood" element={<Page title="Seatfood" />} />
+            <Route path="/produce" element={<Page title="Produce" />} />
+            <Route path="/meat" element={<Page title="Meat" />} />
+            <Route path="/seafood" element={<Page title="Seatfood" />} />
+            <Route path="/dairy/butter" element={<Page title="Dairy &gt; Butter" />} />
+            <Route path="/dairy/cheese" element={<Page title="Dairy &gt; Cheese" />} />
+            <Route path="/dairy/eggs" element={<Page title="Dairy &gt; Eggs" />} />
           </Routes>
         </div>
       </KnockGuideProvider>
