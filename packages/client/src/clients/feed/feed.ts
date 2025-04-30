@@ -594,15 +594,19 @@ class Feed {
   }
 
   // Invoked when a new real-time message comes in from the socket
-  private async onNewMessageReceived({
-    metadata,
-  }: FeedMessagesReceivedPayload) {
+  private async onNewMessageReceived({ data }: FeedMessagesReceivedPayload) {
     this.knock.log("[Feed] Received new real-time message");
+
     // Handle the new message coming in
     const { items, ...state } = this.store.getState();
     const currentHead: FeedItem | undefined = items[0];
+
     // Optimistically set the badge counts
-    state.setMetadata(metadata);
+    const metadata = data[this.referenceId]?.metadata;
+    if (metadata) {
+      state.setMetadata(metadata);
+    }
+
     // Fetch the items before the current head (if it exists)
     this.fetch({ before: currentHead?.__cursor, __fetchSource: "socket" });
   }

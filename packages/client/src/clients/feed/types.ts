@@ -24,6 +24,7 @@ export interface FeedStoreState {
 
 export interface FeedMessagesReceivedPayload {
   metadata: FeedMetadata;
+  data: Record<string, { metadata: FeedMetadata }>;
 }
 
 /*

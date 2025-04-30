@@ -20,14 +20,17 @@ type ClientReferenceId = string;
 
 type NewMessageEventPayload = {
   event: SocketEventType.NewMessage;
+  /** Feed metadata. Exists for legacy reasons. */
   metadata: FeedMetadata;
+  /** Feed metadata, keyed by client reference id. */
+  data: Record<ClientReferenceId, { metadata: FeedMetadata }>;
 };
 
 export type SocketEventPayload = NewMessageEventPayload;
 
 // "attn" field contains a list of client reference ids that should be notified
 // of a socket event.
-type WithAttn<P> = P & { attn: Array<ClientReferenceId> };
+type WithAttn<P> = P & { attn: ClientReferenceId[] };
 
 type FeedSocketInbox = Record<ClientReferenceId, SocketEventPayload>;
 
