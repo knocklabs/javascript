@@ -37,14 +37,34 @@ class FeedClient {
   }
 
   teardownInstances() {
+    this.unsubscribeAllFeedsFromSocketEvents();
+
     for (const feed of this.feedInstances) {
       feed.teardown();
     }
   }
 
   reinitializeInstances() {
+    this.unsubscribeAllFeedsFromSocketEvents();
+
+    // TODO Socket has changed, so set up new FeedSocketManager
+
     for (const feed of this.feedInstances) {
       feed.reinitialize();
+
+      if (this.socketManager) {
+        feed.subscribeToSocketEvents(this.socketManager);
+      }
+    }
+  }
+
+  private unsubscribeAllFeedsFromSocketEvents() {
+    if (!this.socketManager) {
+      return;
+    }
+
+    for (const feed of this.feedInstances) {
+      feed.unsubscribeFromSocketEvents(this.socketManager);
     }
   }
 }
