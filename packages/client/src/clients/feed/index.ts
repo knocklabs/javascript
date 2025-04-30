@@ -11,13 +11,14 @@ class FeedClient {
 
   constructor(instance: Knock) {
     this.instance = instance;
-    const socket = this.instance.client().socket;
-    if (socket) {
-      this.socketManager = new FeedSocketManager(socket);
-    }
   }
 
   initialize(feedChannelId: string, options: FeedClientOptions = {}) {
+    const socket = this.instance.client().socket;
+    if (socket && !this.socketManager) {
+      this.socketManager = new FeedSocketManager(socket);
+    }
+
     const feedInstance = new Feed(this.instance, feedChannelId, options);
     this.feedInstances.push(feedInstance);
 
