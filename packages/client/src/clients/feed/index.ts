@@ -14,10 +14,7 @@ class FeedClient {
   }
 
   initialize(feedChannelId: string, options: FeedClientOptions = {}) {
-    const socket = this.instance.client().socket;
-    if (socket && !this.socketManager) {
-      this.socketManager = new FeedSocketManager(socket);
-    }
+    this.initSocketManager();
 
     const feedInstance = new Feed(this.instance, feedChannelId, options);
     this.feedInstances.push(feedInstance);
@@ -49,10 +46,8 @@ class FeedClient {
 
     // When the API client is reinitialized, a new socket is created,
     // so we need to set up a new FeedSocketManager
-    const socket = this.instance.client().socket;
-    if (socket) {
-      this.socketManager = new FeedSocketManager(socket);
-    }
+    this.socketManager = undefined;
+    this.initSocketManager();
 
     for (const feed of this.feedInstances) {
       feed.reinitialize();
@@ -60,6 +55,13 @@ class FeedClient {
       if (this.socketManager) {
         feed.subscribeToSocketEvents(this.socketManager);
       }
+    }
+  }
+
+  private initSocketManager() {
+    const socket = this.instance.client().socket;
+    if (socket && !this.socketManager) {
+      this.socketManager = new FeedSocketManager(socket);
     }
   }
 
