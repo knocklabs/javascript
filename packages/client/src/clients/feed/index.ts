@@ -2,13 +2,19 @@ import Knock from "../../knock";
 
 import Feed from "./feed";
 import { FeedClientOptions } from "./interfaces";
+import { FeedSocketManager } from "./socket-manager";
 
 class FeedClient {
   private instance: Knock;
   private feedInstances: Feed[] = [];
+  private socketManager: FeedSocketManager | undefined;
 
   constructor(instance: Knock) {
     this.instance = instance;
+    const socket = this.instance.client().socket;
+    if (socket) {
+      this.socketManager = new FeedSocketManager(socket);
+    }
   }
 
   initialize(feedChannelId: string, options: FeedClientOptions = {}) {
