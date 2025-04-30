@@ -140,9 +140,7 @@ export class FeedSocketManager {
   }
 
   leave(feed: Feed) {
-    if (feed.unsub) {
-      feed.unsub();
-    }
+    feed.unsub?.();
 
     // TODO Expose topic properly
     const topic = `feeds:${feed.userFeedId}`;

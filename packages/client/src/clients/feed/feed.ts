@@ -20,7 +20,11 @@ import {
   FetchFeedOptions,
   FetchFeedOptionsForRequest,
 } from "./interfaces";
-import { SocketEventPayload, SocketEventType } from "./socket-manager";
+import {
+  FeedSocketManager,
+  SocketEventPayload,
+  SocketEventType,
+} from "./socket-manager";
 import createStore from "./store";
 import {
   BindableFeedEvent,
@@ -52,6 +56,7 @@ class Feed {
   private hasSubscribedToRealTimeUpdates: boolean = false;
   private visibilityChangeHandler: () => void = () => {};
   private visibilityChangeListenerConnected: boolean = false;
+  public unsub: (() => void) | undefined = undefined;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
@@ -159,6 +164,14 @@ class Feed {
     if (this.channel && ["closed", "errored"].includes(this.channel.state)) {
       this.channel.join();
     }
+  }
+
+  subscribeToSocketEvents(socketManager: FeedSocketManager) {
+    this.unsub = socketManager.join(this);
+  }
+
+  unsubscribeFromSocketEvents(socketManager: FeedSocketManager) {
+    socketManager.leave(this);
   }
 
   /* Binds a handler to be invoked when event occurs */

@@ -22,10 +22,17 @@ class FeedClient {
     const feedInstance = new Feed(this.instance, feedChannelId, options);
     this.feedInstances.push(feedInstance);
 
+    if (this.socketManager) {
+      feedInstance.subscribeToSocketEvents(this.socketManager);
+    }
+
     return feedInstance;
   }
 
   removeInstance(feed: Feed) {
+    if (this.socketManager) {
+      feed.unsubscribeFromSocketEvents(this.socketManager);
+    }
     this.feedInstances = this.feedInstances.filter((f) => f !== feed);
   }
 
