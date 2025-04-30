@@ -1,7 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
 import { nanoid } from "nanoid";
-import { Channel } from "phoenix";
 import type { StoreApi } from "zustand";
 
 import { isValidUuid } from "../../helpers";
@@ -47,8 +46,8 @@ const DEFAULT_DISCONNECT_DELAY = 2000;
 
 class Feed {
   public userFeedId: string;
-  private channel?: Channel;
   public referenceId: string;
+  private socketManager: FeedSocketManager | undefined;
   private broadcaster: EventEmitter;
   public readonly defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
@@ -65,6 +64,7 @@ class Feed {
     readonly knock: Knock,
     readonly feedId: string,
     options: FeedClientOptions,
+    socketManager: FeedSocketManager | undefined,
   ) {
     if (!feedId || !isValidUuid(feedId)) {
       this.knock.log(
@@ -76,6 +76,7 @@ class Feed {
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
     this.referenceId = nanoid();
+    this.socketManager = socketManager;
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = {
@@ -93,7 +94,9 @@ class Feed {
   /**
    * Used to reinitialize a current feed instance, which is useful when reauthenticating users
    */
-  reinitialize() {
+  reinitialize(socketManager?: FeedSocketManager) {
+    this.socketManager = socketManager;
+
     // Reinitialize the user feed id incase the userId changed
     this.userFeedId = this.buildUserFeedId();
 
@@ -111,10 +114,7 @@ class Feed {
   teardown() {
     this.knock.log("[Feed] Tearing down feed instance");
 
-    if (this.channel) {
-      this.channel.leave();
-      this.channel.off("new-message");
-    }
+    this.socketManager?.leave(this);
 
     this.teardownAutoSocketManager();
 
@@ -153,25 +153,7 @@ class Feed {
       return;
     }
 
-    const maybeSocket = this.knock.client().socket;
-
-    // Connect the socket only if we don't already have a connection
-    if (maybeSocket && !maybeSocket.isConnected()) {
-      maybeSocket.connect();
-    }
-
-    // Only join the channel if we're not already in a joining state
-    if (this.channel && ["closed", "errored"].includes(this.channel.state)) {
-      this.channel.join();
-    }
-  }
-
-  subscribeToSocketEvents(socketManager: FeedSocketManager) {
-    this.unsub = socketManager.join(this);
-  }
-
-  unsubscribeFromSocketEvents(socketManager: FeedSocketManager) {
-    socketManager.leave(this);
+    this.unsub = this.socketManager?.join(this);
   }
 
   /* Binds a handler to be invoked when event occurs */
@@ -784,18 +766,8 @@ class Feed {
   }
 
   private initializeRealtimeConnection() {
-    const { socket: maybeSocket } = this.knock.client();
-
     // In server environments we might not have a socket connection
-    if (!maybeSocket) return;
-
-    // Reinitialize channel connections incase the socket changed
-    this.channel = maybeSocket.channel(
-      `feeds:${this.userFeedId}`,
-      this.defaultOptions,
-    );
-
-    this.channel.on("new-message", (resp) => this.onNewMessageReceived(resp));
+    if (!this.socketManager) return;
 
     if (this.defaultOptions.auto_manage_socket_connection) {
       this.setupAutoSocketManager();
@@ -804,8 +776,7 @@ class Feed {
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
     if (this.hasSubscribedToRealTimeUpdates && this.knock.isAuthenticated()) {
-      if (!maybeSocket.isConnected()) maybeSocket.connect();
-      this.channel.join();
+      this.unsub = this.socketManager?.join(this);
     }
   }
 

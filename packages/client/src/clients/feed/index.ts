@@ -16,45 +16,38 @@ class FeedClient {
   initialize(feedChannelId: string, options: FeedClientOptions = {}) {
     this.initSocketManager();
 
-    const feedInstance = new Feed(this.instance, feedChannelId, options);
+    const feedInstance = new Feed(
+      this.instance,
+      feedChannelId,
+      options,
+      this.socketManager,
+    );
     this.feedInstances.push(feedInstance);
-
-    if (this.socketManager) {
-      feedInstance.subscribeToSocketEvents(this.socketManager);
-    }
-
     return feedInstance;
   }
 
   removeInstance(feed: Feed) {
-    if (this.socketManager) {
-      feed.unsubscribeFromSocketEvents(this.socketManager);
-    }
     this.feedInstances = this.feedInstances.filter((f) => f !== feed);
   }
 
   teardownInstances() {
-    this.unsubscribeAllFeedsFromSocketEvents();
-
     for (const feed of this.feedInstances) {
       feed.teardown();
     }
   }
 
   reinitializeInstances() {
-    this.unsubscribeAllFeedsFromSocketEvents();
+    for (const feed of this.feedInstances) {
+      this.socketManager?.leave(feed);
+    }
 
-    // When the API client is reinitialized, a new socket is created,
-    // so we need to set up a new FeedSocketManager
+    // The API client has a new socket once it's reinitialized,
+    // so we need to set up a new socket manager
     this.socketManager = undefined;
     this.initSocketManager();
 
     for (const feed of this.feedInstances) {
-      feed.reinitialize();
-
-      if (this.socketManager) {
-        feed.subscribeToSocketEvents(this.socketManager);
-      }
+      feed.reinitialize(this.socketManager);
     }
   }
 
@@ -62,16 +55,6 @@ class FeedClient {
     const socket = this.instance.client().socket;
     if (socket && !this.socketManager) {
       this.socketManager = new FeedSocketManager(socket);
-    }
-  }
-
-  private unsubscribeAllFeedsFromSocketEvents() {
-    if (!this.socketManager) {
-      return;
-    }
-
-    for (const feed of this.feedInstances) {
-      feed.unsubscribeFromSocketEvents(this.socketManager);
     }
   }
 }
