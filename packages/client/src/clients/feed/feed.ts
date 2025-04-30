@@ -1,5 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
+import { nanoid } from "nanoid";
 import { Channel } from "phoenix";
 import type { StoreApi } from "zustand";
 
@@ -42,6 +43,7 @@ const DEFAULT_DISCONNECT_DELAY = 2000;
 class Feed {
   private userFeedId: string;
   private channel?: Channel;
+  public referenceId: string;
   private broadcaster: EventEmitter;
   private defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
@@ -67,6 +69,7 @@ class Feed {
 
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
+    this.referenceId = nanoid();
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = {
