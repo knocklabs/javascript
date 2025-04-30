@@ -20,6 +20,7 @@ import {
   FetchFeedOptions,
   FetchFeedOptionsForRequest,
 } from "./interfaces";
+import { SocketEventPayload, SocketEventType } from "./socket-manager";
 import createStore from "./store";
 import {
   BindableFeedEvent,
@@ -41,11 +42,11 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
 const DEFAULT_DISCONNECT_DELAY = 2000;
 
 class Feed {
-  private userFeedId: string;
+  public userFeedId: string;
   private channel?: Channel;
   public referenceId: string;
   private broadcaster: EventEmitter;
-  private defaultOptions: FeedClientOptions;
+  public readonly defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: boolean = false;
@@ -792,6 +793,18 @@ class Feed {
     if (this.hasSubscribedToRealTimeUpdates && this.knock.isAuthenticated()) {
       if (!maybeSocket.isConnected()) maybeSocket.connect();
       this.channel.join();
+    }
+  }
+
+  async handleSocketEvent(payload: SocketEventPayload) {
+    switch (payload.event) {
+      case SocketEventType.NewMessage:
+        this.onNewMessageReceived(payload);
+        return;
+      default: {
+        const _exhaustiveCheck: never = payload.event;
+        return;
+      }
     }
   }
 
