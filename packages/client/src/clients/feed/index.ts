@@ -47,7 +47,12 @@ class FeedClient {
   reinitializeInstances() {
     this.unsubscribeAllFeedsFromSocketEvents();
 
-    // TODO Socket has changed, so set up new FeedSocketManager
+    // When the API client is reinitialized, a new socket is created,
+    // so we need to set up a new FeedSocketManager
+    const socket = this.instance.client().socket;
+    if (socket) {
+      this.socketManager = new FeedSocketManager(socket);
+    }
 
     for (const feed of this.feedInstances) {
       feed.reinitialize();
