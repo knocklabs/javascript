@@ -327,21 +327,33 @@ export class KnockGuideClient {
         return false;
       }
 
-      const locationRules = guide.activation_location_rules;
+      const locationRules = guide.activation_location_rules || [];
+
       if (locationRules.length > 0 && state.href) {
         const allowed = locationRules.reduce<boolean | undefined>(
           (acc, rule) => {
-            // If already matched to block, then no need to evaluate further.
+            // Any matched block rule prevails so no need to evaluate further
+            // as soon as there is one.
             if (acc === false) return false;
+
+            // At this point we either have a matched allow rule (acc is true),
+            // or no matched rule found yet (acc is undefined).
 
             switch (rule.directive) {
               case "allow": {
+                // No need to evaluate more allow rules once we matched one
+                // since any matched allowed rule means allow.
                 if (acc === true) return true;
-                return rule.pattern.test(state.href);
+
+                const matched = rule.pattern.test(state.href);
+                return matched ? true : undefined;
               }
 
               case "block": {
-                return !rule.pattern.test(state.href);
+                // Always test block rules (unless already matched to block)
+                // because they'd prevail over matched allow rules.
+                const matched = rule.pattern.test(state.href);
+                return matched ? false : acc;
               }
             }
           },
