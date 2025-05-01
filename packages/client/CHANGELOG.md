@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.5
+
+### Patch Changes
+
+- 8f00623: activation location rules support for guides
+
 ## 0.14.4
 
 ### Patch Changes

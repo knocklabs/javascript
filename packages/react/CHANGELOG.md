@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.6
+
+### Patch Changes
+
+- 8f00623: activation location rules support for guides
+- Updated dependencies [8f00623]
+  - @knocklabs/client@0.14.5
+  - @knocklabs/react-core@0.6.6
+
 ## 0.7.5
 
 ### Patch Changes
