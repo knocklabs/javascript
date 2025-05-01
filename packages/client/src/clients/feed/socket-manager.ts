@@ -12,7 +12,7 @@ const SOCKET_EVENT_TYPES = [SocketEventType.NewMessage];
 
 type ClientQueryParams = FeedClientOptions;
 
-// e.g. feed:<channel_id>:<user_id>
+// e.g. feeds:<channel_id>:<user_id>
 type ChannelTopic = string;
 
 // Unique reference id of a feed client
@@ -48,7 +48,7 @@ export class FeedSocketManager {
   // reference id, and grouped by channel topic. It's a double nested object
   // that looks like:
   //  {
-  //    "feed:<channel_1>:<user_1>": {
+  //    "feeds:<channel_1>:<user_1>": {
   //      "ref-1": {
   //        "tenant": "foo",
   //      },
@@ -56,7 +56,7 @@ export class FeedSocketManager {
   //        "tenant": "bar",
   //      },
   //    },
-  //    "feed:<channel_2>:<user_1>": {
+  //    "feeds:<channel_2>:<user_1>": {
   //      "ref-3": {
   //        "tenant": "baz",
   //      },
