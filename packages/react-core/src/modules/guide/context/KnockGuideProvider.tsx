@@ -22,14 +22,16 @@ type Props = {
   listenForUpdates?: boolean;
   colorMode?: ColorMode;
   targetParams?: KnockGuideTargetParams;
+  trackLocationFromWindow?: boolean;
 };
 
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   channelId,
   readyToTarget,
-  listenForUpdates,
+  listenForUpdates = true,
   colorMode = "light",
-  targetParams,
+  targetParams = {},
+  trackLocationFromWindow = true,
   children,
 }) => {
   let knock: Knock;
@@ -43,8 +45,10 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   const stableTargetParams = useStableOptions(targetParams);
 
   const knockGuideClient = React.useMemo(() => {
-    return new KnockGuideClient(knock, channelId, stableTargetParams);
-  }, [knock, channelId, stableTargetParams]);
+    return new KnockGuideClient(knock, channelId, stableTargetParams, {
+      trackLocationFromWindow,
+    });
+  }, [knock, channelId, stableTargetParams, trackLocationFromWindow]);
 
   React.useEffect(() => {
     if (readyToTarget) {

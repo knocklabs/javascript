@@ -146,7 +146,7 @@ type QueryStatus = {
 type StoreState = {
   guides: KnockGuide[];
   queries: Record<QueryKey, QueryStatus>;
-  href: string | undefined;
+  location: string | undefined;
 };
 
 type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
@@ -159,6 +159,10 @@ export type SelectFilterParams = {
 export type TargetParams = {
   data?: GenericData | undefined;
   tenant?: string | undefined;
+};
+
+type ConstructorOpts = {
+  trackLocationFromWindow?: boolean;
 };
 
 export class KnockGuideClient {
@@ -178,11 +182,18 @@ export class KnockGuideClient {
     readonly knock: Knock,
     readonly channelId: string,
     readonly targetParams: TargetParams = {},
+    readonly options: ConstructorOpts = {},
   ) {
+    const { trackLocationFromWindow = true } = options;
+
+    const location = trackLocationFromWindow
+      ? window?.location.href
+      : undefined;
+
     this.store = new Store<StoreState>({
       guides: [],
       queries: {},
-      href: window?.location.href,
+      location,
     });
 
     // In server environments we might not have a socket connection.
@@ -190,8 +201,9 @@ export class KnockGuideClient {
     this.socket = maybeSocket;
     this.socketChannelTopic = `guides:${channelId}`;
 
-    // Set up event listeners for location changes.
-    this.addEventListeners();
+    if (trackLocationFromWindow) {
+      this.listenForLocationChangesFromWindow();
+    }
 
     this.knock.log("[Guide] Initialized a guide client");
   }
@@ -329,7 +341,7 @@ export class KnockGuideClient {
 
       const locationRules = guide.activation_location_rules || [];
 
-      if (locationRules.length > 0 && state.href) {
+      if (locationRules.length > 0 && state.location) {
         const allowed = locationRules.reduce<boolean | undefined>(
           (acc, rule) => {
             // Any matched block rule prevails so no need to evaluate further
@@ -345,14 +357,14 @@ export class KnockGuideClient {
                 // since any matched allowed rule means allow.
                 if (acc === true) return true;
 
-                const matched = rule.pattern.test(state.href);
+                const matched = rule.pattern.test(state.location);
                 return matched ? true : undefined;
               }
 
               case "block": {
                 // Always test block rules (unless already matched to block)
                 // because they'd prevail over matched allow rules.
-                const matched = rule.pattern.test(state.href);
+                const matched = rule.pattern.test(state.location);
                 return matched ? false : acc;
               }
             }
@@ -610,16 +622,14 @@ export class KnockGuideClient {
 
   private handleLocationChange() {
     const href = window.location.href;
-    if (this.store.state.href === href) return;
+    if (this.store.state.location === href) return;
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
 
-    this.store.setState((state) => ({ ...state, href }));
+    this.store.setState((state) => ({ ...state, location: href }));
   }
 
-  private addEventListeners() {
-    // const self = this;
-
+  private listenForLocationChangesFromWindow() {
     if (window?.history) {
       // 1. Listen for browser back/forward button clicks.
       window.addEventListener("popstate", this.handleLocationChange);
@@ -654,7 +664,7 @@ export class KnockGuideClient {
       this.replaceStateFn = replaceStateFn;
     } else {
       this.knock.log(
-        "[Guide] Unable to access the `history` object to detect location changes",
+        "[Guide] Unable to access the `window.history` object to detect location changes",
       );
     }
   }
