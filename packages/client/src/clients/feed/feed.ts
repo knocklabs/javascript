@@ -46,8 +46,8 @@ const DEFAULT_DISCONNECT_DELAY = 2000;
 
 class Feed {
   public readonly defaultOptions: FeedClientOptions;
+  public readonly referenceId: string;
   public userFeedId: string;
-  public referenceId: string;
   public unsub: (() => void) | undefined = undefined;
   private socketManager: FeedSocketManager | undefined;
   private broadcaster: EventEmitter;
