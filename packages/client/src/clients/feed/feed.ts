@@ -868,7 +868,7 @@ class Feed {
 
       // If the socket is not connected, try to reconnect
       if (!client.socket?.isConnected()) {
-        this.initializeRealtimeConnection();
+        client.socket?.connect();
       }
     }
   }
