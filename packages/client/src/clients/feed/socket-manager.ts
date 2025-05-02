@@ -20,7 +20,7 @@ type ClientReferenceId = string;
 
 type NewMessageEventPayload = {
   event: SocketEventType.NewMessage;
-  /** Feed metadata. Exists for legacy reasons. */
+  /** Top-level feed metadata. Exists for legacy reasons. */
   metadata: FeedMetadata;
   /** Feed metadata, keyed by client reference id. */
   data: Record<ClientReferenceId, { metadata: FeedMetadata }>;
