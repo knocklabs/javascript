@@ -116,7 +116,7 @@ class Feed {
 
     this.socketManager?.leave(this);
 
-    this.teardownAutoSocketManager();
+    this.tearDownVisibilityListeners();
 
     if (this.disconnectTimer) {
       clearTimeout(this.disconnectTimer);
@@ -778,7 +778,7 @@ class Feed {
     if (!this.socketManager) return;
 
     if (this.defaultOptions.auto_manage_socket_connection) {
-      this.setupAutoSocketManager();
+      this.setUpVisibilityListeners();
     }
 
     // If we're initializing but they have previously opted to listen to real-time updates
@@ -804,7 +804,7 @@ class Feed {
    * Listen for changes to document visibility and automatically disconnect
    * or reconnect the socket after a delay
    */
-  private setupAutoSocketManager() {
+  private setUpVisibilityListeners() {
     if (
       typeof document === "undefined" ||
       this.visibilityChangeListenerConnected
@@ -817,7 +817,7 @@ class Feed {
     document.addEventListener("visibilitychange", this.visibilityChangeHandler);
   }
 
-  private teardownAutoSocketManager() {
+  private tearDownVisibilityListeners() {
     if (typeof document === "undefined") return;
 
     document.removeEventListener(
