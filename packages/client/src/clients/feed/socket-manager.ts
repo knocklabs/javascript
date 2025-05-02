@@ -141,7 +141,7 @@ export class FeedSocketManager {
   }
 
   leave(feed: Feed) {
-    feed.unsub?.();
+    feed.unsubscribeFromSocketEvents?.();
 
     const topic = feed.socketChannelTopic;
     const referenceId = feed.referenceId;

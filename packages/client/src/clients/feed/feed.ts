@@ -48,7 +48,7 @@ class Feed {
   public readonly defaultOptions: FeedClientOptions;
   public readonly referenceId: string;
   public userFeedId: string;
-  public unsub: (() => void) | undefined = undefined;
+  public unsubscribeFromSocketEvents: (() => void) | undefined = undefined;
   private socketManager: FeedSocketManager | undefined;
   private broadcaster: EventEmitter;
   private broadcastChannel!: BroadcastChannel | null;
@@ -153,7 +153,7 @@ class Feed {
       return;
     }
 
-    this.unsub = this.socketManager?.join(this);
+    this.unsubscribeFromSocketEvents = this.socketManager?.join(this);
   }
 
   /* Binds a handler to be invoked when event occurs */
@@ -784,7 +784,7 @@ class Feed {
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
     if (this.hasSubscribedToRealTimeUpdates && this.knock.isAuthenticated()) {
-      this.unsub = this.socketManager?.join(this);
+      this.unsubscribeFromSocketEvents = this.socketManager?.join(this);
     }
   }
 
