@@ -4,9 +4,9 @@ import { Channel, Socket } from "phoenix";
 import Feed from "./feed";
 import type { FeedClientOptions, FeedMetadata } from "./interfaces";
 
-export enum SocketEventType {
-  NewMessage = "new-message",
-}
+export const SocketEventType = {
+  NewMessage: "new-message",
+} as const;
 
 const SOCKET_EVENT_TYPES = [SocketEventType.NewMessage];
 
@@ -19,7 +19,7 @@ type ChannelTopic = string;
 type ClientReferenceId = string;
 
 type NewMessageEventPayload = {
-  event: SocketEventType.NewMessage;
+  event: typeof SocketEventType.NewMessage;
   /** Top-level feed metadata. Exists for legacy reasons. */
   metadata: FeedMetadata;
   /** Feed metadata, keyed by client reference id. */

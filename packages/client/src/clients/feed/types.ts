@@ -25,7 +25,7 @@ export interface FeedStoreState {
 
 export type FeedMessagesReceivedPayload = Extract<
   SocketEventPayload,
-  { event: SocketEventType.NewMessage }
+  { event: typeof SocketEventType.NewMessage }
 >;
 
 /*
