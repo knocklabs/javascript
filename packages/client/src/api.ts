@@ -47,7 +47,6 @@ class ApiClient {
           user_token: this.userToken,
           api_key: this.apiKey,
         },
-        debug: true,
       });
     }
 
