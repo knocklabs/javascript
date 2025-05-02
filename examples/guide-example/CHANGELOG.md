@@ -1,5 +1,14 @@
 # guide-example
 
+## 0.0.7
+
+### Patch Changes
+
+- 8f00623: activation location rules support for guides
+- Updated dependencies [8f00623]
+  - @knocklabs/client@0.14.5
+  - @knocklabs/react@0.7.6
+
 ## 0.0.6
 
 ### Patch Changes
