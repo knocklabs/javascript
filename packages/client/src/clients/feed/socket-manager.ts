@@ -44,9 +44,8 @@ export class FeedSocketManager {
   // client(s) that can subscribe.
   private channels: Record<ChannelTopic, Channel>;
 
-  // Mapping of query params for each in-app message client, partitioned by its
-  // reference id, and grouped by channel topic. It's a double nested object
-  // that looks like:
+  // Mapping of query params for each feeds client, partitioned by reference id,
+  // and grouped by channel topic. It's a double nested object that looks like:
   //  {
   //    "feeds:<channel_1>:<user_1>": {
   //      "ref-1": {
