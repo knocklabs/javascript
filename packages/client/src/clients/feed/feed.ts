@@ -586,6 +586,10 @@ class Feed {
     });
   }
 
+  get socketChannelTopic(): string {
+    return `feeds:${this.userFeedId}`;
+  }
+
   private broadcast(
     eventName: FeedEvent,
     data: FeedResponse | FeedEventPayload,

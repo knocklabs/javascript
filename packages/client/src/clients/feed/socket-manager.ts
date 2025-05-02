@@ -85,8 +85,7 @@ export class FeedSocketManager {
   }
 
   join(feed: Feed) {
-    // TODO Expose topic properly
-    const topic = `feeds:${feed.userFeedId}`;
+    const topic = feed.socketChannelTopic;
     const referenceId = feed.referenceId;
     const params = feed.defaultOptions;
 
@@ -144,8 +143,7 @@ export class FeedSocketManager {
   leave(feed: Feed) {
     feed.unsub?.();
 
-    // TODO Expose topic properly
-    const topic = `feeds:${feed.userFeedId}`;
+    const topic = feed.socketChannelTopic;
     const referenceId = feed.referenceId;
 
     const partitionedParams = { ...this.params };
