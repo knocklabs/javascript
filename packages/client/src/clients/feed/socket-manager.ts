@@ -66,7 +66,7 @@ export class FeedSocketManager {
   //
   // Each time a new feed client joins a channel, we send all cumulated
   // params such that the socket API can apply filtering rules and figure out
-  // which feed clients should be notified basd on reference ids in
+  // which feed clients should be notified based on reference ids in
   // "attn" field of the event payload when sending out an event.
   private params: Record<
     ChannelTopic,
