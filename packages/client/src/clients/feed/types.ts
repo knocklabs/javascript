@@ -3,6 +3,7 @@ import { GenericData, PageInfo } from "@knocklabs/types";
 import { NetworkStatus } from "../../networkStatus";
 
 import { FeedItem, FeedMetadata, FeedResponse } from "./interfaces";
+import { SocketEventPayload, SocketEventType } from "./socket-manager";
 
 export type StoreFeedResultOptions = {
   shouldSetPage?: boolean;
@@ -22,10 +23,10 @@ export interface FeedStoreState {
   resetStore: (metadata?: FeedMetadata) => void;
 }
 
-export interface FeedMessagesReceivedPayload {
-  metadata: FeedMetadata;
-  data: Record<string, { metadata: FeedMetadata }>;
-}
+export type FeedMessagesReceivedPayload = Extract<
+  SocketEventPayload,
+  { event: SocketEventType.NewMessage }
+>;
 
 /*
 Event types:
