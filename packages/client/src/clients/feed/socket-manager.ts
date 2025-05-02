@@ -39,7 +39,7 @@ type FeedSocketInbox = Record<ClientReferenceId, SocketEventPayload>;
 /*
  * Manages socket subscriptions for feeds, allowing multiple feed clients
  * to listen for real time updates from the socket API via a single socket
- * connection. It's expected to be instantiated once per feed channel.
+ * connection.
  */
 export class FeedSocketManager {
   // Mapping of live channels by topic. Note, there can be one or more feed
