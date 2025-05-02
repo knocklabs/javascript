@@ -45,17 +45,17 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
 const DEFAULT_DISCONNECT_DELAY = 2000;
 
 class Feed {
+  public readonly defaultOptions: FeedClientOptions;
   public userFeedId: string;
   public referenceId: string;
+  public unsub: (() => void) | undefined = undefined;
   private socketManager: FeedSocketManager | undefined;
   private broadcaster: EventEmitter;
-  public readonly defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: boolean = false;
   private visibilityChangeHandler: () => void = () => {};
   private visibilityChangeListenerConnected: boolean = false;
-  public unsub: (() => void) | undefined = undefined;
 
   // The raw store instance, used for binding in React and other environments
   public store: StoreApi<FeedStoreState>;
