@@ -4919,7 +4919,7 @@ __metadata:
     expo-notifications: "npm:>=0.29.13"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
-    react-native-gesture-handler: "npm:^2.21.2"
+    react-native-gesture-handler: "npm:^2.25.0"
     react-native-render-html: "npm:^6.3.4"
     react-native-svg: "npm:^15.10.1"
     rimraf: "npm:^6.0.1"
@@ -5047,7 +5047,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.14"
     react: "npm:^18.2.0"
     react-native: "npm:^0.73.4"
-    react-native-gesture-handler: "npm:^2.21.2"
+    react-native-gesture-handler: "npm:^2.25.0"
     react-native-render-html: "npm:^6.3.4"
     react-native-svg: "npm:^15.10.1"
     rimraf: "npm:^6.0.1"
@@ -18275,9 +18275,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.21.2":
-  version: 2.24.0
-  resolution: "react-native-gesture-handler@npm:2.24.0"
+"react-native-gesture-handler@npm:^2.25.0":
+  version: 2.25.0
+  resolution: "react-native-gesture-handler@npm:2.25.0"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -18285,7 +18285,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/eb2c5cb53690ae5de1482370a156cbd775f6b3054540cd47310ec4712df83a280fe7b6259f372eec4c14a6d7f70ab18f1919a9fe63beaca9ceae126edbe32298
+  checksum: 10c0/95eccc67fb07418ef76b84bcee4b29c16865e78afa367ec82d94b08554cfa7337158ab23937b785bd9a732e62c9c815b294a93d1b2c2cbdc7a8a1e7029f2ba35
   languageName: node
   linkType: hard
 
