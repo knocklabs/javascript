@@ -94,6 +94,26 @@ describe("FeedSocketManager", () => {
         [TEST_CLIENT_REF_ID]: { tenant: "new-tenant" },
       });
     });
+
+    it("should allow joining the same feed ID multiple times", () => {
+      manager.join(mockFeed);
+      const anotherFeed = createMockFeed({
+        referenceId: "client_IgJDCQHSh-C546bVSnATQ",
+        defaultOptions: { tenant: "test-tenant-2" },
+      });
+      manager.join(anotherFeed);
+
+      expect(socket.channel).toHaveBeenCalledTimes(2);
+      expect(mockChannel.join).toHaveBeenCalledTimes(2);
+
+      expect(socket.channel).toHaveBeenNthCalledWith(1, "feeds:test:user1", {
+        [TEST_CLIENT_REF_ID]: { tenant: "test-tenant" },
+      });
+      expect(socket.channel).toHaveBeenNthCalledWith(2, "feeds:test:user1", {
+        [TEST_CLIENT_REF_ID]: { tenant: "test-tenant" },
+        [anotherFeed.referenceId]: { tenant: "test-tenant-2" },
+      });
+    });
   });
 
   describe("leave", () => {
