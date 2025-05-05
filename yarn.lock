@@ -4854,7 +4854,7 @@ __metadata:
     eventemitter2: "npm:^6.4.5"
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
-    nanoid: "npm:^3"
+    nanoid: "npm:^3.3.11"
     phoenix: "npm:1.7.19"
     prettier: "npm:^3.5.3"
     rimraf: "npm:^6.0.1"
@@ -16882,7 +16882,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3":
+"nanoid@npm:^3.3.11":
   version: 3.3.11
   resolution: "nanoid@npm:3.3.11"
   bin:
