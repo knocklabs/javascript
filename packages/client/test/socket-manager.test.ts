@@ -10,6 +10,8 @@ import {
 } from "../src/clients/feed/socket-manager";
 import Knock from "../src/knock";
 
+const TEST_CLIENT_REF_ID = "client_V1StGXR8_Z5jdHi6B-myT";
+
 describe("FeedSocketManager", () => {
   let socket: Socket;
   let manager: FeedSocketManager;
@@ -19,7 +21,7 @@ describe("FeedSocketManager", () => {
   const createMockFeed = (overrides = {}) =>
     ({
       socketChannelTopic: "feeds:test:user1",
-      referenceId: "ref-1",
+      referenceId: TEST_CLIENT_REF_ID,
       defaultOptions: { tenant: "test-tenant" },
       handleSocketEvent: vi.fn(),
       unsubscribeFromSocketEvents: vi.fn(),
@@ -31,7 +33,7 @@ describe("FeedSocketManager", () => {
       hasSubscribedToRealTimeUpdates: false,
       visibilityChangeHandler: () => {},
       visibilityChangeListenerConnected: false,
-      store: {} as StoreApi<any>,
+      store: {} as StoreApi<unknown>,
       knock: {} as Knock,
       feedId: "test-feed",
       ...overrides,
@@ -63,7 +65,7 @@ describe("FeedSocketManager", () => {
     it("should create and join channel with correct params", () => {
       manager.join(mockFeed);
       expect(socket.channel).toHaveBeenCalledWith("feeds:test:user1", {
-        "ref-1": { tenant: "test-tenant" },
+        [TEST_CLIENT_REF_ID]: { tenant: "test-tenant" },
       });
       expect(mockChannel.join).toHaveBeenCalled();
     });
@@ -89,7 +91,7 @@ describe("FeedSocketManager", () => {
       });
       manager.join(newFeed);
       expect(socket.channel).toHaveBeenCalledWith("feeds:test:user1", {
-        "ref-1": { tenant: "new-tenant" },
+        [TEST_CLIENT_REF_ID]: { tenant: "new-tenant" },
       });
     });
   });
@@ -111,7 +113,9 @@ describe("FeedSocketManager", () => {
     });
 
     it("should not leave channel if other feeds remain", () => {
-      const anotherFeed = createMockFeed({ referenceId: "ref-2" });
+      const anotherFeed = createMockFeed({
+        referenceId: "client_IgJDCQHSh-C546bVSnATQ",
+      });
       manager.join(anotherFeed);
       manager.leave(mockFeed);
       expect(mockChannel.leave).not.toHaveBeenCalled();
@@ -126,30 +130,32 @@ describe("FeedSocketManager", () => {
       const payload = {
         event: SocketEventType.NewMessage,
         metadata: { id: "test" },
-        data: { "ref-1": { metadata: { id: "test" } } },
-        attn: ["ref-1"],
+        data: { TEST_CLIENT_REF_ID: { metadata: { id: "test" } } },
+        attn: [TEST_CLIENT_REF_ID],
       };
 
       eventHandler(payload);
       expect(mockFeed.handleSocketEvent).toHaveBeenCalledWith({
         event: SocketEventType.NewMessage,
         metadata: { id: "test" },
-        data: { "ref-1": { metadata: { id: "test" } } },
+        data: { TEST_CLIENT_REF_ID: { metadata: { id: "test" } } },
       });
 
       unsub();
     });
 
     it("should not notify feed clients not in attn list", () => {
-      const anotherFeed = createMockFeed({ referenceId: "ref-2" });
+      const anotherFeed = createMockFeed({
+        referenceId: "client_IgJDCQHSh-C546bVSnATQ",
+      });
       manager.join(anotherFeed);
       const eventHandler = (mockChannel.on as any).mock.calls[0][1];
 
       const payload = {
         event: SocketEventType.NewMessage,
         metadata: { id: "test" },
-        data: { "ref-1": { metadata: { id: "test" } } },
-        attn: ["ref-1"],
+        data: { TEST_CLIENT_REF_ID: { metadata: { id: "test" } } },
+        attn: [TEST_CLIENT_REF_ID],
       };
 
       eventHandler(payload);
