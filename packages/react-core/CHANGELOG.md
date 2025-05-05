@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.9
+
+### Patch Changes
+
+- 329ee05: downgrade tanstack store deps to 0.6.x to work in older TS version
+- Updated dependencies [329ee05]
+  - @knocklabs/client@0.14.8
+
 ## 0.6.8
 
 ### Patch Changes

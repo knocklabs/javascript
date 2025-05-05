@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.8
+
+### Patch Changes
+
+- 329ee05: downgrade tanstack store deps to 0.6.x to work in older TS version
+
 ## 0.14.7
 
 ### Patch Changes
