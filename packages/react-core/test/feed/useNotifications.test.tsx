@@ -36,4 +36,49 @@ describe("useNotifications", () => {
     expect(feedClient.feedId).toEqual(TEST_FEED_CHANNEL_ID);
     expect(feedClient.defaultOptions).toEqual(options);
   });
+
+  test("disposes existing feed client when options change", () => {
+    vi.spyOn(knock.feeds, "initialize");
+    vi.spyOn(knock.feeds, "removeInstance");
+
+    const options1: FeedClientOptions = {
+      archived: "include",
+      page_size: 10,
+      status: "all",
+    };
+
+    const options2: FeedClientOptions = {
+      archived: "exclude",
+      page_size: 10,
+      status: "read",
+    };
+
+    const { result, rerender } = renderHook(
+      (options: FeedClientOptions) =>
+        useNotifications(knock, TEST_FEED_CHANNEL_ID, options),
+      { initialProps: options1 },
+    );
+
+    const feedClient1 = result.current;
+    rerender(options2);
+    const feedClient2 = result.current;
+
+    // The old feed client should be disposed
+    expect(knock.feeds.removeInstance).toHaveBeenCalledExactlyOnceWith(
+      feedClient1,
+    );
+
+    expect(knock.feeds.initialize).toHaveBeenCalledTimes(2);
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
+      2,
+      TEST_FEED_CHANNEL_ID,
+      options2,
+    );
+
+    // A new feed client should be created
+    expect(feedClient2).toBeDefined();
+    expect(feedClient2).not.toBe(feedClient1);
+    expect(feedClient2.feedId).toEqual(TEST_FEED_CHANNEL_ID);
+    expect(feedClient2.defaultOptions).toEqual(options2);
+  });
 });
