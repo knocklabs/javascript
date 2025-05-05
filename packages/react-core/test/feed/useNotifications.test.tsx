@@ -1,39 +1,32 @@
-import { FeedClientOptions } from "@knocklabs/client";
+import Knock, { FeedClientOptions } from "@knocklabs/client";
 import { renderHook } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import useNotifications from "../../src/modules/feed/hooks/useNotifications";
 
 const TEST_FEED_CHANNEL_ID = "e84d5ddc-fd69-44ad-a431-68d784b8c306";
 
 describe("useNotifications", () => {
+  let knock: Knock;
+
+  beforeEach(() => {
+    knock = new Knock("test_api_key");
+  });
+
   test("initializes and returns a new feed client", () => {
-    // Create a mock Knock instance
-    const mockKnock = {
-      feeds: {
-        initialize: vi.fn().mockReturnValue({
-          dispose: vi.fn(),
-          store: {
-            subscribe: vi.fn(),
-            setState: vi.fn(),
-          },
-          listenForUpdates: vi.fn(),
-        }),
-      },
-    };
+    vi.spyOn(knock.feeds, "initialize");
 
     const options: FeedClientOptions = {
+      archived: "include",
       page_size: 10,
       status: "all",
     };
 
-    // Render the hook
     const { result } = renderHook(() =>
-      useNotifications(mockKnock as any, TEST_FEED_CHANNEL_ID, options),
+      useNotifications(knock, TEST_FEED_CHANNEL_ID, options),
     );
 
-    // Verify that initialize was called with the correct parameters
-    expect(mockKnock.feeds.initialize).toHaveBeenCalledWith(
+    expect(knock.feeds.initialize).toHaveBeenCalledExactlyOnceWith(
       TEST_FEED_CHANNEL_ID,
       options,
     );
