@@ -18,3 +18,6 @@ updates:
     ignore:
       - dependency-name: "@radix-ui/react-popover"
       - dependency-name: "@radix-ui/react-visually-hidden"
+      # nanoid >3 drops support for cjs
+      - dependency-name: "nanoid"
+        versions: [">=4.0.0"]
