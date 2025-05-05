@@ -145,7 +145,7 @@ describe("FeedSocketManager", () => {
   describe("socket event handling", () => {
     it("should notify relevant feed clients when receiving socket events", () => {
       const unsub = manager.join(mockFeed);
-      const eventHandler = (mockChannel.on as any).mock.calls[0][1];
+      const eventHandler = vi.mocked(mockChannel.on).mock.calls[0]?.[1];
 
       const payload = {
         event: SocketEventType.NewMessage,
@@ -154,7 +154,7 @@ describe("FeedSocketManager", () => {
         attn: [TEST_CLIENT_REF_ID],
       };
 
-      eventHandler(payload);
+      eventHandler?.(payload);
       expect(mockFeed.handleSocketEvent).toHaveBeenCalledWith({
         event: SocketEventType.NewMessage,
         metadata: { id: "test" },
@@ -169,7 +169,7 @@ describe("FeedSocketManager", () => {
         referenceId: "client_IgJDCQHSh-C546bVSnATQ",
       });
       manager.join(anotherFeed);
-      const eventHandler = (mockChannel.on as any).mock.calls[0][1];
+      const eventHandler = vi.mocked(mockChannel.on).mock.calls[0]?.[1];
 
       const payload = {
         event: SocketEventType.NewMessage,
@@ -178,7 +178,7 @@ describe("FeedSocketManager", () => {
         attn: [TEST_CLIENT_REF_ID],
       };
 
-      eventHandler(payload);
+      eventHandler?.(payload);
       expect(anotherFeed.handleSocketEvent).not.toHaveBeenCalled();
     });
   });
