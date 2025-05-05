@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
-    "@tanstack/react-store": "^0.7.0",
+    "@tanstack/react-store": "0.6.1",
     "date-fns": "^4.0.0",
     "fast-deep-equal": "^3.1.3",
     "swr": "^2.3.3",
