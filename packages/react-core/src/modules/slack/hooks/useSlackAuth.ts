@@ -17,19 +17,28 @@ type UseSlackAuthOutput = {
   disconnectFromSlack: () => void;
 };
 
+type UseSlackAuthOptions = {
+  // When provided, the default scopes will be overridden with the provided scopes
+  scopes?: string[];
+  // Additional scopes to add to the default scopes
+  additionalScopes?: string[];
+};
+
 function useSlackAuth(
   slackClientId: string,
   redirectUrl?: string,
-  additionalScopes?: string[],
+  options?: UseSlackAuthOptions,
 ): UseSlackAuthOutput {
   const knock = useKnockClient();
   const { setConnectionStatus, knockSlackChannelId, tenantId, setActionLabel } =
     useKnockSlackClient();
 
+  const baseScopes = options?.scopes ?? DEFAULT_SLACK_SCOPES;
+
   const combinedScopes =
-    additionalScopes && additionalScopes.length > 0
-      ? Array.from(new Set(DEFAULT_SLACK_SCOPES.concat(additionalScopes)))
-      : DEFAULT_SLACK_SCOPES;
+    options?.additionalScopes && options.additionalScopes.length > 0
+      ? Array.from(new Set(baseScopes.concat(options.additionalScopes)))
+      : baseScopes;
 
   const disconnectFromSlack = useCallback(async () => {
     setActionLabel(null);
