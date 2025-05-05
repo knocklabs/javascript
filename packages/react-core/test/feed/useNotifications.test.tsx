@@ -37,6 +37,37 @@ describe("useNotifications", () => {
     expect(feedClient.defaultOptions).toEqual(options);
   });
 
+  test.fails("disposes feed client on unmount", () => {
+    vi.spyOn(knock.feeds, "initialize");
+    vi.spyOn(knock.feeds, "removeInstance");
+
+    const options: FeedClientOptions = {
+      archived: "include",
+      page_size: 10,
+      status: "all",
+    };
+
+    const { result, unmount } = renderHook(() =>
+      useNotifications(knock, TEST_FEED_CHANNEL_ID, options),
+    );
+
+    const feedClient = result.current;
+
+    // A feed client was initialized
+    expect(knock.feeds.initialize).toHaveBeenCalledTimes(1);
+    expect(result.current).toBeDefined();
+
+    unmount();
+
+    // The feed client was disposed
+    expect(knock.feeds.removeInstance).toHaveBeenCalledExactlyOnceWith(
+      feedClient,
+    );
+
+    // No additional feed clients were initialized
+    expect(knock.feeds.initialize).toHaveBeenCalledTimes(1);
+  });
+
   test("disposes existing feed client when feed ID changes", () => {
     vi.spyOn(knock.feeds, "initialize");
     vi.spyOn(knock.feeds, "removeInstance");
