@@ -44,6 +44,8 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
 
 const DEFAULT_DISCONNECT_DELAY = 2000;
 
+const CLIENT_REF_ID_PREFIX = "client_";
+
 class Feed {
   public readonly defaultOptions: FeedClientOptions;
   public readonly referenceId: string;
@@ -75,7 +77,7 @@ class Feed {
 
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
-    this.referenceId = nanoid();
+    this.referenceId = CLIENT_REF_ID_PREFIX + nanoid();
     this.socketManager = socketManager;
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
