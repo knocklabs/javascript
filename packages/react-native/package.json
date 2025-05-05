@@ -48,11 +48,13 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "react-native-gesture-handler": "^2.25.0",
+    "react-native-get-random-values": "^1.11.0",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "^15.10.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.6",
+    "@types/react-native-get-random-values": "^1",
     "@types/react-native-htmlview": "^0.16.5",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.27.0",
