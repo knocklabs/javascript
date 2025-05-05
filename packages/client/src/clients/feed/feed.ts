@@ -1,6 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
-import { Channel } from "phoenix";
+import { nanoid } from "nanoid";
 import type { StoreApi } from "zustand";
 
 import { isValidUuid } from "../../helpers";
@@ -19,6 +19,11 @@ import {
   FetchFeedOptions,
   FetchFeedOptionsForRequest,
 } from "./interfaces";
+import {
+  FeedSocketManager,
+  SocketEventPayload,
+  SocketEventType,
+} from "./socket-manager";
 import createStore from "./store";
 import {
   BindableFeedEvent,
@@ -39,11 +44,15 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
 
 const DEFAULT_DISCONNECT_DELAY = 2000;
 
+const CLIENT_REF_ID_PREFIX = "client_";
+
 class Feed {
+  public readonly defaultOptions: FeedClientOptions;
+  public readonly referenceId: string;
+  public unsubscribeFromSocketEvents: (() => void) | undefined = undefined;
+  private socketManager: FeedSocketManager | undefined;
   private userFeedId: string;
-  private channel?: Channel;
   private broadcaster: EventEmitter;
-  private defaultOptions: FeedClientOptions;
   private broadcastChannel!: BroadcastChannel | null;
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: boolean = false;
@@ -57,6 +66,7 @@ class Feed {
     readonly knock: Knock,
     readonly feedId: string,
     options: FeedClientOptions,
+    socketManager: FeedSocketManager | undefined,
   ) {
     if (!feedId || !isValidUuid(feedId)) {
       this.knock.log(
@@ -67,6 +77,8 @@ class Feed {
 
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
+    this.referenceId = CLIENT_REF_ID_PREFIX + nanoid();
+    this.socketManager = socketManager;
     this.store = createStore();
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = {
@@ -84,7 +96,9 @@ class Feed {
   /**
    * Used to reinitialize a current feed instance, which is useful when reauthenticating users
    */
-  reinitialize() {
+  reinitialize(socketManager?: FeedSocketManager) {
+    this.socketManager = socketManager;
+
     // Reinitialize the user feed id incase the userId changed
     this.userFeedId = this.buildUserFeedId();
 
@@ -102,12 +116,9 @@ class Feed {
   teardown() {
     this.knock.log("[Feed] Tearing down feed instance");
 
-    if (this.channel) {
-      this.channel.leave();
-      this.channel.off("new-message");
-    }
+    this.socketManager?.leave(this);
 
-    this.teardownAutoSocketManager();
+    this.tearDownVisibilityListeners();
 
     if (this.disconnectTimer) {
       clearTimeout(this.disconnectTimer);
@@ -144,17 +155,7 @@ class Feed {
       return;
     }
 
-    const maybeSocket = this.knock.client().socket;
-
-    // Connect the socket only if we don't already have a connection
-    if (maybeSocket && !maybeSocket.isConnected()) {
-      maybeSocket.connect();
-    }
-
-    // Only join the channel if we're not already in a joining state
-    if (this.channel && ["closed", "errored"].includes(this.channel.state)) {
-      this.channel.join();
-    }
+    this.unsubscribeFromSocketEvents = this.socketManager?.join(this);
   }
 
   /* Binds a handler to be invoked when event occurs */
@@ -587,6 +588,10 @@ class Feed {
     });
   }
 
+  get socketChannelTopic(): string {
+    return `feeds:${this.userFeedId}`;
+  }
+
   private broadcast(
     eventName: FeedEvent,
     data: FeedResponse | FeedEventPayload,
@@ -595,15 +600,19 @@ class Feed {
   }
 
   // Invoked when a new real-time message comes in from the socket
-  private async onNewMessageReceived({
-    metadata,
-  }: FeedMessagesReceivedPayload) {
+  private async onNewMessageReceived({ data }: FeedMessagesReceivedPayload) {
     this.knock.log("[Feed] Received new real-time message");
+
     // Handle the new message coming in
     const { items, ...state } = this.store.getState();
     const currentHead: FeedItem | undefined = items[0];
+
     // Optimistically set the badge counts
-    state.setMetadata(metadata);
+    const metadata = data[this.referenceId]?.metadata;
+    if (metadata) {
+      state.setMetadata(metadata);
+    }
+
     // Fetch the items before the current head (if it exists)
     this.fetch({ before: currentHead?.__cursor, __fetchSource: "socket" });
   }
@@ -767,28 +776,29 @@ class Feed {
   }
 
   private initializeRealtimeConnection() {
-    const { socket: maybeSocket } = this.knock.client();
-
     // In server environments we might not have a socket connection
-    if (!maybeSocket) return;
-
-    // Reinitialize channel connections incase the socket changed
-    this.channel = maybeSocket.channel(
-      `feeds:${this.userFeedId}`,
-      this.defaultOptions,
-    );
-
-    this.channel.on("new-message", (resp) => this.onNewMessageReceived(resp));
+    if (!this.socketManager) return;
 
     if (this.defaultOptions.auto_manage_socket_connection) {
-      this.setupAutoSocketManager();
+      this.setUpVisibilityListeners();
     }
 
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
     if (this.hasSubscribedToRealTimeUpdates && this.knock.isAuthenticated()) {
-      if (!maybeSocket.isConnected()) maybeSocket.connect();
-      this.channel.join();
+      this.unsubscribeFromSocketEvents = this.socketManager?.join(this);
+    }
+  }
+
+  async handleSocketEvent(payload: SocketEventPayload) {
+    switch (payload.event) {
+      case SocketEventType.NewMessage:
+        this.onNewMessageReceived(payload);
+        return;
+      default: {
+        const _exhaustiveCheck: never = payload.event;
+        return;
+      }
     }
   }
 
@@ -796,7 +806,7 @@ class Feed {
    * Listen for changes to document visibility and automatically disconnect
    * or reconnect the socket after a delay
    */
-  private setupAutoSocketManager() {
+  private setUpVisibilityListeners() {
     if (
       typeof document === "undefined" ||
       this.visibilityChangeListenerConnected
@@ -809,7 +819,7 @@ class Feed {
     document.addEventListener("visibilitychange", this.visibilityChangeHandler);
   }
 
-  private teardownAutoSocketManager() {
+  private tearDownVisibilityListeners() {
     if (typeof document === "undefined") return;
 
     document.removeEventListener(
@@ -860,7 +870,7 @@ class Feed {
 
       // If the socket is not connected, try to reconnect
       if (!client.socket?.isConnected()) {
-        this.initializeRealtimeConnection();
+        client.socket?.connect();
       }
     }
   }
