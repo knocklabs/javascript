@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.14.7
+
+### Patch Changes
+
+- efd1005: Fix CJS builds
+
+  v0.14.6 of our client SDK did not support CJS. This version fixes CJS support.
+
 ## 0.14.6
 
 ### Patch Changes
