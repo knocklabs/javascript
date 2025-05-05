@@ -37,6 +37,48 @@ describe("useNotifications", () => {
     expect(feedClient.defaultOptions).toEqual(options);
   });
 
+  test("disposes existing feed client when feed ID changes", () => {
+    vi.spyOn(knock.feeds, "initialize");
+    vi.spyOn(knock.feeds, "removeInstance");
+
+    const feedId1 = TEST_FEED_CHANNEL_ID;
+    const feedId2 = "86784a77-b9ea-4683-85b3-7362b426e810";
+
+    const options: FeedClientOptions = {
+      archived: "include",
+      page_size: 10,
+      status: "all",
+    };
+
+    const { result, rerender } = renderHook(
+      (feedId: string) =>
+        useNotifications(knock, feedId, {
+          archived: "include",
+          page_size: 10,
+          status: "all",
+        }),
+      { initialProps: feedId1 },
+    );
+
+    const feedClient1 = result.current;
+    rerender(feedId2);
+    const feedClient2 = result.current;
+
+    // The old feed client should be disposed
+    expect(knock.feeds.removeInstance).toHaveBeenCalledExactlyOnceWith(
+      feedClient1,
+    );
+
+    expect(knock.feeds.initialize).toHaveBeenCalledTimes(2);
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(2, feedId2, options);
+
+    // A new feed client should be created
+    expect(feedClient2).toBeDefined();
+    expect(feedClient2).not.toBe(feedClient1);
+    expect(feedClient2.feedId).toEqual(feedId2);
+    expect(feedClient2.defaultOptions).toEqual(options);
+  });
+
   test("disposes existing feed client when options change", () => {
     vi.spyOn(knock.feeds, "initialize");
     vi.spyOn(knock.feeds, "removeInstance");
