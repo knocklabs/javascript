@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.7
+
+### Patch Changes
+
+- Updated dependencies [a5c615e]
+  - @knocklabs/client@0.14.6
+
 ## 0.6.6
 
 ### Patch Changes
