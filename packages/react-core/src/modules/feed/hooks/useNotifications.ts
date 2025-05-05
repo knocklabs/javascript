@@ -7,7 +7,7 @@ function useNotifications(
   knock: Knock,
   feedChannelId: string,
   options: FeedClientOptions = {},
-) {
+): Feed {
   const feedClientRef = useRef<Feed>();
   const stableOptions = useStableOptions(options);
 
