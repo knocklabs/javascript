@@ -21,5 +21,8 @@ updates:
       # nanoid >3 drops support for cjs
       - dependency-name: "nanoid"
         versions: [">=4.0.0"]
+      # We cannot upgrade tanstack store to >=0.7.0 at the moment until we are
+      # ready to require more recent typescript version (likely v5.4 or greater)
+      # See: https://github.com/knocklabs/javascript/pull/520
       - dependency-name: "@tanstack/store"
       - dependency-name: "@tanstack/react-store"
