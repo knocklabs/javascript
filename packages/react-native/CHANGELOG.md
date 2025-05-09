@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.17
+
+### Patch Changes
+
+- Updated dependencies [337bade]
+  - @knocklabs/react-core@0.6.10
+
 ## 0.6.16
 
 ### Patch Changes
