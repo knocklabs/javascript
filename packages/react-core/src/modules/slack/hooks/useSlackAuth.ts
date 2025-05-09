@@ -24,21 +24,38 @@ type UseSlackAuthOptions = {
   additionalScopes?: string[];
 };
 
+// Here we normalize the options to be a single object with scopes and additionalScopes
+// The "options" parameter can be an array of scopes, an object with scopes and additionalScopes, or undefined
+// We handle the array case because it was the previous way to pass options so we're being backward compatible
+function normalizeOptions(options?: UseSlackAuthOptions | string[]): {
+  scopes: string[];
+  additionalScopes: string[];
+} {
+  if (!options) {
+    return { scopes: DEFAULT_SLACK_SCOPES, additionalScopes: [] };
+  }
+
+  if (Array.isArray(options)) {
+    return { scopes: DEFAULT_SLACK_SCOPES, additionalScopes: options };
+  }
+
+  return {
+    scopes: options.scopes ?? DEFAULT_SLACK_SCOPES,
+    additionalScopes: options.additionalScopes ?? [],
+  };
+}
+
 function useSlackAuth(
   slackClientId: string,
   redirectUrl?: string,
-  options?: UseSlackAuthOptions,
+  options?: UseSlackAuthOptions | string[],
 ): UseSlackAuthOutput {
   const knock = useKnockClient();
   const { setConnectionStatus, knockSlackChannelId, tenantId, setActionLabel } =
     useKnockSlackClient();
 
-  const baseScopes = options?.scopes ?? DEFAULT_SLACK_SCOPES;
-
-  const combinedScopes =
-    options?.additionalScopes && options.additionalScopes.length > 0
-      ? Array.from(new Set(baseScopes.concat(options.additionalScopes)))
-      : baseScopes;
+  const { scopes, additionalScopes } = normalizeOptions(options);
+  const combinedScopes = Array.from(new Set(scopes.concat(additionalScopes)));
 
   const disconnectFromSlack = useCallback(async () => {
     setActionLabel(null);
