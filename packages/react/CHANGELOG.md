@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.10
+
+### Patch Changes
+
+- 337bade: feat: introduce ability to override slack scopes
+- Updated dependencies [337bade]
+  - @knocklabs/react-core@0.6.10
+
 ## 0.7.9
 
 ### Patch Changes

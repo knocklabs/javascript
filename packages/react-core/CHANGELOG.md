@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.10
+
+### Patch Changes
+
+- 337bade: feat: introduce ability to override slack scopes
+
 ## 0.6.9
 
 ### Patch Changes
