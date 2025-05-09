@@ -17,19 +17,45 @@ type UseSlackAuthOutput = {
   disconnectFromSlack: () => void;
 };
 
+type UseSlackAuthOptions = {
+  // When provided, the default scopes will be overridden with the provided scopes
+  scopes?: string[];
+  // Additional scopes to add to the default scopes
+  additionalScopes?: string[];
+};
+
+// Here we normalize the options to be a single object with scopes and additionalScopes
+// The "options" parameter can be an array of scopes, an object with scopes and additionalScopes, or undefined
+// We handle the array case because it was the previous way to pass options so we're being backward compatible
+function normalizeOptions(options?: UseSlackAuthOptions | string[]): {
+  scopes: string[];
+  additionalScopes: string[];
+} {
+  if (!options) {
+    return { scopes: DEFAULT_SLACK_SCOPES, additionalScopes: [] };
+  }
+
+  if (Array.isArray(options)) {
+    return { scopes: DEFAULT_SLACK_SCOPES, additionalScopes: options };
+  }
+
+  return {
+    scopes: options.scopes ?? DEFAULT_SLACK_SCOPES,
+    additionalScopes: options.additionalScopes ?? [],
+  };
+}
+
 function useSlackAuth(
   slackClientId: string,
   redirectUrl?: string,
-  additionalScopes?: string[],
+  options?: UseSlackAuthOptions | string[],
 ): UseSlackAuthOutput {
   const knock = useKnockClient();
   const { setConnectionStatus, knockSlackChannelId, tenantId, setActionLabel } =
     useKnockSlackClient();
 
-  const combinedScopes =
-    additionalScopes && additionalScopes.length > 0
-      ? Array.from(new Set(DEFAULT_SLACK_SCOPES.concat(additionalScopes)))
-      : DEFAULT_SLACK_SCOPES;
+  const { scopes, additionalScopes } = normalizeOptions(options);
+  const combinedScopes = Array.from(new Set(scopes.concat(additionalScopes)));
 
   const disconnectFromSlack = useCallback(async () => {
     setActionLabel(null);

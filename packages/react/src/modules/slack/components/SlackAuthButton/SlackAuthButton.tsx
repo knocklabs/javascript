@@ -4,7 +4,7 @@ import {
   useSlackAuth,
   useTranslations,
 } from "@knocklabs/react-core";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { useEffect } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
@@ -17,6 +17,9 @@ export interface SlackAuthButtonProps {
   slackClientId: string;
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
+  // When provided, the default scopes will be overridden with the provided scopes
+  scopes?: string[];
+  // Additional scopes to add to the default scopes
   additionalScopes?: string[];
 }
 
@@ -24,6 +27,7 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   slackClientId,
   redirectUrl,
   onAuthenticationComplete,
+  scopes,
   additionalScopes,
 }) => {
   const { t } = useTranslations();
@@ -37,10 +41,18 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     errorLabel,
   } = useKnockSlackClient();
 
+  const useSlackAuthOptions = useMemo(
+    () => ({
+      scopes,
+      additionalScopes,
+    }),
+    [scopes, additionalScopes],
+  );
+
   const { buildSlackAuthUrl, disconnectFromSlack } = useSlackAuth(
     slackClientId,
     redirectUrl,
-    additionalScopes,
+    useSlackAuthOptions,
   );
 
   useEffect(() => {
