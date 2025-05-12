@@ -7,7 +7,7 @@
 - [ ] Sample todo item 2
 
 ### Checklist
-- [ ] Unit tests have been added for new features or major refactors to existing features.
+- [ ] Tests have been added for new features or major refactors to existing features.
 
 ### Screenshots or videos
 ** Attach any screenshots or recordings to visually illustrate the changes, as necessary. Delete if not relevant. **
