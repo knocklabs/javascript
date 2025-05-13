@@ -54,6 +54,12 @@
   gap: var(--knock-spacing-3);
   margin-top: var(--knock-spacing-4);
 }
+.knock-guide-modal__img {
+  display: block;
+  margin-top: var(--knock-spacing-4);
+  max-width: 100%;
+  height: auto;
+}
 .knock-guide-modal__action {
   text-decoration: none;
   text-align: center;

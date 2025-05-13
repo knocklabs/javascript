@@ -3,11 +3,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import clsx from "clsx";
 import React from "react";
 
-import { maybeNavigateToUrlWithDelay } from "../helpers";
+import { isValidHttpUrl, maybeNavigateToUrlWithDelay } from "../helpers";
 import {
   ButtonContent,
+  ImageContent,
   TargetButton,
-  TargetButtonWithGuideContext,
+  TargetButtonWithGuide,
+  TargetImage,
+  TargetImageWithGuide,
 } from "../types";
 
 import "./styles.css";
@@ -108,6 +111,21 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 };
 Body.displayName = "ModalView.Body";
 
+const Img: React.FC<
+  React.PropsWithChildren<React.ComponentPropsWithRef<"img">>
+> = ({ children, className, alt, ...props }) => {
+  return (
+    <img
+      className={clsx("knock-guide-modal__img", className)}
+      {...props}
+      alt={alt || ""}
+    >
+      {children}
+    </img>
+  );
+};
+Img.displayName = "ModalView.Img";
+
 const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
@@ -175,6 +193,7 @@ Close.displayName = "ModalView.Close";
 type ModalContent = {
   title: string;
   body: string;
+  image?: ImageContent;
   primary_button?: ButtonContent;
   secondary_button?: ButtonContent;
   dismissible?: boolean;
@@ -186,12 +205,14 @@ const DefaultView: React.FC<{
   onOpenChange?: (open: boolean) => void;
   onDismiss?: () => void;
   onButtonClick?: (e: React.MouseEvent, button: TargetButton) => void;
+  onImageClick?: (e: React.MouseEvent, image: TargetImage) => void;
 }> = ({
   content,
   colorMode = "light",
   onOpenChange,
   onDismiss,
   onButtonClick,
+  onImageClick,
 }) => {
   return (
     <Root onOpenChange={onOpenChange}>
@@ -208,32 +229,59 @@ const DefaultView: React.FC<{
 
         <Body body={content.body} />
 
-        <Actions>
-          {content.secondary_button && (
-            <SecondaryButton
-              text={content.secondary_button.text}
-              action={content.secondary_button.action}
+        {content.image && (
+          <a
+            href={
+              isValidHttpUrl(content.image.action)
+                ? content.image.action
+                : undefined
+            }
+            target="_blank"
+          >
+            <Img
+              src={content.image.url}
+              alt={content.image.alt || ""}
               onClick={(e) => {
-                if (onButtonClick) {
-                  const { text, action } = content.secondary_button!;
-                  onButtonClick(e, { name: "secondary_button", text, action });
+                if (onImageClick) {
+                  onImageClick(e, content.image!);
                 }
               }}
             />
-          )}
-          {content.primary_button && (
-            <PrimaryButton
-              text={content.primary_button.text}
-              action={content.primary_button.action}
-              onClick={(e) => {
-                if (onButtonClick) {
-                  const { text, action } = content.primary_button!;
-                  onButtonClick(e, { name: "primary_button", text, action });
-                }
-              }}
-            />
-          )}
-        </Actions>
+          </a>
+        )}
+
+        {(content.primary_button || content.secondary_button) && (
+          <Actions>
+            {content.secondary_button && (
+              <SecondaryButton
+                text={content.secondary_button.text}
+                action={content.secondary_button.action}
+                onClick={(e) => {
+                  if (onButtonClick) {
+                    const { text, action } = content.secondary_button!;
+                    onButtonClick(e, {
+                      name: "secondary_button",
+                      text,
+                      action,
+                    });
+                  }
+                }}
+              />
+            )}
+            {content.primary_button && (
+              <PrimaryButton
+                text={content.primary_button.text}
+                action={content.primary_button.action}
+                onClick={(e) => {
+                  if (onButtonClick) {
+                    const { text, action } = content.primary_button!;
+                    onButtonClick(e, { name: "primary_button", text, action });
+                  }
+                }}
+              />
+            )}
+          </Actions>
+        )}
       </Content>
     </Root>
   );
@@ -242,13 +290,15 @@ DefaultView.displayName = "ModalView.Default";
 
 type ModalProps = {
   guideKey?: string;
-  onButtonClick?: (
-    e: React.MouseEvent,
-    target: TargetButtonWithGuideContext,
-  ) => void;
+  onButtonClick?: (e: React.MouseEvent, target: TargetButtonWithGuide) => void;
+  onImageClick?: (e: React.MouseEvent, target: TargetImageWithGuide) => void;
 };
 
-export const Modal: React.FC<ModalProps> = ({ guideKey, onButtonClick }) => {
+export const Modal: React.FC<ModalProps> = ({
+  guideKey,
+  onButtonClick,
+  onImageClick,
+}) => {
   const { guide, step, colorMode } = useGuide({
     key: guideKey,
     type: MESSAGE_TYPE,
@@ -273,6 +323,14 @@ export const Modal: React.FC<ModalProps> = ({ guideKey, onButtonClick }) => {
           ? onButtonClick(e, { button, step, guide })
           : maybeNavigateToUrlWithDelay(button.action);
       }}
+      onImageClick={(e, image) => {
+        const metadata = { ...image, type: "image_click" };
+        step.markAsInteracted({ metadata });
+
+        if (onImageClick) {
+          return onImageClick(e, { image, step, guide });
+        }
+      }}
     />
   );
 };
@@ -285,6 +343,7 @@ export const ModalView = {} as {
   Content: typeof Content;
   Title: typeof Title;
   Body: typeof Body;
+  Img: typeof Img;
   Actions: typeof Actions;
   PrimaryButton: typeof PrimaryButton;
   SecondaryButton: typeof SecondaryButton;
@@ -298,6 +357,7 @@ Object.assign(ModalView, {
   Content,
   Title,
   Body,
+  Img,
   Actions,
   PrimaryButton,
   SecondaryButton,

@@ -3,11 +3,7 @@ import clsx from "clsx";
 import React from "react";
 
 import { maybeNavigateToUrlWithDelay } from "../helpers";
-import {
-  ButtonContent,
-  TargetButton,
-  TargetButtonWithGuideContext,
-} from "../types";
+import { ButtonContent, TargetButton, TargetButtonWithGuide } from "../types";
 
 import "./styles.css";
 
@@ -181,10 +177,7 @@ DefaultView.displayName = "BannerView.Default";
 
 type BannerProps = {
   guideKey?: string;
-  onButtonClick?: (
-    e: React.MouseEvent,
-    target: TargetButtonWithGuideContext,
-  ) => void;
+  onButtonClick?: (e: React.MouseEvent, target: TargetButtonWithGuide) => void;
 };
 
 export const Banner: React.FC<BannerProps> = ({ guideKey, onButtonClick }) => {
