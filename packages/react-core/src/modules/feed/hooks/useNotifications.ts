@@ -1,5 +1,5 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useStableOptions } from "../../core";
 
@@ -8,46 +8,43 @@ function useNotifications(
   feedChannelId: string,
   options: FeedClientOptions = {},
 ): Feed {
-  const stableOptions = useStableOptions(options);
-  const initFeedClient = useCallback(() => {
-    const feedClient = knock.feeds.initialize(feedChannelId, stableOptions);
-
-    // In development, we need to introduce this extra set state to force a render
-    // for Zustand as otherwise the state doesn't get reflected correctly
-    feedClient.store.subscribe((t) => feedClient.store.setState(t));
-
-    feedClient.listenForUpdates();
-
-    return feedClient;
-  }, [knock, feedChannelId, stableOptions]);
-
-  const feedClientRef = useRef<Feed | null>(null);
-
-  // See https://react.dev/reference/react/useRef#avoiding-recreating-the-ref-contents
-  if (feedClientRef.current === null) {
-    feedClientRef.current = initFeedClient();
-  }
-
+  const feedClientRef = useRef<Feed>();
   const disposedRef = useRef(false);
+  const stableOptions = useStableOptions(options);
 
   useEffect(() => {
-    if (disposedRef.current) {
-      feedClientRef.current = initFeedClient();
-      disposedRef.current = false;
-    }
-
-    const feedClient = feedClientRef.current;
-    const isDisposed = disposedRef.current;
-
     return () => {
-      if (!isDisposed && feedClient) {
-        feedClient.dispose();
+      const isDisposed = disposedRef.current;
+      if (!isDisposed) {
+        feedClientRef.current?.dispose();
         disposedRef.current = true;
       }
     };
-  }, [initFeedClient]);
+  }, []);
 
-  return feedClientRef.current;
+  return useMemo(() => {
+    const isDisposed = disposedRef.current;
+    if (!isDisposed && feedClientRef.current) {
+      feedClientRef.current.dispose();
+      disposedRef.current = true;
+    }
+
+    feedClientRef.current = knock.feeds.initialize(
+      feedChannelId,
+      stableOptions,
+    );
+    disposedRef.current = false;
+
+    // In development, we need to introduce this extra set state to force a render
+    // for Zustand as otherwise the state doesn't get reflected correctly
+    feedClientRef.current.store.subscribe((t) =>
+      feedClientRef?.current?.store.setState(t),
+    );
+
+    feedClientRef.current.listenForUpdates();
+
+    return feedClientRef.current;
+  }, [knock, feedChannelId, stableOptions]);
 }
 
 export default useNotifications;
