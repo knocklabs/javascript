@@ -1,5 +1,5 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useStableOptions } from "../../core";
 
@@ -21,23 +21,31 @@ function useNotifications(
     return feedClient;
   }, [knock, feedChannelId, stableOptions]);
 
-  const feedClientRef = useRef<Feed>(initFeedClient());
-  const [disposed, setDisposed] = useState(false);
+  const feedClientRef = useRef<Feed | null>(null);
+
+  // See https://react.dev/reference/react/useRef#avoiding-recreating-the-ref-contents
+  if (feedClientRef.current === null) {
+    feedClientRef.current = initFeedClient();
+  }
+
+  const disposedRef = useRef(false);
 
   useEffect(() => {
-    if (disposed) {
+    if (disposedRef.current) {
       feedClientRef.current = initFeedClient();
-      setDisposed(false);
+      disposedRef.current = false;
     }
 
     const feedClient = feedClientRef.current;
+    const isDisposed = disposedRef.current;
+
     return () => {
-      if (!disposed && feedClient) {
+      if (!isDisposed && feedClient) {
         feedClient.dispose();
-        setDisposed(true);
+        disposedRef.current = true;
       }
     };
-  }, [disposed, initFeedClient]);
+  }, [initFeedClient]);
 
   return feedClientRef.current;
 }

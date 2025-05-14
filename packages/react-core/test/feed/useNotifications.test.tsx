@@ -37,7 +37,7 @@ describe("useNotifications", () => {
     expect(feedClient.defaultOptions).toEqual(options);
   });
 
-  test.fails("disposes feed client on unmount", () => {
+  test("disposes feed client on unmount", () => {
     vi.spyOn(knock.feeds, "initialize");
     vi.spyOn(knock.feeds, "removeInstance");
 
