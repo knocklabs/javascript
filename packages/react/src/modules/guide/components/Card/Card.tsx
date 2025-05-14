@@ -92,8 +92,8 @@ const Img: React.FC<
   return (
     <img
       className={clsx("knock-guide-card__img", className)}
-      {...props}
       alt={alt || ""}
+      {...props}
     >
       {children}
     </img>

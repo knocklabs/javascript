@@ -117,8 +117,8 @@ const Img: React.FC<
   return (
     <img
       className={clsx("knock-guide-modal__img", className)}
-      {...props}
       alt={alt || ""}
+      {...props}
     >
       {children}
     </img>
@@ -240,7 +240,7 @@ const DefaultView: React.FC<{
           >
             <Img
               src={content.image.url}
-              alt={content.image.alt || ""}
+              alt={content.image.alt}
               onClick={(e) => {
                 if (onImageClick) {
                   onImageClick(e, content.image!);
