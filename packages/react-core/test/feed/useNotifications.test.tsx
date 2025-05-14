@@ -82,12 +82,7 @@ describe("useNotifications", () => {
     };
 
     const { result, rerender } = renderHook(
-      (feedId: string) =>
-        useNotifications(knock, feedId, {
-          archived: "include",
-          page_size: 10,
-          status: "all",
-        }),
+      (feedId: string) => useNotifications(knock, feedId, options),
       { initialProps: feedId1 },
     );
 
