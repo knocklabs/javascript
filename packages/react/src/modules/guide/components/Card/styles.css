@@ -46,6 +46,11 @@
 .knock-guide-card__body > :last-child {
   margin-bottom: 0;
 }
+.knock-guide-card__img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
 .knock-guide-card__actions {
   display: flex;
   align-items: center;
