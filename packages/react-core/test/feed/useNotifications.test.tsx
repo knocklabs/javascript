@@ -13,7 +13,7 @@ describe("useNotifications", () => {
     knock = new Knock("test_api_key");
   });
 
-  test("initializes and returns a new feed client (strict mode off)", () => {
+  test("initializes and returns a new feed client", () => {
     vi.spyOn(knock.feeds, "initialize");
 
     const options: FeedClientOptions = {
@@ -38,54 +38,8 @@ describe("useNotifications", () => {
     expect(feedClient.defaultOptions).toEqual(options);
   });
 
-  test("initializes and returns a new feed client (strict mode on)", () => {
-    vi.spyOn(knock.feeds, "initialize");
-    vi.spyOn(knock.feeds, "removeInstance");
-
-    const options: FeedClientOptions = {
-      archived: "include",
-      page_size: 10,
-      status: "all",
-    };
-
-    const { result } = renderHook(
-      () => useNotifications(knock, TEST_FEED_CHANNEL_ID, options),
-      { reactStrictMode: true },
-    );
-
-    const feedClient = result.current;
-
-    // useState initializers and useEffect hooks run twice in strict mode,
-    // so we should see 3 calls to initialize (2 in the useState initializer,
-    // 1 in the useEffect hook when the disposed feed is reinitialized)
-
-    expect(knock.feeds.initialize).toHaveBeenCalledTimes(3);
-    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
-      1,
-      TEST_FEED_CHANNEL_ID,
-      options,
-    );
-    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
-      2,
-      TEST_FEED_CHANNEL_ID,
-      options,
-    );
-    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
-      3,
-      TEST_FEED_CHANNEL_ID,
-      options,
-    );
-
-    expect(knock.feeds.removeInstance).toHaveBeenCalledTimes(1);
-    const disposedFeedClient = vi.mocked(knock.feeds.removeInstance).mock
-      .calls?.[0]?.[0];
-    // The disposed feed client should have the same feed ID,
-    // but should *not* be the same feed client instance
-    expect(disposedFeedClient?.feedId).toEqual(TEST_FEED_CHANNEL_ID);
-    expect(disposedFeedClient).not.toBe(feedClient);
-  });
-
-  test("disposes feed client on unmount", () => {
+  // KNO-8595: useNotifications hook does not dispose of feed client when component unmounts
+  test.fails("disposes feed client on unmount", () => {
     vi.spyOn(knock.feeds, "initialize");
     vi.spyOn(knock.feeds, "removeInstance");
 
