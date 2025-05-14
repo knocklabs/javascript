@@ -26,7 +26,7 @@ function useNotifications(
 
   useEffect(() => {
     if (disposed) {
-      initFeedClient();
+      feedClientRef.current = initFeedClient();
       setDisposed(false);
     }
 
