@@ -1,4 +1,4 @@
-const isValidHttpUrl = (input: string) => {
+export const isValidHttpUrl = (input: string) => {
   let url;
 
   try {
