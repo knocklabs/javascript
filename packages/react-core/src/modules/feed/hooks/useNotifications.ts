@@ -1,5 +1,5 @@
 import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useStableOptions } from "../../core";
 
@@ -33,13 +33,20 @@ function useNotifications(
     feedClient: initFeedClient(feedChannelId, stableOptions),
     options: stableOptions,
   }));
+  const disposedRef = useRef(false);
 
   useEffect(() => {
+    const isDisposed = disposedRef.current;
+
+    // Initialize a new feed client if the feed ID has changed,
+    // options have changed, or the current feed client has been disposed
     const needsReinit =
       state.feedClient.feedId !== feedChannelId ||
-      state.options !== stableOptions;
+      state.options !== stableOptions ||
+      isDisposed;
 
     if (needsReinit) {
+      disposedRef.current = false;
       setState({
         feedClient: initFeedClient(feedChannelId, stableOptions),
         options: stableOptions,
@@ -47,7 +54,10 @@ function useNotifications(
       return;
     }
 
-    return () => state.feedClient.dispose();
+    return () => {
+      disposedRef.current = true;
+      state.feedClient.dispose();
+    };
   }, [initFeedClient, feedChannelId, stableOptions, state]);
 
   return state.feedClient;
