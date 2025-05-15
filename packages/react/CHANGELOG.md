@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.11
+
+### Patch Changes
+
+- ca3cf14: Support an optional image field in Modal and Card components
+
 ## 0.7.10
 
 ### Patch Changes

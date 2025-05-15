@@ -103,7 +103,7 @@ describe("useNotifications", () => {
 
     // A feed client was initialized
     expect(knock.feeds.initialize).toHaveBeenCalledTimes(1);
-    expect(result.current).toBeDefined();
+    expect(feedClient).toBeDefined();
 
     unmount();
 
@@ -144,6 +144,7 @@ describe("useNotifications", () => {
     );
 
     expect(knock.feeds.initialize).toHaveBeenCalledTimes(2);
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(1, feedId1, options);
     expect(knock.feeds.initialize).toHaveBeenNthCalledWith(2, feedId2, options);
 
     // A new feed client should be created
@@ -185,6 +186,11 @@ describe("useNotifications", () => {
     );
 
     expect(knock.feeds.initialize).toHaveBeenCalledTimes(2);
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
+      1,
+      TEST_FEED_CHANNEL_ID,
+      options1,
+    );
     expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
       2,
       TEST_FEED_CHANNEL_ID,
