@@ -30,6 +30,9 @@ function useNotifications(
 
   const stableOptions = useStableOptions(options);
   const [state, setState] = useState<State>(() => ({
+    // FIXME In strict mode, useState initializer functions are called twice,
+    // which results in one extra instance of the feed client being created
+    // and not disposed of. This only affects strict mode.
     feedClient: initFeedClient(feedChannelId, stableOptions),
     options: stableOptions,
   }));
