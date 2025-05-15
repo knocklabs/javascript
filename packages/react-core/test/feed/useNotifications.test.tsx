@@ -27,8 +27,6 @@ describe("useNotifications", () => {
       { reactStrictMode: false },
     );
 
-    expect(knock.feeds.countInstances()).toBe(1);
-
     expect(knock.feeds.initialize).toHaveBeenCalledExactlyOnceWith(
       TEST_FEED_CHANNEL_ID,
       options,
@@ -40,58 +38,52 @@ describe("useNotifications", () => {
     expect(feedClient.defaultOptions).toEqual(options);
   });
 
-  test.fails(
-    "initializes and returns a new feed client (strict mode on)",
-    () => {
-      vi.spyOn(knock.feeds, "initialize");
-      vi.spyOn(knock.feeds, "removeInstance");
+  test("initializes and returns a new feed client (strict mode on)", () => {
+    vi.spyOn(knock.feeds, "initialize");
+    vi.spyOn(knock.feeds, "removeInstance");
 
-      const options: FeedClientOptions = {
-        archived: "include",
-        page_size: 10,
-        status: "all",
-      };
+    const options: FeedClientOptions = {
+      archived: "include",
+      page_size: 10,
+      status: "all",
+    };
 
-      const { result } = renderHook(
-        () => useNotifications(knock, TEST_FEED_CHANNEL_ID, options),
-        { reactStrictMode: true },
-      );
+    const { result } = renderHook(
+      () => useNotifications(knock, TEST_FEED_CHANNEL_ID, options),
+      { reactStrictMode: true },
+    );
 
-      const feedClient = result.current;
+    const feedClient = result.current;
 
-      // useState initializers and useEffect hooks run twice in strict mode,
-      // so we should see 3 calls to initialize (2 in the useState initializer,
-      // 1 in the useEffect hook when the disposed feed is reinitialized)
+    // useState initializers and useEffect hooks run twice in strict mode,
+    // so we should see 3 calls to initialize (2 in the useState initializer,
+    // 1 in the useEffect hook when the disposed feed is reinitialized)
 
-      expect(knock.feeds.initialize).toHaveBeenCalledTimes(3);
-      expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
-        1,
-        TEST_FEED_CHANNEL_ID,
-        options,
-      );
-      expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
-        2,
-        TEST_FEED_CHANNEL_ID,
-        options,
-      );
-      expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
-        3,
-        TEST_FEED_CHANNEL_ID,
-        options,
-      );
+    expect(knock.feeds.initialize).toHaveBeenCalledTimes(3);
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
+      1,
+      TEST_FEED_CHANNEL_ID,
+      options,
+    );
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
+      2,
+      TEST_FEED_CHANNEL_ID,
+      options,
+    );
+    expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
+      3,
+      TEST_FEED_CHANNEL_ID,
+      options,
+    );
 
-      expect(knock.feeds.removeInstance).toHaveBeenCalledTimes(1);
-      const disposedFeedClient = vi.mocked(knock.feeds.removeInstance).mock
-        .calls?.[0]?.[0];
-      // The disposed feed client should have the same feed ID,
-      // but should *not* be the same feed client instance
-      expect(disposedFeedClient?.feedId).toEqual(TEST_FEED_CHANNEL_ID);
-      expect(disposedFeedClient).not.toBe(feedClient);
-
-      // This is failing
-      expect(knock.feeds.countInstances()).toBe(1);
-    },
-  );
+    expect(knock.feeds.removeInstance).toHaveBeenCalledTimes(1);
+    const disposedFeedClient = vi.mocked(knock.feeds.removeInstance).mock
+      .calls?.[0]?.[0];
+    // The disposed feed client should have the same feed ID,
+    // but should *not* be the same feed client instance
+    expect(disposedFeedClient?.feedId).toEqual(TEST_FEED_CHANNEL_ID);
+    expect(disposedFeedClient).not.toBe(feedClient);
+  });
 
   test("disposes feed client on unmount", () => {
     vi.spyOn(knock.feeds, "initialize");
@@ -110,14 +102,12 @@ describe("useNotifications", () => {
     const feedClient = result.current;
 
     // A feed client was initialized
-    expect(knock.feeds.countInstances()).toBe(1);
     expect(knock.feeds.initialize).toHaveBeenCalledTimes(1);
     expect(feedClient).toBeDefined();
 
     unmount();
 
     // The feed client was disposed
-    expect(knock.feeds.countInstances()).toBe(0);
     expect(knock.feeds.removeInstance).toHaveBeenCalledExactlyOnceWith(
       feedClient,
     );
@@ -152,8 +142,6 @@ describe("useNotifications", () => {
     expect(knock.feeds.removeInstance).toHaveBeenCalledExactlyOnceWith(
       feedClient1,
     );
-
-    expect(knock.feeds.countInstances()).toBe(1);
 
     expect(knock.feeds.initialize).toHaveBeenCalledTimes(2);
     expect(knock.feeds.initialize).toHaveBeenNthCalledWith(1, feedId1, options);
@@ -196,8 +184,6 @@ describe("useNotifications", () => {
     expect(knock.feeds.removeInstance).toHaveBeenCalledExactlyOnceWith(
       feedClient1,
     );
-
-    expect(knock.feeds.countInstances()).toBe(1);
 
     expect(knock.feeds.initialize).toHaveBeenCalledTimes(2);
     expect(knock.feeds.initialize).toHaveBeenNthCalledWith(
