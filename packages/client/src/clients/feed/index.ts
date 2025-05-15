@@ -51,11 +51,6 @@ class FeedClient {
     }
   }
 
-  // Visible for testing
-  countInstances(): number {
-    return this.feedInstances.length;
-  }
-
   private initSocketManager() {
     const socket = this.instance.client().socket;
     if (socket && !this.socketManager) {
