@@ -8,8 +8,8 @@ import {
   vi,
 } from "vitest";
 
-import Knock from "../src/knock";
 import ApiClient from "../src/api";
+import Knock from "../src/knock";
 
 describe("it can create a feed client", () => {
   test("it sets configuration values", () => {
@@ -175,5 +175,22 @@ describe("it can handle date range parameters", () => {
         }),
       }),
     );
+  });
+});
+
+describe("countInstances", () => {
+  test("returns number of initialized feed instances", () => {
+    const knock = new Knock("pk_test_12345");
+    knock.authenticate("userId");
+
+    const feedId1 = "a9a65b13-993a-409e-a551-3ab0c1c83b9c";
+    const feedId2 = "f7a2fcef-96ff-452d-ba3a-51730349fe0a";
+    const feedId3 = "500f3b22-eb2c-446f-bca5-b302f277f727";
+
+    [feedId1, feedId2, feedId3].forEach((feedId) => {
+      knock.feeds.initialize(feedId, {});
+    });
+
+    expect(knock.feeds.countInstances()).toBe(3);
   });
 });
