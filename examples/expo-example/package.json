@@ -15,7 +15,7 @@
     "expo": ">=52.0.35",
     "expo-constants": ">=17.1.5",
     "expo-device": ">=7.0.3",
-    "expo-notifications": ">=0.29.13",
+    "expo-notifications": ">=0.31.2",
     "expo-status-bar": "~2.0.1",
     "react": "^18.2.0",
     "react-native": "^0.73.4"
