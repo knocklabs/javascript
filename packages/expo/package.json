@@ -54,7 +54,7 @@
     "@knocklabs/react-native": "workspace:^",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-render-html": "^6.3.4",
-    "react-native-svg": "^15.10.1"
+    "react-native-svg": "^15.12.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.6",
