@@ -7,8 +7,6 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-    reviewers:
-      - "knocklabs/product"
     versioning-strategy: increase
     open-pull-requests-limit: 5
     groups:
