@@ -57,7 +57,7 @@
     "@types/react-native-get-random-values": "^1",
     "@types/react-native-htmlview": "^0.16.5",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
-    "@typescript-eslint/parser": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^5.2.0",
