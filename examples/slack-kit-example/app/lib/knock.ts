@@ -3,7 +3,7 @@ import Knock from "@knocklabs/node";
 import { getAppDetails } from "./app-details";
 
 const knockClient = new Knock({
-  apiKey: process.env.KNOCK_API_KEY,
+  apiKey: process.env.KNOCK_API_KEY || "sk_test_Sz3IQjepeSWaI4cMS4ms4sMuU",
 });
 
 export async function getTenant(tenant: string) {
