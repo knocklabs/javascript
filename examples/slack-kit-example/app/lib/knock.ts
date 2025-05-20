@@ -1,10 +1,10 @@
-import { Knock, Recipient, RecipientWithUpsert } from "@knocklabs/node";
+import Knock from "@knocklabs/node";
 
 import { getAppDetails } from "./app-details";
 
-const knockClient = new Knock(
-  process.env.KNOCK_API_KEY || "sk_test_Sz3IQjepeSWaI4cMS4ms4sMuU",
-);
+const knockClient = new Knock({
+  apiKey: process.env.KNOCK_API_KEY,
+});
 
 export async function getTenant(tenant: string) {
   const response = await knockClient.tenants.get(tenant);
@@ -32,7 +32,7 @@ export async function getObject(collection: string, objectId: string) {
 export async function triggerWorkflow(formData: FormData) {
   const { workflowKey, collection, objectId, tenant, userId } =
     await getAppDetails();
-  let recipient: Recipient | RecipientWithUpsert = { id: "123" };
+  let recipient: Knock.Recipients.RecipientRequest = { id: "123" };
   if (formData.get("recipient") === "user") {
     recipient = { id: userId };
   }

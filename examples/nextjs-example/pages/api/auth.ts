@@ -1,4 +1,4 @@
-import { Knock } from "@knocklabs/node";
+import { signUserToken } from "@knocklabs/node/lib/tokenSigner";
 import { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
 
@@ -17,7 +17,7 @@ export default async function handler(
   const userId = (id as string) || uuidv4();
 
   try {
-    const userToken = await Knock.signUserToken(userId, {
+    const userToken = await signUserToken(userId, {
       expiresInSeconds: process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS
         ? Number(process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS)
         : 3600,
