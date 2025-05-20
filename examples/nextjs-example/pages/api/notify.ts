@@ -1,8 +1,9 @@
-import { Knock } from "@knocklabs/node";
+import Knock from "@knocklabs/node";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY, {
-  host: process.env.NEXT_PUBLIC_KNOCK_HOST,
+const knockClient = new Knock({
+  apiKey: process.env.KNOCK_SECRET_API_KEY,
+  baseURL: process.env.NEXT_PUBLIC_KNOCK_HOST,
 });
 
 const KNOCK_WORKFLOW = process.env.NEXT_PUBLIC_WORKFLOW_KEY!;

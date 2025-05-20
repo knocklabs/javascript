@@ -1,5 +1,8 @@
-import { Knock } from "@knocklabs/node";
-import { Grants } from "@knocklabs/node/dist/src/common/userTokens";
+import {
+  buildUserTokenGrant,
+  signUserToken,
+} from "@knocklabs/node/lib/tokenSigner";
+import { Grants } from "@knocklabs/node/lib/userTokens";
 import "@knocklabs/react/dist/index.css";
 
 import Providers from "./components/providers";
@@ -13,12 +16,12 @@ const signingKey = process.env.KNOCK_SIGNING_KEY!;
 async function MyApp({ children }: { children: React.ReactElement }) {
   //Generate a production build in CI/CD even if we're missing the env vars
   const userToken = signingKey
-    ? await Knock.signUserToken(userId, {
+    ? await signUserToken(userId, {
         grants: [
-          Knock.buildUserTokenGrant({ type: "tenant", id: tenant }, [
+          buildUserTokenGrant({ type: "tenant", id: tenant }, [
             Grants.SlackChannelsRead,
           ]),
-          Knock.buildUserTokenGrant(
+          buildUserTokenGrant(
             { type: "object", id: objectId, collection: collection },
             [Grants.ChannelDataRead, Grants.ChannelDataWrite],
           ),

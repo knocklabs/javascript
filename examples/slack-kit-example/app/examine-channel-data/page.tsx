@@ -5,16 +5,19 @@ import { getChannelData } from "../lib/knock";
 
 export default async function Page() {
   const { tenant, collection, objectId } = getAppDetails();
-  const objectRecipientChannelData = await getChannelData(
+  const objectRecipientChannelData = (await getChannelData(
     collection,
     objectId,
     process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID as string,
-  );
-  const tenantChannelData = await getChannelData(
+  )) as { channel_id: string; data: { connections: any[]; token: any } };
+  const tenantChannelData = (await getChannelData(
     "$tenants",
     tenant,
     process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID as string,
-  );
+  )) as {
+    channel_id: string;
+    data: { connections: any[]; token: { access_token: string } };
+  };
   return (
     <>
       <h2 className="text-xl font-bold my-4">Confirm Channel Data</h2>

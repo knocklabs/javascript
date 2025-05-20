@@ -34,6 +34,8 @@ Notifications.setNotificationHandler({
       shouldShowAlert: true,
       shouldPlaySound: true,
       shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
     };
   },
 });
@@ -45,6 +47,8 @@ const defaultNotificationHandler = async (
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   };
 };
 
@@ -166,7 +170,9 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       notification: Notifications.Notification,
       status: MessageEngagementStatus,
     ): Promise<Message> => {
-      const messageId = notification.request.content.data["knock_message_id"];
+      const messageId = notification.request.content.data[
+        "knock_message_id"
+      ] as string;
       return knockClient.messages.updateStatus(messageId, status);
     },
     [knockClient],

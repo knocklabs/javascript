@@ -1,10 +1,12 @@
 import { faker } from "@faker-js/faker";
-import { Knock } from "@knocklabs/node";
+import Knock from "@knocklabs/node";
+import { signUserToken } from "@knocklabs/node/lib/tokenSigner";
 import { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
 
-const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY, {
-  host: process.env.NEXT_PUBLIC_KNOCK_HOST,
+const knockClient = new Knock({
+  apiKey: process.env.KNOCK_SECRET_API_KEY,
+  baseURL: process.env.NEXT_PUBLIC_KNOCK_HOST,
 });
 
 export default async function handler(
@@ -22,7 +24,7 @@ export default async function handler(
   const userId = id || uuidv4();
 
   try {
-    const knockUser = await knockClient.users.identify(userId, {
+    const knockUser = await knockClient.users.update(userId, {
       // Create a user for the demo, we'll only set the name if we don't have a user yet
       name: id ? undefined : faker.person.fullName(),
     });
@@ -30,7 +32,7 @@ export default async function handler(
     let userToken = undefined;
 
     if (process.env.KNOCK_SIGNING_KEY) {
-      userToken = await Knock.signUserToken(userId, {
+      userToken = await signUserToken(userId, {
         expiresInSeconds: process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS
           ? Number(process.env.KNOCK_TOKEN_EXPIRES_IN_SECONDS)
           : 3600,

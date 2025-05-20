@@ -1,11 +1,12 @@
 "use server";
 
-import { Knock } from "@knocklabs/node";
+import Knock from "@knocklabs/node";
 
 import { getAppDetails } from "../lib/app-details";
 
-const knockApiKey = process.env.KNOCK_API_KEY;
-const knock = new Knock(knockApiKey);
+const knock = new Knock({
+  apiKey: process.env.KNOCK_API_KEY,
+});
 const appDetails = getAppDetails();
 
 export async function fetchUserId(email: string): Promise<string> {
@@ -48,7 +49,9 @@ async function setKnockChannelData(
       userId,
       process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID as string,
       {
-        connections: [{ user_id: slackUserId }],
+        data: {
+          connections: [{ user_id: slackUserId }],
+        },
       },
     );
 

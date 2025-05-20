@@ -180,8 +180,8 @@ To create some of the necessary authentication data, like `userToken` and `userI
 **Note: this is necessary because the user in this context is an end user in your application who does not have access to Knock as a [member of the account](https://docs.knock.app/manage-your-account/managing-members). Therefore, these grants provide them elevated privileges to operate on specific resources using the API.**
 
 ```
-import { Knock } from "@knocklabs/node";
-import { Grants } from "@knocklabs/node/dist/src/common/userTokens";
+import Knock from "@knocklabs/node";
+import { Grants } from "@knocklabs/node/lib/userTokens";
 import "@knocklabs/react/dist/index.css";
 
 import Providers from "./components/providers";
