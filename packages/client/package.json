@@ -47,7 +47,7 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@babel/cli": "^7.26.4",
+    "@babel/cli": "^7.27.2",
     "@babel/core": "^7.26.0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
@@ -56,7 +56,7 @@
     "@babel/preset-typescript": "^7.27.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
-    "@typescript-eslint/parser": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.1",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "eslint": "^8.56.0",

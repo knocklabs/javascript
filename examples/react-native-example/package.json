@@ -9,11 +9,11 @@
   "dependencies": {
     "@knocklabs/react-native": "workspace:^",
     "@react-native-firebase/app": "^22.1.0",
-    "@react-native-firebase/messaging": "^21.10.1",
+    "@react-native-firebase/messaging": "^22.2.0",
     "react": "^18.2.0",
     "react-native": "^0.73.4",
     "react-native-config": "^1.5.5",
-    "react-native-svg": "^15.10.1"
+    "react-native-svg": "^15.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
