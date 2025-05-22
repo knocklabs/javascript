@@ -13,8 +13,10 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "format:check": "turbo format:check",
-    "test": "turbo run test",
-    "test:watch": "turbo run test:watch",
+    "test": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts",
+    "test:watch": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --watch",
+    "test:coverage": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --coverage",
+    "test:ci": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --silent --coverage",
     "type:check": "turbo type:check",
     "release": "yarn build:packages && yarn release:publish && yarn changeset tag",
     "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish",
@@ -41,7 +43,9 @@
     "@knocklabs/prettier-config": "workspace:^",
     "@knocklabs/typescript-config": "workspace:^",
     "@manypkg/cli": "^0.23.0",
+    "@vitest/coverage-v8": "^3.1.4",
     "prettier": "^3.5.3",
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.3",
+    "vitest": "^3.1.1"
   }
 }
