@@ -16,8 +16,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
-    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
-    "test": "echo \"No tests\" && exit 0"
+    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check"
   },
   "eslintConfig": {
     "extends": [
