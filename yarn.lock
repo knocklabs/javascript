@@ -4155,7 +4155,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^3.1.4"
     prettier: "npm:^3.5.3"
     turbo: "npm:^2.3.3"
-    vitest: "npm:^3.1.4"
+    vitest: "npm:^3.1.1"
   languageName: unknown
   linkType: soft
 
@@ -19458,7 +19458,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^3.1.1, vitest@npm:^3.1.4":
+"vitest@npm:^3.1.1":
   version: 3.1.4
   resolution: "vitest@npm:3.1.4"
   dependencies:
