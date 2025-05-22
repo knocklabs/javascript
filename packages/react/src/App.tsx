@@ -17,6 +17,7 @@ const App: FunctionComponent = () => {
             >
               Primary
             </Button>
+
             <Button
               variant="secondary"
               onClick={() => {
