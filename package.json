@@ -16,7 +16,7 @@
     "test": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts",
     "test:watch": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --watch",
     "test:coverage": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --coverage",
-    "test:ci": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --silent --coverage",
+    "test:ci": "vitest run --config=./vitest/config.ts --workspace=./vitest/workspaces.ts --silent --coverage --reporter=junit --outputFile=test-report.junit.xml",
     "type:check": "turbo type:check",
     "release": "yarn build:packages && yarn release:publish && yarn changeset tag",
     "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish",
