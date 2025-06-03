@@ -35,7 +35,7 @@ jobs:
           jq '.resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
           mv tmp.json package.json
       - name: Install Dependencies
-        run: yarn install --immutable-cache --update-lockfile
+        run: yarn install
       - name: Cache Build
         uses: actions/cache@v4
         with:
