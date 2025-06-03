@@ -32,8 +32,8 @@ jobs:
           echo "build_cache_key=build-${{ github.sha }}-react-${{ inputs.react-version }}" >> $GITHUB_OUTPUT
       - name: Setup React Version
         run: |
-          yarn config set resolution react@${{ inputs.react-version }}
-          yarn config set resolution react-dom@${{ inputs.react-version }}
+          jq '.resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
+          mv tmp.json package.json
       - name: Install Dependencies
         run: yarn --immutable
       - name: Cache Build
