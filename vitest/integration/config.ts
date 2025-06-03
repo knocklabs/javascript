@@ -12,15 +12,11 @@ const sharedConfig = defineConfig({
         "*.d.ts",
         "**/dist/**",
         "**/node_modules/**",
-        // Ignore config packages
-        "packages/eslint-config",
-        "packages/prettier-config",
-        "packages/typescript-config",
-        "packages/types",
       ],
     },
     globals: true,
     environment: "jsdom",
+    setupFiles: "./setup.ts",
   },
 });
 export default sharedConfig;
