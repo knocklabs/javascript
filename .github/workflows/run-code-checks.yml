@@ -48,7 +48,6 @@ jobs:
             ${{ env.BUILD_CACHE_KEY }}
       - name: Build Packages
         run: yarn build:packages
-
   format-check:
     name: Format Check
     runs-on: ubuntu-latest
@@ -61,9 +60,12 @@ jobs:
         with:
           node-version-file: "package.json"
           cache: "yarn"
+      - name: Install Dependencies
+        run: yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Run Format Check
         run: yarn format:check
-
   type-check:
     name: Type Check
     runs-on: ubuntu-latest
@@ -76,9 +78,12 @@ jobs:
         with:
           node-version-file: "package.json"
           cache: "yarn"
+      - name: Install Dependencies
+        run: yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Run Type Check
         run: yarn typecheck
-
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -91,9 +96,12 @@ jobs:
         with:
           node-version-file: "package.json"
           cache: "yarn"
+      - name: Install Dependencies
+        run: yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Run Lint
         run: yarn lint
-
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -106,6 +114,10 @@ jobs:
         with:
           node-version-file: "package.json"
           cache: "yarn"
+      - name: Install Dependencies
+        run: yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Restore Build Cache
         uses: actions/cache@v4
         with:
