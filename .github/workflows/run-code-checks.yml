@@ -3,9 +3,9 @@ name: Run Code Checks
 on:
   workflow_call:
     inputs:
-    react-version:
-      required: true
-      type: string
+      react-version:
+        required: true
+        type: string
 
 concurrency:
   group: setup-files-${{ github.workflow }}-${{ github.ref }}
