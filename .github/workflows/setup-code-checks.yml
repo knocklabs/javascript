@@ -4,10 +4,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: setup-code-checks-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   run-code-checks:
     name: Run Code Checks (React ${{ matrix.react-version }})

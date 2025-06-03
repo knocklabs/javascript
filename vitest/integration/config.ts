@@ -16,7 +16,6 @@ const sharedConfig = defineConfig({
     },
     globals: true,
     environment: "jsdom",
-    setupFiles: "./setup.ts",
   },
 });
 export default sharedConfig;
