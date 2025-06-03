@@ -16,9 +16,15 @@ jobs:
       matrix:
         include:
           - react-version: "16.14.0"
+            testing-library-version: "12.1.5"
           - react-version: "17.0.2"
+            testing-library-version: "12.1.5"
           - react-version: "18.2.0"
           - react-version: "19.1.0"
+    env:
+      INTEGRATION_KNOCK_PUBLIC_KEY: ${{ secrets.INTEGRATION_KNOCK_PUBLIC_KEY }}
+      INTEGRATION_KNOCK_USER_ID: ${{ secrets.INTEGRATION_KNOCK_USER_ID }}
+      INTEGRATION_KNOCK_FEED_ID: ${{ secrets.INTEGRATION_KNOCK_FEED_ID }}
     steps:
       - name: Checkout Latest
         uses: actions/checkout@v4
@@ -41,6 +47,13 @@ jobs:
             '.resolutions += {} 
             | .resolutions["react"] = $react_version
             | .resolutions["react-dom"] = $react_version' package.json > tmp.json
+          mv tmp.json package.json
+      - name: Setup Testing Library Version
+        if: matrix.testing-library-version
+        run: |
+          jq --arg testing_library_version "${{ matrix.testing-library-version }}" \
+            '.resolutions += {} 
+            | .resolutions["@testing-library/react"] = $testing_library_version' package.json > tmp.json
           mv tmp.json package.json
       - name: Update Dependencies For Integration Tests
         run: yarn install
