@@ -6,6 +6,9 @@ on:
       react-version:
         required: true
         type: string
+      testing-library-version:
+        required: false
+        type: string
 
 concurrency:
   group: run-code-checks-${{ github.workflow }}-${{ github.ref }}-react-${{ inputs.react-version }}
@@ -27,7 +30,11 @@ jobs:
           scope: "@knocklabs"
       - name: Setup React Version
         run: |
-          jq '.resolutions += {} | .resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
+          JQ_CMD='.resolutions += {} | .resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"'
+          if [[ -n "${{ inputs.testing-library-version }}" ]]; then
+            JQ_CMD="$JQ_CMD | .resolutions[\"@testing-library/react\"] = \"${{ inputs.testing-library-version }}\""
+          fi
+          jq "$JQ_CMD" package.json > tmp.json
           mv tmp.json package.json
       - name: Install Dependencies
         run: yarn install

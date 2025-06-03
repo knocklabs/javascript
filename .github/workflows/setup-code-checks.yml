@@ -14,6 +14,12 @@ jobs:
     uses: ./.github/workflows/run-code-checks.yml
     strategy:
       matrix:
-        react-version: ["16.14.0", "17.0.2", "18.2.0", "19.1.0"]
+        include:
+          - react-version: "16.14.0"
+            testing-library-version: "12.1.2"
+          - react-version: "17.0.2"
+            testing-library-version: "12.1.2"
+          - react-version: "18.2.0"
+          - react-version: "19.1.0"
     with:
       react-version: ${{ matrix.react-version }}
