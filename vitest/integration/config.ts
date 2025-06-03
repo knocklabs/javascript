@@ -16,6 +16,7 @@ const sharedConfig = defineConfig({
     },
     globals: true,
     environment: "jsdom",
+    setupFiles: ["dotenv/config"],
   },
 });
 export default sharedConfig;

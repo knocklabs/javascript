@@ -4172,6 +4172,7 @@ __metadata:
     "@knocklabs/typescript-config": "workspace:^"
     "@manypkg/cli": "npm:^0.23.0"
     "@vitest/coverage-v8": "npm:^3.1.4"
+    dotenv: "npm:^16.5.0"
     prettier: "npm:^3.5.3"
     turbo: "npm:^2.3.3"
     vitest: "npm:^3.1.1"
@@ -10419,7 +10420,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^16.4.5":
+"dotenv@npm:^16.4.5, dotenv@npm:^16.5.0":
   version: 16.5.0
   resolution: "dotenv@npm:16.5.0"
   checksum: 10c0/5bc94c919fbd955bf0ba44d33922a1e93d1078e64a1db5c30faeded1d996e7a83c55332cb8ea4fae5a9ca4d0be44cbceb95c5811e70f9f095298df09d1997dd9

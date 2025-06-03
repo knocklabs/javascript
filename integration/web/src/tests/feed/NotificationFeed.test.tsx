@@ -4,18 +4,15 @@ import {
   NotificationFeed,
 } from "@knocklabs/react";
 import { render } from "@testing-library/react";
-import { describe, test } from "vitest";
+import { describe, it } from "vitest";
 
-type FeedProps = {
-  apiKey: string;
-  userId: string;
-  feedId: string;
-};
-
-const Feed = ({ apiKey, userId, feedId }: FeedProps) => {
+const Feed = () => {
   return (
-    <KnockProvider apiKey={apiKey} userId={userId}>
-      <KnockFeedProvider feedId={feedId}>
+    <KnockProvider
+      apiKey={process.env.INTEGRATION_KNOCK_PUBLIC_KEY}
+      userId={process.env.INTEGRATION_KNOCK_USER_ID}
+    >
+      <KnockFeedProvider feedId={process.env.INTEGRATION_KNOCK_FEED_ID}>
         <NotificationFeed />
       </KnockFeedProvider>
     </KnockProvider>
@@ -23,7 +20,7 @@ const Feed = ({ apiKey, userId, feedId }: FeedProps) => {
 };
 
 describe("NotificationFeed", () => {
-  test("should render", () => {
-    render(<Feed apiKey="apiKey" userId="userId" feedId="feedId" />);
+  it("should render", () => {
+    render(<Feed />);
   });
 });
