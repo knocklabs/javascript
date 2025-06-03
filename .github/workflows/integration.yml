@@ -4,10 +4,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: run-code-checks-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   run-integration-tests:
     name: React ${{ matrix.react-version }}
