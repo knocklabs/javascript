@@ -9,9 +9,12 @@ import { describe, it } from "vitest";
 const Feed = () => {
   return (
     <KnockProvider
+      // eslint-disable-next-line
       apiKey={process.env.INTEGRATION_KNOCK_PUBLIC_KEY}
+      // eslint-disable-next-line
       userId={process.env.INTEGRATION_KNOCK_USER_ID}
     >
+      {/* eslint-disable-next-line */}
       <KnockFeedProvider feedId={process.env.INTEGRATION_KNOCK_FEED_ID}>
         <NotificationFeed />
       </KnockFeedProvider>

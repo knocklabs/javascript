@@ -4154,6 +4154,7 @@ __metadata:
     "@knocklabs/typescript-config": "workspace:^"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
+    eslint: "npm:^8.56.0"
     prettier: "npm:^3.5.3"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
