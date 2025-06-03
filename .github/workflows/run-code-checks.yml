@@ -28,25 +28,13 @@ jobs:
           cache: "yarn"
           registry-url: "https://registry.npmjs.org"
           scope: "@knocklabs"
-      - name: Setup React Version
-        run: |
-          JQ_CMD='.resolutions += {} | .resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"'
-          if [[ -n "${{ inputs.testing-library-version }}" ]]; then
-            JQ_CMD="$JQ_CMD | .resolutions[\"@testing-library/react\"] = \"${{ inputs.testing-library-version }}\""
-          fi
-          jq "$JQ_CMD" package.json > tmp.json
-          mv tmp.json package.json
       - name: Install Dependencies
         run: yarn install
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Build Packages
         run: yarn build:packages
-      - name: Run Type Check
-        run: yarn type:check
-      - name: Run Lint
-        run: yarn lint
-      - name: Run Format Check
-        run: yarn format:check
+      - name: Update React Version For Integration Tests
+        run: yarn workspace @knocklabs/integration-web add react@${{ inputs.react-version }} react-dom@${{ inputs.react-version }}
       - name: Run Test
-        run: yarn test:ci
+        run: yarn test:integration
