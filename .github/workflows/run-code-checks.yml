@@ -35,7 +35,6 @@ jobs:
       - name: Build Packages
         run: yarn build:packages
       - name: Setup React Version
-      - name: Setup React Version
         run: |
           jq '.resolutions += {} \
             | .resolutions["react"] = "${{ matrix.react-version }}" \
