@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: setup-files-${{ github.workflow }}-${{ github.ref }}
+  group: setup-code-checks-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

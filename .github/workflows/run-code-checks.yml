@@ -8,7 +8,7 @@ on:
         type: string
 
 concurrency:
-  group: setup-files-${{ github.workflow }}-${{ github.ref }}
+  group: run-code-checks-${{ github.workflow }}-${{ github.ref }}-react-${{ inputs.react-version }}
   cancel-in-progress: true
 
 jobs:
