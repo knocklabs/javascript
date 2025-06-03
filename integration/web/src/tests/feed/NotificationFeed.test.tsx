@@ -4,9 +4,11 @@ import {
   NotificationFeed,
 } from "@knocklabs/react";
 import { render } from "@testing-library/react";
+import { useId } from "react";
 import { describe, it } from "vitest";
 
 const Feed = () => {
+  const id = useId();
   return (
     <KnockProvider
       // eslint-disable-next-line
