@@ -1,4 +1,4 @@
-name: Setup Code Checks
+name: Code Checks
 
 on:
   pull_request:
