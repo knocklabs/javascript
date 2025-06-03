@@ -40,17 +40,17 @@ jobs:
       - name: Setup React Version
         run: |
           jq --arg react_version "${{ matrix.react-version }}" \
-            '.resolutions += {} 
-            | .resolutions["react"] = $react_version
-            | .resolutions["react-dom"] = $react_version' package.json > tmp.json
-          mv tmp.json package.json
+            '.dependencies += {} 
+            | .dependencies["react"] = $react_version
+            | .dependencies["react-dom"] = $react_version' package.json > tmp.json
+          mv tmp.json ./integration/web/package.json
       - name: Setup Testing Library Version
         if: matrix.testing-library-version
         run: |
           jq --arg testing_library_version "${{ matrix.testing-library-version }}" \
-            '.resolutions += {} 
-            | .resolutions["@testing-library/react"] = $testing_library_version' package.json > tmp.json
-          mv tmp.json package.json
+            '.devDependencies += {} 
+            | .devDependencies["@testing-library/react"] = $testing_library_version' package.json > tmp.json
+          mv tmp.json ./integration/web/package.json
       - name: Update Dependencies For Integration Tests
         run: yarn install
         env:
