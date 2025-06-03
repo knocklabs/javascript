@@ -53,7 +53,7 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
-    "@radix-ui/react-dialog": "1.0.5",
+    "@radix-ui/react-dialog": "^1.1.14",
     "@telegraph/combobox": "^0.0.81",
     "@telegraph/icon": "^0.0.50",
     "@telegraph/layout": "^0.1.16",
