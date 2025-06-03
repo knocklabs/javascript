@@ -27,11 +27,6 @@ jobs:
           cache: "yarn"
           registry-url: "https://registry.npmjs.org"
           scope: "@knocklabs"
-      - name: Set Build Cache Key ENV and Output
-        id: set-build-cache-key
-        run: |
-          echo "BUILD_CACHE_KEY=build-${{ github.sha }}-react-${{ inputs.react-version }}" >> $GITHUB_ENV
-          echo "build_cache_key=build-${{ github.sha }}-react-${{ inputs.react-version }}" >> $GITHUB_OUTPUT
       - name: Setup React Version
         run: |
           jq '.resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
@@ -40,107 +35,13 @@ jobs:
         run: yarn install
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Cache Build
-        uses: actions/cache@v4
-        with:
-          path: |
-            packages/*/dist
-          key: ${{ env.BUILD_CACHE_KEY }}
-          restore-keys: |
-            ${{ env.BUILD_CACHE_KEY }}
       - name: Build Packages
         run: yarn build:packages
-  format-check:
-    name: Format Check
-    runs-on: ubuntu-latest
-    needs: [setup-files]
-    steps:
-      - name: Checkout Latest
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "yarn"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@knocklabs"
-      - name: Install Dependencies
-        run: yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Run Format Check
-        run: yarn format:check
-  type-check:
-    name: Type Check
-    runs-on: ubuntu-latest
-    needs: [setup-files]
-    steps:
-      - name: Checkout Latest
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "yarn"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@knocklabs"
-      - name: Install Dependencies
-        run: yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Restore Build Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            packages/*/dist
-          key: ${{ needs.setup-files.outputs.build_cache_key }}
-          restore-keys: ${{ needs.setup-files.outputs.build_cache_key }}
       - name: Run Type Check
         run: yarn type:check
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    needs: [setup-files]
-    steps:
-      - name: Checkout Latest
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "yarn"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@knocklabs"
-      - name: Install Dependencies
-        run: yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Run Lint
         run: yarn lint
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: [setup-files]
-    steps:
-      - name: Checkout Latest
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-          cache: "yarn"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@knocklabs"
-      - name: Install Dependencies
-        run: yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Restore Build Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            packages/*/dist
-          key: ${{ needs.setup-files.outputs.build_cache_key }}
-          restore-keys: ${{ needs.setup-files.outputs.build_cache_key }}
+      - name: Run Format Check
+        run: yarn format:check
       - name: Run Test
         run: yarn test:ci
