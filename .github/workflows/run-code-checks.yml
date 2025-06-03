@@ -1,0 +1,115 @@
+name: Run Code Checks
+
+on:
+  workflow_call:
+    inputs:
+    react-version:
+      required: true
+      type: string
+
+concurrency:
+  group: setup-files-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup-files:
+    name: Setup Files
+    runs-on: ubuntu-latest
+    outputs:
+      build_cache_key: ${{ steps.set-build-cache-key.outputs.build_cache_key }}
+    steps:
+      - name: Checkout Latest
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+      - name: Set Build Cache Key ENV and Output
+        id: set-build-cache-key
+        run: |
+          echo "BUILD_CACHE_KEY=build-${{ github.sha }}-react-${{ inputs.react-version }}" >> $GITHUB_ENV
+          echo "build_cache_key=build-${{ github.sha }}-react-${{ inputs.react-version }}" >> $GITHUB_OUTPUT
+      - name: Setup React Version
+        run: |
+          yarn config set resolution react@${{ inputs.react-version }}
+          yarn config set resolution react-dom@${{ inputs.react-version }}
+      - name: Install Dependencies
+        run: yarn --immutable
+      - name: Cache Build
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+          key: ${{ env.BUILD_CACHE_KEY }}
+          restore-keys: |
+            ${{ env.BUILD_CACHE_KEY }}
+      - name: Build Packages
+        run: yarn build:packages
+
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    needs: [setup-files]
+    steps:
+      - name: Checkout Latest
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+      - name: Run Format Check
+        run: yarn format:check
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    needs: [setup-files]
+    steps:
+      - name: Checkout Latest
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+      - name: Run Type Check
+        run: yarn typecheck
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: [setup-files]
+    steps:
+      - name: Checkout Latest
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+      - name: Run Lint
+        run: yarn lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [setup-files]
+    steps:
+      - name: Checkout Latest
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+      - name: Restore Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+          key: ${{ needs.setup-files.outputs.build_cache_key }}
+          restore-keys: ${{ needs.setup-files.outputs.build_cache_key }}
+      - name: Run Test
+        run: yarn test:ci

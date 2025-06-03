@@ -1,0 +1,19 @@
+name: Setup Code Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: setup-files-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-code-checks:
+    name: Run Code Checks (React ${{ matrix.react-version }})
+    uses: ./.github/workflows/setup-files.yml
+    strategy:
+      matrix:
+        react-version: ["16.14.0", "17.0.2", "18.2.0", "19.1.0"]
+    with:
+      react-version: ${{ matrix.react-version }}
