@@ -11,7 +11,7 @@ concurrency:
 jobs:
   run-code-checks:
     name: Run Code Checks (React ${{ matrix.react-version }})
-    uses: ./.github/workflows/setup-files.yml
+    uses: ./.github/workflows/run-code-checks.yml
     strategy:
       matrix:
         react-version: ["16.14.0", "17.0.2", "18.2.0", "19.1.0"]
