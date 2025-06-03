@@ -1,23 +1,24 @@
-name: Run Code Checks
+name: Integration Tests
 
 on:
-  workflow_call:
-    inputs:
-      react-version:
-        required: true
-        type: string
-      testing-library-version:
-        required: false
-        type: string
+  pull_request:
+  workflow_dispatch:
 
 concurrency:
-  group: run-code-checks-${{ github.workflow }}-${{ github.ref }}-react-${{ inputs.react-version }}
+  group: run-code-checks-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  run-code-checks:
-    name: Run Code Checks
+  run-integration-tests:
+    name: Integration Tests (React ${{ matrix.react-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - react-version: "16.14.0"
+          - react-version: "17.0.2"
+          - react-version: "18.2.0"
+          - react-version: "19.1.0"
     steps:
       - name: Checkout Latest
         uses: actions/checkout@v4
@@ -37,8 +38,8 @@ jobs:
       - name: Setup React Version
         run: |
           jq '.resolutions += {} \
-            | .resolutions["react"] = "${{ matrix.react-version }}" \
-            | .resolutions["react-dom"] = "${{ matrix.react-version }}"' package.json > tmp.json
+            | .resolutions["react"] = "${{ inputs.react-version }}" \
+            | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
           mv tmp.json package.json
       - name: Update Dependencies For Integration Tests
         run: yarn install
