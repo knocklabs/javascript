@@ -12,11 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup-files:
-    name: Setup Files
+  run-code-checks:
+    name: Run Code Checks
     runs-on: ubuntu-latest
-    outputs:
-      build_cache_key: ${{ steps.set-build-cache-key.outputs.build_cache_key }}
     steps:
       - name: Checkout Latest
         uses: actions/checkout@v4
@@ -29,7 +27,7 @@ jobs:
           scope: "@knocklabs"
       - name: Setup React Version
         run: |
-          jq '.resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
+          jq '.resolutions += {} | .resolutions["react"] = "${{ inputs.react-version }}" | .resolutions["react-dom"] = "${{ inputs.react-version }}"' package.json > tmp.json
           mv tmp.json package.json
       - name: Install Dependencies
         run: yarn install
