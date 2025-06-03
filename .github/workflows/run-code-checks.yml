@@ -34,7 +34,16 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Build Packages
         run: yarn build:packages
-      - name: Update React Version For Integration Tests
-        run: yarn workspace @knocklabs/integration-web add react@${{ inputs.react-version }} react-dom@${{ inputs.react-version }}
+      - name: Setup React Version
+      - name: Setup React Version
+        run: |
+          jq '.resolutions += {} \
+            | .resolutions["react"] = "${{ matrix.react-version }}" \
+            | .resolutions["react-dom"] = "${{ matrix.react-version }}"' package.json > tmp.json
+          mv tmp.json package.json
+      - name: Update Dependencies For Integration Tests
+        run: yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Run Test
         run: yarn test:integration
