@@ -88,6 +88,13 @@ jobs:
         run: yarn install
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - name: Restore Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+          key: ${{ needs.setup-files.outputs.build_cache_key }}
+          restore-keys: ${{ needs.setup-files.outputs.build_cache_key }}
       - name: Run Type Check
         run: yarn type:check
   lint:
