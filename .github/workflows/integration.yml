@@ -37,19 +37,17 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Build Packages
         run: yarn build:packages
-      - name: Setup React Version
+      - name: Setup Versions
         run: |
-          jq --arg react_version "${{ matrix.react-version }}" \
-            '.resolutions += {}
-            | .resolutions["react"] = $react_version
-            | .resolutions["react-dom"] = $react_version' ./integration/web/package.json > tmp.json
-          mv tmp.json ./integration/web/package.json
-      - name: Setup Testing Library Version
-        if: matrix.testing-library-version
-        run: |
-          jq --arg testing_library_version "${{ matrix.testing-library-version }}" \
-            '.resolutions += {}
-            | .resolutions["@testing-library/react"] = $testing_library_version' ./integration/web/package.json > tmp.json
+          JQ_CMD='.resolutions += {}
+            | .resolutions["react"] = "${{ matrix.react-version }}"
+            | .resolutions["react-dom"] = "${{ matrix.react-version }}"'
+
+          if [[ -n "${{ matrix.testing-library-version }}" ]]; then
+            JQ_CMD="$JQ_CMD | .resolutions[\"@testing-library/react\"] = \"${{ matrix.testing-library-version }}\""
+          fi
+
+          jq "$JQ_CMD" ./integration/web/package.json > tmp.json
           mv tmp.json ./integration/web/package.json
       - name: Update Dependencies For Integration Tests
         run: yarn install
