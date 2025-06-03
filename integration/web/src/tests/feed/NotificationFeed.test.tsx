@@ -9,6 +9,7 @@ import { describe, it } from "vitest";
 
 const Feed = () => {
   const id = useId();
+
   return (
     <KnockProvider
       // eslint-disable-next-line
