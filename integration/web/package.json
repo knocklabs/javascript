@@ -3,36 +3,27 @@
   "description": "Integration tests for Knock Web",
   "private": true,
   "prettier": "@knocklabs/prettier-config",
-  "type": "module",
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
-    "type:check": "tsc --noEmit",
-    "test": "vitest"
-  },
-  "resolutions": {
-    "@knocklabs/client": "file:../../packages/client",
-    "@knocklabs/react": "file:../../packages/react",
-    "@knocklabs/types": "file:../../packages/types",
-    "@knocklabs/react-core": "file:../../packages/react-core"
+    "type:check": "tsc --noEmit"
   },
   "dependencies": {
-    "@knocklabs/client": "file:../../packages/client",
-    "@knocklabs/react": "file:../../packages/react",
-    "react": "^18.1.0",
-    "react-dom": "^19.1.0",
-    "vite": "^6.3.5"
+    "@knocklabs/client": "workspace:^",
+    "@knocklabs/react": "workspace:^",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@knocklabs/eslint-config": "file:../../packages/eslint-config",
-    "@knocklabs/prettier-config": "file:../../packages/prettier-config",
-    "@knocklabs/typescript-config": "file:../../packages/typescript-config",
+    "@knocklabs/eslint-config": "workspace:^",
+    "@knocklabs/prettier-config": "workspace:^",
+    "@knocklabs/typescript-config": "workspace:^",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.3.0",
     "eslint": "^8.56.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.3",
+    "turbo": "^2.3.3",
     "vitest": "^3.1.1"
   }
 }

@@ -13,11 +13,11 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "format:check": "turbo format:check",
-    "test": "vitest run --config=./vitest/config.ts",
-    "test:watch": "vitest run --config=./vitest/config.ts --watch",
-    "test:coverage": "vitest run --config=./vitest/config.ts --coverage",
-    "test:ci": "vitest run --config=./vitest/config.ts --silent --coverage --reporter=junit --outputFile=test-report.junit.xml",
-    "test:integration": "cd integration/web && yarn test",
+    "test": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts",
+    "test:watch": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts --watch",
+    "test:coverage": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts --coverage",
+    "test:ci": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts --silent --coverage --reporter=junit --outputFile=test-report.junit.xml",
+    "test:integration": "vitest run --config=./vitest/integration/config.ts --workspace=./vitest/integration/workspaces.ts",
     "type:check": "turbo type:check",
     "release": "yarn build:packages && yarn release:publish && yarn changeset tag",
     "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish",
@@ -30,7 +30,8 @@
   },
   "workspaces": [
     "examples/*",
-    "packages/*"
+    "packages/*",
+    "integration/*"
   ],
   "manypkg": {
     "defaultBranch": "main",
