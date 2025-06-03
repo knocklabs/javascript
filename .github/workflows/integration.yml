@@ -47,8 +47,8 @@ jobs:
             JQ_CMD="$JQ_CMD | .resolutions[\"@testing-library/react\"] = \"${{ matrix.testing-library-version }}\""
           fi
 
-          jq "$JQ_CMD" ./integration/web/package.json > tmp.json
-          mv tmp.json ./integration/web/package.json
+          jq "$JQ_CMD" ./package.json > tmp.json
+          mv tmp.json ./package.json
       - name: Update Dependencies For Integration Tests
         run: yarn install
         env:
