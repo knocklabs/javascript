@@ -83,7 +83,7 @@ jobs:
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Run Type Check
-        run: yarn typecheck
+        run: yarn type:check
   lint:
     name: Lint
     runs-on: ubuntu-latest
