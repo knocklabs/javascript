@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.9
+
+### Patch Changes
+
+- 4e73f12: fix: ensure this is bound to guide client instance in handleLocationChange
+
 ## 0.14.8
 
 ### Patch Changes
