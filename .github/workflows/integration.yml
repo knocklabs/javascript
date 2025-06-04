@@ -23,4 +23,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           scope: "@knocklabs"
       - name: Install Dependencies
+        run: yarn install
+      - name: Build Packages
+        run: yarn build:packages
+      - name: Run Integration Tests
         run: yarn test:integration
