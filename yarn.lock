@@ -4112,7 +4112,7 @@ __metadata:
     "@knocklabs/react-core": "workspace:^"
     "@knocklabs/react-native": "workspace:^"
     "@types/react": "npm:^18.3.6"
-    "@types/react-native-htmlview": "npm:^0.16.5"
+    "@types/react-native-htmlview": "npm:^0.16.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
     "@typescript-eslint/parser": "npm:^8.32.1"
     "@vitejs/plugin-react": "npm:^4.4.1"
@@ -4251,7 +4251,7 @@ __metadata:
     "@knocklabs/react-core": "workspace:^"
     "@types/react": "npm:^18.3.6"
     "@types/react-native-get-random-values": "npm:^1"
-    "@types/react-native-htmlview": "npm:^0.16.5"
+    "@types/react-native-htmlview": "npm:^0.16.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
     "@typescript-eslint/parser": "npm:^8.32.1"
     "@vitejs/plugin-react": "npm:^4.4.1"
@@ -7452,13 +7452,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-native-htmlview@npm:^0.16.5":
-  version: 0.16.5
-  resolution: "@types/react-native-htmlview@npm:0.16.5"
+"@types/react-native-htmlview@npm:^0.16.6":
+  version: 0.16.6
+  resolution: "@types/react-native-htmlview@npm:0.16.6"
   dependencies:
     "@types/react": "npm:*"
     react-native: "npm:*"
-  checksum: 10c0/521ea3338ecf138aac22e94e8bd3f88609da7f673c60a9272a44d362509784b8bc0dcd6ec00d42f645309af87f3b9d881591490ccb6c012abcfe153b200b8a7d
+  checksum: 10c0/db997e68490e4df896edb94885162573b288076a3dfa6dae58557f2631b3bbd978a231bfb2a1b6b2ba1820927bea38d3abcde30c828c9ffc0564c152b58f4f97
   languageName: node
   linkType: hard
 
