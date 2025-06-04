@@ -60,7 +60,7 @@ In order to reproduce the most realistic integration test, we need to:
 1. Build our packages with the react version currently present in the repo.
 2. Override that react version when testing to see how our code responds in those scenarios, similar to how `peerDependencies` work.
 
-## The issue
+### The issue
 
 Unfortunately, this isn't super straightfoward. In our `yarn` monorepo there is a single version of `react` present. We do this so that there are not multiple versions running at the same time to avoid this error:
 
