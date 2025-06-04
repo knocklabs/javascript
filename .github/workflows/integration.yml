@@ -6,7 +6,6 @@ on:
 
 jobs:
   run-integration-tests:
-    name: React ${{ matrix.react-version }}
     runs-on: ubuntu-latest
     env:
       INTEGRATION_KNOCK_PUBLIC_KEY: ${{ secrets.INTEGRATION_KNOCK_PUBLIC_KEY }}
