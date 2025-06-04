@@ -620,14 +620,15 @@ export class KnockGuideClient {
     });
   }
 
-  private handleLocationChange() {
+  // Define as an arrow func property to always bind this to the class instance.
+  private handleLocationChange = () => {
     const href = window.location.href;
     if (this.store.state.location === href) return;
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
 
     this.store.setState((state) => ({ ...state, location: href }));
-  }
+  };
 
   private listenForLocationChangesFromWindow() {
     if (window?.history) {
