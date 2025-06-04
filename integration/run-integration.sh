@@ -21,14 +21,14 @@ JQ_CMD=".resolutions += {}
 cp ./package.json ./original.json
 
 # Ensure that we always restore the original package.json AND run yarn install on exit
-trap 'echo "Restoring original package.json..."; mv ./original.json ./package.json; echo "Running yarn install to restore lockfile and node_modules..."; yarn install' EXIT
+trap 'echo "Restoring original package.json..."; mv ./original.json ./package.json; echo "Running yarn install to restore lockfile and node_modules..."; yarn install --no-immutable' EXIT
 
 # Apply modifications
 jq "$JQ_CMD" ./package.json > tmp.json
 mv tmp.json ./package.json
 
 # Run commands
-yarn install
+yarn install --no-immutable
 yarn test:integration:runner
 
 
