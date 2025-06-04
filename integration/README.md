@@ -13,20 +13,20 @@ There are 3 different ways that you can run the test suite depending on the resu
 
 Run for all versions of react that we support:
 
-```
+```bash
 yarn test:integration
 ```
 
 Run for individual version of react that we support:
 
-```
+```bash
 yarn test:integration:react-18
 yarn test:integration:react-19
 ```
 
 Run for a specific version of react not already defined in `package.json`
 
-```
+```bash
 ./integration/run-integration.sh x.x.x
 ```
 
@@ -41,20 +41,16 @@ To add new tests to our integration test suite, navigate to `./integration/tests
 
 Here's an example of adding a component to our test suite.
 
-```
-import {
-  NotificationFeed,
-} from "@knocklabs/react";
+```tsx
+import { NotificationFeed } from "@knocklabs/react";
 import { render } from "@testing-library/react";
 import { describe, it } from "vitest";
-
 
 describe("NotificationFeed", () => {
   it("should render", () => {
     render(<NotificationFeed />);
   });
 });
-
 ```
 
 ## Explanation of the architecture
