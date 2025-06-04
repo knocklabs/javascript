@@ -1,0 +1,10 @@
+{
+  "extends": "@knocklabs/typescript-config/node.json",
+  "include": ["vitest.config.ts", "tests"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "types": ["node", "vite"],
+    "incremental": true,
+    "jsx": "react-jsx"
+  }
+}

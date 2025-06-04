@@ -23,6 +23,14 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test:integration:runner": {
+      "cache": false,
+      "env": [
+        "INTEGRATION_KNOCK_PUBLIC_KEY",
+        "INTEGRATION_KNOCK_USER_ID",
+        "INTEGRATION_KNOCK_FEED_ID"
+      ]
     }
   }
 }

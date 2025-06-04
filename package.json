@@ -17,7 +17,10 @@
     "test:watch": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts --watch",
     "test:coverage": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts --coverage",
     "test:ci": "vitest run --config=./vitest/unit/config.ts --workspace=./vitest/unit/workspaces.ts --silent --coverage --reporter=junit --outputFile=test-report.junit.xml",
-    "test:integration": "vitest run --config=./vitest/integration/config.ts --workspace=./vitest/integration/workspaces.ts",
+    "test:integration": "yarn test:integration:react-18 && yarn test:integration:react-19",
+    "test:integration:react-18": "./integration/run-integration.sh 18.2.0",
+    "test:integration:react-19": "./integration/run-integration.sh 19.1.0",
+    "test:integration:runner": "cd ./integration && yarn test:integration",
     "type:check": "turbo type:check",
     "release": "yarn build:packages && yarn release:publish && yarn changeset tag",
     "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish",
@@ -31,7 +34,7 @@
   "workspaces": [
     "examples/*",
     "packages/*",
-    "integration/*"
+    "integration"
   ],
   "manypkg": {
     "defaultBranch": "main",

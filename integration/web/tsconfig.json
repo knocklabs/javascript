@@ -1,5 +1,0 @@
-{
-  "extends": "@knocklabs/typescript-config/react-library.json",
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
-}

@@ -4143,23 +4143,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/integration-web@workspace:integration/web":
+"@knocklabs/integration@workspace:integration":
   version: 0.0.0-use.local
-  resolution: "@knocklabs/integration-web@workspace:integration/web"
-  dependencies:
-    "@knocklabs/client": "workspace:^"
-    "@knocklabs/eslint-config": "workspace:^"
-    "@knocklabs/prettier-config": "workspace:^"
-    "@knocklabs/react": "workspace:^"
-    "@knocklabs/typescript-config": "workspace:^"
-    "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.3.0"
-    eslint: "npm:^8.56.0"
-    prettier: "npm:^3.5.3"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    turbo: "npm:^2.3.3"
-    vitest: "npm:^3.1.1"
+  resolution: "@knocklabs/integration@workspace:integration"
   languageName: unknown
   linkType: soft
 

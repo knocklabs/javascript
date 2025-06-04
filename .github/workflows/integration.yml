@@ -8,15 +8,6 @@ jobs:
   run-integration-tests:
     name: React ${{ matrix.react-version }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - react-version: "16.14.0"
-            testing-library-version: "12.1.5"
-          - react-version: "17.0.2"
-            testing-library-version: "12.1.5"
-          - react-version: "18.2.0"
-          - react-version: "19.1.0"
     env:
       INTEGRATION_KNOCK_PUBLIC_KEY: ${{ secrets.INTEGRATION_KNOCK_PUBLIC_KEY }}
       INTEGRATION_KNOCK_USER_ID: ${{ secrets.INTEGRATION_KNOCK_USER_ID }}
@@ -32,26 +23,4 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           scope: "@knocklabs"
       - name: Install Dependencies
-        run: yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Build Packages
-        run: yarn build:packages
-      - name: Setup Versions
-        run: |
-          JQ_CMD='.resolutions += {}
-            | .resolutions["react"] = "${{ matrix.react-version }}"
-            | .resolutions["react-dom"] = "${{ matrix.react-version }}"'
-
-          if [[ -n "${{ matrix.testing-library-version }}" ]]; then
-            JQ_CMD="$JQ_CMD | .resolutions[\"@testing-library/react\"] = \"${{ matrix.testing-library-version }}\""
-          fi
-
-          jq "$JQ_CMD" ./package.json > tmp.json
-          mv tmp.json ./package.json
-      - name: Update Dependencies For Integration Tests
-        run: yarn install
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Run Test
         run: yarn test:integration
