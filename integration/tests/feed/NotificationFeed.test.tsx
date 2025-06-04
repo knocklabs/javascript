@@ -4,11 +4,9 @@ import {
   NotificationFeed,
 } from "@knocklabs/react";
 import { render } from "@testing-library/react";
-import { version } from "react";
 import { describe, it } from "vitest";
 
 const Feed = () => {
-  console.log("VERSION", version);
   return (
     <KnockProvider
       apiKey={process.env.INTEGRATION_KNOCK_PUBLIC_KEY}

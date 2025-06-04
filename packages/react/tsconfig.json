@@ -2,8 +2,5 @@
   "extends": "@knocklabs/typescript-config/react-library.json",
   "include": ["src"],
   "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "compilerOptions": {
-    "jsx": "react"
-  }
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

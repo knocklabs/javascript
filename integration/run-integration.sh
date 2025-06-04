@@ -27,6 +27,8 @@ trap 'echo "Restoring original package.json..."; mv ./original.json ./package.js
 jq "$JQ_CMD" ./package.json > tmp.json
 mv tmp.json ./package.json
 
+echo "Starting run for react version $REACT_VERSION"
+
 # Run commands
 yarn install --no-immutable
 yarn test:integration:runner
