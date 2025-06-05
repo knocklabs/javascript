@@ -55,7 +55,7 @@
   "devDependencies": {
     "@types/react": "^18.3.6",
     "@types/react-native-get-random-values": "^1",
-    "@types/react-native-htmlview": "^0.16.5",
+    "@types/react-native-htmlview": "^0.16.6",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^4.5.1",
