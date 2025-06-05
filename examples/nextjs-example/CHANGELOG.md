@@ -1,5 +1,13 @@
 # nextjs-example
 
+## 1.1.17
+
+### Patch Changes
+
+- 742af1f: update telegraph dependencies
+- Updated dependencies [742af1f]
+  - @knocklabs/react@0.7.14
+
 ## 1.1.16
 
 ### Patch Changes
