@@ -1,0 +1,33 @@
+name: Integration Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-integration-tests:
+    strategy:
+      matrix:
+        react-version: [18, 19]
+    runs-on: ubuntu-latest
+    name: React ${{ matrix.react-version }}
+    env:
+      INTEGRATION_KNOCK_PUBLIC_KEY: ${{ secrets.INTEGRATION_KNOCK_PUBLIC_KEY }}
+      INTEGRATION_KNOCK_USER_ID: ${{ secrets.INTEGRATION_KNOCK_USER_ID }}
+      INTEGRATION_KNOCK_FEED_ID: ${{ secrets.INTEGRATION_KNOCK_FEED_ID }}
+    steps:
+      - name: Checkout Latest
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@knocklabs"
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build Packages
+        run: yarn build:packages
+      - name: Run Integration Tests
+        run: yarn test:integration:react-${{ matrix.react-version }}

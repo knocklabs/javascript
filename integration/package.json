@@ -1,0 +1,11 @@
+{
+  "name": "@knocklabs/integration",
+  "private": true,
+  "prettier": "@knocklabs/prettier-config",
+  "engines": {
+    "node": "20.9.0"
+  },
+  "scripts": {
+    "test:integration": "vitest run"
+  }
+}

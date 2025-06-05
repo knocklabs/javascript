@@ -4143,6 +4143,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@knocklabs/integration@workspace:integration":
+  version: 0.0.0-use.local
+  resolution: "@knocklabs/integration@workspace:integration"
+  languageName: unknown
+  linkType: soft
+
 "@knocklabs/javascript@workspace:.":
   version: 0.0.0-use.local
   resolution: "@knocklabs/javascript@workspace:."
