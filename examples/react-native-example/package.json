@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native-example",
-  "version": "1.4.32",
+  "version": "1.4.33",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",

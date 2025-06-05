@@ -1,5 +1,13 @@
 # @knocklabs/expo
 
+## 0.3.20
+
+### Patch Changes
+
+- b317a4e: bump @types/react-native-htmlview from 0.16.5 to 0.16.6
+- Updated dependencies [b317a4e]
+  - @knocklabs/react-native@0.6.20
+
 ## 0.3.19
 
 ### Patch Changes

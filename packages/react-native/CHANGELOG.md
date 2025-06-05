@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.20
+
+### Patch Changes
+
+- b317a4e: bump @types/react-native-htmlview from 0.16.5 to 0.16.6
+
 ## 0.6.19
 
 ### Patch Changes
