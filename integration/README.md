@@ -62,7 +62,7 @@ In order to reproduce the most realistic integration test, we need to:
 
 ### The issue
 
-Unfortunately, this isn't super straightfoward. In our `yarn` monorepo there is a single version of `react` present. We do this so that there are not multiple versions running at the same time to avoid this error:
+Unfortunately, this isn't super straightforward. In our `yarn` monorepo there is a single version of `react` present. We do this so that there are not multiple versions running at the same time to avoid this error:
 
 ```
 A React Element from an older version of React was rendered. This is not supported. It can happen if:
@@ -71,16 +71,16 @@ A React Element from an older version of React was rendered. This is not support
 - A compiler tries to "inline" JSX instead of using the runtime.
 ```
 
-This means that if we want to test specific versions of react in our integration tests, the entire repo will need to resolve to that version. The initial solve would be to add this specific version as the one that is referenced in `@knocklabs/integration`, this won't work. The resolved version of `react` will end up being the version hoisted in the root `node_modules`. If you try to override that by pointing directly to specific version of `react` in the `node_modules` folder via `vitest` alias (or other solution), you will get the above error because the built version and the resolved version will be running at the same time. We could build the packages utilizing the verison we want to test against, but that means in some cases the build would not succeed even though the package would work with a lower version of react.
+This means that if we want to test specific versions of react in our integration tests, the entire repo will need to resolve to that version. The initial solve would be to add this specific version as the one that is referenced in `@knocklabs/integration`, this won't work. The resolved version of `react` will end up being the version hoisted in the root `node_modules`. If you try to override that by pointing directly to specific version of `react` in the `node_modules` folder via `vitest` alias (or other solution), you will get the above error because the built version and the resolved version will be running at the same time. We could build the packages utilizing the version we want to test against, but that means in some cases the build would not succeed even though the package would work with a lower version of react.
 
 There is no "easy" way around this.
 
 ### The solve
 
-Luckily, `yarn` v4 gives us one singular escape hatch, the `resolutions` key in `package.json`. This config will override **EVERY** version of the specificed package throughout the repo, yipee. But the caveat is this value is only configurable in the monorepo's root `package.json` file. So, if we want to test specific `react` versions we'll need to add the `resolutions` key defining those verisons. Here's how our script works.
+Luckily, `yarn` v4 gives us one singular escape hatch, the `resolutions` key in `package.json`. This config will override **EVERY** version of the specified package throughout the repo, yippee. But the caveat is this value is only configurable in the monorepo's root `package.json` file. So, if we want to test specific `react` versions we'll need to add the `resolutions` key defining those versions. Here's how our script works.
 
 1. Take in the `react` version that the maintainer wants to test. Any version should be easily testable without any extra configuration. So we take this in as a parameter when running the script, example: `./integration.run-integration.sh 18.2.0`.
-2. Create a copy of the monorepo's root `package.json` file so that we can restore it back to it's original state after the run. This helps to prevent the maintainer from comitting configuration changes to version control everytime they need to test a different version of `react`.
+2. Create a copy of the monorepo's root `package.json` file so that we can restore it back to it's original state after the run. This helps to prevent the maintainer from committing configuration changes to version control every time they need to test a different version of `react`.
 3. Set the `resolutions` key to the specified `react` version passed as a parameter and write it to the `package.json` file. This sets the version for `react` and `react-dom`.
 4. Run `yarn` so that each instance of `react` points to the specified version.
 5. Run the test suite from `@knocklabs/integration` via `yarn test:integration:runner`
