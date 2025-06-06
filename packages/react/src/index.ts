@@ -1,3 +1,5 @@
+"use client";
+
 import "./theme.css";
 
 export * from "./modules/core";
