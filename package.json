@@ -9,6 +9,7 @@
     "build:packages": "turbo build --filter=\"./packages/*\"",
     "dev": "turbo dev",
     "dev:next-example": "turbo dev --filter=\"./packages/*\" --filter=nextjs-example",
+    "dev:next-app-dir-example": "turbo dev --filter=\"./packages/*\" --filter=nextjs-app-dir-example",
     "dev:packages": "turbo dev --filter=\"./packages/*\"",
     "lint": "turbo lint",
     "format": "turbo format",

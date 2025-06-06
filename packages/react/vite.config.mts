@@ -2,6 +2,7 @@
 import react from "@vitejs/plugin-react";
 import path from "path";
 import execute from "rollup-plugin-execute";
+import preserveDirectives from "rollup-preserve-directives";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
 import dts from "vite-plugin-dts";
 import noBundlePlugin from "vite-plugin-no-bundle";
@@ -24,6 +25,7 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
+      preserveDirectives(),
       noBundlePlugin({ root: path.resolve(__dirname, "src") }),
     ],
     build: {
