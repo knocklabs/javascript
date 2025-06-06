@@ -1,1 +1,4 @@
-export * from "./NotificationFeedPopover";
+export {
+  NotificationFeedPopover,
+  type NotificationFeedPopoverProps,
+} from "./NotificationFeedPopover";

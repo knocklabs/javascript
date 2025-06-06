@@ -1,2 +1,5 @@
-export * from "./NotificationCell";
-export * from "./Avatar";
+export {
+  NotificationCell,
+  type NotificationCellProps,
+} from "./NotificationCell";
+export { Avatar, type AvatarProps } from "./Avatar";

@@ -1,1 +1,1 @@
-export * from "./NotificationFeedContainer";
+export { NotificationFeedContainer } from "./NotificationFeedContainer";

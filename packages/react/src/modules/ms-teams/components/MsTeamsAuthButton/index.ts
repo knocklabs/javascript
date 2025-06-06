@@ -1,1 +1,4 @@
-export * from "./MsTeamsAuthButton";
+export {
+  MsTeamsAuthButton,
+  type MsTeamsAuthButtonProps,
+} from "./MsTeamsAuthButton";

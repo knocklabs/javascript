@@ -1,3 +1,9 @@
-export * from "./components/MsTeamsAuthButton";
-export * from "./components/MsTeamsAuthContainer";
-export * from "./components/MsTeamsChannelCombobox";
+export {
+  MsTeamsAuthButton,
+  type MsTeamsAuthButtonProps,
+} from "./components/MsTeamsAuthButton";
+export {
+  MsTeamsAuthContainer,
+  type MsTeamsAuthContainerProps,
+} from "./components/MsTeamsAuthContainer";
+export { MsTeamsChannelCombobox } from "./components/MsTeamsChannelCombobox";
