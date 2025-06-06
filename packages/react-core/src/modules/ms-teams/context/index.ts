@@ -1,1 +1,6 @@
-export * from "./KnockMsTeamsProvider";
+export {
+  KnockMsTeamsProvider,
+  type KnockMsTeamsProviderProps,
+  type KnockMsTeamsProviderState,
+  useKnockMsTeamsClient,
+} from "./KnockMsTeamsProvider";

@@ -1,2 +1,2 @@
-export * from "./context";
-export * from "./hooks";
+export { KnockGuideProvider, KnockGuideContext } from "./context";
+export { useGuide } from "./hooks";

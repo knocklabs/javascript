@@ -1,1 +1,4 @@
-export * from "./SlackAuthContainer";
+export {
+  SlackAuthContainer,
+  type SlackAuthContainerProps,
+} from "./SlackAuthContainer";
