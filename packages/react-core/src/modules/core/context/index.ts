@@ -1,1 +1,6 @@
-export * from "./KnockProvider";
+export {
+  KnockProvider,
+  useKnockClient,
+  type KnockProviderProps,
+  type KnockProviderState,
+} from "./KnockProvider";

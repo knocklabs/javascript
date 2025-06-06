@@ -1,1 +1,4 @@
-export * from "./NotificationIconButton";
+export {
+  NotificationIconButton,
+  type NotificationIconButtonProps,
+} from "./NotificationIconButton";
