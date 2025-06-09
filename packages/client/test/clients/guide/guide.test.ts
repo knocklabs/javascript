@@ -1,0 +1,447 @@
+// @vitest-environment node
+import { Store } from "@tanstack/store";
+import { Channel, Socket } from "phoenix";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+import ApiClient from "../../../src/api";
+import {
+  type KnockGuide,
+  KnockGuideClient,
+  type KnockGuideStep,
+} from "../../../src/clients/guide";
+import Knock from "../../../src/knock";
+
+// Mock @tanstack/store
+const mockStore = {
+  getState: vi.fn(() => ({
+    guides: [] as any[],
+    queries: {},
+    location: undefined,
+  })),
+  setState: vi.fn((fn) => {
+    if (typeof fn === "function") {
+      const currentState = mockStore.state;
+      const newState = fn(currentState);
+      mockStore.state = newState;
+      return newState;
+    }
+    mockStore.state = fn;
+    return fn;
+  }),
+  state: {
+    guides: [] as any[],
+    queries: {},
+    location: undefined,
+  },
+};
+
+vi.mock("@tanstack/store", () => ({
+  Store: vi.fn(() => mockStore),
+}));
+
+// Mock phoenix
+vi.mock("phoenix", () => ({
+  Socket: vi.fn(),
+  Channel: vi.fn(),
+}));
+
+// Mock window for location tracking tests
+const mockWindow = {
+  location: { href: "https://example.com" },
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+};
+
+describe("KnockGuideClient", () => {
+  let mockApiClient: Partial<ApiClient>;
+  let mockKnock: Knock;
+
+  beforeEach(() => {
+    mockApiClient = {
+      makeRequest: vi.fn().mockResolvedValue({ statusCode: "ok" }),
+      socket: undefined,
+    };
+
+    mockKnock = {
+      client: vi.fn(() => mockApiClient as ApiClient),
+      log: vi.fn(),
+      failIfNotAuthenticated: vi.fn(),
+      userId: "test_user",
+      user: {
+        getGuides: vi
+          .fn()
+          .mockImplementation(() => Promise.resolve({ entries: [] })),
+      },
+    } as unknown as Knock;
+
+    vi.clearAllMocks();
+    // Reset window to undefined by default
+    vi.stubGlobal("window", undefined);
+    // Reset store state
+    mockStore.setState.mockClear();
+    mockStore.getState.mockReturnValue({
+      guides: [],
+      queries: {},
+      location: undefined,
+    });
+    mockStore.state = {
+      guides: [],
+      queries: {},
+      location: undefined,
+    };
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const channelId = "channel_123";
+  const defaultTargetParams = {
+    data: { key: "value" },
+    tenant: "tenant_123",
+  };
+
+  describe("constructor", () => {
+    test("initializes with default options", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      expect(client.channelId).toBe(channelId);
+      expect(client.targetParams).toEqual({});
+      expect(Store).toHaveBeenCalledWith({
+        guides: [],
+        queries: {},
+        location: undefined,
+      });
+    });
+
+    test("initializes with target params", () => {
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      expect(client.targetParams).toEqual(defaultTargetParams);
+    });
+
+    test("tracks location from window when enabled", () => {
+      // Mock window to simulate browser environment
+      vi.stubGlobal("window", mockWindow);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+
+      expect(Store).toHaveBeenCalledWith({
+        guides: [],
+        queries: {},
+        location: "https://example.com",
+      });
+    });
+
+    test("does not track location when window is not available", () => {
+      // window is already undefined from beforeEach
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+
+      expect(Store).toHaveBeenCalledWith({
+        guides: [],
+        queries: {},
+        location: undefined,
+      });
+    });
+  });
+
+  describe("fetch", () => {
+    test("fetches guides with default params", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide",
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            priority: 1,
+            type: "test",
+            semver: "1.0.0",
+            steps: [],
+            activation_location_rules: [],
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockImplementationOnce(() =>
+        Promise.resolve(mockResponse),
+      );
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      await client.fetch();
+
+      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
+        channelId,
+        expect.objectContaining({
+          data: JSON.stringify(defaultTargetParams.data),
+          tenant: defaultTargetParams.tenant,
+        }),
+      );
+    });
+
+    test("handles fetch errors", async () => {
+      const mockError = new Error("Network error");
+      vi.mocked(mockKnock.user.getGuides).mockImplementationOnce(() =>
+        Promise.reject(mockError),
+      );
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockStore.setState).toHaveBeenCalledWith(expect.any(Function));
+
+      // Get the last setState call and execute its function
+      const calls = mockStore.setState.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      if (lastCall) {
+        const setStateFunction = lastCall[0];
+        const newState = setStateFunction({
+          guides: [],
+          queries: {},
+          location: undefined,
+        });
+        expect(newState.queries).toEqual({
+          "/v1/users/test_user/guides": { status: "error", error: mockError },
+        });
+      }
+    });
+  });
+
+  describe("subscribe/unsubscribe", () => {
+    test("subscribes to socket events when socket is available", () => {
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+      client.subscribe();
+
+      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockSocket.channel).toHaveBeenCalledWith(
+        `guides:${channelId}`,
+        expect.objectContaining({
+          user_id: mockKnock.userId,
+          data: defaultTargetParams.data,
+          tenant: defaultTargetParams.tenant,
+        }),
+      );
+      expect(mockChannel.join).toHaveBeenCalled();
+    });
+
+    test("unsubscribes from socket events", () => {
+      const mockChannel = {
+        join: vi.fn(),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client["socketChannel"] = mockChannel as unknown as Channel;
+
+      client.unsubscribe();
+
+      expect(mockChannel.off).toHaveBeenCalled();
+      expect(mockChannel.leave).toHaveBeenCalled();
+    });
+  });
+
+  describe("guide operations", () => {
+    let makeRequestSpy: ReturnType<typeof vi.fn>;
+    let markGuideStepAsSpy: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      makeRequestSpy = vi.fn().mockResolvedValue({ statusCode: "ok" });
+      markGuideStepAsSpy = vi.fn().mockResolvedValue({ status: "ok" });
+
+      mockApiClient.makeRequest = makeRequestSpy;
+
+      // Mock the knock.user.markGuideStepAs method
+      mockKnock = {
+        ...mockKnock,
+        user: {
+          getGuides: vi
+            .fn()
+            .mockImplementation(() => Promise.resolve({ entries: [] })),
+          markGuideStepAs: markGuideStepAsSpy,
+        },
+      } as unknown as Knock;
+
+      vi.mocked(mockKnock.client).mockReturnValue({
+        ...mockApiClient,
+        makeRequest: makeRequestSpy,
+        host: "https://api.knock.app",
+        apiKey: "test_key",
+        userToken: "test_token",
+        axiosClient: {},
+        canRetryRequest: () => true,
+      } as unknown as ApiClient);
+    });
+
+    const mockStep: KnockGuideStep = {
+      ref: "step_1",
+      schema_key: "test",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    };
+
+    const mockGuide: KnockGuide = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_123",
+      key: "test_guide",
+      priority: 1,
+      type: "test",
+      semver: "1.0.0",
+      steps: [mockStep],
+      activation_location_rules: [],
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    test("marks guide step as seen", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guides: [mockGuide],
+        queries: {},
+        location: undefined,
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsSeen(mockGuide, mockStep);
+
+      expect(markGuideStepAsSpy).toHaveBeenCalledWith("seen", {
+        message_id: "msg_123",
+        channel_id: channelId,
+        guide_key: "test_guide",
+        guide_id: "guide_123",
+        guide_step_ref: "step_1",
+        content: {},
+        data: undefined,
+        tenant: undefined,
+      });
+    });
+
+    test("marks guide step as interacted", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guides: [mockGuide],
+        queries: {},
+        location: undefined,
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsInteracted(mockGuide, mockStep, { action: "clicked" });
+
+      expect(markGuideStepAsSpy).toHaveBeenCalledWith("interacted", {
+        message_id: "msg_123",
+        channel_id: channelId,
+        guide_key: "test_guide",
+        guide_id: "guide_123",
+        guide_step_ref: "step_1",
+        metadata: { action: "clicked" },
+      });
+    });
+
+    test("marks guide step as archived", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guides: [mockGuide],
+        queries: {},
+        location: undefined,
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(mockGuide, mockStep);
+
+      expect(markGuideStepAsSpy).toHaveBeenCalledWith("archived", {
+        message_id: "msg_123",
+        channel_id: channelId,
+        guide_key: "test_guide",
+        guide_id: "guide_123",
+        guide_step_ref: "step_1",
+      });
+    });
+  });
+
+  describe("cleanup", () => {
+    test("removes event listeners and unsubscribes", () => {
+      vi.stubGlobal("window", mockWindow);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+      const unsubscribeSpy = vi.spyOn(client, "unsubscribe");
+
+      client.cleanup();
+
+      expect(unsubscribeSpy).toHaveBeenCalled();
+      expect(mockWindow.removeEventListener).toHaveBeenCalled();
+    });
+  });
+});
