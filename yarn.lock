@@ -15470,7 +15470,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-seo@npm:^6.8.0":
+"next-seo@npm:^6.6.0, next-seo@npm:^6.8.0":
   version: 6.8.0
   resolution: "next-seo@npm:6.8.0"
   peerDependencies:
