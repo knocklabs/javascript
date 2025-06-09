@@ -1,1 +1,4 @@
-export * from "./MsTeamsAuthContainer";
+export {
+  MsTeamsAuthContainer,
+  type MsTeamsAuthContainerProps,
+} from "./MsTeamsAuthContainer";
