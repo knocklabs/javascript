@@ -1,5 +1,5 @@
 // @vitest-environment node
-import jstDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import ApiClient from "../src/api";
@@ -73,6 +73,7 @@ describe("knock", () => {
     );
     expect(logSpy).toHaveBeenCalledWith("Reinitialized real-time connections");
   });
+
   test("authenticate schedules user token expiration", () => {
     const knock = new Knock("pk_test_12345");
     const onUserTokenExpiring = vi.fn();
@@ -188,28 +189,123 @@ describe("knock", () => {
     consoleLogSpy.mockRestore();
   });
 
-  test("maybeScheduleUserTokenExpiration triggers reauthentication with new token", async () => {
+  test("maybeScheduleUserTokenExpiration does not reauthenticate when callback returns falsy", async () => {
     const knock = new Knock("pk_test_12345");
-
-    const newToken = "new_token_abc";
-
-    // Spy on authenticate to verify it gets called again
     const authenticateSpy = vi.spyOn(knock, "authenticate");
+    const onUserTokenExpiring = vi.fn().mockResolvedValue(null);
 
-    const onUserTokenExpiring = vi.fn().mockResolvedValue(newToken);
-
-    knock.authenticate("user_123", "original_token_123", {
+    // Call authenticate initially
+    knock.authenticate("user_123", "user_token_1", {
       onUserTokenExpiring,
-      timeBeforeExpirationInMs: 30000,
     });
 
-    // ⏩ Advance time just enough to trigger the first token expiration callback
-    await vi.advanceTimersByTimeAsync(31000);
+    const initialCallCount = authenticateSpy.mock.calls.length;
 
-    // ✅ It should call authenticate again with the new token
-    expect(authenticateSpy).toHaveBeenCalledWith("user_123", newToken, {
+    // Fast-forward time to trigger the callback
+    vi.advanceTimersByTime(31000);
+    await vi.runAllTimersAsync();
+
+    // Should not have called authenticate again since callback returned null (lines 154-157)
+    expect(authenticateSpy).toHaveBeenCalledTimes(initialCallCount);
+  });
+
+  test("maybeScheduleUserTokenExpiration handles no userToken case", async () => {
+    const knock = new Knock("pk_test_12345");
+    const onUserTokenExpiring = vi.fn();
+
+    // Authenticate without userToken
+    knock.authenticate("user_123", undefined, {
       onUserTokenExpiring,
-      timeBeforeExpirationInMs: 30000,
+    });
+
+    // Should not schedule any timeout since there's no userToken
+    vi.advanceTimersByTime(31000);
+    await vi.runAllTimersAsync();
+
+    expect(onUserTokenExpiring).not.toHaveBeenCalled();
+  });
+
+  describe("with custom jwt token", () => {
+    test("schedules token expiration callback with future expiration", async () => {
+      const mockCallback = vi.fn().mockResolvedValue("new_token");
+      const futureExp = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+      const mockDecodedToken = { exp: futureExp };
+
+      vi.mocked(jwtDecode).mockReturnValueOnce(mockDecodedToken);
+
+      const knock = new Knock("pk_test_123");
+
+      // Mock authenticate to prevent infinite recursion
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      // Call authenticate once to set up the initial timer
+      knock.authenticate("user_123", "old_token", {
+        onUserTokenExpiring: mockCallback,
+        timeBeforeExpirationInMs: 30000,
+      });
+
+      // Now mock authenticate to prevent recursion when callback fires
+      authenticateSpy.mockImplementation(() => {});
+
+      // Fast forward to trigger the callback
+      const timeToCallback = futureExp * 1000 - 30000 - Date.now();
+      vi.advanceTimersByTime(timeToCallback + 100);
+
+      // Wait for async operations to complete
+      await vi.runAllTimersAsync();
+
+      expect(mockCallback).toHaveBeenCalledWith("old_token", mockDecodedToken);
+      expect(authenticateSpy).toHaveBeenCalledWith("user_123", "new_token", {
+        onUserTokenExpiring: mockCallback,
+        timeBeforeExpirationInMs: 30000,
+      });
+    });
+
+    test("handles token expiration callback returning undefined", async () => {
+      const mockCallback = vi.fn().mockResolvedValue(undefined);
+      const futureExp = Math.floor(Date.now() / 1000) + 3600;
+      const mockDecodedToken = { exp: futureExp };
+
+      vi.mocked(jwtDecode).mockReturnValueOnce(mockDecodedToken);
+
+      const knock = new Knock("pk_test_123");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      knock.authenticate("user_123", "old_token", {
+        onUserTokenExpiring: mockCallback,
+        timeBeforeExpirationInMs: 30000,
+      });
+
+      // Mock authenticate to prevent recursion
+      authenticateSpy.mockImplementation(() => {});
+
+      const timeToCallback = futureExp * 1000 - 30000 - Date.now();
+      vi.advanceTimersByTime(timeToCallback + 100);
+      await vi.runAllTimersAsync();
+
+      expect(mockCallback).toHaveBeenCalledWith("old_token", mockDecodedToken);
+      // Should not call authenticate again when callback returns undefined (lines 154-157)
+      expect(authenticateSpy).toHaveBeenCalledTimes(1); // Only the initial call
+    });
+
+    test("does not schedule expiration when token is already expired", async () => {
+      const mockCallback = vi.fn();
+      const pastExp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago (expired)
+      const mockDecodedToken = { exp: pastExp };
+
+      vi.mocked(jwtDecode).mockReturnValueOnce(mockDecodedToken);
+
+      const knock = new Knock("pk_test_123");
+
+      knock.authenticate("user_123", "expired_token", {
+        onUserTokenExpiring: mockCallback,
+      });
+
+      // Fast forward time
+      vi.advanceTimersByTime(60000);
+      await vi.runAllTimersAsync();
+
+      expect(mockCallback).not.toHaveBeenCalled();
     });
   });
 });

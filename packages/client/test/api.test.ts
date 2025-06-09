@@ -113,7 +113,7 @@ describe("ApiClient", () => {
       });
     });
 
-    test("handles failed requests", async () => {
+    test("handles failed requests and logs error", async () => {
       // Create a mock that simulates an axios error
       const mockAxiosInstance = vi.fn();
 
@@ -132,7 +132,7 @@ describe("ApiClient", () => {
 
       mockAxiosInstance.mockRejectedValueOnce(axiosError);
 
-      // Mock console.error to suppress error output during test
+      // Mock console.error to capture the call and suppress output during test
       const consoleSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
@@ -149,7 +149,54 @@ describe("ApiClient", () => {
         status: 500,
       });
 
+      // Verify console.error was called with the error (line 65)
+      expect(consoleSpy).toHaveBeenCalledWith(axiosError);
+
       consoleSpy.mockRestore();
+    });
+
+    test("handles requests with status codes between 200-299 as ok", async () => {
+      const mockAxiosInstance = vi.fn().mockResolvedValue({
+        status: 201,
+        data: { created: true },
+      });
+
+      vi.mocked(axios.create).mockReturnValueOnce(mockAxiosInstance as any);
+
+      const client = new ApiClient(defaultOptions);
+      const response = await client.makeRequest({
+        method: "POST",
+        url: "/test",
+      });
+
+      expect(response).toEqual({
+        statusCode: "ok",
+        body: { created: true },
+        error: undefined,
+        status: 201,
+      });
+    });
+
+    test("handles requests with status codes 300+ as error", async () => {
+      const mockAxiosInstance = vi.fn().mockResolvedValue({
+        status: 302,
+        data: { redirect: true },
+      });
+
+      vi.mocked(axios.create).mockReturnValueOnce(mockAxiosInstance as any);
+
+      const client = new ApiClient(defaultOptions);
+      const response = await client.makeRequest({
+        method: "GET",
+        url: "/test",
+      });
+
+      expect(response).toEqual({
+        statusCode: "error",
+        body: { redirect: true },
+        error: undefined,
+        status: 302,
+      });
     });
   });
 
