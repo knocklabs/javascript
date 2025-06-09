@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.13
+
+### Patch Changes
+
+- bea5604: update @knocklabs/react & @knocklabs/react-core to use named exports instead of barrel exports
+
 ## 0.6.12
 
 ### Patch Changes

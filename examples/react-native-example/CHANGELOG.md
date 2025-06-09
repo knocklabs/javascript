@@ -1,5 +1,11 @@
 # @knocklabs/react-native-example
 
+## 1.4.34
+
+### Patch Changes
+
+- @knocklabs/react-native@0.6.21
+
 ## 1.4.33
 
 ### Patch Changes
