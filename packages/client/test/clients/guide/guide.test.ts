@@ -129,13 +129,6 @@ describe("KnockGuideClient", () => {
       // Mock window to simulate browser environment
       vi.stubGlobal("window", mockWindow);
 
-      const client = new KnockGuideClient(
-        mockKnock,
-        channelId,
-        {},
-        { trackLocationFromWindow: true },
-      );
-
       expect(Store).toHaveBeenCalledWith({
         guides: [],
         queries: {},
@@ -145,12 +138,6 @@ describe("KnockGuideClient", () => {
 
     test("does not track location when window is not available", () => {
       // window is already undefined from beforeEach
-      const client = new KnockGuideClient(
-        mockKnock,
-        channelId,
-        {},
-        { trackLocationFromWindow: true },
-      );
 
       expect(Store).toHaveBeenCalledWith({
         guides: [],
@@ -808,13 +795,6 @@ describe("KnockGuideClient", () => {
         history: mockHistory,
       });
 
-      const client = new KnockGuideClient(
-        mockKnock,
-        channelId,
-        {},
-        { trackLocationFromWindow: true },
-      );
-
       // Verify that history methods were monkey-patched
       expect(typeof (window as any).history.pushState).toBe("function");
       expect(typeof (window as any).history.replaceState).toBe("function");
@@ -859,10 +839,6 @@ describe("KnockGuideClient", () => {
         {},
         { trackLocationFromWindow: true },
       );
-
-      // Store references to the patched methods
-      const patchedPushState = (window as any).history.pushState;
-      const patchedReplaceState = (window as any).history.replaceState;
 
       client.cleanup();
 

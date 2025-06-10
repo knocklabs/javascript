@@ -2,17 +2,9 @@
 import { jwtDecode } from "jwt-decode";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import ApiClient from "../src/api";
 import Knock from "../src/knock";
 
-import { mockJwtDecode } from "./test-utils/mocks";
 import { authenticateKnock, createMockKnock } from "./test-utils/mocks";
-
-// const apiClientMock = vi.fn();
-
-// vi.mock("../src/api", () => ({
-//   default: apiClientMock,
-// }));
 
 // ✅ Mock the named export `jwtDecode` from the "jwt-decode" module.
 // It will always return a decoded token with an `exp` 61 seconds in the future.
@@ -32,16 +24,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-/**
- * Modern Knock Client Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - User journey-focused test organization
- * - Realistic mock behavior
- * - Authentication lifecycle testing
- * - Token management testing
- * - Error scenario coverage
- */
 describe("Knock Client", () => {
   describe("Initialization and Configuration", () => {
     test("creates a Knock client with API key", () => {

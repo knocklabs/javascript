@@ -1,17 +1,8 @@
 import { vi } from "vitest";
 
-// Import AFTER the Phoenix mock is set up
-import ApiClient from "../../src/api";
 import Feed from "../../src/clients/feed/feed";
 import type { FeedClientOptions } from "../../src/clients/feed/interfaces";
 import Knock from "../../src/knock";
-
-/**
- * Simplified Test Setup & Mock Utilities
- *
- * This combines simple mock factories with focused test setup utilities.
- * Each function has a clear responsibility and minimal abstraction.
- */
 
 // Simple mock factories - no complex state management
 export const createMockApiClient = () => {

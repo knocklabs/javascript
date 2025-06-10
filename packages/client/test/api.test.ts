@@ -2,16 +2,8 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import ApiClient from "../src/api";
-import Knock from "../src/knock";
 
 import { createAxiosMock, mockAxios } from "./test-utils/mocks";
-import {
-  authenticateKnock,
-  createMockKnock,
-  mockNetworkError,
-  mockNetworkFailure,
-  mockNetworkSuccess,
-} from "./test-utils/mocks";
 
 // Use vi.hoisted to ensure proper mock setup
 const { mockIsNetworkError, mockExponentialDelay, mockAxiosRetry } = vi.hoisted(
@@ -360,16 +352,6 @@ describe("API Client", () => {
       // Configure the mock to return true for network errors
       mockIsNetworkError.mockReturnValue(true);
 
-      // Debug: Check if the hoisted mock is properly attached
-      console.log(
-        "mockAxiosRetry.isNetworkError:",
-        typeof mockAxiosRetry.isNetworkError,
-      );
-      console.log(
-        "Are they the same?",
-        mockIsNetworkError === mockAxiosRetry.isNetworkError,
-      );
-
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
         apiKey: "pk_test_12345",
@@ -381,14 +363,7 @@ describe("API Client", () => {
       networkError.code = "ECONNABORTED";
       networkError.isAxiosError = true;
 
-      // Test the mock directly before calling canRetryRequest
-      console.log(
-        "Direct mock test before:",
-        mockAxiosRetry.isNetworkError(networkError),
-      );
-
       const canRetry = (apiClient as any).canRetryRequest(networkError);
-      console.log("canRetry result:", canRetry);
 
       expect(canRetry).toBe(true);
       expect(mockIsNetworkError).toHaveBeenCalledWith(networkError);

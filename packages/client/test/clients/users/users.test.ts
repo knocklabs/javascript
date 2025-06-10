@@ -9,16 +9,6 @@ import UserClient from "../../../src/clients/users";
 import type { ChannelData, User } from "../../../src/interfaces";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
-/**
- * Modern User Client Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - User journey-focused test organization
- * - Realistic mock behavior
- * - Comprehensive error scenario testing
- * - Authentication lifecycle testing
- * - Proper cleanup and resource management
- */
 describe("User Client", () => {
   beforeEach(() => {
     vi.clearAllMocks();

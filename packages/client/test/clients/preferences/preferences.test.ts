@@ -2,19 +2,8 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import PreferencesClient from "../../../src/clients/preferences";
-import Knock from "../../../src/knock";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
-/**
- * Modern Preferences Client Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - User journey-focused test organization
- * - Realistic mock behavior
- * - Comprehensive error scenario testing
- * - Authentication lifecycle testing
- * - Proper cleanup and resource management
- */
 describe("Preferences Client", () => {
   beforeEach(() => {
     vi.clearAllMocks();

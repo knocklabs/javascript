@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { TENANT_OBJECT_COLLECTION } from "../../../src/clients/objects/constants";
 import SlackClient from "../../../src/clients/slack";
@@ -9,15 +9,6 @@ import type {
 } from "../../../src/clients/slack/interfaces";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
-/**
- * Modern Slack Client Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - User journey-focused test organization
- * - Realistic mock behavior
- * - Comprehensive error scenario testing
- * - Proper cleanup and resource management
- */
 describe("Slack Client", () => {
   const getTestSetup = () => {
     const { knock, mockApiClient } = createMockKnock();

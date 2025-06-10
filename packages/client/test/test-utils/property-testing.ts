@@ -2,9 +2,6 @@ import type { FeedItem, FeedMetadata } from "../../src/clients/feed/interfaces";
 
 import { createMockFeedItem, createMockFeedMetadata } from "./fixtures";
 
-// Simple property-based testing utilities (without external dependencies)
-// In a real implementation, you might want to use fast-check or similar
-
 export interface Arbitrary<T> {
   generate(): T;
   sample(count: number): T[];

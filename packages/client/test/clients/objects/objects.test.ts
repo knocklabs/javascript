@@ -1,19 +1,10 @@
 // @vitest-environment node
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import ObjectClient from "../../../src/clients/objects";
 import type { ChannelData } from "../../../src/interfaces";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
-/**
- * Modern Object Client Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - Realistic mock behavior
- * - Comprehensive error scenario testing
- * - User journey-focused organization
- * - Proper cleanup and resource management
- */
 describe("Object Client", () => {
   const getTestSetup = () => {
     const { knock, mockApiClient } = createMockKnock();

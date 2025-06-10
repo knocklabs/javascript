@@ -1,26 +1,14 @@
 // @vitest-environment node
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import Feed from "../../../src/clients/feed/feed";
 import { NetworkStatus } from "../../../src/networkStatus";
 import {
-  createMixedStateFeedDataset,
   createMockFeedItems,
-  createReadFeedItem,
   createUnreadFeedItem,
 } from "../../test-utils/fixtures";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
-/**
- * Modern Feed Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - User journey-focused test organization
- * - Realistic mock behavior
- * - Performance testing
- * - Error resilience testing
- * - Comprehensive scenario coverage
- */
 describe("Feed", () => {
   const getTestSetup = () => {
     const { knock, mockApiClient } = createMockKnock();
@@ -731,13 +719,6 @@ describe("Feed", () => {
           .fn()
           .mockImplementation(() => mockBroadcastChannel);
         global.self = global as any;
-
-        const feed = new Feed(
-          knock,
-          "01234567-89ab-cdef-0123-456789abcdef",
-          { __experimentalCrossBrowserUpdates: true },
-          undefined,
-        );
 
         expect(global.BroadcastChannel).toHaveBeenCalledWith(
           `knock:feed:01234567-89ab-cdef-0123-456789abcdef:${knock.userId}`,

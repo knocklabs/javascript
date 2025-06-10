@@ -7,10 +7,7 @@ import type {
   FeedMetadata,
 } from "../../src/clients/feed/interfaces";
 import type { NotificationSource } from "../../src/clients/messages/interfaces";
-import type {
-  Message,
-  MessageEngagementStatus,
-} from "../../src/clients/messages/interfaces";
+import type { Message } from "../../src/clients/messages/interfaces";
 import type { PreferenceSet } from "../../src/clients/preferences/interfaces";
 import type { User } from "../../src/interfaces";
 import { NetworkStatus } from "../../src/networkStatus";
@@ -351,7 +348,7 @@ export function createMockMessages(
     interactedPercentage = 0.3,
   } = options;
 
-  return Array.from({ length: count }, (_, index) => {
+  return Array.from({ length: count }, (_) => {
     const isRead = Math.random() < readPercentage;
     const isArchived = Math.random() < archivedPercentage;
     const isInteracted = Math.random() < interactedPercentage;

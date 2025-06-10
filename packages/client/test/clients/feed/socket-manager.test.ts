@@ -196,7 +196,7 @@ describe("FeedSocketManager", () => {
     });
 
     test("handles store subscription callback", () => {
-      let subscriptionCallback: Function;
+      let subscriptionCallback: (() => void) | undefined;
       vi.mocked(mockStore.subscribe).mockImplementation((callback) => {
         subscriptionCallback = callback;
         return vi.fn();
@@ -214,7 +214,7 @@ describe("FeedSocketManager", () => {
     });
 
     test("ignores store subscription callback when no payload for reference id", () => {
-      let subscriptionCallback: Function;
+      let subscriptionCallback: (() => void) | undefined;
       vi.mocked(mockStore.subscribe).mockImplementation((callback) => {
         subscriptionCallback = callback;
         return vi.fn();
@@ -381,7 +381,7 @@ describe("FeedSocketManager", () => {
 
   describe("event handling integration", () => {
     test("properly handles socket events through channel listeners", () => {
-      let eventCallback: Function;
+      let eventCallback: ((payload: any) => void) | undefined;
       vi.mocked(mockChannel.on).mockImplementation((eventType, callback) => {
         if (eventType === SocketEventType.NewMessage) {
           eventCallback = callback;

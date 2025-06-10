@@ -86,8 +86,6 @@ describe("Helper Functions", () => {
       });
 
       test("validates proper hyphen placement", () => {
-        const validPattern = "123e4567-e89b-12d3-a456-426614174000";
-
         // Test with hyphens in wrong positions
         const wrongHyphens = [
           "123e456-7e89b-12d3-a456-426614174000", // hyphen moved

@@ -1,7 +1,6 @@
 // @vitest-environment node
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import ApiClient from "../../../src/api";
 import MsTeamsClient from "../../../src/clients/ms-teams";
 import type {
   GetMsTeamsChannelsResponse,
@@ -10,18 +9,8 @@ import type {
   MsTeamsTeam,
 } from "../../../src/clients/ms-teams/interfaces";
 import { TENANT_OBJECT_COLLECTION } from "../../../src/clients/objects/constants";
-import Knock from "../../../src/knock";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
-/**
- * Modern MS Teams Client Test Suite
- *
- * This test suite demonstrates modern testing practices including:
- * - User journey-focused test organization
- * - Realistic mock behavior
- * - Comprehensive error scenario testing
- * - Proper cleanup and resource management
- */
 describe("Microsoft Teams Client", () => {
   const getTestSetup = () => {
     const { knock, mockApiClient } = createMockKnock();
@@ -32,12 +21,6 @@ describe("Microsoft Teams Client", () => {
       cleanup: () => vi.clearAllMocks(),
     };
   };
-
-  const mockKnock = {
-    client: vi.fn(() => ({
-      makeRequest: vi.fn(),
-    })),
-  } as unknown as Knock;
 
   beforeEach(() => {
     vi.clearAllMocks();
