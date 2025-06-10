@@ -449,4 +449,75 @@ describe("Slack Client", () => {
       }
     });
   });
+
+  describe("Error Handling", () => {
+    test("returns error response for client errors", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: { response: { status: 400 } }, // Client error
+          body: "Bad Request",
+        });
+
+        const client = new SlackClient(knock);
+        const result = await client.getChannels({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        // Should return the error object for client errors
+        expect(result).toEqual({ response: { status: 400 } });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("throws error for server errors", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: { response: { status: 500 } }, // Server error
+          body: "Internal Server Error",
+        });
+
+        const client = new SlackClient(knock);
+
+        await expect(
+          client.authCheck({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("throws error body when error is null", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: null,
+          body: "Service Unavailable",
+        });
+
+        const client = new SlackClient(knock);
+
+        await expect(
+          client.revokeAccessToken({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow("Service Unavailable");
+      } finally {
+        cleanup();
+      }
+    });
+  });
 });

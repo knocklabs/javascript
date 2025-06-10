@@ -303,6 +303,49 @@ describe("Object Client", () => {
         }
       });
     });
+
+    describe("Error Handling", () => {
+      test("throws error when status code indicates error", async () => {
+        const { knock, mockApiClient } = getTestSetup();
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: "Object not found",
+          body: "Invalid object ID",
+        });
+
+        const client = new ObjectClient(knock);
+
+        await expect(
+          client.getChannelData({
+            collection: "tenants",
+            objectId: "invalid_id",
+            channelId: "email",
+          }),
+        ).rejects.toThrow("Object not found");
+      });
+
+      test("throws error body when error is null", async () => {
+        const { knock, mockApiClient } = getTestSetup();
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: null,
+          body: "Service unavailable",
+        });
+
+        const client = new ObjectClient(knock);
+
+        await expect(
+          client.setChannelData({
+            collection: "tenants",
+            objectId: "tenant_123",
+            channelId: "email",
+            data: { key: "value" },
+          }),
+        ).rejects.toThrow("Service unavailable");
+      });
+    });
   });
 
   describe("Performance and Integration", () => {

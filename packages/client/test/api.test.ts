@@ -13,6 +13,27 @@ import {
   mockNetworkSuccess,
 } from "./test-utils/mocks";
 
+// Use vi.hoisted to ensure proper mock setup
+const { mockIsNetworkError, mockExponentialDelay, mockAxiosRetry } = vi.hoisted(
+  () => {
+    const mockIsNetworkError = vi.fn();
+    const mockExponentialDelay = vi.fn().mockReturnValue(1000);
+    const mockAxiosRetry = Object.assign(vi.fn(), {
+      isNetworkError: mockIsNetworkError,
+      exponentialDelay: mockExponentialDelay,
+    });
+
+    return { mockIsNetworkError, mockExponentialDelay, mockAxiosRetry };
+  },
+);
+
+// Mock axios-retry using the hoisted mocks
+vi.mock("axios-retry", () => ({
+  default: mockAxiosRetry,
+  isNetworkError: mockIsNetworkError,
+  exponentialDelay: mockExponentialDelay,
+}));
+
 // Mock Phoenix Socket directly in this file - vi.mock() calls are hoisted
 vi.mock("phoenix", () => ({
   Socket: vi.fn().mockImplementation(() => ({
@@ -333,6 +354,149 @@ describe("API Client", () => {
       } finally {
         consoleSpy.mockRestore();
       }
+    });
+
+    test("retries on network errors", async () => {
+      // Configure the mock to return true for network errors
+      mockIsNetworkError.mockReturnValue(true);
+
+      // Debug: Check if the hoisted mock is properly attached
+      console.log(
+        "mockAxiosRetry.isNetworkError:",
+        typeof mockAxiosRetry.isNetworkError,
+      );
+      console.log(
+        "Are they the same?",
+        mockIsNetworkError === mockAxiosRetry.isNetworkError,
+      );
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      // Mock network error
+      const networkError = new Error("Network Error") as any;
+      networkError.code = "ECONNABORTED";
+      networkError.isAxiosError = true;
+
+      // Test the mock directly before calling canRetryRequest
+      console.log(
+        "Direct mock test before:",
+        mockAxiosRetry.isNetworkError(networkError),
+      );
+
+      const canRetry = (apiClient as any).canRetryRequest(networkError);
+      console.log("canRetry result:", canRetry);
+
+      expect(canRetry).toBe(true);
+      expect(mockIsNetworkError).toHaveBeenCalledWith(networkError);
+    });
+
+    test("retries on 5xx server errors", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const serverErrors = [500, 501, 502, 503, 504, 599];
+
+      serverErrors.forEach((status) => {
+        const serverError = {
+          response: { status },
+          isAxiosError: true,
+        } as any;
+
+        // Mock axiosRetry.isNetworkError to return false for server errors
+        mockIsNetworkError.mockReturnValue(false);
+
+        const canRetry = (apiClient as any).canRetryRequest(serverError);
+        expect(canRetry).toBe(true);
+      });
+    });
+
+    test("retries on rate limit errors (429)", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const rateLimitError = {
+        response: { status: 429 },
+        isAxiosError: true,
+      } as any;
+
+      mockIsNetworkError.mockReturnValue(false);
+
+      const canRetry = (apiClient as any).canRetryRequest(rateLimitError);
+      expect(canRetry).toBe(true);
+    });
+
+    test("does not retry on client errors (4xx except 429)", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const clientErrors = [400, 401, 403, 404, 422];
+
+      clientErrors.forEach((status) => {
+        const clientError = {
+          response: { status },
+          isAxiosError: true,
+        } as any;
+
+        // Mock axiosRetry.isNetworkError to return false
+        mockIsNetworkError.mockReturnValue(false);
+
+        const canRetry = (apiClient as any).canRetryRequest(clientError);
+        expect(canRetry).toBe(false);
+      });
+    });
+
+    test("does not retry when response is undefined", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const errorWithoutResponse = {
+        isAxiosError: true,
+        response: undefined,
+      } as any;
+
+      mockIsNetworkError.mockReturnValue(false);
+
+      const canRetry = (apiClient as any).canRetryRequest(errorWithoutResponse);
+      expect(canRetry).toBe(false);
+    });
+
+    test("does not retry on successful 2xx responses", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const successResponses = [200, 201, 204];
+
+      successResponses.forEach((status) => {
+        const successError = {
+          response: { status },
+          isAxiosError: true,
+        } as any;
+
+        // Mock axiosRetry.isNetworkError to return false
+        mockIsNetworkError.mockReturnValue(false);
+
+        const canRetry = (apiClient as any).canRetryRequest(successError);
+        expect(canRetry).toBe(false);
+      });
     });
   });
 

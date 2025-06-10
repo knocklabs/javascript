@@ -369,5 +369,53 @@ describe("feed utils", () => {
 
       expect(result).toBe(JSON.stringify(triggerData));
     });
+
+    test("returns stringified object for object trigger data", () => {
+      const options = {
+        trigger_data: { userId: "123", action: "click" },
+      };
+
+      const result = getFormattedTriggerData(options);
+      expect(result).toBe('{"userId":"123","action":"click"}');
+    });
+
+    test("returns string as-is for string trigger data", () => {
+      const options = {
+        trigger_data: '{"userId":"456","action":"view"}',
+      } as any;
+
+      const result = getFormattedTriggerData(options);
+      expect(result).toBe('{"userId":"456","action":"view"}');
+    });
+
+    test("returns undefined for undefined trigger data", () => {
+      const options = {};
+
+      const result = getFormattedTriggerData(options);
+      expect(result).toBeUndefined();
+    });
+
+    test("stringifies null trigger data (since typeof null === 'object')", () => {
+      const options = {
+        trigger_data: null,
+      } as any;
+
+      const result = getFormattedTriggerData(options);
+      // In JavaScript, typeof null === "object", so null gets stringified
+      expect(result).toBe("null");
+    });
+
+    test("returns undefined for other primitive types", () => {
+      const testCases = [
+        { trigger_data: 123 } as any,
+        { trigger_data: true } as any,
+        { trigger_data: Symbol("test") } as any,
+      ];
+
+      testCases.forEach((options) => {
+        const result = getFormattedTriggerData(options);
+        expect(result).toBeUndefined();
+      });
+    });
   });
 });

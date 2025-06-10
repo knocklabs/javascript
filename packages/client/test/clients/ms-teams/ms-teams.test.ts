@@ -469,4 +469,183 @@ describe("Microsoft Teams Client", () => {
       }
     });
   });
+
+  describe("Access Token Management", () => {
+    test("revokes access token successfully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockRevokeResponse = {
+          success: true,
+          message: "Access token revoked successfully",
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockRevokeResponse,
+        });
+
+        const client = new MsTeamsClient(knock);
+        const result = await client.revokeAccessToken({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "PUT",
+          url: "/v1/providers/ms-teams/channel_123/revoke_access",
+          params: {
+            ms_teams_tenant_object: {
+              object_id: "tenant_123",
+              collection: TENANT_OBJECT_COLLECTION,
+            },
+            channel_id: "channel_123",
+          },
+        });
+        expect(result).toEqual(mockRevokeResponse);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles revoke access token errors", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: new Error("Failed to revoke access token"),
+          body: undefined,
+        });
+
+        const client = new MsTeamsClient(knock);
+
+        await expect(
+          client.revokeAccessToken({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow("Failed to revoke access token");
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles unauthorized revoke attempts", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: { response: { status: 401 } },
+          body: "Unauthorized",
+        });
+
+        const client = new MsTeamsClient(knock);
+        const result = await client.revokeAccessToken({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        // Should return the error response for client errors (< 500)
+        expect(result).toEqual({ response: { status: 401 } });
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Enhanced Error Handling", () => {
+    test("returns error response for client errors", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: { response: { status: 400 } }, // Client error
+          body: "Bad Request",
+        });
+
+        const client = new MsTeamsClient(knock);
+        const result = await client.getTeams({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        // Should return the error object for client errors
+        expect(result).toEqual({ response: { status: 400 } });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("throws error for server errors (>= 500)", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: { response: { status: 500 } }, // Server error
+          body: "Internal Server Error",
+        });
+
+        const client = new MsTeamsClient(knock);
+
+        await expect(
+          client.getTeams({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("throws error body for server errors when no error object", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: null,
+          body: "Service Unavailable",
+        });
+
+        const client = new MsTeamsClient(knock);
+
+        await expect(
+          client.getTeams({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow("Service Unavailable");
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("throws error when error object is undefined", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: undefined,
+          body: "Unknown error",
+        });
+
+        const client = new MsTeamsClient(knock);
+
+        await expect(
+          client.getTeams({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow("Unknown error");
+      } finally {
+        cleanup();
+      }
+    });
+  });
 });
