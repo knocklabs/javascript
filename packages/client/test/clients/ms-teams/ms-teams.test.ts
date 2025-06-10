@@ -11,7 +11,7 @@ import type {
 } from "../../../src/clients/ms-teams/interfaces";
 import { TENANT_OBJECT_COLLECTION } from "../../../src/clients/objects/constants";
 import Knock from "../../../src/knock";
-import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
+import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
 /**
  * Modern MS Teams Client Test Suite
@@ -22,8 +22,16 @@ import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
  * - Comprehensive error scenario testing
  * - Proper cleanup and resource management
  */
-describe("MS Teams Client", () => {
-  const getTestSetup = useTestHooks(() => setupKnockTest());
+describe("Microsoft Teams Client", () => {
+  const getTestSetup = () => {
+    const { knock, mockApiClient } = createMockKnock();
+    authenticateKnock(knock);
+    return {
+      knock,
+      mockApiClient,
+      cleanup: () => vi.clearAllMocks(),
+    };
+  };
 
   const mockKnock = {
     client: vi.fn(() => ({

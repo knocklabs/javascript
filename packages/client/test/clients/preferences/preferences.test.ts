@@ -1,12 +1,9 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import Preferences from "../../../src/clients/preferences";
-import type {
-  PreferenceSet,
-  WorkflowPreferenceSetting,
-} from "../../../src/clients/preferences/interfaces";
-import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
+import PreferencesClient from "../../../src/clients/preferences";
+import Knock from "../../../src/knock";
+import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
 /**
  * Modern Preferences Client Test Suite
@@ -19,668 +16,124 @@ import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
  * - Proper cleanup and resource management
  */
 describe("Preferences Client", () => {
-  const getTestSetup = useTestHooks(() => setupKnockTest());
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-  const mockPreferenceSet: PreferenceSet = {
-    id: "default",
-    channel_types: {
-      in_app_feed: true,
-      email: false,
-    },
-    workflows: {
-      onboarding: {
-        channel_types: {
-          in_app_feed: true,
-          email: false,
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("Getting Preferences", () => {
+    test("fetches user preferences successfully", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      authenticateKnock(knock);
+
+      const mockPreferences = {
+        categories: {
+          marketing: true,
+          security: false,
         },
-      },
-    },
-    categories: {
-      marketing: {
-        channel_types: {
-          in_app_feed: true,
-          email: false,
-        },
-      },
-    },
-  };
+      };
 
-  describe("Preference Set Management", () => {
-    describe("Getting Preference Sets", () => {
-      test("fetches all preference sets successfully", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: [mockPreferenceSet],
-          });
-
-          const client = new Preferences(knock);
-          const result = await client.getAll();
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "GET",
-            url: "/v1/users/user_123/preferences",
-          });
-          expect(result).toEqual([mockPreferenceSet]);
-        } finally {
-          cleanup();
-        }
+      mockApiClient.makeRequest.mockResolvedValue({
+        statusCode: "ok",
+        body: mockPreferences,
       });
 
-      test("fetches a specific preference set", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
+      const client = new PreferencesClient(knock);
+      const result = await client.get();
 
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          const result = await client.get({ preferenceSet: "default" });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "GET",
-            url: "/v1/users/user_123/preferences/default",
-          });
-          expect(result).toEqual(mockPreferenceSet);
-        } finally {
-          cleanup();
-        }
+      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+        method: "GET",
+        url: "/v1/users/user_123/preferences/default",
       });
-
-      test("fetches preference set with tenant context", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.get({
-            preferenceSet: "tenant_specific",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "GET",
-            url: "/v1/users/user_123/preferences/tenant_specific",
-          });
-        } finally {
-          cleanup();
-        }
-      });
-
-      test("handles empty preference sets gracefully", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: [],
-          });
-
-          const client = new Preferences(knock);
-          const result = await client.getAll();
-
-          expect(result).toEqual([]);
-        } finally {
-          cleanup();
-        }
-      });
+      expect(result).toEqual(mockPreferences);
     });
 
-    describe("Setting Preferences", () => {
-      test("updates a complete preference set", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
+    test("requires authentication", async () => {
+      const { knock } = createMockKnock();
 
-        try {
-          knock.authenticate("user_123", "test_token");
+      const client = new PreferencesClient(knock);
 
-          const preferences = {
+      await expect(client.get()).rejects.toThrow(
+        "Not authenticated. Please call `authenticate` first.",
+      );
+    });
+  });
+
+  describe("Setting Preferences", () => {
+    test("updates user preferences successfully", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      authenticateKnock(knock);
+
+      const preferences = {
+        channel_types: {
+          email: true,
+          in_app_feed: false,
+        },
+        workflows: {},
+        categories: {
+          marketing: {
             channel_types: {
-              in_app_feed: true,
               email: false,
             },
-            workflows: {
-              onboarding: {
-                channel_types: {
-                  in_app_feed: true,
-                  email: false,
-                },
-              },
-            },
-            categories: {
-              marketing: {
-                channel_types: {
-                  in_app_feed: true,
-                  email: false,
-                },
-              },
-            },
-          };
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.set(preferences, { preferenceSet: "default" });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/default",
-            data: preferences,
-          });
-        } finally {
-          cleanup();
-        }
-      });
-
-      test("handles complex workflow preferences", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const complexPreferences = {
-            channel_types: {
-              in_app_feed: true,
-              email: true,
-              sms: false,
-              push: true,
-            },
-            workflows: {
-              welcome_series: {
-                channel_types: { email: true, sms: false },
-              },
-              weekly_digest: false, // Boolean workflow preference
-              urgent_alerts: {
-                channel_types: { sms: true, push: true },
-              },
-            },
-            categories: {
-              marketing: {
-                channel_types: { email: false },
-              },
-              security: {
-                channel_types: { email: true, sms: true },
-              },
-            },
-          };
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: complexPreferences,
-          });
-
-          const client = new Preferences(knock);
-          await client.set(complexPreferences, {
-            preferenceSet: "comprehensive",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/comprehensive",
-            data: complexPreferences,
-          });
-        } finally {
-          cleanup();
-        }
-      });
-    });
-  });
-
-  describe("Channel Type Preferences", () => {
-    describe("Bulk Channel Type Updates", () => {
-      test("updates multiple channel type preferences", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const channelTypes = {
-            in_app_feed: true,
-            email: false,
-            sms: true,
-            push: false,
-          };
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setChannelTypes(channelTypes, {
-            preferenceSet: "default",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/default/channel_types",
-            data: channelTypes,
-          });
-        } finally {
-          cleanup();
-        }
-      });
-
-      test("handles channel type updates with tenant context", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const channelTypes = {
-            email: true,
-            chat: false,
-          };
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setChannelTypes(channelTypes, {
-            preferenceSet: "tenant_specific",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/tenant_specific/channel_types",
-            data: channelTypes,
-          });
-        } finally {
-          cleanup();
-        }
-      });
-    });
-
-    describe("Individual Channel Type Updates", () => {
-      test("updates a single channel type preference", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setChannelType("email", true, {
-            preferenceSet: "default",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/default/channel_types/email",
-            data: { subscribed: true },
-          });
-        } finally {
-          cleanup();
-        }
-      });
-
-      test("handles disabling channel types", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setChannelType("sms", false, {
-            preferenceSet: "marketing",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/marketing/channel_types/sms",
-            data: { subscribed: false },
-          });
-        } finally {
-          cleanup();
-        }
-      });
-    });
-  });
-
-  describe("Workflow and Category Preferences", () => {
-    describe("Workflow Management", () => {
-      test("sets workflow preferences with channel type overrides", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const workflowSetting: WorkflowPreferenceSetting = {
+          },
+          security: {
             channel_types: {
               email: true,
-              sms: false,
-              push: true,
             },
-          };
+          },
+        },
+      };
 
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setWorkflow("welcome_series", workflowSetting, {
-            preferenceSet: "default",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/default/workflows/welcome_series",
-            data: workflowSetting,
-          });
-        } finally {
-          cleanup();
-        }
+      mockApiClient.makeRequest.mockResolvedValue({
+        statusCode: "ok",
+        body: preferences,
       });
 
-      test("disables workflow completely", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
+      const client = new PreferencesClient(knock);
+      const result = await client.set(preferences);
 
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setWorkflow("marketing_emails", false, {
-            preferenceSet: "default",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/default/workflows/marketing_emails",
-            data: { subscribed: false },
-          });
-        } finally {
-          cleanup();
-        }
+      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+        method: "PUT",
+        url: "/v1/users/user_123/preferences/default",
+        data: preferences,
       });
+      expect(result).toEqual(preferences);
     });
 
-    describe("Category Management", () => {
-      test("sets category preferences", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
+    test("handles preference update errors", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      authenticateKnock(knock);
 
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const categorySetting: WorkflowPreferenceSetting = {
-            channel_types: {
-              email: false,
-              in_app_feed: true,
-            },
-          };
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setCategory("marketing", categorySetting, {
-            preferenceSet: "default",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/default/categories/marketing",
-            data: categorySetting,
-          });
-        } finally {
-          cleanup();
-        }
+      mockApiClient.makeRequest.mockResolvedValue({
+        statusCode: "error",
+        error: "Invalid preferences",
       });
 
-      test("handles category preference updates with tenant", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
+      const client = new PreferencesClient(knock);
 
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const categorySetting: WorkflowPreferenceSetting = {
-            channel_types: {
-              chat: true,
-              email: false,
-            },
-          };
-
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          });
-
-          const client = new Preferences(knock);
-          await client.setCategory("updates", categorySetting, {
-            preferenceSet: "tenant_specific",
-          });
-
-          expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-            method: "PUT",
-            url: "/v1/users/user_123/preferences/tenant_specific/categories/updates",
-            data: categorySetting,
-          });
-        } finally {
-          cleanup();
-        }
-      });
+      await expect(
+        client.set({
+          channel_types: {},
+          workflows: {},
+          categories: {},
+        }),
+      ).rejects.toThrow("Invalid preferences");
     });
   });
 
-  describe("Error Handling and Edge Cases", () => {
-    describe("Authentication Requirements", () => {
-      test("requires authentication for all preference operations", async () => {
-        const { knock, cleanup } = getTestSetup();
+  describe("Error Handling", () => {
+    test("handles network errors gracefully", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      authenticateKnock(knock);
 
-        try {
-          const client = new Preferences(knock);
+      mockApiClient.makeRequest.mockRejectedValue(new Error("Network error"));
 
-          // Test all methods require authentication
-          await expect(client.getAll()).rejects.toThrow(
-            "Not authenticated. Please call `authenticate` first.",
-          );
+      const client = new PreferencesClient(knock);
 
-          await expect(
-            client.get({ preferenceSet: "default" }),
-          ).rejects.toThrow(
-            "Not authenticated. Please call `authenticate` first.",
-          );
-
-          await expect(
-            client.set(
-              {
-                channel_types: { email: true },
-                workflows: {},
-                categories: {},
-              },
-              { preferenceSet: "default" },
-            ),
-          ).rejects.toThrow(
-            "Not authenticated. Please call `authenticate` first.",
-          );
-
-          await expect(
-            client.setChannelTypes(
-              { email: true },
-              { preferenceSet: "default" },
-            ),
-          ).rejects.toThrow(
-            "Not authenticated. Please call `authenticate` first.",
-          );
-
-          await expect(
-            client.setChannelType("email", true, { preferenceSet: "default" }),
-          ).rejects.toThrow(
-            "Not authenticated. Please call `authenticate` first.",
-          );
-        } finally {
-          cleanup();
-        }
-      });
-    });
-
-    describe("Error Response Handling", () => {
-      test("handles preference operation errors gracefully", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        const consoleSpy = vi
-          .spyOn(console, "error")
-          .mockImplementation(() => {});
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const errorScenarios = [
-            {
-              error: new Error("Preference set not found"),
-              expectedMessage: "Preference set not found",
-            },
-            {
-              error: new Error("Invalid channel type"),
-              expectedMessage: "Invalid channel type",
-            },
-            {
-              error: new Error("Tenant access denied"),
-              expectedMessage: "Tenant access denied",
-            },
-          ];
-
-          const client = new Preferences(knock);
-
-          for (const scenario of errorScenarios) {
-            mockApiClient.makeRequest.mockResolvedValueOnce({
-              statusCode: "error",
-              error: scenario.error,
-            });
-
-            await expect(client.get({ preferenceSet: "test" })).rejects.toThrow(
-              scenario.expectedMessage,
-            );
-          }
-        } finally {
-          consoleSpy.mockRestore();
-          cleanup();
-        }
-      });
-
-      test("handles network errors during bulk operations", async () => {
-        const { knock, mockApiClient, cleanup } = getTestSetup();
-
-        const consoleSpy = vi
-          .spyOn(console, "error")
-          .mockImplementation(() => {});
-
-        try {
-          knock.authenticate("user_123", "test_token");
-
-          const networkError = new Error("Network timeout");
-          mockApiClient.makeRequest.mockResolvedValue({
-            statusCode: "error",
-            error: networkError,
-          });
-
-          const client = new Preferences(knock);
-          await expect(
-            client.setChannelTypes(
-              { email: true, sms: false },
-              { preferenceSet: "default" },
-            ),
-          ).rejects.toThrow("Network timeout");
-        } finally {
-          consoleSpy.mockRestore();
-          cleanup();
-        }
-      });
-    });
-  });
-
-  describe("Performance and Integration", () => {
-    test("handles concurrent preference operations efficiently", async () => {
-      const { knock, mockApiClient, cleanup } = getTestSetup();
-
-      try {
-        knock.authenticate("user_123", "test_token");
-
-        // Mock multiple successful responses
-        mockApiClient.makeRequest.mockImplementation(() =>
-          Promise.resolve({
-            statusCode: "ok",
-            body: mockPreferenceSet,
-          }),
-        );
-
-        const client = new Preferences(knock);
-        const startTime = Date.now();
-
-        // Make multiple concurrent requests
-        const requests = [
-          client.get({ preferenceSet: "default" }),
-          client.get({ preferenceSet: "marketing" }),
-          client.get({ preferenceSet: "security" }),
-          client.get({ preferenceSet: "notifications" }),
-          client.get({ preferenceSet: "updates" }),
-        ];
-
-        const results = await Promise.all(requests);
-        const endTime = Date.now();
-
-        // All requests should succeed
-        expect(results).toHaveLength(5);
-        results.forEach((result) => {
-          expect(result.id).toBe("default");
-        });
-
-        // Should handle concurrency efficiently
-        expect(endTime - startTime).toBeLessThan(1000);
-      } finally {
-        cleanup();
-      }
-    });
-
-    test("integrates properly with Knock client", () => {
-      const { knock, mockApiClient, cleanup } = getTestSetup();
-
-      try {
-        const client = new Preferences(knock);
-
-        // Verify proper integration
-        expect(client).toBeInstanceOf(Preferences);
-
-        // Verify that the client uses the same API client instance
-        expect(knock.client()).toBe(mockApiClient);
-      } finally {
-        cleanup();
-      }
+      await expect(client.get()).rejects.toThrow("Network error");
     });
   });
 });

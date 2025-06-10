@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import ObjectClient from "../../../src/clients/objects";
 import type { ChannelData } from "../../../src/interfaces";
-import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
+import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
 /**
  * Modern Object Client Test Suite
@@ -15,7 +15,15 @@ import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
  * - Proper cleanup and resource management
  */
 describe("Object Client", () => {
-  const getTestSetup = useTestHooks(() => setupKnockTest());
+  const getTestSetup = () => {
+    const { knock, mockApiClient } = createMockKnock();
+    authenticateKnock(knock);
+    return {
+      knock,
+      mockApiClient,
+      cleanup: () => vi.clearAllMocks(),
+    };
+  };
 
   describe("Channel Data Management", () => {
     describe("Getting Channel Data", () => {

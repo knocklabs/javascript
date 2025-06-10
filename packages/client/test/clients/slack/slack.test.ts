@@ -7,7 +7,7 @@ import type {
   GetSlackChannelsResponse,
   SlackChannel,
 } from "../../../src/clients/slack/interfaces";
-import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
+import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
 
 /**
  * Modern Slack Client Test Suite
@@ -19,7 +19,15 @@ import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
  * - Proper cleanup and resource management
  */
 describe("Slack Client", () => {
-  const getTestSetup = useTestHooks(() => setupKnockTest());
+  const getTestSetup = () => {
+    const { knock, mockApiClient } = createMockKnock();
+    authenticateKnock(knock);
+    return {
+      knock,
+      mockApiClient,
+      cleanup: () => vi.clearAllMocks(),
+    };
+  };
 
   describe("Authentication Management", () => {
     describe("Authentication Check", () => {

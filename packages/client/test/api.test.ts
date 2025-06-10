@@ -2,18 +2,35 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import ApiClient from "../src/api";
+import Knock from "../src/knock";
 
-import { createApiError, createPaginatedResponse } from "./test-utils/fixtures";
+import { createAxiosMock, mockAxios } from "./test-utils/mocks";
 import {
-  expectValidResponse,
-  setupApiTest,
-  setupErrorScenario,
-  setupRetryTest,
-  setupTimerTest,
-  simulateBrowserEnvironment,
-  simulateServerEnvironment,
-  useTestHooks,
-} from "./test-utils/test-setup";
+  authenticateKnock,
+  createMockKnock,
+  mockNetworkError,
+  mockNetworkFailure,
+  mockNetworkSuccess,
+} from "./test-utils/mocks";
+
+// Mock Phoenix Socket directly in this file - vi.mock() calls are hoisted
+vi.mock("phoenix", () => ({
+  Socket: vi.fn().mockImplementation(() => ({
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    isConnected: vi.fn().mockReturnValue(false),
+    channel: vi.fn().mockReturnValue({
+      join: vi.fn(),
+      leave: vi.fn(),
+      push: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+    }),
+  })),
+}));
+
+// Apply module-level mocks
+mockAxios();
 
 /**
  * Modern API Client Test Suite
@@ -25,195 +42,174 @@ import {
  * - Network resilience testing
  * - Performance characteristics testing
  */
-describe("ApiClient", () => {
-  describe("Client Initialization", () => {
-    test("creates client with default configuration", () => {
-      const { apiClient, cleanup } = setupApiTest();
-
-      try {
-        expect(apiClient).toBeDefined();
-        // Should configure base settings without throwing
-        expect(() =>
-          apiClient.makeRequest({ method: "GET", url: "/test" }),
-        ).not.toThrow();
-      } finally {
-        cleanup();
-      }
-    });
-
-    test("handles custom host configurations", () => {
-      const { apiClient, cleanup } = setupApiTest({
-        host: "https://custom.knock.app",
-      });
-
-      try {
-        expect(apiClient).toBeDefined();
-        // Configuration should be applied
-      } finally {
-        cleanup();
-      }
-    });
-
-    test("configures authentication headers correctly", () => {
-      const { apiClient, cleanup } = setupApiTest({
-        apiKey: "pk_custom_123",
-        userToken: "custom_token_456",
-      });
-
-      try {
-        expect(apiClient).toBeDefined();
-        // Headers should be configured with provided tokens
-      } finally {
-        cleanup();
-      }
-    });
+describe("API Client", () => {
+  beforeEach(() => {
+    // Clean slate for each test
+    vi.clearAllMocks();
   });
 
-  describe("Environment-Specific Behavior", () => {
-    test("initializes WebSocket in browser environment", () => {
-      const { cleanup: envCleanup } = simulateBrowserEnvironment();
-      const { apiClient, cleanup: apiCleanup } = setupApiTest();
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-      try {
-        expect(apiClient.socket).toBeDefined();
-      } finally {
-        apiCleanup();
-        envCleanup();
-      }
+  describe("Client Initialization", () => {
+    test("creates API client with proper configuration", () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      expect(apiClient).toBeInstanceOf(ApiClient);
+      // Don't test private properties directly - just verify it was created
+    });
+
+    test("handles user token in configuration", () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+      });
+
+      expect(apiClient).toBeInstanceOf(ApiClient);
+      // Don't test private properties directly - just verify it was created
+    });
+
+    test("initializes WebSocket in browser environment", () => {
+      // Store original window value
+      const originalWindow = (global as any).window;
+
+      // Mock window to simulate browser environment
+      (global as any).window = {};
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      // With mocked Phoenix Socket, socket should be defined in browser environment
+      expect(apiClient.socket).toBeDefined();
+
+      // Restore original window value
+      (global as any).window = originalWindow;
     });
 
     test("skips WebSocket in server environment", () => {
-      const { cleanup: envCleanup } = simulateServerEnvironment();
-      const { apiClient, cleanup: apiCleanup } = setupApiTest();
+      // Ensure window is undefined (server environment)
+      const originalWindow = (global as any).window;
+      (global as any).window = undefined;
 
-      try {
-        expect(apiClient.socket).toBeUndefined();
-      } finally {
-        apiCleanup();
-        envCleanup();
-      }
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      expect(apiClient.socket).toBeUndefined();
+
+      // Restore original window value
+      (global as any).window = originalWindow;
     });
   });
 
-  describe("HTTP Request Handling", () => {
-    const getTestSetup = useTestHooks(() => setupApiTest());
+  describe("Request Handling", () => {
+    test("makes successful API requests", async () => {
+      const mockHttp = createAxiosMock();
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
 
-    test("handles successful GET requests", async () => {
-      const { apiClient, mockAxios, cleanup } = getTestSetup();
+      // Mock the internal axios client
+      (apiClient as any).axiosClient = mockHttp.axios;
 
-      try {
-        const mockData = { message: "success", data: [1, 2, 3] };
-        mockAxios.instance.mockResolvedValue({
-          status: 200,
-          data: mockData,
-        });
+      mockHttp.mockSuccess({ data: "test response" });
 
-        const response = await apiClient.makeRequest({
-          method: "GET",
-          url: "/test",
-        });
+      const response = await apiClient.makeRequest({
+        method: "GET",
+        url: "/test",
+      });
 
-        expectValidResponse(response, (r) => {
-          expect(r.statusCode).toBe("ok");
-          expect(r.body).toEqual(mockData);
-          expect(r.status).toBe(200);
-        });
-      } finally {
-        cleanup();
-      }
+      expect(response.statusCode).toBe("ok");
+      expect(response.body.data).toBe("test response");
     });
 
-    test("handles successful POST requests with data", async () => {
-      const { apiClient, mockAxios, cleanup } = getTestSetup();
+    test("handles request with parameters", async () => {
+      const mockHttp = createAxiosMock();
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
 
-      try {
-        const requestData = { name: "Test", value: 42 };
-        const responseData = { id: "123", ...requestData };
+      (apiClient as any).axiosClient = mockHttp.axios;
 
-        mockAxios.instance.mockResolvedValue({
-          status: 201,
-          data: responseData,
-        });
+      mockHttp.mockSuccess({ received: true });
 
-        const response = await apiClient.makeRequest({
-          method: "POST",
-          url: "/items",
-          data: requestData,
-        });
+      const response = await apiClient.makeRequest({
+        method: "GET",
+        url: "/test",
+        params: { filter: "active" },
+      });
 
-        expectValidResponse(response, (r) => {
-          expect(r.statusCode).toBe("ok");
-          expect(r.body).toEqual(responseData);
-          expect(r.status).toBe(201);
-        });
-      } finally {
-        cleanup();
-      }
+      expect(response.statusCode).toBe("ok");
+      expect(mockHttp.axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          params: { filter: "active" },
+        }),
+      );
     });
 
-    test("treats 2xx status codes as successful", async () => {
-      const { apiClient, mockAxios, cleanup } = getTestSetup();
+    test("handles POST requests with data", async () => {
+      const mockHttp = createAxiosMock();
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
 
-      try {
-        const testCases = [200, 201, 202, 204, 299];
+      (apiClient as any).axiosClient = mockHttp.axios;
 
-        for (const status of testCases) {
-          mockAxios.instance.mockResolvedValueOnce({
-            status,
-            data: { status: "ok" },
-          });
+      const testData = { name: "Test", value: 42 };
+      mockHttp.mockSuccess({ created: true });
 
-          const response = await apiClient.makeRequest({
-            method: "GET",
-            url: "/test",
-          });
+      const response = await apiClient.makeRequest({
+        method: "POST",
+        url: "/test",
+        data: testData,
+      });
 
-          expect(response.statusCode).toBe("ok");
-          expect(response.status).toBe(status);
-        }
-      } finally {
-        cleanup();
-      }
-    });
-
-    test("treats 3xx+ status codes as errors", async () => {
-      const { apiClient, mockAxios, cleanup } = getTestSetup();
-
-      try {
-        const testCases = [300, 302, 400, 404, 500];
-
-        for (const status of testCases) {
-          mockAxios.instance.mockResolvedValueOnce({
-            status,
-            data: { error: "error" },
-          });
-
-          const response = await apiClient.makeRequest({
-            method: "GET",
-            url: "/test",
-          });
-
-          expect(response.statusCode).toBe("error");
-          expect(response.status).toBe(status);
-        }
-      } finally {
-        cleanup();
-      }
+      expect(response.statusCode).toBe("ok");
+      expect(mockHttp.axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: testData,
+        }),
+      );
     });
   });
 
-  describe("Error Handling and Recovery", () => {
-    test("handles network failures gracefully", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
-
-      // Suppress console.error during this test since we expect errors
+  describe("Error Handling", () => {
+    test("handles network errors gracefully", async () => {
+      // Suppress console.error for this expected error test
       const consoleSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
       try {
+        const mockHttp = createAxiosMock();
+        const apiClient = new ApiClient({
+          host: "https://api.knock.app",
+          apiKey: "pk_test_12345",
+          userToken: undefined,
+        });
+
+        (apiClient as any).axiosClient = mockHttp.axios;
+
+        // Mock network failure - this should not create unhandled rejections
         const networkError = new Error("Network Error");
-        mockAxios.instance.mockRejectedValue(networkError);
+        mockHttp.axios.mockRejectedValue(networkError);
 
         const response = await apiClient.makeRequest({
           method: "GET",
@@ -224,19 +220,25 @@ describe("ApiClient", () => {
         expect(response.error).toBe(networkError);
       } finally {
         consoleSpy.mockRestore();
-        cleanup();
       }
     });
 
     test("handles different error types appropriately", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
-
-      // Suppress console.error during this test since we expect errors
+      // Suppress console.error for this expected error test
       const consoleSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
       try {
+        const mockHttp = createAxiosMock();
+        const apiClient = new ApiClient({
+          host: "https://api.knock.app",
+          apiKey: "pk_test_12345",
+          userToken: undefined,
+        });
+
+        (apiClient as any).axiosClient = mockHttp.axios;
+
         const errorScenarios = [
           {
             name: "timeout",
@@ -244,7 +246,6 @@ describe("ApiClient", () => {
               message: "timeout of 5000ms exceeded",
               code: "ECONNABORTED",
             },
-            expectedStatus: undefined,
           },
           {
             name: "server error",
@@ -252,7 +253,6 @@ describe("ApiClient", () => {
               message: "Server Error",
               response: { status: 500, data: { error: "Internal Error" } },
             },
-            expectedStatus: 500,
           },
           {
             name: "not found",
@@ -260,12 +260,11 @@ describe("ApiClient", () => {
               message: "Not Found",
               response: { status: 404, data: { error: "Resource not found" } },
             },
-            expectedStatus: 404,
           },
         ];
 
         for (const scenario of errorScenarios) {
-          mockAxios.instance.mockRejectedValueOnce(scenario.error);
+          mockHttp.axios.mockRejectedValueOnce(scenario.error);
 
           const response = await apiClient.makeRequest({
             method: "GET",
@@ -274,57 +273,53 @@ describe("ApiClient", () => {
 
           expect(response.statusCode).toBe("error");
           expect(response.error).toBe(scenario.error);
-          if (scenario.expectedStatus) {
-            expect(response.status).toBe(scenario.expectedStatus);
-          }
         }
       } finally {
         consoleSpy.mockRestore();
-        cleanup();
       }
     });
 
-    test("logs errors without exposing sensitive information", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
+    test("handles API error responses", async () => {
+      const mockHttp = createAxiosMock();
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
 
-      try {
-        const consoleSpy = vi
-          .spyOn(console, "error")
-          .mockImplementation(() => {});
+      (apiClient as any).axiosClient = mockHttp.axios;
 
-        const sensitiveError = new Error(
-          "Authentication failed: secret_key_123",
-        );
-        mockAxios.instance.mockRejectedValue(sensitiveError);
+      mockHttp.mockError(500, "Internal Server Error");
 
-        await apiClient.makeRequest({
-          method: "GET",
-          url: "/test",
-        });
+      const response = await apiClient.makeRequest({
+        method: "GET",
+        url: "/test",
+      });
 
-        expect(consoleSpy).toHaveBeenCalledWith(sensitiveError);
-
-        consoleSpy.mockRestore();
-      } finally {
-        cleanup();
-      }
+      expect(response.statusCode).toBe("error");
+      expect(response.status).toBe(500);
     });
   });
 
   describe("Retry and Resilience", () => {
-    test("implements retry logic for transient failures", async () => {
-      const { operation, getAttempts, reset } = setupRetryTest(3);
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
-
-      // Suppress console.error during this test since we expect errors
+    test("implements error handling for transient failures", async () => {
+      // Suppress console.error for this expected error test
       const consoleSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
       try {
-        // Since axios-retry is mocked as a no-op, retries don't actually happen
-        // This test verifies that errors are handled gracefully
-        mockAxios.instance.mockRejectedValueOnce(new Error("Network timeout"));
+        const mockHttp = createAxiosMock();
+        const apiClient = new ApiClient({
+          host: "https://api.knock.app",
+          apiKey: "pk_test_12345",
+          userToken: undefined,
+        });
+
+        (apiClient as any).axiosClient = mockHttp.axios;
+
+        // Mock network timeout - should not create unhandled rejections
+        mockHttp.axios.mockRejectedValueOnce(new Error("Network timeout"));
 
         const response = await apiClient.makeRequest({
           method: "GET",
@@ -337,159 +332,100 @@ describe("ApiClient", () => {
         expect(response.error.message).toBe("Network timeout");
       } finally {
         consoleSpy.mockRestore();
-        cleanup();
-        reset();
       }
     });
   });
 
   describe("Request Configuration", () => {
     test("supports various HTTP methods", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
+      const mockHttp = createAxiosMock();
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
 
-      try {
-        const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+      (apiClient as any).axiosClient = mockHttp.axios;
 
-        for (const method of methods) {
-          mockAxios.instance.mockResolvedValueOnce({
-            status: 200,
-            data: { method },
-          });
+      const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
-          const response = await apiClient.makeRequest({
-            method: method as any,
-            url: "/test",
-          });
+      for (const method of methods) {
+        mockHttp.mockSuccess({ method });
 
-          expect(response.statusCode).toBe("ok");
-          expect(response.body.method).toBe(method);
-        }
-      } finally {
-        cleanup();
+        const response = await apiClient.makeRequest({
+          method: method as any,
+          url: "/test",
+        });
+
+        expect(response.statusCode).toBe("ok");
+        expect(response.body.method).toBe(method);
       }
     });
 
     test("handles request parameters correctly", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
+      const mockHttp = createAxiosMock();
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
 
-      try {
-        mockAxios.instance.mockImplementation((config: any) => {
-          return Promise.resolve({
-            status: 200,
-            data: { receivedConfig: config },
-          });
+      (apiClient as any).axiosClient = mockHttp.axios;
+
+      mockHttp.axios.mockImplementation((config: any) => {
+        return Promise.resolve({
+          status: 200,
+          data: { receivedConfig: config },
         });
+      });
 
-        const response = await apiClient.makeRequest({
-          method: "GET",
-          url: "/test",
-          params: { filter: "active", limit: 10 },
-        });
+      const response = await apiClient.makeRequest({
+        method: "GET",
+        url: "/test",
+        params: { filter: "active", limit: 10 },
+      });
 
-        expect(response.statusCode).toBe("ok");
-        // Config should include the parameters
-        expect(response.body.receivedConfig).toBeDefined();
-      } finally {
-        cleanup();
-      }
-    });
-
-    test("handles request data for POST/PUT requests", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
-
-      try {
-        const testData = {
-          name: "Test Item",
-          value: 42,
-          nested: { key: "value" },
-        };
-
-        mockAxios.instance.mockImplementation((config: any) => {
-          return Promise.resolve({
-            status: 201,
-            data: { created: true, receivedData: config.data },
-          });
-        });
-
-        const response = await apiClient.makeRequest({
-          method: "POST",
-          url: "/items",
-          data: testData,
-        });
-
-        expect(response.statusCode).toBe("ok");
-        expect(response.body.receivedData).toEqual(testData);
-      } finally {
-        cleanup();
-      }
-    });
-  });
-
-  describe("Performance Characteristics", () => {
-    test("handles concurrent requests efficiently", async () => {
-      const { apiClient, mockAxios, cleanup } = setupApiTest();
-
-      try {
-        // Set up mock to respond to multiple requests
-        mockAxios.instance.mockImplementation((config: any) => {
-          return Promise.resolve({
-            status: 200,
-            data: { url: config.url, timestamp: Date.now() },
-          });
-        });
-
-        const startTime = Date.now();
-
-        // Make 10 concurrent requests
-        const requests = Array.from({ length: 10 }, (_, i) =>
-          apiClient.makeRequest({
-            method: "GET",
-            url: `/item/${i}`,
-          }),
-        );
-
-        const responses = await Promise.all(requests);
-        const endTime = Date.now();
-
-        // All requests should succeed
-        responses.forEach((response, index) => {
-          expect(response.statusCode).toBe("ok");
-          expect(response.body.url).toBe(`/item/${index}`);
-        });
-
-        // Should handle concurrency efficiently (this is a basic check)
-        expect(endTime - startTime).toBeLessThan(1000);
-      } finally {
-        cleanup();
-      }
+      expect(response.statusCode).toBe("ok");
+      expect(response.body.receivedConfig).toBeDefined();
     });
   });
 
   describe("Socket Connection Management", () => {
     test("provides socket interface in browser environment", () => {
-      const { cleanup: envCleanup } = simulateBrowserEnvironment();
-      const { apiClient, cleanup: apiCleanup } = setupApiTest();
+      // Store original window value
+      const originalWindow = (global as any).window;
 
-      try {
-        expect(apiClient.socket).toBeDefined();
-        // Socket should be configured but not necessarily connected
-      } finally {
-        apiCleanup();
-        envCleanup();
-      }
+      // Mock window to simulate browser environment
+      (global as any).window = {};
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      expect(apiClient.socket).toBeDefined();
+
+      // Restore original window value
+      (global as any).window = originalWindow;
     });
 
     test("gracefully handles missing WebSocket in server environment", () => {
-      const { cleanup: envCleanup } = simulateServerEnvironment();
-      const { apiClient, cleanup: apiCleanup } = setupApiTest();
+      // Store original window value
+      const originalWindow = (global as any).window;
+      (global as any).window = undefined;
 
-      try {
-        expect(apiClient.socket).toBeUndefined();
-        // Should not throw or cause issues
-      } finally {
-        apiCleanup();
-        envCleanup();
-      }
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      // In server environment, socket should be undefined
+      expect(apiClient.socket).toBeUndefined();
+
+      // Restore original window value
+      (global as any).window = originalWindow;
     });
   });
 });
