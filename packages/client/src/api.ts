@@ -72,13 +72,9 @@ class ApiClient {
     } catch (e: unknown) {
       console.error(e);
 
-      // Extract status from axios error if available
-      const axiosError = e as AxiosError;
-      const status = axiosError.response?.status || 500;
-
       return {
         statusCode: "error",
-        status,
+        status: 500,
         body: undefined,
         error: e,
       };
