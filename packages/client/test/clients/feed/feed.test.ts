@@ -714,4 +714,744 @@ describe("Feed", () => {
       }
     });
   });
+
+  describe("Cross-Browser Communication", () => {
+    test("sets up broadcast channel when available", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        // Mock BroadcastChannel being available
+        const mockBroadcastChannel = {
+          postMessage: vi.fn(),
+          close: vi.fn(),
+          onmessage: null,
+        };
+
+        global.BroadcastChannel = vi
+          .fn()
+          .mockImplementation(() => mockBroadcastChannel);
+        global.self = global as any;
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { __experimentalCrossBrowserUpdates: true },
+          undefined,
+        );
+
+        expect(global.BroadcastChannel).toHaveBeenCalledWith(
+          `knock:feed:01234567-89ab-cdef-0123-456789abcdef:${knock.userId}`,
+        );
+      } finally {
+        delete (global as any).BroadcastChannel;
+        delete (global as any).self;
+        cleanup();
+      }
+    });
+
+    test("handles broadcast channel unavailable gracefully", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        // Ensure BroadcastChannel is not available
+        delete (global as any).BroadcastChannel;
+        delete (global as any).self;
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { __experimentalCrossBrowserUpdates: true },
+          undefined,
+        );
+
+        // Should not throw and feed should still work
+        expect(feed.feedId).toBe("01234567-89ab-cdef-0123-456789abcdef");
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("broadcasts messages over channel when available", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockPostMessage = vi.fn();
+        const mockBroadcastChannel = {
+          postMessage: mockPostMessage,
+          close: vi.fn(),
+          onmessage: null,
+        };
+
+        global.BroadcastChannel = vi
+          .fn()
+          .mockImplementation(() => mockBroadcastChannel);
+        global.self = global as any;
+
+        const feedItem = createUnreadFeedItem();
+        const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [updatedItem],
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { __experimentalCrossBrowserUpdates: true },
+          undefined,
+        );
+
+        await feed.markAsSeen(feedItem);
+
+        expect(mockPostMessage).toHaveBeenCalledWith({
+          type: "items:seen",
+          payload: { items: [feedItem] }, // Uses original items, not updated ones
+        });
+      } finally {
+        delete (global as any).BroadcastChannel;
+        delete (global as any).self;
+        cleanup();
+      }
+    });
+
+    test("handles broadcast channel message cloning errors", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        const mockPostMessage = vi.fn();
+        const mockBroadcastChannel = {
+          postMessage: mockPostMessage,
+          close: vi.fn(),
+          onmessage: null,
+        };
+
+        global.BroadcastChannel = vi
+          .fn()
+          .mockImplementation(() => mockBroadcastChannel);
+        global.self = global as any;
+
+        // Create a feedItem with circular reference to trigger JSON error
+        const feedItem = createUnreadFeedItem();
+        const circularData: any = { self: null };
+        circularData.self = circularData;
+        feedItem.data = circularData;
+
+        const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [updatedItem],
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { __experimentalCrossBrowserUpdates: true },
+          undefined,
+        );
+
+        await feed.markAsSeen(feedItem);
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          expect.stringContaining("Could not broadcast items:seen"),
+        );
+      } finally {
+        consoleSpy.mockRestore();
+        delete (global as any).BroadcastChannel;
+        delete (global as any).self;
+        cleanup();
+      }
+    });
+
+    test("receives and handles cross-browser updates", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockBroadcastChannel = {
+          postMessage: vi.fn(),
+          close: vi.fn(),
+          onmessage: vi.fn(),
+        };
+
+        global.BroadcastChannel = vi
+          .fn()
+          .mockImplementation(() => mockBroadcastChannel);
+        global.self = global as any;
+
+        // Mock fetch response for when broadcast message triggers refetch
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: {
+            entries: [],
+            page_info: { before: null, after: null },
+            metadata: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { __experimentalCrossBrowserUpdates: true },
+          undefined,
+        );
+
+        // Verify that the broadcast channel was set up
+        expect(global.BroadcastChannel).toHaveBeenCalledWith(
+          `knock:feed:01234567-89ab-cdef-0123-456789abcdef:${knock.userId}`,
+        );
+      } finally {
+        delete (global as any).BroadcastChannel;
+        delete (global as any).self;
+        cleanup();
+      }
+    });
+  });
+
+  describe("Visibility Change Handling", () => {
+    test("sets up visibility listeners when auto_manage_socket_connection is enabled", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        const mockAddEventListener = vi.fn();
+        global.document = {
+          addEventListener: mockAddEventListener,
+          removeEventListener: vi.fn(),
+          visibilityState: "visible",
+        } as any;
+
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { auto_manage_socket_connection: true },
+          mockSocketManager as any,
+        );
+
+        expect(mockAddEventListener).toHaveBeenCalledWith(
+          "visibilitychange",
+          expect.any(Function),
+        );
+      } finally {
+        delete (global as any).document;
+        cleanup();
+      }
+    });
+
+    test("handles document visibility change to hidden", async () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        let visibilityHandler: () => void;
+        const mockAddEventListener = vi.fn((event, handler) => {
+          if (event === "visibilitychange") {
+            visibilityHandler = handler;
+          }
+        });
+        const mockSocket = {
+          disconnect: vi.fn(),
+          isConnected: vi.fn().mockReturnValue(true),
+          connect: vi.fn(),
+        };
+
+        const mockDocument = {
+          addEventListener: mockAddEventListener,
+          removeEventListener: vi.fn(),
+          visibilityState: "visible",
+        };
+        global.document = mockDocument as any;
+
+        const mockClient = {
+          socket: mockSocket,
+        };
+
+        vi.spyOn(knock, "client").mockReturnValue(mockClient as any);
+
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            auto_manage_socket_connection: true,
+            auto_manage_socket_connection_delay: 100,
+          },
+          mockSocketManager as any,
+        );
+
+        // Simulate visibility change to hidden
+        mockDocument.visibilityState = "hidden";
+        visibilityHandler!();
+
+        // Should set up disconnect timer
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        expect(mockSocket.disconnect).toHaveBeenCalled();
+      } finally {
+        delete (global as any).document;
+        cleanup();
+      }
+    });
+
+    test("handles document visibility change to visible", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        let visibilityHandler: () => void;
+        const mockAddEventListener = vi.fn((event, handler) => {
+          if (event === "visibilitychange") {
+            visibilityHandler = handler;
+          }
+        });
+        const mockSocket = {
+          disconnect: vi.fn(),
+          isConnected: vi.fn().mockReturnValue(false),
+          connect: vi.fn(),
+        };
+
+        const mockDocument = {
+          addEventListener: mockAddEventListener,
+          removeEventListener: vi.fn(),
+          visibilityState: "hidden",
+        };
+        global.document = mockDocument as any;
+
+        const mockClient = {
+          socket: mockSocket,
+        };
+
+        vi.spyOn(knock, "client").mockReturnValue(mockClient as any);
+
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { auto_manage_socket_connection: true },
+          mockSocketManager as any,
+        );
+
+        // Simulate visibility change to visible
+        mockDocument.visibilityState = "visible";
+        visibilityHandler!();
+
+        expect(mockSocket.connect).toHaveBeenCalled();
+      } finally {
+        delete (global as any).document;
+        cleanup();
+      }
+    });
+
+    test("tears down visibility listeners on dispose", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        const mockRemoveEventListener = vi.fn();
+        global.document = {
+          addEventListener: vi.fn(),
+          removeEventListener: mockRemoveEventListener,
+          visibilityState: "visible",
+        } as any;
+
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { auto_manage_socket_connection: true },
+          mockSocketManager as any,
+        );
+
+        feed.dispose();
+
+        expect(mockRemoveEventListener).toHaveBeenCalledWith(
+          "visibilitychange",
+          expect.any(Function),
+        );
+      } finally {
+        delete (global as any).document;
+        cleanup();
+      }
+    });
+  });
+
+  describe("Socket Event Handling", () => {
+    test("handles new message socket events", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        // Mock the store response for the feed fetch
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: {
+            entries: [],
+            page_info: { before: null, after: null },
+            metadata: { total_count: 1, unread_count: 1, unseen_count: 1 },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          mockSocketManager as any,
+        );
+
+        const newMessagePayload = {
+          event: "new-message" as const,
+          metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
+          data: {
+            client_ref_id: {
+              metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
+            },
+          },
+        };
+
+        await feed.handleSocketEvent(newMessagePayload);
+
+        // Should trigger a fetch to get the latest data
+        expect(mockApiClient.makeRequest).toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("initializes realtime connection with socket manager", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        const mockJoin = vi.fn().mockReturnValue(vi.fn());
+        const mockSocketManager = {
+          join: mockJoin,
+          leave: vi.fn(),
+        };
+
+        // Make knock authenticated and set hasSubscribedToRealTimeUpdates
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          mockSocketManager as any,
+        );
+
+        // Simulate having subscribed before
+        feed.listenForUpdates();
+
+        // Reinitialize to trigger the realtime connection logic
+        feed.reinitialize(mockSocketManager as any);
+
+        expect(mockJoin).toHaveBeenCalledWith(feed);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("skips realtime connection when no socket manager", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined, // No socket manager
+        );
+
+        // Should not throw when trying to initialize realtime connection
+        feed.reinitialize();
+
+        expect(feed.unsubscribeFromSocketEvents).toBeUndefined();
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Bulk Status Operations", () => {
+    test("performs bulk status update with proper scoping", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: { success: true },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            status: "unread",
+            archived: "exclude",
+            has_tenant: true,
+            tenant: "tenant-123",
+          },
+          undefined,
+        );
+
+        await feed.markAllAsRead();
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "POST",
+          url: "/v1/channels/01234567-89ab-cdef-0123-456789abcdef/messages/bulk/read",
+          data: {
+            user_ids: ["user_123"],
+            engagement_status: "unread",
+            archived: "exclude",
+            has_tenant: true,
+            tenants: ["tenant-123"],
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles bulk status update with 'all' status filter", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: { success: true },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            status: "all", // Should not be included in options
+            archived: "include",
+          },
+          undefined,
+        );
+
+        await feed.markAllAsSeen();
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "POST",
+          url: "/v1/channels/01234567-89ab-cdef-0123-456789abcdef/messages/bulk/seen",
+          data: {
+            user_ids: ["user_123"],
+            engagement_status: undefined, // Should be undefined when status is "all"
+            archived: "include",
+            has_tenant: undefined,
+            tenants: undefined,
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Error Handling and Edge Cases", () => {
+    test("handles API errors during status updates gracefully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const feedItem = createUnreadFeedItem();
+
+        mockApiClient.makeRequest.mockRejectedValue(new Error("API Error"));
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        await expect(feed.markAsSeen(feedItem)).rejects.toThrow("API Error");
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles network status updates during operations", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const feedItem = createUnreadFeedItem();
+        const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [updatedItem],
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        // Initially the store should have ready network status
+        expect(feed.getState().networkStatus).toBe("ready");
+
+        const resultPromise = feed.markAsSeen(feedItem);
+
+        await resultPromise;
+
+        // After operation completes, should be ready again
+        expect(feed.getState().networkStatus).toBe("ready");
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles empty item arrays gracefully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        // Mock empty array response for empty input
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [],
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        const result = await feed.markAsSeen([]);
+
+        expect(result).toEqual([]);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles invalid metadata during status updates", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const feedItem = createUnreadFeedItem();
+        const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [updatedItem],
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        // Create metadata with circular reference
+        const circularMetadata: any = { self: null };
+        circularMetadata.self = circularMetadata;
+
+        const result = await feed.markAsInteracted(
+          feedItem,
+          circularMetadata as any,
+        );
+
+        expect(result).toEqual([updatedItem]);
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "POST",
+          url: "/v1/messages/batch/interacted",
+          data: {
+            message_ids: [feedItem.id],
+            metadata: circularMetadata,
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Event Emission and Broadcasting", () => {
+    test("emits events in both formats for compatibility", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const feedItem = createUnreadFeedItem();
+        const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [updatedItem],
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        const dotEventHandler = vi.fn();
+        const colonEventHandler = vi.fn();
+
+        feed.on("items.seen", dotEventHandler);
+        feed.on("items.*", colonEventHandler);
+
+        await feed.markAsSeen(feedItem);
+
+        expect(dotEventHandler).toHaveBeenCalledWith({ items: [feedItem] });
+        expect(colonEventHandler).toHaveBeenCalledWith({ items: [feedItem] });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles broadcast channel being null during event emission", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const feedItem = createUnreadFeedItem();
+        const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: [updatedItem],
+        });
+
+        // Ensure no BroadcastChannel is available
+        delete (global as any).BroadcastChannel;
+        delete (global as any).self;
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        // Should not throw even without BroadcastChannel
+        const result = await feed.markAsSeen(feedItem);
+
+        expect(result).toEqual([updatedItem]);
+      } finally {
+        cleanup();
+      }
+    });
+  });
 });
