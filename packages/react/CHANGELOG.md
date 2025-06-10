@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.15
+
+### Patch Changes
+
+- 732a4f7: add use client directive to @knocklabs/react package
+- bea5604: update @knocklabs/react & @knocklabs/react-core to use named exports instead of barrel exports
+- Updated dependencies [bea5604]
+  - @knocklabs/react-core@0.6.13
+
 ## 0.7.14
 
 ### Patch Changes

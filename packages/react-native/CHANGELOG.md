@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.21
+
+### Patch Changes
+
+- Updated dependencies [bea5604]
+  - @knocklabs/react-core@0.6.13
+
 ## 0.6.20
 
 ### Patch Changes
