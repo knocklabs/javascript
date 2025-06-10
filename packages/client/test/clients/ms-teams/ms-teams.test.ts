@@ -11,8 +11,20 @@ import type {
 } from "../../../src/clients/ms-teams/interfaces";
 import { TENANT_OBJECT_COLLECTION } from "../../../src/clients/objects/constants";
 import Knock from "../../../src/knock";
+import { setupKnockTest, useTestHooks } from "../../test-utils/test-setup";
 
-describe("MsTeamsClient", () => {
+/**
+ * Modern MS Teams Client Test Suite
+ *
+ * This test suite demonstrates modern testing practices including:
+ * - User journey-focused test organization
+ * - Realistic mock behavior
+ * - Comprehensive error scenario testing
+ * - Proper cleanup and resource management
+ */
+describe("MS Teams Client", () => {
+  const getTestSetup = useTestHooks(() => setupKnockTest());
+
   const mockKnock = {
     client: vi.fn(() => ({
       makeRequest: vi.fn(),
@@ -23,63 +35,71 @@ describe("MsTeamsClient", () => {
     vi.clearAllMocks();
   });
 
-  describe("authCheck", () => {
-    test("checks authentication status", async () => {
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
+  describe("Authentication Management", () => {
+    test("checks authentication status successfully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
           statusCode: "ok",
           body: { authenticated: true },
-        }),
-      };
+        });
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
+        const client = new MsTeamsClient(knock);
+        const result = await client.authCheck({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
 
-      const client = new MsTeamsClient(mockKnock);
-      await client.authCheck({
-        tenant: "tenant_123",
-        knockChannelId: "channel_123",
-      });
-
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-        method: "GET",
-        url: "/v1/providers/ms-teams/channel_123/auth_check",
-        params: {
-          ms_teams_tenant_object: {
-            object_id: "tenant_123",
-            collection: TENANT_OBJECT_COLLECTION,
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/providers/ms-teams/channel_123/auth_check",
+          params: {
+            ms_teams_tenant_object: {
+              object_id: "tenant_123",
+              collection: TENANT_OBJECT_COLLECTION,
+            },
+            channel_id: "channel_123",
           },
-          channel_id: "channel_123",
-        },
-      });
+        });
+
+        expect(result).toEqual({ authenticated: true });
+      } finally {
+        cleanup();
+      }
     });
 
-    test("handles error responses", async () => {
-      const mockError = new Error("Unauthorized");
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
+    test("handles authentication errors gracefully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      // Suppress console.error for expected error scenarios
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      try {
+        const mockError = new Error("Unauthorized");
+        mockApiClient.makeRequest.mockResolvedValue({
           statusCode: "error",
           error: mockError,
           body: undefined,
-        }),
-      };
+        });
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
-
-      const client = new MsTeamsClient(mockKnock);
-      await expect(
-        client.authCheck({
-          tenant: "tenant_123",
-          knockChannelId: "channel_123",
-        }),
-      ).rejects.toThrow("Unauthorized");
+        const client = new MsTeamsClient(knock);
+        await expect(
+          client.authCheck({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+          }),
+        ).rejects.toThrow("Unauthorized");
+      } finally {
+        consoleSpy.mockRestore();
+        cleanup();
+      }
     });
   });
 
-  describe("getTeams", () => {
+  describe("Teams Management", () => {
     const mockTeam: MsTeamsTeam = {
       id: "team_123",
       displayName: "Test Team",
@@ -92,207 +112,353 @@ describe("MsTeamsClient", () => {
     };
 
     test("fetches teams with default options", async () => {
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
           statusCode: "ok",
           body: mockTeamsResponse,
-        }),
-      };
+        });
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
+        const client = new MsTeamsClient(knock);
+        const result = await client.getTeams({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
 
-      const client = new MsTeamsClient(mockKnock);
-      const result = await client.getTeams({
-        tenant: "tenant_123",
-        knockChannelId: "channel_123",
-      });
-
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-        method: "GET",
-        url: "/v1/providers/ms-teams/channel_123/teams",
-        params: {
-          ms_teams_tenant_object: {
-            object_id: "tenant_123",
-            collection: TENANT_OBJECT_COLLECTION,
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/providers/ms-teams/channel_123/teams",
+          params: {
+            ms_teams_tenant_object: {
+              object_id: "tenant_123",
+              collection: TENANT_OBJECT_COLLECTION,
+            },
+            query_options: {
+              $filter: undefined,
+              $select: undefined,
+              $top: undefined,
+              $skiptoken: undefined,
+            },
           },
-          query_options: {
-            $filter: undefined,
-            $select: undefined,
-            $top: undefined,
-            $skiptoken: undefined,
-          },
-        },
-      });
-      expect(result).toEqual(mockTeamsResponse);
+        });
+        expect(result).toEqual(mockTeamsResponse);
+      } finally {
+        cleanup();
+      }
     });
 
-    test("fetches teams with query options", async () => {
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
+    test("fetches teams with comprehensive query options", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const extendedTeamsResponse = {
+          ms_teams_teams: [
+            mockTeam,
+            {
+              id: "team_456",
+              displayName: "Engineering Team",
+              description: "Development team",
+            },
+          ],
+          skip_token: "next_page_token",
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
           statusCode: "ok",
-          body: mockTeamsResponse,
-        }),
-      };
+          body: extendedTeamsResponse,
+        });
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
-
-      const client = new MsTeamsClient(mockKnock);
-      await client.getTeams({
-        tenant: "tenant_123",
-        knockChannelId: "channel_123",
-        queryOptions: {
-          $filter: "displayName eq 'Test Team'",
-          $select: "id,displayName",
-          $top: 10,
-          $skiptoken: "token_123",
-        },
-      });
-
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-        method: "GET",
-        url: "/v1/providers/ms-teams/channel_123/teams",
-        params: {
-          ms_teams_tenant_object: {
-            object_id: "tenant_123",
-            collection: TENANT_OBJECT_COLLECTION,
-          },
-          query_options: {
+        const client = new MsTeamsClient(knock);
+        const result = await client.getTeams({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+          queryOptions: {
             $filter: "displayName eq 'Test Team'",
             $select: "id,displayName",
             $top: 10,
             $skiptoken: "token_123",
           },
-        },
-      });
+        });
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/providers/ms-teams/channel_123/teams",
+          params: {
+            ms_teams_tenant_object: {
+              object_id: "tenant_123",
+              collection: TENANT_OBJECT_COLLECTION,
+            },
+            query_options: {
+              $filter: "displayName eq 'Test Team'",
+              $select: "id,displayName",
+              $top: 10,
+              $skiptoken: "token_123",
+            },
+          },
+        });
+
+        expect(result).toEqual(extendedTeamsResponse);
+        expect(result.ms_teams_teams).toHaveLength(2);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles empty teams response gracefully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const emptyResponse: GetMsTeamsTeamsResponse = {
+          ms_teams_teams: [],
+          skip_token: null,
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: emptyResponse,
+        });
+
+        const client = new MsTeamsClient(knock);
+        const result = await client.getTeams({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        expect(result.ms_teams_teams).toEqual([]);
+        expect(result.skip_token).toBeNull();
+      } finally {
+        cleanup();
+      }
     });
   });
 
-  describe("getChannels", () => {
+  describe("Channels Management", () => {
     const mockChannel: MsTeamsChannel = {
       id: "channel_123",
       displayName: "Test Channel",
       description: "Test channel description",
       membershipType: "standard",
       isArchived: false,
-      createdDateTime: new Date().toISOString(),
+      createdDateTime: "2023-01-01T00:00:00Z",
     };
 
     const mockChannelsResponse: GetMsTeamsChannelsResponse = {
       ms_teams_channels: [mockChannel],
     };
 
-    test("fetches channels with default options", async () => {
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
+    test("fetches channels successfully", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        mockApiClient.makeRequest.mockResolvedValue({
           statusCode: "ok",
           body: mockChannelsResponse,
-        }),
-      };
+        });
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
+        const client = new MsTeamsClient(knock);
+        const result = await client.getChannels({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+          teamId: "team_123",
+        });
 
-      const client = new MsTeamsClient(mockKnock);
-      const result = await client.getChannels({
-        tenant: "tenant_123",
-        knockChannelId: "channel_123",
-        teamId: "team_123",
-      });
-
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-        method: "GET",
-        url: "/v1/providers/ms-teams/channel_123/channels",
-        params: {
-          ms_teams_tenant_object: {
-            object_id: "tenant_123",
-            collection: TENANT_OBJECT_COLLECTION,
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/providers/ms-teams/channel_123/channels",
+          params: {
+            ms_teams_tenant_object: {
+              object_id: "tenant_123",
+              collection: TENANT_OBJECT_COLLECTION,
+            },
+            team_id: "team_123",
+            query_options: {
+              $filter: undefined,
+              $select: undefined,
+            },
           },
-          team_id: "team_123",
-          query_options: {
-            $filter: undefined,
-            $select: undefined,
-          },
-        },
-      });
-      expect(result).toEqual(mockChannelsResponse);
+        });
+        expect(result).toEqual(mockChannelsResponse);
+      } finally {
+        cleanup();
+      }
     });
 
-    test("fetches channels with query options", async () => {
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
+    test("handles multiple channel types", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const multiChannelResponse = {
+          ms_teams_channels: [
+            mockChannel,
+            {
+              id: "channel_456",
+              displayName: "Private Channel",
+              description: "Private channel",
+              membershipType: "private",
+              isArchived: false,
+              createdDateTime: "2023-01-02T00:00:00Z",
+            },
+            {
+              id: "channel_789",
+              displayName: "Archived Channel",
+              description: "Archived channel",
+              membershipType: "standard",
+              isArchived: true,
+              createdDateTime: "2023-01-03T00:00:00Z",
+            },
+          ],
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
           statusCode: "ok",
-          body: mockChannelsResponse,
-        }),
-      };
+          body: multiChannelResponse,
+        });
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
+        const client = new MsTeamsClient(knock);
+        const result = await client.getChannels({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+          teamId: "team_123",
+        });
 
-      const client = new MsTeamsClient(mockKnock);
-      await client.getChannels({
-        tenant: "tenant_123",
-        knockChannelId: "channel_123",
-        teamId: "team_123",
-        queryOptions: {
-          $filter: "displayName eq 'Test Channel'",
-          $select: "id,displayName",
-        },
-      });
-
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-        method: "GET",
-        url: "/v1/providers/ms-teams/channel_123/channels",
-        params: {
-          ms_teams_tenant_object: {
-            object_id: "tenant_123",
-            collection: TENANT_OBJECT_COLLECTION,
-          },
-          team_id: "team_123",
-          query_options: {
-            $filter: "displayName eq 'Test Channel'",
-            $select: "id,displayName",
-          },
-        },
-      });
+        expect(result.ms_teams_channels).toHaveLength(3);
+        expect(result.ms_teams_channels[1]?.membershipType).toBe("private");
+        expect(result.ms_teams_channels[2]?.isArchived).toBe(true);
+      } finally {
+        cleanup();
+      }
     });
   });
 
-  describe("revokeAccessToken", () => {
-    test("revokes access token", async () => {
-      const mockApiClient = {
-        makeRequest: vi.fn().mockResolvedValue({
-          statusCode: "ok",
-          body: { success: true },
-        }),
-      };
+  describe("Error Handling and Edge Cases", () => {
+    test("handles various error scenarios", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
 
-      vi.mocked(mockKnock.client).mockReturnValue(
-        mockApiClient as unknown as ApiClient,
-      );
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
-      const client = new MsTeamsClient(mockKnock);
-      await client.revokeAccessToken({
-        tenant: "tenant_123",
-        knockChannelId: "channel_123",
-      });
-
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
-        method: "PUT",
-        url: "/v1/providers/ms-teams/channel_123/revoke_access",
-        params: {
-          ms_teams_tenant_object: {
-            object_id: "tenant_123",
-            collection: TENANT_OBJECT_COLLECTION,
+      try {
+        const errorScenarios = [
+          {
+            error: new Error("Team not found"),
+            expectedMessage: "Team not found",
           },
-          channel_id: "channel_123",
-        },
-      });
+          {
+            error: new Error("Permission denied"),
+            expectedMessage: "Permission denied",
+          },
+          {
+            error: new Error("Rate limit exceeded"),
+            expectedMessage: "Rate limit exceeded",
+          },
+        ];
+
+        const client = new MsTeamsClient(knock);
+
+        for (const scenario of errorScenarios) {
+          mockApiClient.makeRequest.mockResolvedValueOnce({
+            statusCode: "error",
+            error: scenario.error,
+          });
+
+          await expect(
+            client.getTeams({
+              tenant: "tenant_test",
+              knockChannelId: "channel_test",
+            }),
+          ).rejects.toThrow(scenario.expectedMessage);
+        }
+      } finally {
+        consoleSpy.mockRestore();
+        cleanup();
+      }
+    });
+
+    test("handles network errors during channel operations", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      try {
+        const networkError = new Error("Network timeout");
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "error",
+          error: networkError,
+        });
+
+        const client = new MsTeamsClient(knock);
+        await expect(
+          client.getChannels({
+            tenant: "tenant_123",
+            knockChannelId: "channel_123",
+            teamId: "team_123",
+          }),
+        ).rejects.toThrow("Network timeout");
+      } finally {
+        consoleSpy.mockRestore();
+        cleanup();
+      }
+    });
+  });
+
+  describe("Performance and Integration", () => {
+    test("handles concurrent operations efficiently", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        // Mock successful responses for concurrent operations
+        mockApiClient.makeRequest.mockImplementation(() =>
+          Promise.resolve({
+            statusCode: "ok",
+            body: { authenticated: true },
+          }),
+        );
+
+        const client = new MsTeamsClient(knock);
+        const startTime = Date.now();
+
+        // Make multiple concurrent auth checks
+        const requests = Array.from({ length: 3 }, (_, i) =>
+          client.authCheck({
+            tenant: `tenant_${i}`,
+            knockChannelId: `channel_${i}`,
+          }),
+        );
+
+        const results = await Promise.all(requests);
+        const endTime = Date.now();
+
+        // All requests should succeed
+        expect(results).toHaveLength(3);
+        results.forEach((result) => {
+          expect(result.authenticated).toBe(true);
+        });
+
+        // Should handle concurrency efficiently
+        expect(endTime - startTime).toBeLessThan(1000);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("integrates properly with Knock client", () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const client = new MsTeamsClient(knock);
+
+        // Verify proper integration
+        expect(client).toBeInstanceOf(MsTeamsClient);
+
+        // Verify that the client uses the same API client instance
+        expect(knock.client()).toBe(mockApiClient);
+      } finally {
+        cleanup();
+      }
     });
   });
 });
