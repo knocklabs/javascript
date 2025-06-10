@@ -16,14 +16,15 @@ describe("FeedClient", () => {
   };
 
   const mockKnock = {
+    userId: "user_123",
+    userToken: "token_456",
     log: vi.fn(),
     isAuthenticated: vi.fn(() => true),
-    userId: "user_123",
     client: vi.fn(() => ({
       socket: mockSocket,
       makeRequest: vi.fn(),
     })),
-    feeds: {} as any,
+    feeds: {} as Record<string, unknown>,
   } as unknown as Knock;
 
   const validFeedId = "550e8400-e29b-41d4-a716-446655440000";

@@ -45,13 +45,13 @@ describe("Helper Functions", () => {
 
       test("handles edge cases and special inputs", () => {
         // Test null and undefined
-        expect(isValidUuid(null as any)).toBe(false);
-        expect(isValidUuid(undefined as any)).toBe(false);
+        expect(isValidUuid(null as unknown as string)).toBe(false);
+        expect(isValidUuid(undefined as unknown as string)).toBe(false);
 
         // Test numbers and objects
-        expect(isValidUuid(123 as any)).toBe(false);
-        expect(isValidUuid({} as any)).toBe(false);
-        expect(isValidUuid([] as any)).toBe(false);
+        expect(isValidUuid(123 as unknown as string)).toBe(false);
+        expect(isValidUuid({} as unknown as string)).toBe(false);
+        expect(isValidUuid([] as unknown as string)).toBe(false);
 
         // Test whitespace
         expect(isValidUuid("  123e4567-e89b-12d3-a456-426614174000  ")).toBe(

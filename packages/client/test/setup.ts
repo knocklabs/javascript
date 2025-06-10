@@ -9,32 +9,48 @@ import "urlpattern-polyfill";
 import { afterAll, vi } from "vitest";
 
 // Track unhandled promise rejections for debugging
-const unhandledRejections: any[] = [];
+const unhandledRejections: unknown[] = [];
 
 // Handle unhandled promise rejections globally
-const handleUnhandledRejection = (event: any) => {
-  const reason = event.reason || event;
+const handleUnhandledRejection = (event: unknown) => {
+  const reason = (event as { reason?: unknown }).reason || event;
+
+  // Type guard to check if reason has error-like properties
+  const isErrorLike = (
+    obj: unknown,
+  ): obj is { message?: string; code?: string } => {
+    return obj != null && typeof obj === "object";
+  };
 
   // Log for debugging but don't fail tests for expected rejections
   if (
-    reason?.message?.includes("Network error") ||
-    reason?.message?.includes("Network Error") ||
-    reason?.message?.includes("timeout") ||
-    reason?.message?.includes("Server error") ||
-    reason?.code === "ECONNABORTED" ||
-    reason?.message?.includes("Network failure") ||
-    reason?.message?.includes("Network timeout")
+    isErrorLike(reason) &&
+    (reason.message?.includes("Network error") ||
+      reason.message?.includes("Network Error") ||
+      reason.message?.includes("timeout") ||
+      reason.message?.includes("Server error") ||
+      reason.code === "ECONNABORTED" ||
+      reason.message?.includes("Network failure") ||
+      reason.message?.includes("Network timeout"))
   ) {
     // These are expected test errors - just track them silently
     unhandledRejections.push(reason);
-    event.preventDefault?.();
+    if (
+      typeof event === "object" &&
+      event != null &&
+      "preventDefault" in event
+    ) {
+      (event as { preventDefault?: () => void }).preventDefault?.();
+    }
     return;
   }
 
   // Log unexpected rejections for debugging but don't fail tests
   console.warn("[TEST] Unhandled promise rejection:", reason);
   unhandledRejections.push(reason);
-  event.preventDefault?.();
+  if (typeof event === "object" && event != null && "preventDefault" in event) {
+    (event as { preventDefault?: () => void }).preventDefault?.();
+  }
 };
 
 // Add listeners for both Node.js and browser environments
@@ -55,7 +71,7 @@ const originalConsoleLog = console.log;
 const noOp = () => {};
 
 // Filter out specific warnings we expect during tests
-console.warn = (message: any, ...args: any[]) => {
+console.warn = (message: unknown, ...args: unknown[]) => {
   const messageStr = String(message);
 
   // Suppress expected test warnings
@@ -75,7 +91,7 @@ console.warn = (message: any, ...args: any[]) => {
 console.error = noOp;
 
 // Suppress console.log during tests to prevent Knock debug messages
-console.log = (message: any, ...args: any[]) => {
+console.log = (message: unknown, ...args: unknown[]) => {
   const messageStr = String(message);
 
   // Allow test-specific logs but suppress Knock logs

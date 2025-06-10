@@ -1,11 +1,22 @@
 import { vi } from "vitest";
 
 import Feed from "../../src/clients/feed/feed";
-import type { FeedClientOptions } from "../../src/clients/feed/interfaces";
+import type {
+  FeedClientOptions,
+  FeedItem,
+  FeedMetadata,
+} from "../../src/clients/feed/interfaces";
+import type { FeedSocketManager } from "../../src/clients/feed/socket-manager";
 import Knock from "../../src/knock";
 
+// Type for API client with mock methods
+type MockApiClient = {
+  makeRequest: ReturnType<typeof vi.fn>;
+  socket: undefined;
+};
+
 // Simple mock factories - no complex state management
-export const createMockApiClient = () => {
+export const createMockApiClient = (): MockApiClient => {
   const makeRequest = vi.fn().mockResolvedValue({
     statusCode: "ok",
     body: { success: true },
@@ -13,7 +24,7 @@ export const createMockApiClient = () => {
   });
 
   // Ensure promise rejections are properly handled
-  makeRequest.mockRejectedValue = (error: any) => {
+  makeRequest.mockRejectedValue = (error: unknown) => {
     const rejectedMock = vi.fn().mockRejectedValue(error);
     // Handle the rejection to prevent unhandled promise rejections
     rejectedMock().catch(() => {
@@ -32,10 +43,18 @@ export const createMockKnock = (apiKey = "pk_test_12345") => {
   const knock = new Knock(apiKey);
   const mockApiClient = createMockApiClient();
 
-  vi.spyOn(knock, "client").mockReturnValue(mockApiClient as any);
+  vi.spyOn(knock, "client").mockReturnValue(
+    mockApiClient as unknown as ReturnType<typeof knock.client>,
+  );
   vi.spyOn(knock, "log").mockImplementation(() => {});
 
   return { knock, mockApiClient };
+};
+
+// Type for socket manager mock
+type MockSocketManager = {
+  join: ReturnType<typeof vi.fn>;
+  leave: ReturnType<typeof vi.fn>;
 };
 
 // Simple feed setup without complex environment mocking
@@ -51,7 +70,7 @@ export const createMockFeed = (
   };
 
   // Simple socket manager mock
-  const mockSocketManager = {
+  const mockSocketManager: MockSocketManager = {
     join: vi.fn().mockReturnValue(vi.fn()), // returns unsubscribe function
     leave: vi.fn(),
   };
@@ -60,7 +79,7 @@ export const createMockFeed = (
     knock,
     feedId,
     defaultOptions,
-    mockSocketManager as any,
+    mockSocketManager as unknown as FeedSocketManager,
   );
 
   return {
@@ -73,8 +92,8 @@ export const createMockFeed = (
 
 // Network mocking utilities - applied per test, not globally
 export const mockNetworkSuccess = (
-  mockApiClient: any,
-  data: any = { success: true },
+  mockApiClient: MockApiClient,
+  data: unknown = { success: true },
 ) => {
   mockApiClient.makeRequest.mockResolvedValue({
     statusCode: "ok",
@@ -84,7 +103,7 @@ export const mockNetworkSuccess = (
 };
 
 export const mockNetworkError = (
-  mockApiClient: any,
+  mockApiClient: MockApiClient,
   status = 500,
   error = "Server error",
 ) => {
@@ -96,7 +115,7 @@ export const mockNetworkError = (
 };
 
 export const mockNetworkFailure = (
-  mockApiClient: any,
+  mockApiClient: MockApiClient,
   error = new Error("Network failure"),
 ) => {
   // Properly handle rejected promises to prevent unhandled rejections
@@ -133,7 +152,9 @@ export const createCleanup = (...cleanupFns: (() => void)[]) => {
 };
 
 // Simple test data generators
-export const createMockFeedItem = (overrides: any = {}) => ({
+export const createMockFeedItem = (
+  overrides: Partial<FeedItem> = {},
+): FeedItem => ({
   __cursor: `cursor-${Math.random().toString(36).substr(2, 9)}`,
   id: `item-${Math.random().toString(36).substr(2, 9)}`,
   activities: [],
@@ -150,12 +171,14 @@ export const createMockFeedItem = (overrides: any = {}) => ({
   link_clicked_at: null,
   total_activities: 1,
   total_actors: 1,
-  source: { key: "test-source" },
+  source: { key: "test-source", version_id: "v1", categories: [] },
   tenant: null,
   ...overrides,
 });
 
-export const createMockFeedMetadata = (overrides: any = {}) => ({
+export const createMockFeedMetadata = (
+  overrides: Partial<FeedMetadata> = {},
+): FeedMetadata => ({
   total_count: 10,
   unread_count: 5,
   unseen_count: 3,
@@ -177,8 +200,9 @@ export const setupBrowserEnvironment = () => {
   const originalWebSocket = global.WebSocket;
   const originalBroadcastChannel = global.BroadcastChannel;
 
-  (global as any).WebSocket = vi.fn();
-  (global as any).BroadcastChannel = vi.fn();
+  (global as unknown as { WebSocket: unknown }).WebSocket = vi.fn();
+  (global as unknown as { BroadcastChannel: unknown }).BroadcastChannel =
+    vi.fn();
 
   return {
     cleanup: () => {
@@ -199,7 +223,7 @@ export const createAxiosMock = () => {
   });
 
   // Helper methods for common scenarios
-  const mockSuccess = (data: any, status = 200) => {
+  const mockSuccess = (data: unknown, status = 200) => {
     mockAxios.mockResolvedValue({ status, data });
   };
 
@@ -254,7 +278,7 @@ export const createBroadcastChannelMock = () => {
     onmessage: ((event: MessageEvent) => void) | null = null;
 
     // Test utility to simulate message
-    simulateMessage(data: any) {
+    simulateMessage(data: unknown) {
       if (this.onmessage) {
         this.onmessage(new MessageEvent("message", { data }));
       }

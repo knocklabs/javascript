@@ -1,3 +1,4 @@
+import Feed from "../../src/clients/feed/feed";
 import type { FeedItem, FeedMetadata } from "../../src/clients/feed/interfaces";
 
 import { createMockFeedItem, createMockFeedMetadata } from "./fixtures";
@@ -166,7 +167,7 @@ export interface PropertyTest {
 
 export interface PropertyTestResult {
   success: boolean;
-  counterExample?: any;
+  counterExample?: unknown;
   numTests: number;
   description?: string;
 }
@@ -211,7 +212,7 @@ export const property = {
 // Common property test patterns for Feed
 export const feedProperties = {
   // Property: marking an item as read should always set read_at
-  markAsReadSetsTimestamp: (feed: any) =>
+  markAsReadSetsTimestamp: (feed: Feed) =>
     property.forAll(unreadFeedItemArbitrary(), async (item) => {
       await feed.markAsRead(item);
       const state = feed.getState();
@@ -220,7 +221,7 @@ export const feedProperties = {
     }),
 
   // Property: marking an item as seen should always set seen_at
-  markAsSeenSetsTimestamp: (feed: any) =>
+  markAsSeenSetsTimestamp: (feed: Feed) =>
     property.forAll(feedItemArbitrary(), async (item) => {
       await feed.markAsSeen(item);
       const state = feed.getState();
@@ -229,7 +230,7 @@ export const feedProperties = {
     }),
 
   // Property: archiving should always set archived_at
-  markAsArchivedSetsTimestamp: (feed: any) =>
+  markAsArchivedSetsTimestamp: (feed: Feed) =>
     property.forAll(feedItemArbitrary(), async (item) => {
       await feed.markAsArchived(item);
       const state = feed.getState();
@@ -238,7 +239,7 @@ export const feedProperties = {
     }),
 
   // Property: unread count should never be negative
-  unreadCountNeverNegative: (feed: any) =>
+  unreadCountNeverNegative: (feed: Feed) =>
     property.forAll(feedItemArbitrary(), async (item) => {
       await feed.markAsRead(item);
       const state = feed.getState();
@@ -246,7 +247,7 @@ export const feedProperties = {
     }),
 
   // Property: unseen count should never be negative
-  unseenCountNeverNegative: (feed: any) =>
+  unseenCountNeverNegative: (feed: Feed) =>
     property.forAll(feedItemArbitrary(), async (item) => {
       await feed.markAsSeen(item);
       const state = feed.getState();
@@ -254,13 +255,13 @@ export const feedProperties = {
     }),
 
   // Property: total count should be consistent with items length
-  totalCountConsistentWithItems: (feed: any) => {
+  totalCountConsistentWithItems: (feed: Feed) => {
     const state = feed.getState();
     return state.metadata.total_count >= state.items.length;
   },
 
   // Property: read items should also be seen (business rule)
-  readItemsShouldBeSeen: (feed: any) => {
+  readItemsShouldBeSeen: (feed: Feed) => {
     const state = feed.getState();
     const readItems = state.items.filter(
       (item: FeedItem) => item.read_at !== null,
@@ -272,10 +273,10 @@ export const feedProperties = {
 // Invariant testing utilities
 export const invariants = {
   // Test that certain conditions always hold after operations
-  checkInvariant: async (
-    setup: () => Promise<any>,
-    operations: Array<(context: any) => Promise<void>>,
-    invariant: (context: any) => boolean,
+  checkInvariant: async <T>(
+    setup: () => Promise<T>,
+    operations: Array<(context: T) => Promise<void>>,
+    invariant: (context: T) => boolean,
     description: string,
   ): Promise<PropertyTestResult> => {
     try {
@@ -308,10 +309,10 @@ export const invariants = {
   },
 
   // Test multiple scenarios
-  checkInvariants: async (
-    setup: () => Promise<any>,
-    operationSets: Array<Array<(context: any) => Promise<void>>>,
-    invariant: (context: any) => boolean,
+  checkInvariants: async <T>(
+    setup: () => Promise<T>,
+    operationSets: Array<Array<(context: T) => Promise<void>>>,
+    invariant: (context: T) => boolean,
     description: string,
   ): Promise<PropertyTestResult> => {
     for (let i = 0; i < operationSets.length; i++) {
@@ -373,7 +374,7 @@ export const stateMachine = {
 
   // Test that all generated sequences are valid
   testValidSequences: async (
-    feed: any,
+    feed: Feed,
     numSequences = 50,
   ): Promise<PropertyTestResult> => {
     for (let i = 0; i < numSequences; i++) {
@@ -382,8 +383,16 @@ export const stateMachine = {
 
       try {
         for (const step of sequence) {
-          // Execute the operation
-          await (feed as any)[step.operation](item);
+          // Execute the operation - use type assertion with proper method lookup
+          const method = (feed as unknown as Record<string, unknown>)[
+            step.operation
+          ];
+          if (typeof method === "function") {
+            await (method as (item: FeedItem) => Promise<unknown>).call(
+              feed,
+              item,
+            );
+          }
         }
       } catch (error) {
         return {

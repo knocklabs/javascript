@@ -1,7 +1,9 @@
 // @vitest-environment node
 import { describe, expect, test, vi } from "vitest";
 
+import ApiClient from "../../../src/api";
 import Feed from "../../../src/clients/feed/feed";
+import { FeedSocketManager } from "../../../src/clients/feed/socket-manager";
 import { NetworkStatus } from "../../../src/networkStatus";
 import {
   createMockFeedItems,
@@ -605,9 +607,12 @@ describe("Feed", () => {
       const { knock, cleanup } = getTestSetup();
 
       try {
-        // Unauthenticate the user
-        (knock as any).userId = undefined;
-        (knock as any).userToken = undefined;
+        // Set up the user as not authenticated
+        (knock as unknown as { userId?: string; userToken?: string }).userId =
+          undefined;
+        (
+          knock as unknown as { userId?: string; userToken?: string }
+        ).userToken = undefined;
 
         const feed = new Feed(
           knock,
@@ -718,14 +723,21 @@ describe("Feed", () => {
         global.BroadcastChannel = vi
           .fn()
           .mockImplementation(() => mockBroadcastChannel);
-        global.self = global as any;
+        vi.stubGlobal("self", global);
+
+        const _feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { __experimentalCrossBrowserUpdates: true },
+          undefined,
+        );
 
         expect(global.BroadcastChannel).toHaveBeenCalledWith(
           `knock:feed:01234567-89ab-cdef-0123-456789abcdef:${knock.userId}`,
         );
       } finally {
-        delete (global as any).BroadcastChannel;
-        delete (global as any).self;
+        delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+        delete (global as unknown as Record<string, unknown>).self;
         cleanup();
       }
     });
@@ -735,8 +747,8 @@ describe("Feed", () => {
 
       try {
         // Ensure BroadcastChannel is not available
-        delete (global as any).BroadcastChannel;
-        delete (global as any).self;
+        delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+        delete (global as unknown as Record<string, unknown>).self;
 
         const feed = new Feed(
           knock,
@@ -766,7 +778,7 @@ describe("Feed", () => {
         global.BroadcastChannel = vi
           .fn()
           .mockImplementation(() => mockBroadcastChannel);
-        global.self = global as any;
+        vi.stubGlobal("self", global);
 
         const feedItem = createUnreadFeedItem();
         const updatedItem = { ...feedItem, seen_at: new Date().toISOString() };
@@ -790,8 +802,8 @@ describe("Feed", () => {
           payload: { items: [feedItem] }, // Uses original items, not updated ones
         });
       } finally {
-        delete (global as any).BroadcastChannel;
-        delete (global as any).self;
+        delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+        delete (global as unknown as Record<string, unknown>).self;
         cleanup();
       }
     });
@@ -811,11 +823,11 @@ describe("Feed", () => {
         global.BroadcastChannel = vi
           .fn()
           .mockImplementation(() => mockBroadcastChannel);
-        global.self = global as any;
+        vi.stubGlobal("self", global);
 
         // Create a feedItem with circular reference to trigger JSON error
         const feedItem = createUnreadFeedItem();
-        const circularData: any = { self: null };
+        const circularData: Record<string, unknown> = { self: null };
         circularData.self = circularData;
         feedItem.data = circularData;
 
@@ -840,8 +852,8 @@ describe("Feed", () => {
         );
       } finally {
         consoleSpy.mockRestore();
-        delete (global as any).BroadcastChannel;
-        delete (global as any).self;
+        delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+        delete (global as unknown as Record<string, unknown>).self;
         cleanup();
       }
     });
@@ -859,7 +871,7 @@ describe("Feed", () => {
         global.BroadcastChannel = vi
           .fn()
           .mockImplementation(() => mockBroadcastChannel);
-        global.self = global as any;
+        vi.stubGlobal("self", global);
 
         // Mock fetch response for when broadcast message triggers refetch
         mockApiClient.makeRequest.mockResolvedValue({
@@ -871,7 +883,7 @@ describe("Feed", () => {
           },
         });
 
-        const feed = new Feed(
+        const _feed = new Feed(
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           { __experimentalCrossBrowserUpdates: true },
@@ -883,8 +895,8 @@ describe("Feed", () => {
           `knock:feed:01234567-89ab-cdef-0123-456789abcdef:${knock.userId}`,
         );
       } finally {
-        delete (global as any).BroadcastChannel;
-        delete (global as any).self;
+        delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+        delete (global as unknown as Record<string, unknown>).self;
         cleanup();
       }
     });
@@ -900,7 +912,7 @@ describe("Feed", () => {
           addEventListener: mockAddEventListener,
           removeEventListener: vi.fn(),
           visibilityState: "visible",
-        } as any;
+        } as unknown as Document;
 
         const mockSocketManager = {
           join: vi.fn().mockReturnValue(vi.fn()),
@@ -911,7 +923,7 @@ describe("Feed", () => {
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           { auto_manage_socket_connection: true },
-          mockSocketManager as any,
+          mockSocketManager as unknown as FeedSocketManager,
         );
 
         expect(mockAddEventListener).toHaveBeenCalledWith(
@@ -919,7 +931,7 @@ describe("Feed", () => {
           expect.any(Function),
         );
       } finally {
-        delete (global as any).document;
+        delete (global as unknown as Record<string, unknown>).document;
         cleanup();
       }
     });
@@ -945,13 +957,15 @@ describe("Feed", () => {
           removeEventListener: vi.fn(),
           visibilityState: "visible",
         };
-        global.document = mockDocument as any;
+        global.document = mockDocument as unknown as Document;
 
         const mockClient = {
           socket: mockSocket,
         };
 
-        vi.spyOn(knock, "client").mockReturnValue(mockClient as any);
+        vi.spyOn(knock, "client").mockReturnValue(
+          mockClient as unknown as ApiClient,
+        );
 
         const mockSocketManager = {
           join: vi.fn().mockReturnValue(vi.fn()),
@@ -965,7 +979,7 @@ describe("Feed", () => {
             auto_manage_socket_connection: true,
             auto_manage_socket_connection_delay: 100,
           },
-          mockSocketManager as any,
+          mockSocketManager as unknown as FeedSocketManager,
         );
 
         // Simulate visibility change to hidden
@@ -977,7 +991,7 @@ describe("Feed", () => {
 
         expect(mockSocket.disconnect).toHaveBeenCalled();
       } finally {
-        delete (global as any).document;
+        delete (global as unknown as Record<string, unknown>).document;
         cleanup();
       }
     });
@@ -1003,13 +1017,15 @@ describe("Feed", () => {
           removeEventListener: vi.fn(),
           visibilityState: "hidden",
         };
-        global.document = mockDocument as any;
+        global.document = mockDocument as unknown as Document;
 
         const mockClient = {
           socket: mockSocket,
         };
 
-        vi.spyOn(knock, "client").mockReturnValue(mockClient as any);
+        vi.spyOn(knock, "client").mockReturnValue(
+          mockClient as unknown as ApiClient,
+        );
 
         const mockSocketManager = {
           join: vi.fn().mockReturnValue(vi.fn()),
@@ -1020,7 +1036,7 @@ describe("Feed", () => {
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           { auto_manage_socket_connection: true },
-          mockSocketManager as any,
+          mockSocketManager as unknown as FeedSocketManager,
         );
 
         // Simulate visibility change to visible
@@ -1029,7 +1045,7 @@ describe("Feed", () => {
 
         expect(mockSocket.connect).toHaveBeenCalled();
       } finally {
-        delete (global as any).document;
+        delete (global as unknown as Record<string, unknown>).document;
         cleanup();
       }
     });
@@ -1043,7 +1059,7 @@ describe("Feed", () => {
           addEventListener: vi.fn(),
           removeEventListener: mockRemoveEventListener,
           visibilityState: "visible",
-        } as any;
+        } as unknown as Document;
 
         const mockSocketManager = {
           join: vi.fn().mockReturnValue(vi.fn()),
@@ -1054,7 +1070,7 @@ describe("Feed", () => {
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           { auto_manage_socket_connection: true },
-          mockSocketManager as any,
+          mockSocketManager as unknown as FeedSocketManager,
         );
 
         feed.dispose();
@@ -1064,7 +1080,7 @@ describe("Feed", () => {
           expect.any(Function),
         );
       } finally {
-        delete (global as any).document;
+        delete (global as unknown as Record<string, unknown>).document;
         cleanup();
       }
     });
@@ -1094,7 +1110,7 @@ describe("Feed", () => {
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           {},
-          mockSocketManager as any,
+          mockSocketManager as unknown as FeedSocketManager,
         );
 
         const newMessagePayload = {
@@ -1131,14 +1147,14 @@ describe("Feed", () => {
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           {},
-          mockSocketManager as any,
+          mockSocketManager as unknown as FeedSocketManager,
         );
 
         // Simulate having subscribed before
         feed.listenForUpdates();
 
         // Reinitialize to trigger the realtime connection logic
-        feed.reinitialize(mockSocketManager as any);
+        feed.reinitialize(mockSocketManager as unknown as FeedSocketManager);
 
         expect(mockJoin).toHaveBeenCalledWith(feed);
       } finally {
@@ -1345,12 +1361,12 @@ describe("Feed", () => {
         );
 
         // Create metadata with circular reference
-        const circularMetadata: any = { self: null };
+        const circularMetadata: Record<string, unknown> = { self: null };
         circularMetadata.self = circularMetadata;
 
         const result = await feed.markAsInteracted(
           feedItem,
-          circularMetadata as any,
+          circularMetadata as unknown as Record<string, string>,
         );
 
         expect(result).toEqual([updatedItem]);
@@ -1416,8 +1432,8 @@ describe("Feed", () => {
         });
 
         // Ensure no BroadcastChannel is available
-        delete (global as any).BroadcastChannel;
-        delete (global as any).self;
+        delete (global as unknown as Record<string, unknown>).BroadcastChannel;
+        delete (global as unknown as Record<string, unknown>).self;
 
         const feed = new Feed(
           knock,

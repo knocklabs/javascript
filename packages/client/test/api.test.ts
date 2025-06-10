@@ -5,6 +5,9 @@ import ApiClient from "../src/api";
 
 import { createAxiosMock, mockAxios } from "./test-utils/mocks";
 
+// Type for accessing global properties
+type GlobalWithWindow = Record<string, unknown>;
+
 // Use vi.hoisted to ensure proper mock setup
 const { mockIsNetworkError, mockExponentialDelay, mockAxiosRetry } = vi.hoisted(
   () => {
@@ -90,10 +93,10 @@ describe("API Client", () => {
 
     test("initializes WebSocket in browser environment", () => {
       // Store original window value
-      const originalWindow = (global as any).window;
+      const originalWindow = (global as GlobalWithWindow).window;
 
       // Mock window to simulate browser environment
-      (global as any).window = {};
+      (global as GlobalWithWindow).window = {} as Window;
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -105,13 +108,13 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeDefined();
 
       // Restore original window value
-      (global as any).window = originalWindow;
+      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("skips WebSocket in server environment", () => {
       // Ensure window is undefined (server environment)
-      const originalWindow = (global as any).window;
-      (global as any).window = undefined;
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = undefined;
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -122,7 +125,7 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeUndefined();
 
       // Restore original window value
-      (global as any).window = originalWindow;
+      (global as GlobalWithWindow).window = originalWindow;
     });
   });
 
@@ -136,7 +139,8 @@ describe("API Client", () => {
       });
 
       // Mock the internal axios client
-      (apiClient as any).axiosClient = mockHttp.axios;
+      (apiClient as unknown as Record<string, unknown>).axiosClient =
+        mockHttp.axios;
 
       mockHttp.mockSuccess({ data: "test response" });
 
@@ -157,7 +161,8 @@ describe("API Client", () => {
         userToken: undefined,
       });
 
-      (apiClient as any).axiosClient = mockHttp.axios;
+      (apiClient as unknown as Record<string, unknown>).axiosClient =
+        mockHttp.axios;
 
       mockHttp.mockSuccess({ received: true });
 
@@ -183,7 +188,8 @@ describe("API Client", () => {
         userToken: undefined,
       });
 
-      (apiClient as any).axiosClient = mockHttp.axios;
+      (apiClient as unknown as Record<string, unknown>).axiosClient =
+        mockHttp.axios;
 
       const testData = { name: "Test", value: 42 };
       mockHttp.mockSuccess({ created: true });
@@ -218,10 +224,16 @@ describe("API Client", () => {
           userToken: undefined,
         });
 
-        (apiClient as any).axiosClient = mockHttp.axios;
+        (apiClient as unknown as Record<string, unknown>).axiosClient =
+          mockHttp.axios;
 
         // Mock network failure - this should not create unhandled rejections
         const networkError = new Error("Network Error");
+        (
+          networkError as unknown as { code?: string; isAxiosError?: boolean }
+        ).code = "ECONNABORTED";
+        (networkError as unknown as { isAxiosError?: boolean }).isAxiosError =
+          true;
         mockHttp.axios.mockRejectedValue(networkError);
 
         const response = await apiClient.makeRequest({
@@ -250,7 +262,8 @@ describe("API Client", () => {
           userToken: undefined,
         });
 
-        (apiClient as any).axiosClient = mockHttp.axios;
+        (apiClient as unknown as Record<string, unknown>).axiosClient =
+          mockHttp.axios;
 
         const errorScenarios = [
           {
@@ -300,7 +313,8 @@ describe("API Client", () => {
         userToken: undefined,
       });
 
-      (apiClient as any).axiosClient = mockHttp.axios;
+      (apiClient as unknown as Record<string, unknown>).axiosClient =
+        mockHttp.axios;
 
       mockHttp.mockError(500, "Internal Server Error");
 
@@ -329,7 +343,8 @@ describe("API Client", () => {
           userToken: undefined,
         });
 
-        (apiClient as any).axiosClient = mockHttp.axios;
+        (apiClient as unknown as Record<string, unknown>).axiosClient =
+          mockHttp.axios;
 
         // Mock network timeout - should not create unhandled rejections
         mockHttp.axios.mockRejectedValueOnce(new Error("Network timeout"));
@@ -359,13 +374,16 @@ describe("API Client", () => {
       });
 
       // Mock network error
-      const networkError = new Error("Network Error") as any;
-      networkError.code = "ECONNABORTED";
-      networkError.isAxiosError = true;
+      const networkError = new Error("Network Error");
+      (
+        networkError as unknown as { code?: string; isAxiosError?: boolean }
+      ).code = "ECONNABORTED";
+      (networkError as unknown as { isAxiosError?: boolean }).isAxiosError =
+        true;
 
-      const canRetry = (apiClient as any).canRetryRequest(networkError);
-
-      expect(canRetry).toBe(true);
+      const canRetry = (apiClient as unknown as Record<string, unknown>)
+        .canRetryRequest as (error: unknown) => boolean;
+      expect(canRetry(networkError)).toBe(true);
       expect(mockIsNetworkError).toHaveBeenCalledWith(networkError);
     });
 
@@ -382,13 +400,14 @@ describe("API Client", () => {
         const serverError = {
           response: { status },
           isAxiosError: true,
-        } as any;
+        };
 
         // Mock axiosRetry.isNetworkError to return false for server errors
         mockIsNetworkError.mockReturnValue(false);
 
-        const canRetry = (apiClient as any).canRetryRequest(serverError);
-        expect(canRetry).toBe(true);
+        const canRetry = (apiClient as unknown as Record<string, unknown>)
+          .canRetryRequest as (error: unknown) => boolean;
+        expect(canRetry(serverError)).toBe(true);
       });
     });
 
@@ -402,12 +421,13 @@ describe("API Client", () => {
       const rateLimitError = {
         response: { status: 429 },
         isAxiosError: true,
-      } as any;
+      };
 
       mockIsNetworkError.mockReturnValue(false);
 
-      const canRetry = (apiClient as any).canRetryRequest(rateLimitError);
-      expect(canRetry).toBe(true);
+      const canRetry = (apiClient as unknown as Record<string, unknown>)
+        .canRetryRequest as (error: unknown) => boolean;
+      expect(canRetry(rateLimitError)).toBe(true);
     });
 
     test("does not retry on client errors (4xx except 429)", async () => {
@@ -423,13 +443,14 @@ describe("API Client", () => {
         const clientError = {
           response: { status },
           isAxiosError: true,
-        } as any;
+        };
 
         // Mock axiosRetry.isNetworkError to return false
         mockIsNetworkError.mockReturnValue(false);
 
-        const canRetry = (apiClient as any).canRetryRequest(clientError);
-        expect(canRetry).toBe(false);
+        const canRetry = (apiClient as unknown as Record<string, unknown>)
+          .canRetryRequest as (error: unknown) => boolean;
+        expect(canRetry(clientError)).toBe(false);
       });
     });
 
@@ -443,12 +464,13 @@ describe("API Client", () => {
       const errorWithoutResponse = {
         isAxiosError: true,
         response: undefined,
-      } as any;
+      };
 
       mockIsNetworkError.mockReturnValue(false);
 
-      const canRetry = (apiClient as any).canRetryRequest(errorWithoutResponse);
-      expect(canRetry).toBe(false);
+      const canRetry = (apiClient as unknown as Record<string, unknown>)
+        .canRetryRequest as (error: unknown) => boolean;
+      expect(canRetry(errorWithoutResponse)).toBe(false);
     });
 
     test("does not retry on successful 2xx responses", async () => {
@@ -464,13 +486,14 @@ describe("API Client", () => {
         const successError = {
           response: { status },
           isAxiosError: true,
-        } as any;
+        };
 
         // Mock axiosRetry.isNetworkError to return false
         mockIsNetworkError.mockReturnValue(false);
 
-        const canRetry = (apiClient as any).canRetryRequest(successError);
-        expect(canRetry).toBe(false);
+        const canRetry = (apiClient as unknown as Record<string, unknown>)
+          .canRetryRequest as (error: unknown) => boolean;
+        expect(canRetry(successError)).toBe(false);
       });
     });
   });
@@ -484,7 +507,8 @@ describe("API Client", () => {
         userToken: undefined,
       });
 
-      (apiClient as any).axiosClient = mockHttp.axios;
+      (apiClient as unknown as Record<string, unknown>).axiosClient =
+        mockHttp.axios;
 
       const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
@@ -492,7 +516,7 @@ describe("API Client", () => {
         mockHttp.mockSuccess({ method });
 
         const response = await apiClient.makeRequest({
-          method: method as any,
+          method: method as "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
           url: "/test",
         });
 
@@ -509,9 +533,10 @@ describe("API Client", () => {
         userToken: undefined,
       });
 
-      (apiClient as any).axiosClient = mockHttp.axios;
+      (apiClient as unknown as Record<string, unknown>).axiosClient =
+        mockHttp.axios;
 
-      mockHttp.axios.mockImplementation((config: any) => {
+      mockHttp.axios.mockImplementation((config: unknown) => {
         return Promise.resolve({
           status: 200,
           data: { receivedConfig: config },
@@ -532,10 +557,10 @@ describe("API Client", () => {
   describe("Socket Connection Management", () => {
     test("provides socket interface in browser environment", () => {
       // Store original window value
-      const originalWindow = (global as any).window;
+      const originalWindow = (global as GlobalWithWindow).window;
 
       // Mock window to simulate browser environment
-      (global as any).window = {};
+      (global as GlobalWithWindow).window = {};
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -546,13 +571,13 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeDefined();
 
       // Restore original window value
-      (global as any).window = originalWindow;
+      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("gracefully handles missing WebSocket in server environment", () => {
       // Store original window value
-      const originalWindow = (global as any).window;
-      (global as any).window = undefined;
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = undefined;
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -564,7 +589,7 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeUndefined();
 
       // Restore original window value
-      (global as any).window = originalWindow;
+      (global as GlobalWithWindow).window = originalWindow;
     });
   });
 });

@@ -50,12 +50,16 @@ describe("Network Status", () => {
 
       test("handles edge cases gracefully", () => {
         // Test with undefined/null (should be false)
-        expect(isRequestInFlight(undefined as any)).toBe(false);
-        expect(isRequestInFlight(null as any)).toBe(false);
+        expect(isRequestInFlight(undefined as unknown as NetworkStatus)).toBe(
+          false,
+        );
+        expect(isRequestInFlight(null as unknown as NetworkStatus)).toBe(false);
 
         // Test with invalid string values
-        expect(isRequestInFlight("invalid" as any)).toBe(false);
-        expect(isRequestInFlight("" as any)).toBe(false);
+        expect(isRequestInFlight("invalid" as unknown as NetworkStatus)).toBe(
+          false,
+        );
+        expect(isRequestInFlight("" as unknown as NetworkStatus)).toBe(false);
       });
     });
   });

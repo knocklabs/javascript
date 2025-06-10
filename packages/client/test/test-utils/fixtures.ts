@@ -207,7 +207,7 @@ export const createMixedStateFeedDataset = (): {
 };
 
 // Socket event payloads
-export const createMockSocketPayload = (event: string, data?: any) => ({
+export const createMockSocketPayload = (event: string, data?: unknown) => ({
   event,
   metadata: createMockFeedMetadata(),
   data: data || {},
@@ -439,7 +439,7 @@ export function createMockUserPreferences(
 /**
  * API Response fixtures
  */
-export function createPaginatedResponse<T>(
+export function createPaginatedResponse<T extends FeedItem | unknown>(
   items: T[],
   options: {
     pageSize?: number;
@@ -453,13 +453,28 @@ export function createPaginatedResponse<T>(
     hasPreviousPage = false,
   } = options;
 
+  // Only calculate metadata if items are FeedItems
+  const isFeedItemArray =
+    items.length > 0 &&
+    items[0] &&
+    typeof items[0] === "object" &&
+    "read_at" in items[0];
+
+  const metadata = isFeedItemArray
+    ? createMockFeedMetadata({
+        total_count: items.length,
+        unread_count: (items as FeedItem[]).filter((item) => !item.read_at)
+          .length,
+        unseen_count: (items as FeedItem[]).filter((item) => !item.seen_at)
+          .length,
+      })
+    : createMockFeedMetadata({
+        total_count: items.length,
+      });
+
   return {
     entries: items.slice(0, pageSize),
-    meta: {
-      total_count: items.length,
-      unread_count: items.filter((item: any) => !item.read_at).length,
-      unseen_count: items.filter((item: any) => !item.seen_at).length,
-    },
+    meta: metadata,
     page_info: {
       after: hasNextPage ? faker.string.alphanumeric(20) : null,
       before: hasPreviousPage ? faker.string.alphanumeric(20) : null,

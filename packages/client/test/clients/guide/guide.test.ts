@@ -15,7 +15,7 @@ import Knock from "../../../src/knock";
 // Mock @tanstack/store
 const mockStore = {
   getState: vi.fn(() => ({
-    guides: [] as any[],
+    guides: [] as unknown[],
     queries: {},
     location: undefined,
   })),
@@ -30,7 +30,7 @@ const mockStore = {
     return fn;
   }),
   state: {
-    guides: [] as any[],
+    guides: [] as unknown[],
     queries: {},
     location: undefined,
   },
@@ -64,14 +64,20 @@ describe("KnockGuideClient", () => {
     };
 
     mockKnock = {
-      client: vi.fn(() => mockApiClient as ApiClient),
-      log: vi.fn(),
+      userId: "user_123",
+      userToken: "token_456",
+      isAuthenticated: vi.fn(() => true),
       failIfNotAuthenticated: vi.fn(),
-      userId: "test_user",
+      client: vi.fn(() => ({
+        makeRequest: vi.fn(),
+      })),
+      log: vi.fn(),
+      guides: [] as unknown[],
       user: {
         getGuides: vi
           .fn()
           .mockImplementation(() => Promise.resolve({ entries: [] })),
+        markGuideStepAs: vi.fn().mockResolvedValue({ status: "ok" }),
       },
     } as unknown as Knock;
 
@@ -129,6 +135,8 @@ describe("KnockGuideClient", () => {
       // Mock window to simulate browser environment
       vi.stubGlobal("window", mockWindow);
 
+      const _client = new KnockGuideClient(mockKnock, channelId);
+
       expect(Store).toHaveBeenCalledWith({
         guides: [],
         queries: {},
@@ -138,6 +146,7 @@ describe("KnockGuideClient", () => {
 
     test("does not track location when window is not available", () => {
       // window is already undefined from beforeEach
+      const _client = new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
         guides: [],
@@ -167,9 +176,7 @@ describe("KnockGuideClient", () => {
         ],
       };
 
-      vi.mocked(mockKnock.user.getGuides).mockImplementationOnce(() =>
-        Promise.resolve(mockResponse),
-      );
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
 
       const client = new KnockGuideClient(
         mockKnock,
@@ -191,9 +198,7 @@ describe("KnockGuideClient", () => {
 
     test("handles fetch errors", async () => {
       const mockError = new Error("Network error");
-      vi.mocked(mockKnock.user.getGuides).mockImplementationOnce(() =>
-        Promise.reject(mockError),
-      );
+      vi.mocked(mockKnock.user.getGuides).mockRejectedValueOnce(mockError);
 
       const client = new KnockGuideClient(mockKnock, channelId);
       await client.fetch();
@@ -212,7 +217,7 @@ describe("KnockGuideClient", () => {
           location: undefined,
         });
         expect(newState.queries).toEqual({
-          "/v1/users/test_user/guides": { status: "error", error: mockError },
+          "/v1/users/user_123/guides": { status: "error", error: mockError },
         });
       }
     });
@@ -237,6 +242,7 @@ describe("KnockGuideClient", () => {
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
 
       const client = new KnockGuideClient(
         mockKnock,
@@ -307,7 +313,7 @@ describe("KnockGuideClient", () => {
       } as unknown as ApiClient);
     });
 
-    const mockStep: KnockGuideStep = {
+    const mockStep = {
       ref: "step_1",
       schema_key: "test",
       schema_semver: "1.0.0",
@@ -324,9 +330,9 @@ describe("KnockGuideClient", () => {
       markAsSeen: vi.fn(),
       markAsInteracted: vi.fn(),
       markAsArchived: vi.fn(),
-    };
+    } as unknown as KnockGuideStep;
 
-    const mockGuide: KnockGuide = {
+    const mockGuide = {
       __typename: "Guide",
       channel_id: channelId,
       id: "guide_123",
@@ -338,7 +344,7 @@ describe("KnockGuideClient", () => {
       activation_location_rules: [],
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    };
+    } as unknown as KnockGuide;
 
     test("marks guide step as seen", async () => {
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -771,7 +777,7 @@ describe("KnockGuideClient", () => {
         },
       });
 
-      const client = new KnockGuideClient(
+      const _client = new KnockGuideClient(
         mockKnock,
         channelId,
         {},
@@ -796,8 +802,11 @@ describe("KnockGuideClient", () => {
       });
 
       // Verify that history methods were monkey-patched
-      expect(typeof (window as any).history.pushState).toBe("function");
-      expect(typeof (window as any).history.replaceState).toBe("function");
+      const windowWithHistory = window as unknown as {
+        history: { pushState: unknown; replaceState: unknown };
+      };
+      expect(typeof windowWithHistory.history.pushState).toBe("function");
+      expect(typeof windowWithHistory.history.replaceState).toBe("function");
     });
 
     test("handles location changes", () => {
@@ -843,8 +852,11 @@ describe("KnockGuideClient", () => {
       client.cleanup();
 
       // Verify that original methods were restored
-      expect((window as any).history.pushState).toBe(originalPushState);
-      expect((window as any).history.replaceState).toBe(originalReplaceState);
+      const windowWithHistory = window as unknown as {
+        history: { pushState: unknown; replaceState: unknown };
+      };
+      expect(windowWithHistory.history.pushState).toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
     });
   });
 
@@ -888,13 +900,13 @@ describe("KnockGuideClient", () => {
       const mockStep = {
         ref: "step_1",
         message: { id: "msg_123" },
-      } as any;
+      } as unknown as KnockGuideStep;
 
       const mockGuide = {
         id: "guide_123",
         key: "test_guide",
         channel_id: channelId,
-      } as any;
+      } as unknown as KnockGuide;
 
       const result = client["buildEngagementEventBaseParams"](
         mockGuide,
@@ -941,10 +953,10 @@ describe("KnockGuideClient", () => {
     test("subscribe handles missing socket gracefully", () => {
       mockApiClient.socket = undefined;
 
-      const client = new KnockGuideClient(mockKnock, channelId);
+      const _client = new KnockGuideClient(mockKnock, channelId);
 
       // Should not throw error
-      expect(() => client.subscribe()).not.toThrow();
+      expect(() => _client.subscribe()).not.toThrow();
     });
 
     test("unsubscribe handles missing socket channel gracefully", () => {
@@ -961,6 +973,7 @@ describe("KnockGuideClient", () => {
 
       await client.fetch({ filters: { type: "tooltip" } });
 
+      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({

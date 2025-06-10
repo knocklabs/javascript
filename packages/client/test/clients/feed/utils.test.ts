@@ -382,7 +382,7 @@ describe("feed utils", () => {
     test("returns string as-is for string trigger data", () => {
       const options = {
         trigger_data: '{"userId":"456","action":"view"}',
-      } as any;
+      } as unknown as FeedClientOptions;
 
       const result = getFormattedTriggerData(options);
       expect(result).toBe('{"userId":"456","action":"view"}');
@@ -398,7 +398,7 @@ describe("feed utils", () => {
     test("stringifies null trigger data (since typeof null === 'object')", () => {
       const options = {
         trigger_data: null,
-      } as any;
+      } as unknown as FeedClientOptions;
 
       const result = getFormattedTriggerData(options);
       // In JavaScript, typeof null === "object", so null gets stringified
@@ -407,9 +407,9 @@ describe("feed utils", () => {
 
     test("returns undefined for other primitive types", () => {
       const testCases = [
-        { trigger_data: 123 } as any,
-        { trigger_data: true } as any,
-        { trigger_data: Symbol("test") } as any,
+        { trigger_data: 123 } as unknown as FeedClientOptions,
+        { trigger_data: true } as unknown as FeedClientOptions,
+        { trigger_data: Symbol("test") } as unknown as FeedClientOptions,
       ];
 
       testCases.forEach((options) => {

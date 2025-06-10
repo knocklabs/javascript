@@ -19,7 +19,7 @@ describe("FeedSocketManager", () => {
   let mockChannel: Channel;
   let mockFeed: Feed;
   let socketManager: FeedSocketManager;
-  let mockStore: Store<any>;
+  let mockStore: Store<unknown>;
 
   beforeEach(() => {
     // Mock Socket
@@ -43,7 +43,7 @@ describe("FeedSocketManager", () => {
       state: {},
       setState: vi.fn(),
       subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe function
-    } as unknown as Store<any>;
+    } as unknown as Store<unknown>;
 
     // Mock Feed
     mockFeed = {
@@ -381,7 +381,7 @@ describe("FeedSocketManager", () => {
 
   describe("event handling integration", () => {
     test("properly handles socket events through channel listeners", () => {
-      let eventCallback: ((payload: any) => void) | undefined;
+      let eventCallback: ((payload: unknown) => void) | undefined;
       vi.mocked(mockChannel.on).mockImplementation((eventType, callback) => {
         if (eventType === SocketEventType.NewMessage) {
           eventCallback = callback;

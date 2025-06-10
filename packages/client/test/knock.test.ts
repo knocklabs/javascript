@@ -515,7 +515,8 @@ describe("Knock Client", () => {
         socket: mockSocket, // Direct property, not a function
       };
 
-      knock["apiClient"] = mockApiClient as any;
+      knock["apiClient"] =
+        mockApiClient as unknown as (typeof knock)["apiClient"];
 
       knock.teardown();
 
@@ -536,7 +537,8 @@ describe("Knock Client", () => {
         socket: mockSocket,
       };
 
-      knock["apiClient"] = mockApiClient as any;
+      knock["apiClient"] =
+        mockApiClient as unknown as (typeof knock)["apiClient"];
 
       // Should not throw an error
       expect(() => knock.teardown()).not.toThrow();
