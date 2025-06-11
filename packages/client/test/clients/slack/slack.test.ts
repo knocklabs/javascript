@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, test, vi } from "vitest";
 
 import { TENANT_OBJECT_COLLECTION } from "../../../src/clients/objects/constants";

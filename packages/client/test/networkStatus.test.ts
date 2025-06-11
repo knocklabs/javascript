@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, test } from "vitest";
 
 import { NetworkStatus, isRequestInFlight } from "../src/networkStatus";

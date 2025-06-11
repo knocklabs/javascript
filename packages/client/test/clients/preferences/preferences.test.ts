@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import PreferencesClient from "../../../src/clients/preferences";

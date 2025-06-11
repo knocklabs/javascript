@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
 import { URLPattern } from "urlpattern-polyfill";

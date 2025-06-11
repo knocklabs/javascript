@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { jwtDecode } from "jwt-decode";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 

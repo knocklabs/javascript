@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, test, vi } from "vitest";
 
 import ObjectClient from "../../../src/clients/objects";

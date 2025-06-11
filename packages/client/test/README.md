@@ -28,7 +28,6 @@ test/
 Here's a simple test to get you started:
 
 ```typescript
-// @vitest-environment node
 import { describe, expect, test } from "vitest";
 
 import { createMockKnock } from "./test-utils/mocks";
@@ -43,7 +42,7 @@ describe("My Feature", () => {
 });
 ```
 
-**Important:** Always add `// @vitest-environment node` at the top of test files.
+**Important:** Always add `` at the top of test files.
 
 ## 🛠 Test Utilities
 
@@ -439,7 +438,7 @@ You usually don't need to modify this file.
 All tests should run in Node environment:
 
 ```typescript
-// @vitest-environment node
+
 ```
 
 ## 🚨 Common Issues & Solutions
@@ -519,7 +518,6 @@ test("API operation", async () => {
 ### Complete Test File Example
 
 ```typescript
-// @vitest-environment node
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { createMockFeedItem } from "./test-utils/fixtures";
