@@ -1,3 +1,4 @@
+import type KnockClient from "@knocklabs/client";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -9,7 +10,7 @@ const buildMockKnock = (authCheckImpl: () => Promise<unknown>) => {
     slack: {
       authCheck: vi.fn(authCheckImpl),
     },
-  } as unknown as import("@knocklabs/client").default;
+  } as unknown as KnockClient;
 };
 
 // Mock translations hook so that t(key) returns key

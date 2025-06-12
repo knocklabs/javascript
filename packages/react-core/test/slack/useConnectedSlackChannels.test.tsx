@@ -1,4 +1,4 @@
-import { SlackChannelConnection } from "@knocklabs/client";
+import KnockClient, { SlackChannelConnection } from "@knocklabs/client";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -16,7 +16,7 @@ const mockKnock = {
     getChannelData: mockGetChannelData,
     setChannelData: mockSetChannelData,
   },
-} as unknown as import("@knocklabs/client").default;
+} as unknown as KnockClient;
 
 // Provide minimal translation function
 vi.mock("../../src/modules/i18n", () => ({

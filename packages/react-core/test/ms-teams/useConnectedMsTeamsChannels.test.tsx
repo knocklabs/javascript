@@ -1,3 +1,4 @@
+import KnockClient, { type MsTeamsChannelConnection } from "@knocklabs/client";
 import { act, renderHook } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -15,7 +16,7 @@ const mockKnock = {
     getChannelData: mockGetChannelData,
     setChannelData: mockSetChannelData,
   },
-} as unknown as import("@knocklabs/client").default;
+} as unknown as typeof KnockClient;
 
 // Mock useKnockClient
 vi.mock("../../src/modules/core", () => ({
@@ -46,9 +47,22 @@ vi.mock("swr", () =>
     {
       channel_id: "1",
       team_id: "T",
-    } as unknown as import("@knocklabs/client").MsTeamsChannelConnection,
+    } as unknown as MsTeamsChannelConnection,
   ]),
 );
+
+// Apply shared mocks _before_ loading the hook to ensure context is mocked first
+mockMsTeamsContext();
+mockTranslations();
+
+let useConnectedMsTeamsChannels: typeof import("../../src/modules/ms-teams/hooks/useConnectedMsTeamsChannels").default;
+
+beforeAll(async () => {
+  // Dynamically import after mocks are set up
+  ({ default: useConnectedMsTeamsChannels } = await import(
+    "../../src/modules/ms-teams/hooks/useConnectedMsTeamsChannels?m" as string
+  ));
+});
 
 // ----------------------------------------------------------------------------------
 
@@ -70,7 +84,7 @@ describe("useConnectedMsTeamsChannels", () => {
       {
         channel_id: "1",
         team_id: "T",
-      } as unknown as import("@knocklabs/client").MsTeamsChannelConnection,
+      } as unknown as MsTeamsChannelConnection,
     ]);
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
@@ -90,7 +104,7 @@ describe("useConnectedMsTeamsChannels", () => {
       {
         channel_id: "2",
         team_id: "T",
-      } as unknown as import("@knocklabs/client").MsTeamsChannelConnection,
+      } as unknown as MsTeamsChannelConnection,
     ];
 
     await act(async () => {
@@ -106,17 +120,4 @@ describe("useConnectedMsTeamsChannels", () => {
 
     expect(mutateMock).toHaveBeenCalled();
   });
-});
-
-// Apply shared mocks _before_ loading the hook to ensure context is mocked first
-mockMsTeamsContext();
-mockTranslations();
-
-let useConnectedMsTeamsChannels: typeof import("../../src/modules/ms-teams/hooks/useConnectedMsTeamsChannels").default;
-
-beforeAll(async () => {
-  // Dynamically import after mocks are set up
-  ({ default: useConnectedMsTeamsChannels } = await import(
-    "../../src/modules/ms-teams/hooks/useConnectedMsTeamsChannels?m" as string
-  ));
 });

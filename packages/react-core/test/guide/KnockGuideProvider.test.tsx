@@ -2,11 +2,7 @@ import { renderHook } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore JSX types not enabled in test tsconfig
 import { KnockGuideProvider } from "../../src/modules/guide/context/KnockGuideProvider";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore JSX types not enabled in test tsconfig
 import { useGuideContext } from "../../src/modules/guide/hooks/useGuideContext";
 
 // Note: core is mocked below – no direct reference needed.
