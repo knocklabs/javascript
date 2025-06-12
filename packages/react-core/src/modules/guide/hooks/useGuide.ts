@@ -23,8 +23,8 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
 
   const { client, colorMode } = context;
 
-  const [guide] = useStore(client.store, (state) =>
-    client.select(state, filters),
+  const guide = useStore(client.store, (state) =>
+    client.selectGuide(state, filters),
   );
 
   const step = guide && guide.steps.find((s) => !s.message.archived_at);
