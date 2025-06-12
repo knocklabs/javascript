@@ -490,7 +490,7 @@ export class KnockGuideClient {
       return undefined;
     }
 
-    const { orderResolutionDuration: timeoutDelay } = this.options;
+    const { orderResolutionDuration: timeoutDelay = 0 } = this.options;
 
     // TODO: Check if guide has ignore limit set, and if so return immediately.
     const [index, guide] = [...result][0]!;
