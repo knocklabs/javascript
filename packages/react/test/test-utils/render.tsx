@@ -6,7 +6,7 @@ import {
   KnockFeedProviderProps,
   KnockProvider,
   KnockProviderProps,
-} from "../src";
+} from "../../src";
 
 const defaultKnockProviderProps: KnockProviderProps = {
   apiKey: "apiKey",
@@ -23,18 +23,21 @@ export function renderWithProviders(
     knockProviderProps = {},
     knockFeedProviderProps = {},
     ...renderOptions
+  }: {
+    knockProviderProps?: Partial<KnockProviderProps>;
+    knockFeedProviderProps?: Partial<KnockFeedProviderProps>;
   } = {},
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
     const actualKnockProviderProps = {
       ...defaultKnockProviderProps,
       ...knockProviderProps,
-    };
+    } as KnockProviderProps;
 
     const actualKnockFeedProviderProps = {
       ...defaultKnockFeedProviderProps,
       ...knockFeedProviderProps,
-    };
+    } as KnockFeedProviderProps;
 
     return (
       <KnockProvider {...actualKnockProviderProps}>
@@ -47,5 +50,3 @@ export function renderWithProviders(
 
   return rtlRender(ui, { wrapper: Wrapper, ...renderOptions });
 }
-
-export * from "@testing-library/react";
