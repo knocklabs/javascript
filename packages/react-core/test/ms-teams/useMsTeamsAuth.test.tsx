@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
+import type UseMsTeamsAuth from "../../src/modules/ms-teams/hooks/useMsTeamsAuth";
 import { mockMsTeamsContext, mockTranslations } from "../test-utils/mocks";
 
 // -----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ vi.mock("../../src/modules/core", () => ({
 }));
 
 // Dynamically load the hook after mocks are in place
-let useMsTeamsAuth: typeof import("../../src/modules/ms-teams/hooks/useMsTeamsAuth").default;
+let useMsTeamsAuth: typeof UseMsTeamsAuth;
 
 beforeAll(async () => {
   ({ default: useMsTeamsAuth } = await import(

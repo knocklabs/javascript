@@ -1,3 +1,4 @@
+import type KnockClient from "@knocklabs/client";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,7 +12,7 @@ const buildMockKnock = (authCheckImpl: () => Promise<unknown>) => {
     msTeams: {
       authCheck: vi.fn(authCheckImpl),
     },
-  } as unknown as import("@knocklabs/client").default;
+  } as unknown as KnockClient;
 };
 
 // Mock translations so that t(key) simply returns the key back which allows us

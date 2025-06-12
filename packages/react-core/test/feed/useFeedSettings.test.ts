@@ -1,3 +1,4 @@
+import type { Feed } from "@knocklabs/client";
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
@@ -19,7 +20,7 @@ describe("useFeedSettings", () => {
 
     // Cast to align with the type that useFeedSettings expects (dist vs src artifact mismatch in mocks)
     const { result } = renderHook(() =>
-      useFeedSettings(feed as unknown as import("@knocklabs/client").Feed),
+      useFeedSettings(feed as unknown as Feed),
     );
 
     // Expect initial loading state
@@ -45,7 +46,7 @@ describe("useFeedSettings", () => {
 
     // Cast to align with the type that useFeedSettings expects (dist vs src artifact mismatch in mocks)
     const { result } = renderHook(() =>
-      useFeedSettings(feed as unknown as import("@knocklabs/client").Feed),
+      useFeedSettings(feed as unknown as Feed),
     );
 
     await waitFor(() => {

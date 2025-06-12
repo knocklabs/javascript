@@ -1,6 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type UseMsTeamsTeams from "../../src/modules/ms-teams/hooks/useMsTeamsTeams";
 import { mockMsTeamsContext, mockTranslations } from "../test-utils/mocks";
 
 // Apply shared mocks **before** loading the hook
@@ -8,7 +9,7 @@ mockMsTeamsContext();
 mockTranslations();
 
 // Dynamically load the hook after mocks are set up
-let useMsTeamsTeams: typeof import("../../src/modules/ms-teams/hooks/useMsTeamsTeams").default;
+let useMsTeamsTeams: typeof UseMsTeamsTeams;
 
 beforeAll(async () => {
   ({ default: useMsTeamsTeams } = await import(
