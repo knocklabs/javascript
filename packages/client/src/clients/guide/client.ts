@@ -26,16 +26,16 @@ const sortGuides = <T extends GuideData>(guides: T[]) => {
 };
 
 // Prefix with a special char just to be safe for any potential collision.
-const NOTIONAL_GROUP_KEY = "$notional";
+const MOCK_GROUP_KEY = "$notional";
 
 // Build a notional group to fall back on for ordering only without any limits.
-// This is for backward compatibility purposes.
-const buildNotionalGroup = (entries: GuideData[]) => {
+// This is mostly for backward compatibility purposes.
+const mockDefaultGroup = (entries: GuideData[] = []) => {
   const now = new Date();
 
   return {
     __typename: "GuideGroup",
-    key: NOTIONAL_GROUP_KEY,
+    key: MOCK_GROUP_KEY,
     display_sequence: sortGuides(entries).map((g) => g.key),
     display_interval: null,
     inserted_at: now.toISOString(),
@@ -270,11 +270,11 @@ type QueryStatus = {
 };
 
 type StoreState = {
+  location: string | undefined;
   guideGroups: GuideGroupData[];
   guides: Record<KnockGuide["key"], KnockGuide>;
   queries: Record<QueryKey, QueryStatus>;
   counter: number;
-  location: string | undefined;
 };
 
 type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
@@ -332,11 +332,11 @@ export class KnockGuideClient {
       : undefined;
 
     this.store = new Store<StoreState>({
+      location,
       guideGroups: [],
       guides: {},
       queries: {},
       counter: 0,
-      location,
     });
 
     // In server environments we might not have a socket connection.
@@ -387,7 +387,7 @@ export class KnockGuideClient {
 
       this.store.setState((state) => ({
         ...state,
-        guideGroups: groups.length > 0 ? groups : [buildNotionalGroup(entries)],
+        guideGroups: groups.length > 0 ? groups : [mockDefaultGroup(entries)],
         guides: byKey(entries.map((g) => this.localCopy(g))),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
