@@ -296,7 +296,9 @@ type ConstructorOpts = {
 
 type GroupStage = {
   isOpen: boolean;
-  ranked: Array<KnockGuide["key"]>;
+  // status: "open" | "closed" | "patch";
+  resolved?: KnockGuide["key"];
+  ordered: Array<KnockGuide["key"]>;
   timeoutId: number | null;
 };
 
@@ -446,25 +448,24 @@ export class KnockGuideClient {
     this.socketChannel = undefined;
   }
 
-  // XXX: Need to refactor this.
-  private handleSocketEvent(_payload: GuideSocketEvent) {
-    // const { event, data } = payload;
-    //
-    // switch (event) {
-    //   // case "guide.added":
-    //   //   return this.addGuide(payload);
-    //   //
-    //   // case "guide.updated":
-    //   //   return data.eligible
-    //   //     ? this.replaceOrAddGuide(payload)
-    //   //     : this.removeGuide(payload);
-    //   //
-    //   // case "guide.removed":
-    //   //   return this.removeGuide(payload);
-    //
-    //   default:
-    //     return;
-    // }
+  private handleSocketEvent(payload: GuideSocketEvent) {
+    const { event, data } = payload;
+
+    switch (event) {
+      case "guide.added":
+        return this.addGuide(payload);
+
+      case "guide.updated":
+        return data.eligible
+          ? this.replaceOrAddGuide(payload)
+          : this.removeGuide(payload);
+
+      case "guide.removed":
+        return this.removeGuide(payload);
+
+      default:
+        return;
+    }
   }
 
   setLocation(href: string) {
@@ -498,17 +499,17 @@ export class KnockGuideClient {
     if (!this.stage) {
       this.knock.log(`[Guide] Opening a new group stage with: ${guide.key}`);
 
-      const ranked = [];
-      ranked[index] = guide.key;
+      const ordered = [];
+      ordered[index] = guide.key;
       const timeoutId = setTimeout(() => this.closeGroupStage(), timeoutDelay);
-      this.stage = { isOpen: true, ranked, timeoutId };
+      this.stage = { isOpen: true, ordered, timeoutId };
 
       return undefined;
     }
 
     if (this.stage.isOpen) {
       this.knock.log(`[Guide] Adding to the current group stage: ${guide.key}`);
-      this.stage.ranked[index] = guide.key;
+      this.stage.ordered[index] = guide.key;
 
       return undefined;
     }
@@ -516,16 +517,21 @@ export class KnockGuideClient {
     // TODO: Need to check if this guide can render now based on the group's
     // display interval aka throttle limit.
 
-    return this.stage.ranked[0] === guide.key ? guide : undefined;
+    return this.stage.resolved === guide.key ? guide : undefined;
   }
+
+  // open | closed | patch
 
   private closeGroupStage() {
     if (!this.stage || !this.stage.isOpen) return;
     this.knock.log("[Guide] Closing the current group stage");
 
+    const ordered = this.stage.ordered.filter((x) => x !== undefined);
+
     this.stage = {
       isOpen: false,
-      ranked: this.stage.ranked.filter((x) => x !== undefined),
+      ordered,
+      resolved: ordered[0],
       timeoutId: null,
     };
 
@@ -697,32 +703,32 @@ export class KnockGuideClient {
     return queryStr ? `${basePath}?${queryStr}` : basePath;
   }
 
-  // XXX: Need to refactor this.
   private setStepMessageAttrs(
-    _guideKey: string,
-    _stepRef: string,
-    _attrs: Partial<StepMessageState>,
+    guideKey: string,
+    stepRef: string,
+    attrs: Partial<StepMessageState>,
   ) {
     let updatedStep: KnockGuideStep | undefined;
 
-    // this.store.setState((state) => {
-    //   const guides = state.guides.map((guide) => {
-    //     if (guide.key !== guideKey) return guide;
-    //
-    //     const steps = guide.steps.map((step) => {
-    //       if (step.ref !== stepRef) return step;
-    //
-    //       // Mutate in place and maintain the same obj ref so to make it easier
-    //       // to use in hook deps.
-    //       step.message = { ...step.message, ...attrs };
-    //       updatedStep = step;
-    //
-    //       return step;
-    //     });
-    //     return { ...guide, steps };
-    //   });
-    //   return { ...state, guides };
-    // });
+    this.store.setState((state) => {
+      const guide = state.guides[guideKey];
+      if (!guide) return state;
+
+      const steps = guide.steps.map((step) => {
+        if (step.ref !== stepRef) return step;
+
+        // Mutate in place and maintain the same obj ref so to make it easier
+        // to use in hook deps.
+        step.message = { ...step.message, ...attrs };
+        updatedStep = step;
+
+        return step;
+      });
+      guide.steps = steps;
+
+      const guides = { ...state.guides, [guide.key]: guide };
+      return { ...state, guides };
+    });
 
     return updatedStep;
   }
@@ -740,40 +746,69 @@ export class KnockGuideClient {
     };
   }
 
-  // XXX: Need to refactor this.
-  // private addGuide({ data }: GuideAddedEvent) {
-  //   const guide = this.localCopy(data.guide);
-  //
-  //   this.store.setState((state) => {
-  //     return { ...state, guides: sortGuides([...state.guides, guide]) };
-  //   });
-  // }
-  //
-  // private replaceOrAddGuide({ data }: GuideUpdatedEvent) {
-  //   const guide = this.localCopy(data.guide);
-  //
-  //   this.store.setState((state) => {
-  //     let replaced = false;
-  //
-  //     const guides = state.guides.map((g) => {
-  //       if (g.key !== guide.key) return g;
-  //       replaced = true;
-  //       return guide;
-  //     });
-  //
-  //     return {
-  //       ...state,
-  //       guides: replaced ? sortGuides(guides) : sortGuides([...guides, guide]),
-  //     };
-  //   });
-  // }
-  //
-  // private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
-  //   this.store.setState((state) => {
-  //     const guides = state.guides.filter((g) => g.key !== data.guide.key);
-  //     return { ...state, guides };
-  //   });
-  // }
+  // TODO: Probably need to 1) receive the updated group in the payload and
+  // update in the state 2) then reset the stage to recalculate.
+  private addGuide({ data }: GuideAddedEvent) {
+    const guide = this.localCopy(data.guide);
+
+    this.store.setState((state) => {
+      // Currently we only support one default global group, so append to the
+      // back of the group queue.
+      const defaultGroup = state.guideGroups[0] || mockDefaultGroup();
+
+      const updatedGroup = {
+        ...defaultGroup,
+        display_sequence: [...defaultGroup.display_sequence, guide.key],
+      };
+
+      return {
+        ...state,
+        guides: { ...state.guides, [guide.key]: guide },
+        guideGroups: [updatedGroup],
+      };
+    });
+  }
+
+  // TODO: Same here as above, if adding.
+  private replaceOrAddGuide({ data }: GuideUpdatedEvent) {
+    const guide = this.localCopy(data.guide);
+
+    this.store.setState((state) => {
+      // Currently we only support one default global group.
+      const defaultGroup = state.guideGroups[0] || mockDefaultGroup();
+
+      const included = defaultGroup.display_sequence.includes(guide.key);
+
+      const updatedGroup = {
+        ...defaultGroup,
+        display_sequence: included
+          ? defaultGroup.display_sequence
+          : [...defaultGroup.display_sequence, guide.key],
+      };
+
+      return {
+        ...state,
+        guides: { ...state.guides, [guide.key]: guide },
+        guideGroups: [updatedGroup],
+      };
+    });
+  }
+
+  private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
+    if (this.stage) {
+      const updated = this.stage.ordered.filter(key => key !== data.guide.key)
+      this.stage.ordered = updated;
+    }
+
+    this.store.setState((state) => {
+      const { [data.guide.key]: _, ...rest } = state.guides;
+
+      return {
+        ...state,
+        guides: rest,
+      };
+    });
+  }
 
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
