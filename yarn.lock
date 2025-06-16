@@ -4245,7 +4245,7 @@ __metadata:
     "@react-native-firebase/messaging": "npm:^22.2.0"
     "@react-native/babel-preset": "npm:0.79.1"
     "@react-native/metro-config": "npm:0.79.2"
-    "@react-native/typescript-config": "npm:0.78.1"
+    "@react-native/typescript-config": "npm:0.80.0"
     "@types/react": "npm:^18.3.6"
     "@types/react-test-renderer": "npm:^19.0.0"
     babel-jest: "npm:^29.6.3"
@@ -6083,10 +6083,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/typescript-config@npm:0.78.1":
-  version: 0.78.1
-  resolution: "@react-native/typescript-config@npm:0.78.1"
-  checksum: 10c0/91fa052471b713ea6c83186859be370a3b88ce601a83084a2daacd2023cf97fb0d5e6203c89d0daf795f9598508adecaa739aa8a4893cd010b7c6df2fadb9d56
+"@react-native/typescript-config@npm:0.80.0":
+  version: 0.80.0
+  resolution: "@react-native/typescript-config@npm:0.80.0"
+  checksum: 10c0/66799ab4b6adf0d46c4819edcdd6dc628ede76405354d7d29d7ef92d650f3b07135d5c4c2268ef9e108539fdcaf3544480b4c62580c411ae7feb125a1e7ff3d4
   languageName: node
   linkType: hard
 
