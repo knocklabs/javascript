@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/eslint-config",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "files": [
     "library.js",
     "next.js",

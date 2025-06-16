@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.5
+
+### Patch Changes
+
+- 5de6b57: chore(deps): bump eslint-config-turbo from 2.3.3 to 2.5.4
+
 ## 0.0.4
 
 ### Patch Changes
