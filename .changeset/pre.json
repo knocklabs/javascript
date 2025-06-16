@@ -1,0 +1,25 @@
+{
+  "mode": "pre",
+  "tag": "canary",
+  "initialVersions": {
+    "client-example": "0.3.11",
+    "@knocklabs/expo-example": "0.1.34",
+    "guide-example": "0.0.16",
+    "ms-teams-connect-example": "0.0.3",
+    "nextjs-app-dir-example": "0.0.2",
+    "nextjs-example": "1.1.18",
+    "@knocklabs/react-native-example": "1.4.34",
+    "slack-connect-example": "0.3.2",
+    "slack-kit-example": "0.4.0",
+    "@knocklabs/client": "0.14.9",
+    "@knocklabs/eslint-config": "0.0.4",
+    "@knocklabs/expo": "0.3.21",
+    "@knocklabs/prettier-config": "0.0.1",
+    "@knocklabs/react": "0.7.15",
+    "@knocklabs/react-core": "0.6.13",
+    "@knocklabs/react-native": "0.6.21",
+    "@knocklabs/types": "0.1.5",
+    "@knocklabs/typescript-config": "0.0.2"
+  },
+  "changesets": []
+}
