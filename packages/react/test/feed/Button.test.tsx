@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import { Button } from "../../src";
-import { axe, expectToHaveNoViolations } from "../axe";
 import { renderWithProviders } from "../test-utils";
+import { axe, expectToHaveNoViolations } from "../test-utils/axe";
 
 describe("Button", () => {
   test("renders as expected", () => {

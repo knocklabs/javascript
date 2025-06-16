@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import { EmptyFeed } from "../../src";
-import { axe, expectToHaveNoViolations } from "../axe";
 import { renderWithProviders } from "../test-utils";
+import { axe, expectToHaveNoViolations } from "../test-utils/axe";
 
 describe("EmptyFeed", () => {
   test("renders as expected", () => {
