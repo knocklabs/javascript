@@ -4098,7 +4098,7 @@ __metadata:
     "@vercel/style-guide": "npm:^6.0.0"
     eslint: "npm:^8.56.0"
     eslint-config-prettier: "npm:^10.0.1"
-    eslint-config-turbo: "npm:2.3.3"
+    eslint-config-turbo: "npm:2.5.4"
     eslint-plugin-only-warn: "npm:^1.1.0"
     typescript: "npm:^5.8.3"
   languageName: unknown
@@ -11040,14 +11040,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-turbo@npm:2.3.3":
-  version: 2.3.3
-  resolution: "eslint-config-turbo@npm:2.3.3"
+"eslint-config-turbo@npm:2.5.4":
+  version: 2.5.4
+  resolution: "eslint-config-turbo@npm:2.5.4"
   dependencies:
-    eslint-plugin-turbo: "npm:2.3.3"
+    eslint-plugin-turbo: "npm:2.5.4"
   peerDependencies:
     eslint: ">6.6.0"
-  checksum: 10c0/35f0e07e96eebaf7b65cfbaec28225004d78cab96e70d488d24c50219f9ddcbb2f57854c06818aaf4743501ee7c67723cf9e464a2ff177bd6aa72f4db9938349
+    turbo: ">2.0.0"
+  checksum: 10c0/c0f542cc3aba70246d41d67439c0768bb38bac9ffa13e8ecad20efe3bca189d2cbc26ad9bb3065929168e0d7d4cecd7dad990a27c46829a23014d5d863ea06f3
   languageName: node
   linkType: hard
 
@@ -11289,14 +11290,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-turbo@npm:2.3.3":
-  version: 2.3.3
-  resolution: "eslint-plugin-turbo@npm:2.3.3"
+"eslint-plugin-turbo@npm:2.5.4":
+  version: 2.5.4
+  resolution: "eslint-plugin-turbo@npm:2.5.4"
   dependencies:
     dotenv: "npm:16.0.3"
   peerDependencies:
     eslint: ">6.6.0"
-  checksum: 10c0/dcad30a72cfb391b44a2f14f9d75b613330a315e4a1037a0cb16e36941dc8d4af1a86caa5c1d7ff8a9bbeea84fb1a5998c18690df0ada9afc416754410b4f18f
+    turbo: ">2.0.0"
+  checksum: 10c0/9b23f5a1e8dac3a835d30fbf22f56ed6ab0996d11b9170c8154bbd397784099c8f48a5b7f9c088b26201b6d7b78959ca2f4282cc7b3b78e3d2693406bf899f52
   languageName: node
   linkType: hard
 
