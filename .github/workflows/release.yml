@@ -3,22 +3,46 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - main # Stable releases
+      - canary # Canary (preview) releases
+      - rc # Release candidate cycle
 
 concurrency:
   group: publish-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout the repository with full history and tag data so that
+      # Changesets can generate changelogs and tag new releases appropriately.
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           fetch-tags: true
           fetch-depth: 0
+          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
 
+      # Determine the release type based on the current branch.
+      # Sets the output `release-type` to 'stable', 'canary', or 'rc'.
+      - name: Determine release type
+        id: release-type
+        run: |
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            echo "release-type=stable" >> "$GITHUB_OUTPUT"
+          elif [[ "$GITHUB_REF" == "refs/heads/canary" ]]; then
+            echo "release-type=canary" >> "$GITHUB_OUTPUT"
+          elif [[ "$GITHUB_REF" == "refs/heads/rc" ]]; then
+            echo "release-type=rc" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported branch $GITHUB_REF"; exit 1
+          fi
+
+      # Set up Node.js using the version specified in package.json,
+      # and cache Yarn dependencies for faster installs.
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
@@ -26,10 +50,12 @@ jobs:
           node-version-file: "package.json"
           cache: "yarn"
 
+      # Install dependencies using Yarn with zero tolerance for lockfile drift.
       - name: Install Dependencies
         run: yarn --immutable
 
-      - name: Setup .yarnrc
+      # Configure Yarn to authenticate with the npm registry using a token.
+      - name: Set NPM Auth
         run: |
           yarn config set npmRegistryServer "https://registry.npmjs.org"
           yarn config set npmAlwaysAuth true
@@ -37,12 +63,32 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
+      # Verify that the current branch is in the correct Changeset prerelease mode.
+      # Prevents accidentally publishing a prerelease with the wrong npm tag.
+      - name: Verify pre.json for pre-release branches
+        if: steps.release-type.outputs.release-type != 'stable'
+        run: |
+          tag=${{ steps.release-type.outputs.release-type }}
+          test -f .changeset/pre.json && grep "\"tag\": \"$tag\"" .changeset/pre.json \
+            || (echo "Expected .changeset/pre.json with tag=$tag" && exit 1)
+
+      # Prevent a stable release from being published if the repository
+      # is still in Changesets prerelease mode (canary or rc).
+      - name: Guard against accidental prerelease on main
+        if: steps.release-type.outputs.release-type == 'stable'
+        run: |
+          if [ -f .changeset/pre.json ]; then
+            echo "::error::Cannot release from main while in prerelease mode"
+            exit 1
+          fi
+
+      # Create a versioning PR if changeset files exist, or publish packages
+      # to npm if version bump commits have already been merged into the branch.
+      - name: Create release PR or publish
         uses: changesets/action@v1
         with:
-          commit: "chore(repo): version packages"
-          title: "chore(repo): version packages"
+          commit: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
+          title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           version: yarn changeset version
           publish: yarn release
         env:
