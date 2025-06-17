@@ -25,8 +25,8 @@ const sortGuides = <T extends GuideData>(guides: T[]) => {
   );
 };
 
-// Prefix with a special char just to be safe for any potential collision.
-const MOCK_GROUP_KEY = "$notional";
+// Prefixed with a special char to distinguish from the actual default group.
+const MOCK_GROUP_KEY = "$default";
 
 // Build a notional group to fall back on for ordering only without any limits.
 // This is mostly for backward compatibility purposes.
@@ -243,12 +243,12 @@ type SocketEventPayload<E extends SocketEventType, D> = {
 
 type GuideAddedEvent = SocketEventPayload<
   "guide.added",
-  { guide: GuideData; eligible: true }
+  { guide: GuideData; guide_groups: GuideGroupData[]; eligible: true }
 >;
 
 type GuideUpdatedEvent = SocketEventPayload<
   "guide.updated",
-  { guide: GuideData; eligible: boolean }
+  { guide: GuideData; guide_groups: GuideGroupData[]; eligible: boolean }
 >;
 
 type GuideRemovedEvent = SocketEventPayload<
@@ -295,10 +295,9 @@ type ConstructorOpts = {
 };
 
 type GroupStage = {
-  isOpen: boolean;
-  // status: "open" | "closed" | "patch";
-  resolved?: KnockGuide["key"];
+  status: "open" | "closed" | "patch";
   ordered: Array<KnockGuide["key"]>;
+  resolved?: KnockGuide["key"];
   timeoutId: number | null;
 };
 
@@ -491,7 +490,7 @@ export class KnockGuideClient {
       return undefined;
     }
 
-    const { orderResolutionDuration: timeoutDelay = 0 } = this.options;
+    const { orderResolutionDuration: delay = 0 } = this.options;
 
     // TODO: Check if guide has ignore limit set, and if so return immediately.
     const [index, guide] = [...result][0]!;
@@ -501,37 +500,41 @@ export class KnockGuideClient {
 
       const ordered = [];
       ordered[index] = guide.key;
-      const timeoutId = setTimeout(() => this.closeGroupStage(), timeoutDelay);
-      this.stage = { isOpen: true, ordered, timeoutId };
-
-      return undefined;
-    }
-
-    if (this.stage.isOpen) {
-      this.knock.log(`[Guide] Adding to the current group stage: ${guide.key}`);
-      this.stage.ordered[index] = guide.key;
+      const timeoutId = setTimeout(() => this.closeGroupStage(), delay);
+      this.stage = { status: "open", ordered, timeoutId };
 
       return undefined;
     }
 
     // TODO: Need to check if this guide can render now based on the group's
-    // display interval aka throttle limit.
+    // throttle limit.
+    switch (this.stage.status) {
+      case "open": {
+        this.knock.log(`[Guide] Addng to the group stage: ${guide.key}`);
+        this.stage.ordered[index] = guide.key;
+        return undefined;
+      }
 
-    return this.stage.resolved === guide.key ? guide : undefined;
+      case "patch": {
+        this.knock.log(`[Guide] Patching the group stage: ${guide.key}`);
+        this.stage.ordered[index] = guide.key;
+        return this.stage.resolved === guide.key ? guide : undefined;
+      }
+
+      case "closed": {
+        return this.stage.resolved === guide.key ? guide : undefined;
+      }
+    }
   }
 
-  // open | closed | patch
-
   private closeGroupStage() {
-    if (!this.stage || !this.stage.isOpen) return;
-    this.knock.log("[Guide] Closing the current group stage");
-
-    const ordered = this.stage.ordered.filter((x) => x !== undefined);
+    if (!this.stage || this.stage.status === "closed") return;
+    this.knock.log("[Guide] Closing the group stage");
 
     this.stage = {
-      isOpen: false,
-      ordered,
-      resolved: ordered[0],
+      ...this.stage,
+      status: "closed",
+      resolved: this.stage.ordered.find((x) => x !== undefined),
       timeoutId: null,
     };
 
@@ -746,68 +749,88 @@ export class KnockGuideClient {
     };
   }
 
-  // TODO: Probably need to 1) receive the updated group in the payload and
-  // update in the state 2) then reset the stage to recalculate.
+  // XXX: Test this.
+
   private addGuide({ data }: GuideAddedEvent) {
     const guide = this.localCopy(data.guide);
 
+    this.maybeSetStageToPatch();
+
     this.store.setState((state) => {
-      // Currently we only support one default global group, so append to the
-      // back of the group queue.
-      const defaultGroup = state.guideGroups[0] || mockDefaultGroup();
+      const guides = { ...state.guides, [guide.key]: guide };
+
+      // Expect the latest default group in the event payload.
+      if (data.guide_groups[0]) {
+        return {
+          ...state,
+          guides,
+          guideGroups: data.guide_groups,
+        };
+      }
+
+      // Just in case only for safety. We can remove once we backfill all
+      // accounts with a default global group.
+      const defaultGroup =
+        state.guideGroups[0] || mockDefaultGroup(Object.values(state.guides));
 
       const updatedGroup = {
         ...defaultGroup,
         display_sequence: [...defaultGroup.display_sequence, guide.key],
       };
 
-      return {
-        ...state,
-        guides: { ...state.guides, [guide.key]: guide },
-        guideGroups: [updatedGroup],
-      };
+      return { ...state, guides, guideGroups: [updatedGroup] };
     });
   }
 
-  // TODO: Same here as above, if adding.
   private replaceOrAddGuide({ data }: GuideUpdatedEvent) {
     const guide = this.localCopy(data.guide);
 
+    this.maybeSetStageToPatch();
+
     this.store.setState((state) => {
-      // Currently we only support one default global group.
-      const defaultGroup = state.guideGroups[0] || mockDefaultGroup();
+      const isExistingGuide = !!state.guides[guide.key];
+      const guides = { ...state.guides, [guide.key]: guide };
 
-      const included = defaultGroup.display_sequence.includes(guide.key);
+      if (data.guide_groups[0]) {
+        return { ...state, guides, guideGroups: data.guide_groups };
+      }
 
-      const updatedGroup = {
-        ...defaultGroup,
-        display_sequence: included
-          ? defaultGroup.display_sequence
-          : [...defaultGroup.display_sequence, guide.key],
-      };
+      const defaultGroup =
+        state.guideGroups[0] || mockDefaultGroup(Object.values(state.guides));
 
-      return {
-        ...state,
-        guides: { ...state.guides, [guide.key]: guide },
-        guideGroups: [updatedGroup],
-      };
+      if (!isExistingGuide) {
+        const updatedGroup = {
+          ...defaultGroup,
+          display_sequence: [...defaultGroup.display_sequence, guide.key],
+        };
+        return { ...state, guides, guideGroups: [updatedGroup] };
+      }
+
+      return { ...state, guides };
     });
   }
 
   private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
-    if (this.stage) {
-      const updated = this.stage.ordered.filter(key => key !== data.guide.key)
-      this.stage.ordered = updated;
-    }
+    this.maybeSetStageToPatch();
 
     this.store.setState((state) => {
       const { [data.guide.key]: _, ...rest } = state.guides;
-
-      return {
-        ...state,
-        guides: rest,
-      };
+      return { ...state, guides: rest };
     });
+  }
+
+  private maybeSetStageToPatch() {
+    if (this.stage?.status === "closed") {
+      const { orderResolutionDuration: delay = 0 } = this.options;
+      const timeoutId = setTimeout(() => this.closeGroupStage(), delay);
+
+      this.stage = {
+        ...this.stage,
+        status: "patch",
+        ordered: [],
+        timeoutId,
+      };
+    }
   }
 
   // Define as an arrow func property to always bind this to the class instance.
