@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@knocklabs/expo": "workspace:^",
-    "expo": ">=52.0.35",
+    "expo": ">=53.0.11",
     "expo-constants": ">=17.1.5",
     "expo-device": ">=7.0.3",
     "expo-notifications": ">=0.29.13",
