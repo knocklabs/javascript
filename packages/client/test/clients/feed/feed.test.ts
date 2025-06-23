@@ -497,8 +497,8 @@ describe("Feed", () => {
         );
 
         // Set initial state with pagination
-        feed.store.setState({
-          ...feed.store.getState(),
+        feed.store.setState((state) => ({
+          ...state,
           metadata: {
             total_count: 5,
             unread_count: 1,
@@ -509,7 +509,7 @@ describe("Feed", () => {
             after: "cursor_123",
             page_size: 50,
           },
-        });
+        }));
 
         await feed.fetchNextPage();
 

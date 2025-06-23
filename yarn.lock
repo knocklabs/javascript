@@ -4063,6 +4063,7 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.27.0"
     "@babel/runtime": "npm:^7.27.1"
     "@knocklabs/types": "workspace:^"
+    "@tanstack/react-store": "npm:^0.7.1"
     "@tanstack/store": "npm:0.6.0"
     "@types/jsonwebtoken": "npm:^9.0.9"
     "@types/phoenix": "npm:^1.6.6"
@@ -4085,7 +4086,6 @@ __metadata:
     urlpattern-polyfill: "npm:^10.0.0"
     vite: "npm:^5.4.19"
     vitest: "npm:^3.1.1"
-    zustand: "npm:^4.5.6"
   languageName: unknown
   linkType: soft
 
@@ -6862,10 +6862,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-store@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "@tanstack/react-store@npm:0.7.1"
+  dependencies:
+    "@tanstack/store": "npm:0.7.1"
+    use-sync-external-store: "npm:^1.5.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/50a64f615f448fd323eb968237c91faae1a3c3cb0ed4b52d3b6a620723dab10437ae99d94bd9e1ff03bd3ad1d4d75cadc5fee042ab6d9b3c47f5972716cac680
+  languageName: node
+  linkType: hard
+
 "@tanstack/store@npm:0.6.0":
   version: 0.6.0
   resolution: "@tanstack/store@npm:0.6.0"
   checksum: 10c0/72fbd772b757b53885d628ed486e00d75d16cac2002111bf0fed18382f62f4d3bd936e5c5fbc053af5752910d8c8b2aaec6de48cacc2f17c9fefc8929c153840
+  languageName: node
+  linkType: hard
+
+"@tanstack/store@npm:0.7.1":
+  version: 0.7.1
+  resolution: "@tanstack/store@npm:0.7.1"
+  checksum: 10c0/bc1ebf0e8ced2717ec89b7bfac94da436fd23b0ea485b7805b594bee6c6870d67e1184efd5f140cd8d64d9192ee09adad155abea9a2f5bc1ba96f21645299cd8
   languageName: node
   linkType: hard
 
@@ -19600,7 +19620,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.2.2, use-sync-external-store@npm:^1.4.0":
+"use-sync-external-store@npm:^1.2.2, use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0":
   version: 1.5.0
   resolution: "use-sync-external-store@npm:1.5.0"
   peerDependencies:

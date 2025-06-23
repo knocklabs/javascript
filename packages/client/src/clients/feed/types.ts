@@ -19,7 +19,7 @@ export interface FeedStoreState {
   setResult: (response: FeedResponse, opts?: StoreFeedResultOptions) => void;
   setMetadata: (metadata: FeedMetadata) => void;
   setNetworkStatus: (networkStatus: NetworkStatus) => void;
-  setItemAttrs: (itemIds: string[], attrs: object) => void;
+  setItemAttrs: (itemIds: string[], attrs: Record<string, unknown>) => void;
   resetStore: (metadata?: FeedMetadata) => void;
 }
 

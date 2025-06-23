@@ -1,7 +1,7 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
 import { nanoid } from "nanoid";
-import type { StoreApi } from "zustand";
+import type { FeedStore } from "./store";
 
 import { isValidUuid } from "../../helpers";
 import Knock from "../../knock";
@@ -60,7 +60,7 @@ class Feed {
   private visibilityChangeListenerConnected: boolean = false;
 
   // The raw store instance, used for binding in React and other environments
-  public store: StoreApi<FeedStoreState>;
+  public store: FeedStore;
 
   constructor(
     readonly knock: Knock,
@@ -624,7 +624,7 @@ class Feed {
   private optimisticallyPerformStatusUpdate(
     itemOrItems: FeedItemOrItems,
     type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
-    attrs: object,
+    attrs: Record<string, unknown>,
     badgeCountAttr?: "unread_count" | "unseen_count",
   ) {
     const state = this.store.getState();
