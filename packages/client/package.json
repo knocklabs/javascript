@@ -70,7 +70,7 @@
     "@babel/runtime": "^7.27.1",
     "@knocklabs/types": "workspace:^",
     "@tanstack/react-store": "^0.7.1",
-    "@tanstack/store": "0.6.0",
+    "@tanstack/store": "^0.7.1",
     "@types/phoenix": "^1.6.6",
     "axios": "^1.9.0",
     "axios-retry": "^4.5.0",

@@ -1,22 +1,20 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
-import { type StoreApi, type UseBoundStore, useStore } from "zustand";
+import { type Store, useStore } from "@tanstack/react-store";
 
 export type Selector<T> = (state: FeedStoreState) => T;
 
 /**
- * Access a Bounded Store instance by converting our vanilla store to a UseBoundStore
- * https://zustand.docs.pmnd.rs/guides/typescript#bounded-usestore-hook-for-vanilla-stores
- * Allow passing a selector down from useCreateNotificationStore OR useNotificationStore
- * We'll favor the the one passed later outside of useCreateNotificationStore instantiation
+ * Create a hook factory that provides access to the TanStack Store with optional selector support.
+ * This pattern allows for flexible store access with or without selectors while maintaining
+ * type safety. The selector can be passed either to useCreateNotificationStore or
+ * useNotificationStore, with the latter taking precedence.
  */
-function useCreateNotificationStore<T>(
-  feedClient: Feed,
-): UseBoundStore<StoreApi<FeedStoreState>> {
-  // Keep selector optional for external use
-  // useStore requires a selector so we'll pass in a default one when not provided
-  const useBoundedStore = (selector?: Selector<T>) =>
-    useStore(feedClient.store, selector ?? ((state) => state as T));
-  return useBoundedStore as UseBoundStore<StoreApi<FeedStoreState>>;
+function useCreateNotificationStore(feedClient: Feed) {
+  return <T = FeedStoreState>(selector?: Selector<T>) => {
+    // Keep selector optional for external use
+    // useStore requires a selector so we'll pass in a default one when not provided
+    return useStore(feedClient.store, selector ?? ((state) => state as T));
+  };
 }
 
 /**

@@ -1,4 +1,4 @@
-import { GenericData, PageInfo } from "@knocklabs/types";
+import { GenericData } from "@knocklabs/types";
 import { Store } from "@tanstack/store";
 
 import { NetworkStatus } from "../../networkStatus";
@@ -38,26 +38,10 @@ const initialStoreState: FeedStoreState = {
   setNetworkStatus: () => {},
   resetStore: () => {},
   setItemAttrs: () => {},
-} 
+};
 
-
-// We extend the Store class to add a getState method
-// as to not create breaking changes from the previous
-// implementation that utilized zustand.
-export class FeedStore extends Store<FeedStoreState> {
-  constructor(initialState: FeedStoreState) {
-    super(initialState);
-  }
-
-  getState() {
-    return this.state
-  }
-}
-
-
-
-export default function createStore(){
-  const store = new FeedStore(initialStoreState)
+export default function createStore() {
+  const store = new Store(initialStoreState);
 
   store.setState((state) => ({
     ...state,
@@ -77,14 +61,11 @@ export default function createStore(){
     ) =>
       store.setState((state) => {
         // We resort the list on set, so concating everything is fine (if a bit suboptimal)
-        const items =
-          options.shouldAppend 
-            ? processItems(
-                state.items.concat(entries as FeedItem<GenericData>[]),
-              )
-            : entries;
+        const items = options.shouldAppend
+          ? processItems(state.items.concat(entries as FeedItem<GenericData>[]))
+          : entries;
 
-        console.log("HERE SHOULD SET PAGE", options)
+        console.log("HERE SHOULD SET PAGE", options);
 
         return {
           ...state,

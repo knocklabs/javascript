@@ -11,7 +11,7 @@ describe("feed store", () => {
   describe("createStore", () => {
     test("initializes with default state", () => {
       const store = createStore();
-      const state = store.getState();
+      const state = store.state;
 
       // Check only the data properties, not the methods
       expect(state.items).toEqual([]);
@@ -41,9 +41,9 @@ describe("feed store", () => {
     test("sets network status and loading state", () => {
       const store = createStore();
 
-      store.getState().setNetworkStatus(NetworkStatus.loading);
+      store.state.setNetworkStatus(NetworkStatus.loading);
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.networkStatus).toBe(NetworkStatus.loading);
       expect(state.loading).toBe(true);
     });
@@ -51,9 +51,9 @@ describe("feed store", () => {
     test("sets loading to false for non-loading states", () => {
       const store = createStore();
 
-      store.getState().setNetworkStatus(NetworkStatus.ready);
+      store.state.setNetworkStatus(NetworkStatus.ready);
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.networkStatus).toBe(NetworkStatus.ready);
       expect(state.loading).toBe(false);
     });
@@ -61,9 +61,9 @@ describe("feed store", () => {
     test("handles error status", () => {
       const store = createStore();
 
-      store.getState().setNetworkStatus(NetworkStatus.error);
+      store.state.setNetworkStatus(NetworkStatus.error);
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.networkStatus).toBe(NetworkStatus.error);
       expect(state.loading).toBe(false);
     });
@@ -128,13 +128,13 @@ describe("feed store", () => {
     test("sets result with default options", () => {
       const store = createStore();
 
-      store.getState().setResult({
+      store.state.setResult({
         entries: mockItems,
         meta: mockMetadata,
         page_info: mockPageInfo,
       });
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items).toHaveLength(2);
       expect(state.items[0]!.id).toBe("1"); // Should be sorted by inserted_at desc
       expect(state.items[1]!.id).toBe("2");
@@ -148,14 +148,14 @@ describe("feed store", () => {
       const store = createStore();
 
       // Set initial items
-      store.getState().setResult({
+      store.state.setResult({
         entries: [mockItems[0]!],
         meta: mockMetadata,
         page_info: mockPageInfo,
       });
 
       // Append more items
-      store.getState().setResult(
+      store.state.setResult(
         {
           entries: [mockItems[1]!],
           meta: mockMetadata,
@@ -164,7 +164,7 @@ describe("feed store", () => {
         { shouldAppend: true, shouldSetPage: true },
       );
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items).toHaveLength(2);
       expect(state.items[0]!.id).toBe("1"); // Should be sorted
       expect(state.items[1]!.id).toBe("2");
@@ -173,9 +173,9 @@ describe("feed store", () => {
     test("does not set page info when shouldSetPage is false", () => {
       const store = createStore();
 
-      const originalPageInfo = store.getState().pageInfo;
+      const originalPageInfo = store.state.pageInfo;
 
-      store.getState().setResult(
+      store.state.setResult(
         {
           entries: mockItems,
           meta: mockMetadata,
@@ -184,7 +184,7 @@ describe("feed store", () => {
         { shouldAppend: false, shouldSetPage: false },
       );
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.pageInfo).toEqual(originalPageInfo);
       expect(state.items).toHaveLength(2);
     });
@@ -193,14 +193,14 @@ describe("feed store", () => {
       const store = createStore();
 
       // Set initial items
-      store.getState().setResult({
+      store.state.setResult({
         entries: mockItems,
         meta: mockMetadata,
         page_info: mockPageInfo,
       });
 
       // Append duplicate item
-      store.getState().setResult(
+      store.state.setResult(
         {
           entries: [mockItems[0]!], // Duplicate item
           meta: mockMetadata,
@@ -209,7 +209,7 @@ describe("feed store", () => {
         { shouldAppend: true, shouldSetPage: true },
       );
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items).toHaveLength(2); // Should deduplicate
     });
   });
@@ -224,9 +224,9 @@ describe("feed store", () => {
         unseen_count: 2,
       };
 
-      store.getState().setMetadata(newMetadata);
+      store.state.setMetadata(newMetadata);
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.metadata).toEqual(newMetadata);
     });
   });
@@ -236,7 +236,7 @@ describe("feed store", () => {
       const store = createStore();
 
       // Modify the store first
-      store.getState().setResult({
+      store.state.setResult({
         entries: [
           {
             id: "test",
@@ -263,9 +263,9 @@ describe("feed store", () => {
         page_info: { before: "test", after: "test", page_size: 10 },
       });
 
-      store.getState().resetStore();
+      store.state.resetStore();
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items).toEqual([]);
       expect(state.metadata).toEqual({
         total_count: 0,
@@ -288,9 +288,9 @@ describe("feed store", () => {
         unseen_count: 3,
       };
 
-      store.getState().resetStore(customMetadata);
+      store.state.resetStore(customMetadata);
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items).toEqual([]);
       expect(state.metadata).toEqual(customMetadata);
     });
@@ -344,7 +344,7 @@ describe("feed store", () => {
       ];
 
       // Set initial items
-      store.getState().setResult({
+      store.state.setResult({
         entries: mockItems,
         meta: { total_count: 2, unread_count: 2, unseen_count: 2 },
         page_info: { before: null, after: null, page_size: 50 },
@@ -352,9 +352,9 @@ describe("feed store", () => {
 
       // Update attributes for specific items
       const now = new Date().toISOString();
-      store.getState().setItemAttrs(["1"], { read_at: now, seen_at: now });
+      store.state.setItemAttrs(["1"], { read_at: now, seen_at: now });
 
-      const state = store.getState();
+      const state = store.state;
       const updatedItem = state.items.find((item) => item.id === "1");
       const unchangedItem = state.items.find((item) => item.id === "2");
 
@@ -411,7 +411,7 @@ describe("feed store", () => {
       ];
 
       // Set initial items
-      store.getState().setResult({
+      store.state.setResult({
         entries: mockItems,
         meta: { total_count: 2, unread_count: 2, unseen_count: 2 },
         page_info: { before: null, after: null, page_size: 50 },
@@ -419,9 +419,9 @@ describe("feed store", () => {
 
       // Update attributes for multiple items
       const now = new Date().toISOString();
-      store.getState().setItemAttrs(["1", "2"], { archived_at: now });
+      store.state.setItemAttrs(["1", "2"], { archived_at: now });
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items[0]!.archived_at).toBe(now);
       expect(state.items[1]!.archived_at).toBe(now);
     });
@@ -451,7 +451,7 @@ describe("feed store", () => {
       };
 
       // Set initial item
-      store.getState().setResult({
+      store.state.setResult({
         entries: [mockItem],
         meta: { total_count: 1, unread_count: 1, unseen_count: 1 },
         page_info: { before: null, after: null, page_size: 50 },
@@ -459,9 +459,9 @@ describe("feed store", () => {
 
       // Try to update non-existent item
       const now = new Date().toISOString();
-      store.getState().setItemAttrs(["nonexistent"], { read_at: now });
+      store.state.setItemAttrs(["nonexistent"], { read_at: now });
 
-      const state = store.getState();
+      const state = store.state;
       expect(state.items[0]!.read_at).toBeNull(); // Should remain unchanged
     });
   });
