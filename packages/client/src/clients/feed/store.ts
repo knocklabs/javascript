@@ -1,5 +1,5 @@
 import { GenericData } from "@knocklabs/types";
-import { Listener, ListenerValue, Store } from "@tanstack/store";
+import { Store } from "@tanstack/store";
 
 import { NetworkStatus } from "../../networkStatus";
 
