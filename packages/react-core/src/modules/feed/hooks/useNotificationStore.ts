@@ -14,7 +14,10 @@ function useCreateNotificationStore(feedClient: Feed) {
     // Keep selector optional for external use
     // useStore requires a selector so we'll pass in a default one when not provided
     // eslint-disable-next-line
-    return useStore(feedClient.store, selector ?? ((state) => state as T));
+    return useStore(
+      feedClient.store.store,
+      selector ?? ((state) => state as T),
+    );
   };
 }
 

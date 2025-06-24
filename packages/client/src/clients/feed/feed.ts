@@ -1,5 +1,4 @@
 import { GenericData } from "@knocklabs/types";
-import { Store } from "@tanstack/react-store";
 import EventEmitter from "eventemitter2";
 import { nanoid } from "nanoid";
 
@@ -24,7 +23,7 @@ import {
   SocketEventPayload,
   SocketEventType,
 } from "./socket-manager";
-import createStore from "./store";
+import createStore, { FeedStore } from "./store";
 import {
   BindableFeedEvent,
   FeedEvent,
@@ -33,7 +32,6 @@ import {
   FeedItemOrItems,
   FeedMessagesReceivedPayload,
   FeedRealTimeCallback,
-  FeedStoreState,
 } from "./types";
 import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
@@ -60,7 +58,7 @@ class Feed {
   private visibilityChangeListenerConnected: boolean = false;
 
   // The raw store instance, used for binding in React and other environments
-  public store: Store<FeedStoreState>;
+  public store: FeedStore;
 
   constructor(
     readonly knock: Knock,
@@ -174,7 +172,7 @@ class Feed {
   }
 
   getState() {
-    return this.store.state;
+    return this.store.getState();
   }
 
   async markAsSeen(itemOrItems: FeedItemOrItems) {
@@ -201,7 +199,7 @@ class Feed {
     //
     // Note: here we optimistically handle the case whereby the feed is scoped to show only `unseen`
     // items by removing everything from view.
-    const { metadata, items, ...state } = this.getState();
+    const { metadata, items, ...state } = this.store.getState();
 
     const isViewingOnlyUnseen = this.defaultOptions.status === "unseen";
 
@@ -266,7 +264,7 @@ class Feed {
     //
     // Note: here we optimistically handle the case whereby the feed is scoped to show only `unread`
     // items by removing everything from view.
-    const { metadata, items, ...state } = this.getState();
+    const { metadata, items, ...state } = this.store.getState();
 
     const isViewingOnlyUnread = this.defaultOptions.status === "unread";
 
@@ -334,7 +332,7 @@ class Feed {
   TODO: how do we handle rollbacks?
   */
   async markAsArchived(itemOrItems: FeedItemOrItems) {
-    const state = this.getState();
+    const state = this.store.getState();
 
     const shouldOptimisticallyRemoveItems =
       this.defaultOptions.archived === "exclude";
@@ -408,7 +406,7 @@ class Feed {
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
-    const { items, ...state } = this.getState();
+    const { items, ...state } = this.store.getState();
 
     // Here if we're looking at a feed that excludes all of the archived items by default then we
     // will want to optimistically remove all of the items from the feed as they are now all excluded
@@ -435,7 +433,7 @@ class Feed {
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
-    const { items, ...state } = this.getState();
+    const { items, ...state } = this.store.getState();
     // Filter items to only include those that are unread
     const unreadItems = items.filter((item) => item.read_at === null);
     // Mark all the unread items as archived and read
@@ -483,7 +481,7 @@ class Feed {
 
   /* Fetches the feed content, appending it to the store */
   async fetch(options: FetchFeedOptions = {}) {
-    const { networkStatus, ...state } = this.getState();
+    const { networkStatus, ...state } = this.store.getState();
 
     // If the user is not authenticated, then do nothing
     if (!this.knock.isAuthenticated()) {
@@ -574,7 +572,7 @@ class Feed {
 
   async fetchNextPage(options: FetchFeedOptions = {}) {
     // Attempts to fetch the next page of results (if we have any)
-    const { pageInfo } = this.getState();
+    const { pageInfo } = this.store.getState();
 
     if (!pageInfo.after) {
       // Nothing more to fetch
@@ -604,7 +602,7 @@ class Feed {
     this.knock.log("[Feed] Received new real-time message");
 
     // Handle the new message coming in
-    const { items, ...state } = this.getState();
+    const { items, ...state } = this.store.getState();
     const currentHead: FeedItem | undefined = items[0];
 
     // Optimistically set the badge counts
@@ -624,10 +622,10 @@ class Feed {
   private optimisticallyPerformStatusUpdate(
     itemOrItems: FeedItemOrItems,
     type: MessageEngagementStatus | "unread" | "unseen" | "unarchived",
-    attrs: Record<string, unknown>,
+    attrs: object,
     badgeCountAttr?: "unread_count" | "unseen_count",
   ) {
-    const state = this.getState();
+    const state = this.store.getState();
     const normalizedItems = Array.isArray(itemOrItems)
       ? itemOrItems
       : [itemOrItems];

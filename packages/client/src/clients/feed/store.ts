@@ -1,5 +1,5 @@
 import { GenericData } from "@knocklabs/types";
-import { Store } from "@tanstack/store";
+import { Listener, ListenerValue, Store } from "@tanstack/store";
 
 import { NetworkStatus } from "../../networkStatus";
 
@@ -40,7 +40,7 @@ const initialStoreState: FeedStoreState = {
   setItemAttrs: () => {},
 };
 
-export default function createStore() {
+const initalizeStore = () => {
   const store = new Store(initialStoreState);
 
   store.setState((state) => ({
@@ -65,8 +65,6 @@ export default function createStore() {
           ? processItems(state.items.concat(entries as FeedItem<GenericData>[]))
           : entries;
 
-        console.log("HERE SHOULD SET PAGE", options);
-
         return {
           ...state,
           items,
@@ -83,7 +81,7 @@ export default function createStore() {
     resetStore: (metadata = initialStoreState.metadata) =>
       store.setState(() => ({ ...initialStoreState, metadata })),
 
-    setItemAttrs: (itemIds: Array<string>, attrs: Record<string, unknown>) => {
+    setItemAttrs: (itemIds: Array<string>, attrs: object) => {
       // Create a map for the items to the updates to be made
       const itemUpdatesMap: { [id: string]: object } = itemIds.reduce(
         (acc, itemId) => ({ ...acc, [itemId]: attrs }),
@@ -105,4 +103,38 @@ export default function createStore() {
   }));
 
   return store;
+};
+
+export class FeedStore {
+  store: Store<FeedStoreState>;
+
+  constructor(store: Store<FeedStoreState>) {
+    this.store = store;
+  }
+
+  getState() {
+    return this.store.state;
+  }
+
+  setState(
+    updater: ((state: FeedStoreState) => FeedStoreState) | FeedStoreState,
+  ) {
+    this.store.setState(
+      typeof updater === "function" ? updater : () => updater,
+    );
+  }
+
+  getInitialState() {
+    return initialStoreState;
+  }
+
+  subscribe(listener: (state: FeedStoreState) => void) {
+    return this.store.subscribe((state) => listener(state.currentVal));
+  }
+}
+
+export default function createStore() {
+  const store = initalizeStore();
+
+  return new FeedStore(store);
 }
