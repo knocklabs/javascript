@@ -4063,7 +4063,6 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.27.0"
     "@babel/runtime": "npm:^7.27.1"
     "@knocklabs/types": "workspace:^"
-    "@tanstack/react-store": "npm:^0.7.1"
     "@tanstack/store": "npm:^0.7.1"
     "@types/jsonwebtoken": "npm:^9.0.9"
     "@types/phoenix": "npm:^1.6.6"
