@@ -19,7 +19,7 @@ const defaultSetResultOptions = {
   shouldAppend: false,
 };
 
-const initialStoreState: FeedStoreState = {
+export const initialStoreState: FeedStoreState = {
   items: [],
   metadata: {
     total_count: 0,
@@ -40,6 +40,11 @@ const initialStoreState: FeedStoreState = {
   setItemAttrs: () => {},
 };
 
+/**
+ * Initalize the store with tanstack store so it can be used within our
+ * FeedStore class. We do this seperately so that we have the ability to
+ * change which store library we use in the future if need be.
+ */
 const initalizeStore = () => {
   const store = new Store(initialStoreState);
 
@@ -105,6 +110,13 @@ const initalizeStore = () => {
   return store;
 };
 
+/**
+ * The FeedStore class is a wrapper for our store solution that's
+ * based on the same shape as zustand. This wrapping class allows
+ * us to maintain backwards compatibility with the zustand model
+ * while still allowing us to utilize tanstack store for the
+ * underlying store solution.
+ */
 export class FeedStore {
   store: Store<FeedStoreState>;
 
@@ -135,6 +147,5 @@ export class FeedStore {
 
 export default function createStore() {
   const store = initalizeStore();
-
   return new FeedStore(store);
 }
