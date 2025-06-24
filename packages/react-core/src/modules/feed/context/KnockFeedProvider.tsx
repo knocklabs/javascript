@@ -1,8 +1,4 @@
-import Knock, {
-  Feed,
-  FeedClientOptions,
-  FeedStoreState,
-} from "@knocklabs/client";
+import Knock, { Feed, FeedClientOptions } from "@knocklabs/client";
 import * as React from "react";
 import { PropsWithChildren } from "react";
 

@@ -1,5 +1,5 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
-import { type Store, useStore } from "@tanstack/react-store";
+import { useStore } from "@tanstack/react-store";
 
 export type Selector<T> = (state: FeedStoreState) => T;
 
@@ -13,6 +13,7 @@ function useCreateNotificationStore(feedClient: Feed) {
   return <T = FeedStoreState>(selector?: Selector<T>) => {
     // Keep selector optional for external use
     // useStore requires a selector so we'll pass in a default one when not provided
+    // eslint-disable-next-line
     return useStore(feedClient.store, selector ?? ((state) => state as T));
   };
 }
