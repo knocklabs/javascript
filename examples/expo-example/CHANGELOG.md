@@ -1,5 +1,11 @@
 # @knocklabs/expo-example
 
+## 0.1.35
+
+### Patch Changes
+
+- @knocklabs/expo@0.3.22
+
 ## 0.1.35-canary.2
 
 ### Patch Changes

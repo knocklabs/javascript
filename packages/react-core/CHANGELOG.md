@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.14
+
+### Patch Changes
+
+- e05ad61: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+- e05ad61: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+- e05ad61: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+  - @knocklabs/client@0.14.10
+
 ## 0.6.14-canary.2
 
 ### Patch Changes
