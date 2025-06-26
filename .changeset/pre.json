@@ -22,6 +22,7 @@
     "@knocklabs/typescript-config": "0.0.2"
   },
   "changesets": [
-    "curly-hornets-fetch"
+    "curly-hornets-fetch",
+    "spotty-plums-clap"
   ]
 }
