@@ -8,5 +8,8 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],
-  "publishCommand": "yarn npm publish --access public --tolerate-republish --tag {tag}"
+  "publish": {
+    "script": "yarn npm publish --access public --tolerate-republish --tag {tag}",
+    "supportsTag": true
+  }
 }
