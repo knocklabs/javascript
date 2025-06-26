@@ -1,5 +1,11 @@
 # slack-connect-example
 
+## 0.3.3-canary.2
+
+### Patch Changes
+
+- @knocklabs/react@0.7.16-canary.2
+
 ## 0.3.3-canary.1
 
 ### Patch Changes

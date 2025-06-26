@@ -1,5 +1,13 @@
 # guide-example
 
+## 0.0.17-canary.2
+
+### Patch Changes
+
+- Updated dependencies [e69da7b]
+  - @knocklabs/client@0.14.10-canary.2
+  - @knocklabs/react@0.7.16-canary.2
+
 ## 0.0.17-canary.1
 
 ### Patch Changes

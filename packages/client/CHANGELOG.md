@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.10-canary.2
+
+### Patch Changes
+
+- e69da7b: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+
 ## 0.14.10-canary.1
 
 ### Patch Changes

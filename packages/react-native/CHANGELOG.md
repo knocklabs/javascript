@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.22-canary.2
+
+### Patch Changes
+
+- Updated dependencies [e69da7b]
+  - @knocklabs/react-core@0.6.14-canary.2
+  - @knocklabs/client@0.14.10-canary.2
+
 ## 0.6.22-canary.1
 
 ### Patch Changes
