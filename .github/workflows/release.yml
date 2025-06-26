@@ -81,6 +81,13 @@ jobs:
             exit 1
           fi
 
+      # Export the npm dist-tag based on the release type.
+      - name: Export npm dist-tag
+        run: |
+          TAG=${{ steps.release-type.outputs.release-type }}
+          [ "$TAG" = "stable" ] && TAG=latest
+          echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
+
       # Create a versioning PR if changeset files exist, or publish packages
       # to npm if version bump commits have already been merged into the branch.
       - name: Create release PR or publish
@@ -89,11 +96,7 @@ jobs:
           commit: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           version: yarn changeset version
-          publish: |
-            TAG=${{ steps.release-type.outputs.release-type }}
-            [ "$TAG" = "stable" ] && TAG=latest
-            echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
-            yarn changeset publish
+          publish: yarn changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
