@@ -63,6 +63,27 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Auto-exit prerelease mode when canary is merged into main
+      - name: Exit prerelease and re-generate versions (auto)
+        if: |
+          steps.release-type.outputs.release-type == 'stable' && 
+          hashFiles('.changeset/pre.json') != ''
+        run: |
+          echo "🔄 Repository is still in prerelease mode on main – exiting…"
+
+          yarn changeset pre exit
+          yarn changeset version
+          yarn install --mode=update
+
+          git config --global user.name  "Knock Eng Bot"
+          git config --global user.email "eng-bot@knock.app"
+          git add -A
+          git commit -m "chore(repo): exit canary prerelease mode on merge to main"
+          git push
+
+          echo "✅ prerelease exited and lockfile updated – new push will trigger publish"
+          exit 0
+
       # Verify that the current branch is in the correct Changeset prerelease mode.
       # Prevents accidentally publishing a prerelease with the wrong npm tag.
       - name: Verify pre.json for pre-release branches
