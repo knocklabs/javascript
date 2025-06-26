@@ -75,8 +75,6 @@ jobs:
           yarn changeset version
           yarn install --mode=update
 
-          git config --global user.name  "Knock Eng Bot"
-          git config --global user.email "eng-bot@knock.app"
           git add -A
           git commit -m "chore(repo): exit canary prerelease mode on merge to main"
           git push
