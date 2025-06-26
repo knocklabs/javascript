@@ -73,7 +73,7 @@ jobs:
 
           yarn changeset pre exit
           yarn changeset version
-          yarn install --mode=update
+          yarn install --mode=update-lockfile
 
           git add -A
           git commit -m "chore(repo): exit canary prerelease mode on merge to main"
@@ -114,7 +114,7 @@ jobs:
         with:
           commit: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
-          version: yarn changeset version && yarn install --mode=update
+          version: yarn changeset version && yarn install --mode=update-lockfile
           publish: yarn release:publish
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
