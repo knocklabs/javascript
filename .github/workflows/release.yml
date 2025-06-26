@@ -54,15 +54,6 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
 
-      # Configure Yarn to authenticate with the npm registry using a token.
-      - name: Set NPM Auth
-        run: |
-          yarn config set npmRegistryServer "https://registry.npmjs.org"
-          yarn config set npmAlwaysAuth true
-          yarn config set npmAuthToken $NPM_TOKEN
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       # Auto-exit prerelease mode when canary is merged into main
       - name: Exit prerelease and re-generate versions (auto)
         if: |
@@ -109,6 +100,15 @@ jobs:
           TAG=${{ steps.release-type.outputs.release-type }}
           [ "$TAG" = "stable" ] && TAG=latest
           echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
+
+      # Configure Yarn to authenticate with the npm registry using a token.
+      - name: Set NPM Auth
+        run: |
+          yarn config set npmRegistryServer "https://registry.npmjs.org"
+          yarn config set npmAlwaysAuth true
+          yarn config set npmAuthToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Create a versioning PR if changeset files exist, or publish packages
       # to npm if version bump commits have already been merged into the branch.
