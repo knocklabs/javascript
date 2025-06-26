@@ -24,7 +24,6 @@
     "test:integration:runner": "cd ./integration && yarn test:integration && cd ..",
     "type:check": "turbo type:check",
     "release": "yarn build:packages && yarn changeset tag",
-    "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish",
     "postinstall": "manypkg check"
   },
   "prettier": "@knocklabs/prettier-config",
