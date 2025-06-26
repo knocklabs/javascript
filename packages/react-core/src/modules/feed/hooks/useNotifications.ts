@@ -17,10 +17,6 @@ function useNotifications(
     (feedChannelId: string, options: FeedClientOptions) => {
       const feedClient = knock.feeds.initialize(feedChannelId, options);
 
-      // In development, we need to introduce this extra set state to force a render
-      // for Zustand as otherwise the state doesn't get reflected correctly
-      feedClient.store.subscribe((t) => feedClient.store.setState(t));
-
       feedClient.listenForUpdates();
 
       return feedClient;
