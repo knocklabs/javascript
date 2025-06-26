@@ -1,6 +1,6 @@
 {
   "name": "slack-connect-example",
-  "version": "0.3.3-canary.1",
+  "version": "0.3.3-canary.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,7 +11,7 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@knocklabs/react": "0.7.16-canary.1",
+    "@knocklabs/react": "0.7.16-canary.2",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.3",
     "react": "^18.2.0",
