@@ -88,11 +88,6 @@ jobs:
           [ "$TAG" = "stable" ] && TAG=latest
           echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
 
-      # Let's the action attempt to republish existing package versions so that
-      # this workflow doesn't fail.
-      - name: Allow republishing of existing versions
-        run: echo 'YARN_NPM_PUBLISH_TOLERATE_REPUBLISH=1' >> "$GITHUB_ENV"
-
       # Create a versioning PR if changeset files exist, or publish packages
       # to npm if version bump commits have already been merged into the branch.
       - name: Create release PR or publish

@@ -7,5 +7,6 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [],
+  "publishCommand": "yarn npm publish --access public --tolerate-republish --tag {tag}"
 }
