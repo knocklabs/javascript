@@ -68,14 +68,12 @@ jobs:
           yarn changeset version
           yarn install --mode=update-lockfile
 
-          BOT_LOGIN=$(gh api user --jq .login)
-          BOT_ID=$(gh api user --jq .id)
-          git config --global user.name  "$BOT_LOGIN"
-          git config --global user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
+          git config --global user.name 'knock-eng-bot'
+          git config --global user.email 'knock-eng-bot@users.noreply.github.com'
 
           git add -A
-          git diff --quiet || git commit -m "chore(repo): exit canary prerelease mode on merge to main"
-          git push "https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref }}
+          git commit -m "chore(repo): exit canary prerelease mode on merge to main"
+          git push
 
           echo "✅ prerelease exited and lockfile updated – new push will trigger publish"
           exit 0
