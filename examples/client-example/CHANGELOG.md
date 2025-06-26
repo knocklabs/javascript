@@ -1,5 +1,26 @@
 # client-example
 
+## 0.3.12-canary.2
+
+### Patch Changes
+
+- Updated dependencies [e69da7b]
+  - @knocklabs/client@0.14.10-canary.2
+
+## 0.3.12-canary.1
+
+### Patch Changes
+
+- Updated dependencies [c76b2d9]
+  - @knocklabs/client@0.14.10-canary.1
+
+## 0.3.12-canary.0
+
+### Patch Changes
+
+- Updated dependencies [86a72cc]
+  - @knocklabs/client@0.14.10-canary.0
+
 ## 0.3.11
 
 ### Patch Changes

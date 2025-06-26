@@ -1,5 +1,23 @@
 # @knocklabs/react-native-example
 
+## 1.4.35-canary.2
+
+### Patch Changes
+
+- @knocklabs/react-native@0.6.22-canary.2
+
+## 1.4.35-canary.1
+
+### Patch Changes
+
+- @knocklabs/react-native@0.6.22-canary.1
+
+## 1.4.35-canary.0
+
+### Patch Changes
+
+- @knocklabs/react-native@0.6.22-canary.0
+
 ## 1.4.34
 
 ### Patch Changes

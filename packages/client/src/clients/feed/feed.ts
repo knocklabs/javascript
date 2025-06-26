@@ -1,7 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
 import { nanoid } from "nanoid";
-import type { StoreApi } from "zustand";
 
 import { isValidUuid } from "../../helpers";
 import Knock from "../../knock";
@@ -24,7 +23,7 @@ import {
   SocketEventPayload,
   SocketEventType,
 } from "./socket-manager";
-import createStore from "./store";
+import createStore, { FeedStore } from "./store";
 import {
   BindableFeedEvent,
   FeedEvent,
@@ -33,7 +32,6 @@ import {
   FeedItemOrItems,
   FeedMessagesReceivedPayload,
   FeedRealTimeCallback,
-  FeedStoreState,
 } from "./types";
 import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
@@ -60,7 +58,7 @@ class Feed {
   private visibilityChangeListenerConnected: boolean = false;
 
   // The raw store instance, used for binding in React and other environments
-  public store: StoreApi<FeedStoreState>;
+  public store: FeedStore;
 
   constructor(
     readonly knock: Knock,

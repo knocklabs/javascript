@@ -1,10 +1,12 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import type {
   FeedItem,
   FeedMetadata,
 } from "../../../src/clients/feed/interfaces";
-import createStore from "../../../src/clients/feed/store";
+import createStore, {
+  initialStoreState,
+} from "../../../src/clients/feed/store";
 import { NetworkStatus } from "../../../src/networkStatus";
 
 describe("feed store", () => {
@@ -34,6 +36,24 @@ describe("feed store", () => {
       expect(typeof state.setMetadata).toBe("function");
       expect(typeof state.resetStore).toBe("function");
       expect(typeof state.setItemAttrs).toBe("function");
+    });
+    test("getInitialState returns the initial state", () => {
+      const store = createStore();
+      const initialState = store.getInitialState();
+
+      expect(initialState).toEqual(initialStoreState);
+    });
+    test("subscribe calls the listener with the current state", () => {
+      const store = createStore();
+      const listener = vi.fn();
+
+      store.subscribe((state) => {
+        listener(state);
+      });
+
+      store.setState(initialStoreState);
+
+      expect(listener).toHaveBeenCalledWith(initialStoreState);
     });
   });
 
