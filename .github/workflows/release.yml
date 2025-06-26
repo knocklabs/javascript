@@ -75,6 +75,9 @@ jobs:
           yarn changeset version
           yarn install --mode=update-lockfile
 
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
           git add -A
           git commit -m "chore(repo): exit canary prerelease mode on merge to main"
           git push
