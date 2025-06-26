@@ -95,7 +95,7 @@ jobs:
         with:
           commit: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
-          version: yarn changeset version
+          version: yarn changeset version && yarn install --mode=update
           publish: yarn release:publish
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
