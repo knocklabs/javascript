@@ -90,12 +90,9 @@ jobs:
           title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           version: yarn changeset version
           publish: |
-            # Map branch → correct npm dist-tag
             TAG=${{ steps.release-type.outputs.release-type }}
             [ "$TAG" = "stable" ] && TAG=latest
             echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
-
-            # Publish with Changesets (honours NPM_CONFIG_TAG env-var)
             yarn changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
