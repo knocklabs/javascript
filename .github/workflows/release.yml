@@ -59,6 +59,8 @@ jobs:
         if: |
           steps.release-type.outputs.release-type == 'stable' && 
           hashFiles('.changeset/pre.json') != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
         run: |
           echo "🔄 Repository is still in prerelease mode on main – exiting…"
 
@@ -66,12 +68,14 @@ jobs:
           yarn changeset version
           yarn install --mode=update-lockfile
 
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          BOT_LOGIN=$(gh api user --jq .login)
+          BOT_ID=$(gh api user --jq .id)
+          git config --global user.name  "$BOT_LOGIN"
+          git config --global user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
 
           git add -A
-          git commit -m "chore(repo): exit canary prerelease mode on merge to main"
-          git push
+          git diff --quiet || git commit -m "chore(repo): exit canary prerelease mode on merge to main"
+          git push "https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref }}
 
           echo "✅ prerelease exited and lockfile updated – new push will trigger publish"
           exit 0
