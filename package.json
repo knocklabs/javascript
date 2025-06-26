@@ -23,8 +23,7 @@
     "test:integration:react-19": "./integration/run-integration.sh 19.1.0",
     "test:integration:runner": "cd ./integration && yarn test:integration && cd ..",
     "type:check": "turbo type:check",
-    "release": "yarn build:packages && yarn release:publish && yarn changeset tag",
-    "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish",
+    "release": "yarn build:packages && yarn changeset tag",
     "postinstall": "manypkg check"
   },
   "prettier": "@knocklabs/prettier-config",
