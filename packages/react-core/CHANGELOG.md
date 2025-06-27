@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.15
+
+### Patch Changes
+
+- 6539c97: patch fix package contents being built properly
+- Updated dependencies [6539c97]
+  - @knocklabs/client@0.14.11
+
 ## 0.6.14
 
 ### Patch Changes
