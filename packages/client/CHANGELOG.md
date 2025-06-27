@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.11
+
+### Patch Changes
+
+- 6539c97: patch fix package contents being built properly
+
 ## 0.14.10
 
 ### Patch Changes
