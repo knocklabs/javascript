@@ -4,7 +4,10 @@ import { PropsWithChildren } from "react";
 
 import { slackProviderKey } from "../../core";
 import { useKnockClient } from "../../core";
-import { ConnectionStatus } from "../hooks/useSlackConnectionStatus";
+import {
+  ConnectionStatus,
+  SlackConnection,
+} from "../hooks/useSlackConnectionStatus";
 
 export interface KnockSlackProviderState {
   knockSlackChannelId: string;
@@ -13,6 +16,7 @@ export interface KnockSlackProviderState {
    * @deprecated Use `tenantId` instead. This field will be removed in a future release.
    */
   tenant: string;
+  connection: SlackConnection | null;
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (connectionStatus: ConnectionStatus) => void;
   errorLabel: string | null;
@@ -46,6 +50,7 @@ export const KnockSlackProvider: React.FC<
   const knock = useKnockClient();
 
   const {
+    connection,
     connectionStatus,
     setConnectionStatus,
     errorLabel,
@@ -63,6 +68,7 @@ export const KnockSlackProvider: React.FC<
         errorLabel,
       })}
       value={{
+        connection,
         connectionStatus,
         setConnectionStatus,
         errorLabel,

@@ -31,8 +31,8 @@ Note: you don't have to pre-create the tenant or connections object in Knock for
 ### Knock entities
 
 - `NEXT_PUBLIC_TENANT`: the ID of the tenant you want to use for holding the Slack access token
-- `NEXT_PUBLIC_SLACK_CHANNELS_RECIPIENT_COLLECTION`: the collection of the object that will store the slack channel connections (i.e. "projects")
-- `NEXT_PUBLIC_SLACK_CHANNELS_RECIPIENT_OBJECT_ID`: the id of the object that will store the slack channel connections (i.e. "projects")
+- `NEXT_PUBLIC_CONNECTIONS_COLLECTION`: the collection of the object that will store the slack channel connections (i.e. "projects")
+- `NEXT_PUBLIC_CONNECTIONS_OBJECT_ID`: the id of the object that will store the slack channel connections (i.e. "projects")
 
 ### Slack notification configuration
 

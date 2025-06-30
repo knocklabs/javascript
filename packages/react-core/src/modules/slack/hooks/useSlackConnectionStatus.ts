@@ -3,6 +3,26 @@ import { useEffect, useState } from "react";
 
 import { useTranslations } from "../../i18n";
 
+// Connection based on https://api.slack.com/methods/auth.test#examples
+// Also includes x-oauth-scopes
+type SlackConnectionSuccess = {
+  ok: true;
+  url: string;
+  team: string;
+  user: string;
+  team_id: string;
+  user_id: string;
+  bot_id?: string;
+  scopes?: string[];
+};
+
+type SlackConnectionError = {
+  ok: false;
+  error: string;
+};
+
+export type SlackConnection = SlackConnectionSuccess | SlackConnectionError;
+
 export type ConnectionStatus =
   | "connecting"
   | "connected"
@@ -11,6 +31,7 @@ export type ConnectionStatus =
   | "disconnecting";
 
 type UseSlackConnectionStatusOutput = {
+  connection: SlackConnection | null;
   connectionStatus: ConnectionStatus;
   setConnectionStatus: (status: ConnectionStatus) => void;
   errorLabel: string | null;
@@ -37,6 +58,7 @@ function useSlackConnectionStatus(
   tenantId: string,
 ): UseSlackConnectionStatusOutput {
   const { t } = useTranslations();
+  const [connection, setConnection] = useState<SlackConnection | null>(null);
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("connecting");
   const [errorLabel, setErrorLabel] = useState<string | null>(null);
@@ -51,6 +73,8 @@ function useSlackConnectionStatus(
           tenant: tenantId,
           knockChannelId: knockSlackChannelId,
         });
+
+        setConnection(authRes.connection);
 
         if (authRes.connection?.ok) {
           return setConnectionStatus("connected");
@@ -90,6 +114,7 @@ function useSlackConnectionStatus(
   }, [connectionStatus, tenantId, knockSlackChannelId, knock.slack, t]);
 
   return {
+    connection,
     connectionStatus,
     setConnectionStatus,
     errorLabel,

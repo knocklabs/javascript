@@ -31,7 +31,7 @@ class SlackClient {
   async getChannels(
     input: GetSlackChannelsInput,
   ): Promise<GetSlackChannelsResponse> {
-    const { knockChannelId, tenant } = input;
+    const { knockChannelId, tenant, asUser } = input;
     const queryOptions = input.queryOptions || {};
 
     const result = await this.instance.client().makeRequest({
@@ -43,6 +43,7 @@ class SlackClient {
           collection: TENANT_OBJECT_COLLECTION,
         },
         channel_id: knockChannelId,
+        as_user: asUser,
         query_options: {
           cursor: queryOptions.cursor,
           limit: queryOptions.limit,

@@ -45,13 +45,18 @@ function useSlackChannels({
   queryOptions,
 }: UseSlackChannelsOptions): UseSlackChannelOutput {
   const knock = useKnockClient();
-  const { knockSlackChannelId, tenantId, connectionStatus } =
+  const { knockSlackChannelId, tenantId, connection, connectionStatus } =
     useKnockSlackClient();
+
+  const asUser = useMemo(() => {
+    return connection?.ok && connection?.scopes?.includes("users:read.email");
+  }, [connection]);
 
   const fetchChannels = (queryKey: QueryKey) => {
     return knock.slack.getChannels({
       tenant: tenantId,
       knockChannelId: knockSlackChannelId,
+      asUser,
       queryOptions: {
         ...queryOptions,
         cursor: queryKey?.[1],
