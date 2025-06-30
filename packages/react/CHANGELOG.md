@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.18
+
+### Patch Changes
+
+- ec704d1: upgrade telegraph dependencies to remove legacy vanilla extract style engine
+
 ## 0.7.17
 
 ### Patch Changes
