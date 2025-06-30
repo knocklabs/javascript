@@ -54,7 +54,7 @@
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.14",
-    "@telegraph/combobox": "^0.0.85",
+    "@telegraph/combobox": "^0.0.86",
     "@telegraph/icon": "^0.0.53",
     "@telegraph/layout": "^0.1.18",
     "@telegraph/tokens": "^0.0.21",
