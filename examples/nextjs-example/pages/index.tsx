@@ -3,10 +3,11 @@ import {
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
 import { Select } from "@telegraph/select";
 import { Heading, Text } from "@telegraph/typography";
+import { FileCode, Github } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import NotificationFeed from "../components/NotificationFeed";
@@ -112,7 +113,7 @@ export default function Home() {
                     <Icon
                       aria-hidden={true}
                       alt="GitHub"
-                      icon={Lucide.Github}
+                      icon={Github}
                       color="gray"
                     />
                     <Text as="span" color="gray">
@@ -125,7 +126,7 @@ export default function Home() {
                     <Icon
                       aria-hidden={true}
                       alt="GitHub"
-                      icon={Lucide.FileCode}
+                      icon={FileCode}
                       color="gray"
                     />
                     <Text as="span" color="gray">

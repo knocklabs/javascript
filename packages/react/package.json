@@ -54,13 +54,14 @@
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.14",
-    "@telegraph/combobox": "^0.0.87",
-    "@telegraph/icon": "^0.0.54",
-    "@telegraph/layout": "^0.1.19",
-    "@telegraph/tokens": "^0.0.21",
-    "@telegraph/typography": "^0.1.19",
+    "@telegraph/combobox": "^0.0.89",
+    "@telegraph/icon": "^0.1.0",
+    "@telegraph/layout": "^0.1.21",
+    "@telegraph/tokens": "^0.0.22",
+    "@telegraph/typography": "^0.1.21",
     "clsx": "^2.1.1",
-    "lodash.debounce": "^4.0.8"
+    "lodash.debounce": "^4.0.8",
+    "lucide-react": "^0.525.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",

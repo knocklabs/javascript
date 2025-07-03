@@ -8,9 +8,10 @@ import {
   useTranslations,
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
+import { Hash, Lock } from "lucide-react";
 import { useMemo } from "react";
 import { FunctionComponent } from "react";
 
@@ -200,7 +201,7 @@ export const SlackChannelCombobox: FunctionComponent<
               <Combobox.Option key={channel.id} value={channel.id}>
                 <Stack align="center" gap="1">
                   <Icon
-                    icon={channel.is_private ? Lucide.Lock : Lucide.Hash}
+                    icon={channel.is_private ? Lock : Hash}
                     size="0"
                     aria-hidden
                   />
