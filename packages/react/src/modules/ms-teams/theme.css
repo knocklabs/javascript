@@ -4,7 +4,6 @@
 @import "@telegraph/icon/default.css";
 @import "@telegraph/layout/default.css";
 @import "@telegraph/input/default.css";
-@import "@telegraph/motion/default.css";
 
 :root {
   /* Font sizes */
@@ -33,8 +32,9 @@
   --rtk-font-weight-bold: 700;
 
   /* Font family */
-  --rtk-font-family-sanserif: Inter, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+  --rtk-font-family-sanserif:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu,
+    "Helvetica Neue", sans-serif;
 
   /* Border radius */
   --rtk-border-radius-sm: 2px;
