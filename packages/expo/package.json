@@ -57,6 +57,7 @@
     "react-native-svg": "^15.12.0"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "^1.9.1",
     "@types/react": "^18.3.6",
     "@types/react-native-htmlview": "^0.16.6",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
