@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import { resolve } from "path";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
 import dts from "vite-plugin-dts";
@@ -16,6 +17,11 @@ export default defineConfig(({ mode }) => {
         outDir: "dist/types",
       }),
       noBundlePlugin({ root: "./src" }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "@knocklabs/client",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
     ],
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",

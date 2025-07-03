@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import execute from "rollup-plugin-execute";
@@ -27,6 +28,11 @@ export default defineConfig(({ mode }) => {
       }),
       preserveDirectives(),
       noBundlePlugin({ root: path.resolve(__dirname, "src") }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "@knocklabs/react",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
     ],
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",

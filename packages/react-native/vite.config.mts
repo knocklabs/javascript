@@ -1,3 +1,4 @@
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
@@ -16,6 +17,11 @@ export default defineConfig(({ mode }) => {
       }),
       react(),
       noBundlePlugin({ copy: "**/*.css", root: "./src" }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "@knocklabs/react-native",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
     ],
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",

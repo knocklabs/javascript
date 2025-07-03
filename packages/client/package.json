@@ -52,6 +52,7 @@
     "@babel/plugin-transform-runtime": "^7.25.4",
     "@babel/preset-env": "^7.27.1",
     "@babel/preset-typescript": "^7.27.0",
+    "@codecov/vite-plugin": "^1.9.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
     "@typescript-eslint/parser": "^8.32.1",
