@@ -16,13 +16,13 @@
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
     "@types/node": "^22",
     "@types/react": "^18.3.6",
-    "@types/react-dom": "^18.2.15",
+    "@types/react-dom": "^19.1.6",
     "eslint": "^8.56.0",
     "eslint-config-next": "15.3.5",
     "postcss": "^8",
