@@ -52,7 +52,7 @@
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@knocklabs/react-native": "workspace:^",
-    "react-native-gesture-handler": "^2.25.0",
+    "react-native-gesture-handler": "^2.27.1",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "^15.12.0"
   },
