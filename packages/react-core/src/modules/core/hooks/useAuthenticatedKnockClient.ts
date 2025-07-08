@@ -1,6 +1,7 @@
 import Knock, {
   AuthenticateOptions,
   KnockOptions,
+  UserId,
   UserIdOrUserWithProperties,
 } from "@knocklabs/client";
 import React from "react";
@@ -22,6 +23,26 @@ function authenticateWithOptions(
 export type AuthenticatedKnockClientOptions = KnockOptions &
   AuthenticateOptions;
 
+/**
+ * @deprecated Passing `userId` as a `string` is deprecated and will be removed in a future version.
+ * Please pass a `user` object instead containing an `id` value.
+ * example:
+ * ```ts
+ * useAuthenticatedKnockClient("pk_test_12345", { id: "user_123" });
+ * ```
+ */
+function useAuthenticatedKnockClient(
+  apiKey: string,
+  userIdOrUserWithProperties: UserId,
+  userToken?: Knock["userToken"],
+  options?: AuthenticatedKnockClientOptions,
+): Knock;
+function useAuthenticatedKnockClient(
+  apiKey: string,
+  userIdOrUserWithProperties: UserIdOrUserWithProperties,
+  userToken?: Knock["userToken"],
+  options?: AuthenticatedKnockClientOptions,
+): Knock;
 function useAuthenticatedKnockClient(
   apiKey: string,
   userIdOrUserWithProperties: UserIdOrUserWithProperties,

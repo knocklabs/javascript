@@ -79,5 +79,6 @@ export type RevokeAccessTokenInput = {
   knockChannelId: string;
 };
 
-export type UserWithProperties = { id: Knock["userId"] } & GenericData;
-export type UserIdOrUserWithProperties = Knock["userId"] | UserWithProperties;
+export type UserId = Knock["userId"];
+export type UserWithProperties = { id: UserId } & GenericData;
+export type UserIdOrUserWithProperties = UserId | UserWithProperties;

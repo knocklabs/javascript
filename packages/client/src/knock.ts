@@ -12,6 +12,7 @@ import {
   AuthenticateOptions,
   KnockOptions,
   LogLevel,
+  UserId,
   UserIdOrUserWithProperties,
   UserTokenExpiringCallback,
 } from "./interfaces";
@@ -59,10 +60,24 @@ class Knock {
     return this.apiClient;
   }
 
-  /*
-    Authenticates the current user. In non-sandbox environments
-    the userToken must be specified.
-  */
+  /**
+   * @deprecated Passing `userId` as a `string` is deprecated and will be removed in a future version.
+   * Please pass a `user` object instead containing an `id` value.
+   * example:
+   * ```ts
+   * knock.authenticate({ id: "user_123" });
+   * ```
+   */
+  authenticate(
+    userIdOrUserWithProperties: UserId,
+    userToken?: Knock["userToken"],
+    options?: AuthenticateOptions,
+  ): never;
+  authenticate(
+    userIdOrUserWithProperties: UserIdOrUserWithProperties,
+    userToken?: Knock["userToken"],
+    options?: AuthenticateOptions,
+  ): void;
   authenticate(
     userIdOrUserWithProperties: UserIdOrUserWithProperties,
     userToken?: Knock["userToken"],

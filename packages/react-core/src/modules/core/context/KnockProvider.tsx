@@ -28,7 +28,12 @@ export type KnockProviderProps = {
 } & (
   | {
       /**
-       * @deprecated use `user` prop instead
+       * @deprecated The `userId` prop is deprecated and will be removed in a future version.
+       * Please pass the `user` prop instead containing an `id` value.
+       * example:
+       * ```ts
+       * <KnockProvider user={{ id: "user_123" }}></KnockProvider>
+       * ```
        */
       userId: Knock["userId"];
       user?: never;
@@ -36,7 +41,12 @@ export type KnockProviderProps = {
   | {
       user: UserWithProperties;
       /**
-       * @deprecated use `user` prop instead
+       * @deprecated The `userId` prop is deprecated and will be removed in a future version.
+       * Please pass the `user` prop instead containing an `id` value.
+       * example:
+       * ```ts
+       * <KnockProvider user={{ id: "user_123" }}></KnockProvider>
+       * ```
        */
       userId?: never;
     }
