@@ -211,7 +211,10 @@ class Knock {
    * @throws {Error} If the user object does not contain an `id` property
    */
   private getUserId(userIdOrUserWithProperties: UserIdOrUserWithProperties) {
-    if (typeof userIdOrUserWithProperties === "string") {
+    if (
+      typeof userIdOrUserWithProperties === "string" ||
+      !userIdOrUserWithProperties
+    ) {
       return userIdOrUserWithProperties;
     }
 
