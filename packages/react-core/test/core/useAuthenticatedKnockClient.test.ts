@@ -123,4 +123,14 @@ describe("useAuthenticatedKnockClient", () => {
 
     expect(result.current).toBeInstanceOf(Knock);
   });
+
+  it("should contain userId when user object is provided", () => {
+    const { result } = renderHook(
+      ({ apiKey, userId, userToken, options }) =>
+        useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+      { initialProps: { ...defaultProps, userId: { id: "user_123" } } },
+    );
+
+    expect(result.current.userId).toEqual("user_123");
+  });
 });

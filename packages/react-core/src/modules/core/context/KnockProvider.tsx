@@ -1,4 +1,8 @@
-import Knock, { AuthenticateOptions, LogLevel } from "@knocklabs/client";
+import Knock, {
+  AuthenticateOptions,
+  LogLevel,
+  UserWithProperties,
+} from "@knocklabs/client";
 import * as React from "react";
 import { PropsWithChildren } from "react";
 
@@ -11,31 +15,46 @@ export interface KnockProviderState {
 
 const KnockContext = React.createContext<KnockProviderState | null>(null);
 
-export interface KnockProviderProps {
+export type KnockProviderProps = {
   // Knock client props
   apiKey: string | undefined;
   host?: string;
-  // Authentication props
-  userId: Knock["userId"];
   userToken?: Knock["userToken"];
   onUserTokenExpiring?: AuthenticateOptions["onUserTokenExpiring"];
   timeBeforeExpirationInMs?: AuthenticateOptions["timeBeforeExpirationInMs"];
   // i18n translations
   i18n?: I18nContent;
   logLevel?: LogLevel;
-}
+} & (
+  | {
+      /**
+       * @deprecated use `user` prop instead
+       */
+      userId: Knock["userId"];
+      user?: never;
+    }
+  | {
+      user: UserWithProperties;
+      /**
+       * @deprecated use `user` prop instead
+       */
+      userId?: never;
+    }
+);
 
 export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   apiKey,
   host,
   logLevel,
-  userId,
   userToken,
   onUserTokenExpiring,
   timeBeforeExpirationInMs,
   children,
   i18n,
+  ...props
 }) => {
+  const userIdOrUserWithProperties = props?.user || props?.userId;
+
   // We memoize the options here so that we don't create a new object on every re-render
   const authenticateOptions = React.useMemo(
     () => ({
@@ -49,7 +68,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
 
   const knock = useAuthenticatedKnockClient(
     apiKey ?? "",
-    userId,
+    userIdOrUserWithProperties,
     userToken,
     authenticateOptions,
   );

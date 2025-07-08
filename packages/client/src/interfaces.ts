@@ -1,6 +1,8 @@
 import { GenericData } from "@knocklabs/types";
 import { JwtPayload } from "jwt-decode";
 
+import Knock from "./knock";
+
 export type LogLevel = "debug";
 
 export interface KnockOptions {
@@ -76,3 +78,6 @@ export type RevokeAccessTokenInput = {
   tenant: string;
   knockChannelId: string;
 };
+
+export type UserWithProperties = { id: Knock["userId"] } & GenericData;
+export type UserIdOrUserWithProperties = Knock["userId"] | UserWithProperties;

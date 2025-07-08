@@ -12,6 +12,7 @@ import {
   AuthenticateOptions,
   KnockOptions,
   LogLevel,
+  UserIdOrUserWithProperties,
   UserTokenExpiringCallback,
 } from "./interfaces";
 
@@ -63,12 +64,13 @@ class Knock {
     the userToken must be specified.
   */
   authenticate(
-    userId: Knock["userId"],
+    userIdOrUserWithProperties: UserIdOrUserWithProperties,
     userToken?: Knock["userToken"],
     options?: AuthenticateOptions,
   ) {
     let reinitializeApi = false;
     const currentApiClient = this.apiClient;
+    const userId = this.getUserId(userIdOrUserWithProperties);
 
     // If we've previously been initialized and the values have now changed, then we
     // need to reinitialize any stateful connections we have
@@ -101,6 +103,15 @@ class Knock {
       this.apiClient = this.createApiClient();
       this.feeds.reinitializeInstances();
       this.log("Reinitialized real-time connections");
+    }
+
+    // Inline identify the user if we've been given an object with an id.
+    if (
+      typeof userIdOrUserWithProperties === "object" &&
+      userIdOrUserWithProperties?.id
+    ) {
+      const { id, ...properties } = userIdOrUserWithProperties;
+      this.user.identify(properties);
     }
 
     return;
@@ -176,6 +187,24 @@ class Knock {
         }
       }, msInFuture);
     }
+  }
+
+  /**
+   * Returns the user id from the given userIdOrUserWithProperties
+   * @param userIdOrUserWithProperties - The user id or user object
+   * @returns The user id
+   * @throws {Error} If the user object does not contain an `id` property
+   */
+  private getUserId(userIdOrUserWithProperties: UserIdOrUserWithProperties) {
+    if (typeof userIdOrUserWithProperties === "string") {
+      return userIdOrUserWithProperties;
+    }
+
+    if (userIdOrUserWithProperties?.id) {
+      return userIdOrUserWithProperties.id;
+    }
+
+    throw new Error("`user` object must contain an `id` property");
   }
 }
 
