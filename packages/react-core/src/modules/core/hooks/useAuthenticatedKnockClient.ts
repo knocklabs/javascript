@@ -49,7 +49,7 @@ function useAuthenticatedKnockClient(
   userToken?: Knock["userToken"],
   options: AuthenticatedKnockClientOptions = {},
 ) {
-  const knockRef = React.useRef<Knock | undefined>();
+  const knockRef = React.useRef<Knock | undefined>(undefined);
   const stableOptions = useStableOptions(options);
 
   return React.useMemo(() => {
