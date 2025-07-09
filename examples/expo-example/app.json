@@ -42,9 +42,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "837a985f-1378-4421-a02e-f76b822e711d"
+        "projectId": "37459970-f809-421d-9fc0-26e3c96e3cc2"
       }
     },
-    "owner": "test-knock-services"
+    "owner": "knocklabs"
   }
 }
