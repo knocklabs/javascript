@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-example",
-    "slug": "expo-example",
+    "name": "@knocklabs/expo-example",
+    "slug": "@knocklabs/expo-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
