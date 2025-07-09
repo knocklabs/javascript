@@ -4461,11 +4461,11 @@ __metadata:
     vite-plugin-dts: "npm:^4.5.0"
     vite-plugin-no-bundle: "npm:^4.0.0"
   peerDependencies:
-    expo: ">=53"
+    expo: "*"
     expo-constants: "*"
     expo-device: "*"
     expo-notifications: "*"
-    react: ^18.0.0 || ^19.0.0
+    react: "*"
     react-native: "*"
   languageName: unknown
   linkType: soft
