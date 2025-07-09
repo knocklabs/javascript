@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "@knocklabs/expo-example",
-    "slug": "@knocklabs/expo-example",
+    "name": "expo-example",
+    "slug": "expo-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -38,6 +38,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCanary": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "837a985f-1378-4421-a02e-f76b822e711d"
+      }
+    },
+    "owner": "test-knock-services"
   }
 }
