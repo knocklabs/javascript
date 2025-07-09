@@ -1,40 +1,43 @@
 {
   "expo": {
-    "name": "@knocklabs/expo-example",
-    "slug": "@knocklabs/expo-example",
+    "name": "expo-example",
+    "slug": "expo-example",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/icon.png",
+    "scheme": "expoexample",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": ["**/*"],
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID",
-        "userInterfaceStyle": "automatic",
-        "ios": {
-          "userInterfaceStyle": "automatic"
-        },
-        "android": {
-          "userInterfaceStyle": "automatic"
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
         }
-      }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCanary": true
     }
   }
 }
