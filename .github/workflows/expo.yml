@@ -25,4 +25,4 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Build on EAS
-        run: cd examples/expo-example && eas build --platform all --non-interactive --no-wait
+        run: cd examples/expo-example && eas build --platform ios --non-interactive --no-wait
