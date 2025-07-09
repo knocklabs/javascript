@@ -26,5 +26,5 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Build on EAS
         run: cd examples/expo-example && eas build --platform all --non-interactive --no-wait
-        with:
+        env:
           token: ${{ secrets.EXPO_TOKEN }}
