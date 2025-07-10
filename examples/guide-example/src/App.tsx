@@ -1,17 +1,17 @@
 import {
   Banner,
   Card,
-  Modal,
   KnockGuideProvider,
   KnockProvider,
+  Modal,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
 import { useState } from "react";
-import { Routes, Route, Link } from 'react-router';
+import { Link, Route, Routes } from "react-router";
 
 const Navigation = () => {
   return (
-    <nav style={{ display: "flex", gap: "12px", }}>
+    <nav style={{ display: "flex", gap: "12px" }}>
       <Link to="/">Home</Link>
       <Link to="/produce">Produce</Link>
       <Link to="/meat">Meat</Link>
@@ -31,7 +31,7 @@ function App() {
   return (
     <KnockProvider
       apiKey={import.meta.env.VITE_KNOCK_API_KEY!}
-      userId={import.meta.env.VITE_KNOCK_USER_ID!}
+      user={{ id: import.meta.env.VITE_KNOCK_USER_ID! }}
       host={import.meta.env.VITE_KNOCK_HOST}
       logLevel="debug"
     >
@@ -47,7 +47,7 @@ function App() {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              height: "20px"
+              height: "20px",
             }}
           >
             <Navigation />
@@ -72,9 +72,18 @@ function App() {
             <Route path="/produce" element={<Page title="Produce" />} />
             <Route path="/meat" element={<Page title="Meat" />} />
             <Route path="/seafood" element={<Page title="Seatfood" />} />
-            <Route path="/dairy/butter" element={<Page title="Dairy &gt; Butter" />} />
-            <Route path="/dairy/cheese" element={<Page title="Dairy &gt; Cheese" />} />
-            <Route path="/dairy/eggs" element={<Page title="Dairy &gt; Eggs" />} />
+            <Route
+              path="/dairy/butter"
+              element={<Page title="Dairy &gt; Butter" />}
+            />
+            <Route
+              path="/dairy/cheese"
+              element={<Page title="Dairy &gt; Cheese" />}
+            />
+            <Route
+              path="/dairy/eggs"
+              element={<Page title="Dairy &gt; Eggs" />}
+            />
           </Routes>
         </div>
       </KnockGuideProvider>

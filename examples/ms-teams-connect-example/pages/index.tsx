@@ -46,7 +46,7 @@ export default function Home() {
   return (
     <KnockProvider
       apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
-      userId={user.id}
+      user={{ id: user.id }}
       host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
       userToken={localStorage.getItem("knock-user-token")!}
     >

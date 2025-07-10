@@ -20,7 +20,7 @@ export default function HomeScreen() {
     <KnockProvider
       apiKey={process.env.EXPO_PUBLIC_KNOCK_PUBLIC_API_KEY}
       host={process.env.EXPO_PUBLIC_KNOCK_HOST}
-      userId={process.env.EXPO_PUBLIC_KNOCK_USER_ID}
+      user={{ id: process.env.EXPO_PUBLIC_KNOCK_USER_ID }}
       logLevel="debug"
     >
       <KnockExpoPushNotificationProvider
