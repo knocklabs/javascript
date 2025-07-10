@@ -71,7 +71,7 @@ function App() {
             <Route index element={<Page title="home" />} />
             <Route path="/produce" element={<Page title="Produce" />} />
             <Route path="/meat" element={<Page title="Meat" />} />
-            <Route path="/seafood" element={<Page title="Seatfood" />} />
+            <Route path="/seafood" element={<Page title="Seafood" />} />
             <Route
               path="/dairy/butter"
               element={<Page title="Dairy &gt; Butter" />}
