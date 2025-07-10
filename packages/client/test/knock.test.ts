@@ -127,6 +127,72 @@ describe("Knock Client", () => {
 
       expect(knock.isAuthenticated()).toBe(true);
     });
+
+    test("user identify is not called", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate("user_123", "token_456");
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Authenticate with user object", () => {
+    test("authenticate with credentials", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate({ id: "user_123" }, "token_456");
+
+      expect(knock.userId).toBe("user_123");
+      expect(knock.userToken).toBe("token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("validates authentication state", () => {
+      const knock = new Knock("pk_test_12345");
+
+      expect(knock.isAuthenticated()).toBe(false);
+
+      knock.authenticate({ id: "user_123" }, "token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("allows operations after authentication", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate({ id: "user_123" }, "token_456");
+
+      expect(() => knock.failIfNotAuthenticated()).not.toThrow();
+    });
+
+    test("handles authentication with options", () => {
+      const knock = new Knock("pk_test_12345");
+      const onUserTokenExpiring = vi.fn();
+
+      knock.authenticate({ id: "user_123" }, "token_456", {
+        onUserTokenExpiring,
+      });
+
+      expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("user identify is called", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456");
+
+      expect(identify).toHaveBeenCalledWith({ name: "John Doe" });
+    });
+
+    test("throws error when user object does not contain an `id` property", () => {
+      const knock = new Knock("pk_test_12345");
+      // @ts-expect-error - we want to test the error case
+      expect(() => knock.authenticate({ name: "John Doe" })).toThrowError(
+        "`user` object must contain an `id` property",
+      );
+    });
   });
 
   describe("Client Management", () => {
