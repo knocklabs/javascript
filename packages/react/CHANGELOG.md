@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.21
+
+### Patch Changes
+
+- 60c383c: fix: prevent popover from reopening when clicking notification icon button
+
 ## 0.7.20
 
 ### Patch Changes
