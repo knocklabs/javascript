@@ -1,3 +1,5 @@
+"use client";
+
 import { MarkdownContentBlock } from "@knocklabs/client";
 import {
   KnockProvider,
@@ -7,7 +9,7 @@ import {
 } from "@knocklabs/react";
 import { useCallback, useEffect } from "react";
 
-import useIdentify from "../hooks/useIdentify";
+import useIdentify from "@/hooks/useIdentify";
 
 // Follows this guide as setup to create a custom notifications UI
 // https://docs.knock.app/in-app-ui/react/custom-notifications-ui

@@ -31,7 +31,7 @@ const HeadlessFeed = ({
 
   const knockClient = useAuthenticatedKnockClient(
     process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!,
-    userId,
+    { id: userId },
     userToken,
     { host: process.env.NEXT_PUBLIC_KNOCK_HOST, logLevel: "debug" },
   );

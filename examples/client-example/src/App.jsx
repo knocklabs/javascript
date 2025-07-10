@@ -7,7 +7,7 @@ const knockClient = new Knock(import.meta.env.VITE_KNOCK_API_KEY, {
   host: import.meta.env.VITE_KNOCK_HOST,
 });
 
-knockClient.authenticate(import.meta.env.VITE_KNOCK_USER_ID);
+knockClient.authenticate({ id: import.meta.env.VITE_KNOCK_USER_ID });
 
 const useNotificationFeed = (knockClient, feedId) => {
   return useMemo(() => {

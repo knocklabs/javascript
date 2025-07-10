@@ -8,7 +8,7 @@ const knockClient = new Knock({
   baseURL: process.env.NEXT_PUBLIC_KNOCK_HOST,
 });
 
-export const POST = async (request) => {
+export const POST = async (request: Request) => {
   const { id } = await request.json();
   const userId = id || uuidv4();
 

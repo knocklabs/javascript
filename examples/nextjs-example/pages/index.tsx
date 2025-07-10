@@ -39,7 +39,7 @@ export default function Home() {
 
   return (
     <KnockProvider
-      userId={userId}
+      user={{ id: userId }}
       userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}

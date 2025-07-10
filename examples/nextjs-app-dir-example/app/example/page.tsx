@@ -12,10 +12,10 @@ import { Heading, Text } from "@telegraph/typography";
 import { FileCode, Github } from "lucide-react";
 import { useCallback, useState } from "react";
 
-import NotificationFeed from "../components/NotificationFeed";
-import NotificationToasts from "../components/NotificationToasts";
-import SendNotificationForm from "../components/SendNotificationForm";
-import useIdentify from "../hooks/useIdentify";
+import NotificationFeed from "@/components/NotificationFeed";
+import NotificationToasts from "@/components/NotificationToasts";
+import SendNotificationForm from "@/components/SendNotificationForm";
+import useIdentify from "@/hooks/useIdentify";
 
 const Tenants = {
   TeamA: "team-a",
