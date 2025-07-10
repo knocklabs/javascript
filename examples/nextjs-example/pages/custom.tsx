@@ -23,6 +23,8 @@ function ProviderComponent({ children }: { children: React.ReactNode }) {
     return json.userToken;
   }, [userId]);
 
+  if (!userId) return;
+
   return (
     <KnockProvider
       user={{ id: userId }}

@@ -37,6 +37,8 @@ export default function Home() {
     return json.userToken;
   }, [userId]);
 
+  if (!userId) return;
+
   return (
     <KnockProvider
       user={{ id: userId }}
