@@ -1,0 +1,5 @@
+{
+  "extends": ["expo", "plugin:prettier/recommended"],
+  "ignorePatterns": ["dist/*"],
+  "root": true
+}

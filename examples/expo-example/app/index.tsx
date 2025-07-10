@@ -4,14 +4,14 @@ import {
   KnockProvider,
   NotificationIconButton,
 } from "@knocklabs/expo";
-import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import NotificationFeedContainer from "./NotificationFeedContainer";
+import NotificationFeedContainer from "@/components/NotificationFeedContainer";
 
-const App: React.FC = () => {
+export default function HomeScreen() {
   const [isNotificationFeedOpen, setIsNotificationFeedOpen] = useState(false);
+
   const onTopActionButtonTap = useCallback(() => {
     setIsNotificationFeedOpen(!isNotificationFeedOpen);
   }, [isNotificationFeedOpen]);
@@ -30,7 +30,6 @@ const App: React.FC = () => {
           feedId={process.env.EXPO_PUBLIC_KNOCK_FEED_CHANNEL_ID}
         >
           <View style={styles.container}>
-            <StatusBar style="auto" />
             {!isNotificationFeedOpen && (
               <NotificationIconButton
                 onClick={onTopActionButtonTap}
@@ -49,9 +48,7 @@ const App: React.FC = () => {
       </KnockExpoPushNotificationProvider>
     </KnockProvider>
   );
-};
-
-export default App;
+}
 
 const styles = StyleSheet.create({
   container: {

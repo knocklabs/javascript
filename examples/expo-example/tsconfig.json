@@ -1,8 +1,17 @@
 {
-  "compilerOptions": {
-    "jsx": "react"
-  },
   "extends": "expo/tsconfig.base",
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
 }

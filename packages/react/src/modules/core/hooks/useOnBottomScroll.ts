@@ -2,7 +2,7 @@ import debounce from "lodash.debounce";
 import { RefObject, useCallback, useEffect, useMemo } from "react";
 
 type OnBottomScrollOptions = {
-  ref: RefObject<HTMLDivElement | undefined>;
+  ref: RefObject<HTMLDivElement | null>;
   callback: () => void;
   offset?: number;
 };
