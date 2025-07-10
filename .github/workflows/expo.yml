@@ -1,0 +1,28 @@
+name: Expo Build
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Install and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: yarn
+          registry-url: "https://registry.npmjs.org"
+          scope: "@knocklabs"
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build packages
+        run: yarn build:packages
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build on EAS
+        run: cd examples/expo-example && eas build --platform android --non-interactive --no-wait

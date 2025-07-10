@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "@knocklabs/expo-example",
-    "slug": "@knocklabs/expo-example",
+    "name": "expo-example",
+    "slug": "expo-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,14 +9,16 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.knocklabs.expoexample"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.knocklabs.expoexample"
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +40,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCanary": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "37459970-f809-421d-9fc0-26e3c96e3cc2"
+      }
+    },
+    "owner": "knocklabs"
   }
 }
