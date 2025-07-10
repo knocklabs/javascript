@@ -169,10 +169,20 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     async (
       notification: Notifications.Notification,
       status: MessageEngagementStatus,
-    ): Promise<Message> => {
-      const messageId = notification.request.content.data[
+    ): Promise<Message | void> => {
+      const messageId = notification.request.content.data?.[
         "knock_message_id"
-      ] as string;
+      ] as string | undefined;
+
+      // Skip status update if this isn't a Knock notification
+      // Fixes issue: https://github.com/knocklabs/javascript/issues/589
+      if (!messageId) {
+        knockClient.log(
+          "[Knock] Skipping status update for non-Knock notification",
+        );
+        return;
+      }
+
       return knockClient.messages.updateStatus(messageId, status);
     },
     [knockClient],
