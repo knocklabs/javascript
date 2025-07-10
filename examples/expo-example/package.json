@@ -46,5 +46,8 @@
     "eslint-plugin-prettier": "^5.5.1",
     "typescript": "^5.8.3"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "22.17.0"
+  }
 }
