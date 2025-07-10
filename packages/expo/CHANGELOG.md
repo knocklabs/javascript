@@ -1,5 +1,11 @@
 # @knocklabs/expo
 
+## 0.3.25
+
+### Patch Changes
+
+- f1b129c: updates KnockExpoPushNotificationProvider to ignore messages that do not come from knock
+
 ## 0.3.24
 
 ### Patch Changes
