@@ -3922,7 +3922,7 @@ __metadata:
     "@knocklabs/eslint-config": "workspace:^"
     "@knocklabs/prettier-config": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
-    "@manypkg/cli": "npm:^0.23.0"
+    "@manypkg/cli": "npm:^0.24.0"
     "@vitest/coverage-v8": "npm:^3.1.4"
     prettier: "npm:^3.5.3"
     turbo: "npm:^2.5.4"
@@ -4080,24 +4080,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@manypkg/cli@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "@manypkg/cli@npm:0.23.0"
+"@manypkg/cli@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "@manypkg/cli@npm:0.24.0"
   dependencies:
-    "@manypkg/get-packages": "npm:^2.2.1"
-    detect-indent: "npm:^6.0.0"
+    "@manypkg/get-packages": "npm:^3.0.0"
+    detect-indent: "npm:^7.0.1"
     normalize-path: "npm:^3.0.0"
-    p-limit: "npm:^2.2.1"
+    p-limit: "npm:^6.2.0"
     package-json: "npm:^10.0.1"
-    parse-github-url: "npm:^1.0.2"
-    picocolors: "npm:^1.1.0"
+    parse-github-url: "npm:^1.0.3"
+    picocolors: "npm:^1.1.1"
     sembear: "npm:^0.7.0"
-    semver: "npm:^7.6.3"
-    tinyexec: "npm:^0.3.1"
-    validate-npm-package-name: "npm:^5.0.1"
+    semver: "npm:^7.7.1"
+    tinyexec: "npm:^1.0.1"
+    validate-npm-package-name: "npm:^6.0.0"
   bin:
     manypkg: bin.js
-  checksum: 10c0/715d6abc2f2376b57cfdfafc495b6c226b79654ef43548a4c7894cce54d453c79327f4b5cae89543e5d174f308ae95fb4ad576c88413303ae73f0c7f104f6fe9
+  checksum: 10c0/63cb73b68939b1f52134bd56d881e657d931fd0946105d1a4881b88ac1bb00a1bb9554a92a7b215ae8a736c67d3fb9474f89091ad6a3e374a00b37c54bbc66be
   languageName: node
   linkType: hard
 
@@ -4113,12 +4113,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@manypkg/find-root@npm:^2.2.2":
-  version: 2.2.3
-  resolution: "@manypkg/find-root@npm:2.2.3"
+"@manypkg/find-root@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@manypkg/find-root@npm:3.0.0"
   dependencies:
-    "@manypkg/tools": "npm:^1.1.2"
-  checksum: 10c0/fef84441d00ec9e69a12359c3faa635faa1a8e47d72f3641227cfd3ee86ba57cd6caf079973ab8d3d6984c8c4cc9deda0e59138800268f22ec17b40af7b973ea
+    "@manypkg/tools": "npm:^2.0.0"
+  checksum: 10c0/51bd0bb63dbb0822356f14329772e1baf716ae0be56724f984592f06a79b312562f833422590cf3f35b89d41f969e41b07b9111a85b9c0f79c82c9abf9e7468c
   languageName: node
   linkType: hard
 
@@ -4136,24 +4136,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@manypkg/get-packages@npm:^2.2.1":
-  version: 2.2.2
-  resolution: "@manypkg/get-packages@npm:2.2.2"
+"@manypkg/get-packages@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@manypkg/get-packages@npm:3.0.0"
   dependencies:
-    "@manypkg/find-root": "npm:^2.2.2"
-    "@manypkg/tools": "npm:^1.1.1"
-  checksum: 10c0/3b4fabbf9f7ed90264b0f16d2477d7124625472772ca33c6b2f3d70104a9ca13fadd860963453e5891e0c7722b1e0c045abec4544153e649e5b48f4817ada73a
+    "@manypkg/find-root": "npm:^3.0.0"
+    "@manypkg/tools": "npm:^2.0.0"
+  checksum: 10c0/bacbb484d4a1c9ec1e19704953786b51d7ebe3ceeace7a17ff1408a26893aa37262ccf60b193a3a35a073e6c46f1eb63c994120bc7d4f5b97c4517ff147b47b5
   languageName: node
   linkType: hard
 
-"@manypkg/tools@npm:^1.1.1, @manypkg/tools@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "@manypkg/tools@npm:1.1.2"
+"@manypkg/tools@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@manypkg/tools@npm:2.0.0"
   dependencies:
-    fast-glob: "npm:^3.3.2"
     jju: "npm:^1.4.0"
     js-yaml: "npm:^4.1.0"
-  checksum: 10c0/54e4b8e0d2aeb2682dff2d660139a825ab583aac86f42262ae81c108d6cc54e6d6de7172270e845a2409aaac2e113e51d9a1442bd226207547bc1bb454c3a5b8
+    tinyglobby: "npm:^0.2.13"
+  checksum: 10c0/ac2e45e648846b4edd170e1d4efa5c3b7a9df2cb7758fc21bcfea8e1b73c0b05df4d65dbd0275502c71b69efded431967aed61dd9a34f634faad7c4112077ebd
   languageName: node
   linkType: hard
 
@@ -15111,7 +15111,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-limit@npm:^2.2.0, p-limit@npm:^2.2.1":
+"p-limit@npm:^2.2.0":
   version: 2.3.0
   resolution: "p-limit@npm:2.3.0"
   dependencies:
@@ -15126,6 +15126,15 @@ __metadata:
   dependencies:
     yocto-queue: "npm:^0.1.0"
   checksum: 10c0/9db675949dbdc9c3763c89e748d0ef8bdad0afbb24d49ceaf4c46c02c77d30db4e0652ed36d0a0a7a95154335fab810d95c86153105bb73b3a90448e2bb14e1a
+  languageName: node
+  linkType: hard
+
+"p-limit@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "p-limit@npm:6.2.0"
+  dependencies:
+    yocto-queue: "npm:^1.1.1"
+  checksum: 10c0/448bf55a1776ca1444594d53b3c731e68cdca00d44a6c8df06a2f6e506d5bbd540ebb57b05280f8c8bff992a630ed782a69612473f769a7473495d19e2270166
   languageName: node
   linkType: hard
 
@@ -15205,7 +15214,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parse-github-url@npm:^1.0.2":
+"parse-github-url@npm:^1.0.3":
   version: 1.0.3
   resolution: "parse-github-url@npm:1.0.3"
   bin:
@@ -16838,7 +16847,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.1.3, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.0, semver@npm:^7.6.3, semver@npm:^7.7.1, semver@npm:^7.7.2":
+"semver@npm:^7.1.3, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.0, semver@npm:^7.7.1, semver@npm:^7.7.2":
   version: 7.7.2
   resolution: "semver@npm:7.7.2"
   bin:
@@ -17968,10 +17977,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyexec@npm:^0.3.1, tinyexec@npm:^0.3.2":
+"tinyexec@npm:^0.3.2":
   version: 0.3.2
   resolution: "tinyexec@npm:0.3.2"
   checksum: 10c0/3efbf791a911be0bf0821eab37a3445c2ba07acc1522b1fa84ae1e55f10425076f1290f680286345ed919549ad67527d07281f1c19d584df3b74326909eb1f90
+  languageName: node
+  linkType: hard
+
+"tinyexec@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "tinyexec@npm:1.0.1"
+  checksum: 10c0/e1ec3c8194a0427ce001ba69fd933d0c957e2b8994808189ed8020d3e0c01299aea8ecf0083cc514ecbf90754695895f2b5c0eac07eb2d0c406f7d4fbb8feade
   languageName: node
   linkType: hard
 
@@ -18751,10 +18767,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validate-npm-package-name@npm:^5.0.0, validate-npm-package-name@npm:^5.0.1":
+"validate-npm-package-name@npm:^5.0.0":
   version: 5.0.1
   resolution: "validate-npm-package-name@npm:5.0.1"
   checksum: 10c0/903e738f7387404bb72f7ac34e45d7010c877abd2803dc2d614612527927a40a6d024420033132e667b1bade94544b8a1f65c9431a4eb30d0ce0d80093cd1f74
+  languageName: node
+  linkType: hard
+
+"validate-npm-package-name@npm:^6.0.0":
+  version: 6.0.1
+  resolution: "validate-npm-package-name@npm:6.0.1"
+  checksum: 10c0/4d5455523e0a0c9a9ae3f306d4e6205c43be71dac85882db1c357ebbaf685390ea94985511824cfe41c04ca302dd85eb1f0292ab6941234b5ddca38d11865f9a
   languageName: node
   linkType: hard
 
@@ -19414,6 +19437,13 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"yocto-queue@npm:^1.1.1":
+  version: 1.2.1
+  resolution: "yocto-queue@npm:1.2.1"
+  checksum: 10c0/5762caa3d0b421f4bdb7a1926b2ae2189fc6e4a14469258f183600028eb16db3e9e0306f46e8ebf5a52ff4b81a881f22637afefbef5399d6ad440824e9b27f9f
   languageName: node
   linkType: hard
 
