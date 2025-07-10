@@ -11,7 +11,7 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@faker-js/faker": "^9.8.0",
+    "@faker-js/faker": "^9.9.0",
     "@knocklabs/node": "^1.2.0",
     "@knocklabs/react": "workspace:*",
     "@telegraph/button": "^0.0.83",
