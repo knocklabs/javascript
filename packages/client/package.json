@@ -64,7 +64,7 @@
     "rimraf": "^6.0.1",
     "rollup": "^4.41.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.19",
+    "vite": "^7.0.4",
     "vitest": "^3.1.1"
   },
   "dependencies": {
