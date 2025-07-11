@@ -3,11 +3,14 @@ import { useKnockClient } from "@knocklabs/react-core";
 import React, { createContext, useCallback, useContext } from "react";
 
 export interface KnockPushNotificationContextType {
-  registerPushTokenToChannel(token: string, channelId: string): Promise<void>;
+  registerPushTokenToChannel(
+    token: string,
+    channelId: string,
+  ): Promise<ChannelData | void>;
   unregisterPushTokenFromChannel(
     token: string,
     channelId: string,
-  ): Promise<void>;
+  ): Promise<ChannelData | void>;
 }
 
 const KnockPushNotificationContext = createContext<
@@ -34,8 +37,8 @@ export const KnockPushNotificationProvider: React.FC<
   );
 
   const registerPushTokenToChannel = useCallback(
-    async (token: string, channelId: string): Promise<void> => {
-      knockClient.user
+    async (token: string, channelId: string): Promise<ChannelData | void> => {
+      return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
           const tokens: string[] = result.data["tokens"];
@@ -54,8 +57,8 @@ export const KnockPushNotificationProvider: React.FC<
   );
 
   const unregisterPushTokenFromChannel = useCallback(
-    async (token: string, channelId: string): Promise<void> => {
-      knockClient.user
+    async (token: string, channelId: string): Promise<ChannelData | void> => {
+      return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
           const tokens: string[] = result.data["tokens"];
