@@ -3,7 +3,10 @@ import { useKnockClient } from "@knocklabs/react-core";
 import React, { createContext, useCallback, useContext } from "react";
 
 export interface KnockPushNotificationContextType {
-  registerPushTokenToChannel(token: string, channelId: string): Promise<ChannelData | void>;
+  registerPushTokenToChannel(
+    token: string,
+    channelId: string,
+  ): Promise<ChannelData | void>;
   unregisterPushTokenFromChannel(
     token: string,
     channelId: string,
