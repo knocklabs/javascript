@@ -2,4 +2,4 @@
 "@knocklabs/react-native": patch
 ---
 
-Make token (un)registration methods in KnockPushNotificationProvider awaitable
+fix: make token (un)registration methods in KnockPushNotificationProvider awaitable
