@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.25
+
+### Patch Changes
+
+- d0b85b3: fix: make token (un)registration methods in KnockPushNotificationProvider awaitable
+
 ## 0.6.24
 
 ### Patch Changes
