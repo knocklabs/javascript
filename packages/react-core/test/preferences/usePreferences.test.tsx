@@ -30,7 +30,6 @@ function buildSWRMock() {
         // The real SWR implementation would call the fetcher and store the
         // promise result – we don't need the result here, just the side-effect
         // for our assertions.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         fetcher();
       }
 
