@@ -1,5 +1,14 @@
 # ms-teams-connect-example
 
+## 0.0.11
+
+### Patch Changes
+
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [3703cf6]
+- Updated dependencies [fdc6d82]
+  - @knocklabs/react@0.7.23
+
 ## 0.0.10
 
 ### Patch Changes

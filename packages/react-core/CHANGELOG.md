@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.2
+
+### Patch Changes
+
+- 3703cf6: feat: adds `usePreferences` hook for fetching and updating user preferences in react apps.
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+
 ## 0.7.1
 
 ### Patch Changes

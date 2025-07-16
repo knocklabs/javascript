@@ -1,5 +1,13 @@
 # @knocklabs/expo-example
 
+## 1.0.4
+
+### Patch Changes
+
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [fdc6d82]
+  - @knocklabs/expo@0.3.28
+
 ## 1.0.3
 
 ### Patch Changes

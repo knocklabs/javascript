@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.23
+
+### Patch Changes
+
+- 3703cf6: feat: adds `usePreferences` hook for fetching and updating user preferences in react apps.
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [3703cf6]
+- Updated dependencies [fdc6d82]
+  - @knocklabs/react-core@0.7.2
+
 ## 0.7.22
 
 ### Patch Changes
