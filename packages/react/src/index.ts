@@ -120,4 +120,5 @@ export {
   type Translations,
   useTranslations,
   type RecipientObject,
+  usePreferences,
 } from "@knocklabs/react-core";
