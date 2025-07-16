@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.27
+
+### Patch Changes
+
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [3703cf6]
+- Updated dependencies [fdc6d82]
+  - @knocklabs/react-core@0.7.2
+
 ## 0.6.26
 
 ### Patch Changes
