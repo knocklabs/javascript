@@ -66,3 +66,5 @@ export {
   useTranslations,
 } from "./modules/i18n";
 export { type RecipientObject } from "./interfaces";
+
+export { usePreferences } from "./modules/preferences";
