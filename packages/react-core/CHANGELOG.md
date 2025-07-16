@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+### Patch Changes
+
+- aa16c97: fix: make the user prop to KnockProvider stable by comparing equality, and prevent re-instantiating the knock client unnecessarily
+
 ## 0.7.0
 
 ### Minor Changes

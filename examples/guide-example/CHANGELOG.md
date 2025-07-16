@@ -1,5 +1,11 @@
 # guide-example
 
+## 0.0.23
+
+### Patch Changes
+
+- @knocklabs/react@0.7.22
+
 ## 0.0.22
 
 ### Patch Changes
