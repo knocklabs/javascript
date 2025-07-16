@@ -50,7 +50,9 @@ function useAuthenticatedKnockClient(
   options: AuthenticatedKnockClientOptions = {},
 ) {
   const knockRef = React.useRef<Knock | undefined>(undefined);
+
   const stableOptions = useStableOptions(options);
+  const stableUserIdOrObject = useStableOptions(userIdOrUserWithProperties);
 
   return React.useMemo(() => {
     const userId =
@@ -94,7 +96,7 @@ function useAuthenticatedKnockClient(
     knockRef.current = knock;
 
     return knock;
-  }, [apiKey, userIdOrUserWithProperties, userToken, stableOptions]);
+  }, [apiKey, stableUserIdOrObject, userToken, stableOptions]);
 }
 
 export default useAuthenticatedKnockClient;
