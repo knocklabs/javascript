@@ -56,9 +56,9 @@ function useAuthenticatedKnockClient(
 
   return React.useMemo(() => {
     const userId =
-      typeof userIdOrUserWithProperties === "string"
-        ? userIdOrUserWithProperties
-        : userIdOrUserWithProperties?.id;
+      typeof stableUserIdOrObject === "string"
+        ? stableUserIdOrObject
+        : stableUserIdOrObject?.id;
 
     const currentKnock = knockRef.current;
 
@@ -70,7 +70,7 @@ function useAuthenticatedKnockClient(
     ) {
       authenticateWithOptions(
         currentKnock,
-        userIdOrUserWithProperties,
+        stableUserIdOrObject,
         userToken,
         stableOptions,
       );
@@ -89,7 +89,7 @@ function useAuthenticatedKnockClient(
 
     authenticateWithOptions(
       knock,
-      userIdOrUserWithProperties,
+      stableUserIdOrObject,
       userToken,
       stableOptions,
     );
