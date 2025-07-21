@@ -1,6 +1,6 @@
 {
   "name": "slack-kit-example",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@knocklabs/node": "^1.2.0",
-    "@knocklabs/react": "0.7.23",
+    "@knocklabs/react": "0.7.24",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.3",
     "react": "^19.0.0",
