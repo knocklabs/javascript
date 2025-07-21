@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.24
+
+### Patch Changes
+
+- cbb2aa0: bump telegraph packages to latest
+- a475157: chore(deps): bump the telegraph packages
+
 ## 0.7.23
 
 ### Patch Changes

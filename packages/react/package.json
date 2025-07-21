@@ -2,7 +2,7 @@
   "name": "@knocklabs/react",
   "description": "A set of React components to build notification experiences powered by Knock",
   "author": "@knocklabs",
-  "version": "0.7.23",
+  "version": "0.7.24",
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
