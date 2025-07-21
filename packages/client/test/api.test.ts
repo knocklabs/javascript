@@ -498,6 +498,25 @@ describe("API Client", () => {
   });
 
   describe("Request Configuration", () => {
+    test("sets correct user agent header", () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      // Access the private axios client to check headers
+      const axiosClient = (apiClient as unknown as Record<string, unknown>)
+        .axiosClient as { defaults: { headers: Record<string, string> } };
+
+      expect(axiosClient.defaults.headers["User-Agent"]).toMatch(
+        /^Knock\/ClientJS \d+\.\d+\.\d+/,
+      );
+      expect(axiosClient.defaults.headers["User-Agent"]).toContain(
+        "Knock/ClientJS",
+      );
+    });
+
     test("supports various HTTP methods", async () => {
       const mockHttp = createAxiosMock();
       const apiClient = new ApiClient({

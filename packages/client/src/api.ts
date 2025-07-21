@@ -2,6 +2,8 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 
+import { version } from "../package.json";
+
 type ApiClientOptions = {
   host: string;
   apiKey: string;
@@ -38,6 +40,7 @@ class ApiClient {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
         "X-Knock-User-Token": this.userToken,
+        "User-Agent": this.getUserAgent(),
       },
     });
 
@@ -103,6 +106,12 @@ class ApiClient {
     }
 
     return false;
+  }
+
+  private getUserAgent() {
+    // Note: we're following format used in our Stainless SDKs:
+    // https://github.com/knocklabs/knock-node/blob/main/src/client.ts#L335
+    return `Knock/ClientJS ${version}`;
   }
 }
 
