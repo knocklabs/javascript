@@ -64,8 +64,10 @@ describe("useSlackConnectionStatus", () => {
     );
 
     await waitFor(() =>
-      expect(result.current.connectionStatus).toBe("disconnected"),
+      expect(result.current.connectionStatus).toBe("error"),
     );
-    // No error label expected due to current implementation
+    await waitFor(() =>
+      expect(result.current.errorLabel).toBe("Account inactive"),
+    );
   });
 });

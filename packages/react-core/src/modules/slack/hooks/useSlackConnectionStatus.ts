@@ -56,10 +56,6 @@ function useSlackConnectionStatus(
           return setConnectionStatus("connected");
         }
 
-        if (!authRes.connection?.ok) {
-          return setConnectionStatus("disconnected");
-        }
-
         // This is a normal response for a tenant that doesn't have an access
         // token set on it, meaning it's not connected to Slack, so we
         // give it a "disconnected" status instead of an error status.
@@ -71,14 +67,16 @@ function useSlackConnectionStatus(
         }
 
         // This is for an error coming directly from Slack.
-        if (!authRes.connection?.ok && authRes.connection?.error) {
-          const errorLabel = formatSlackErrorMessage(authRes.connection?.error);
+        if (authRes.connection && authRes.connection.error) {
+          const errorLabel = formatSlackErrorMessage(authRes.connection.error);
           setErrorLabel(errorLabel);
           setConnectionStatus("error");
           return;
         }
 
-        // This is for any Knock errors that would require a reconnect.
+        if (authRes.connection) {
+          return setConnectionStatus("disconnected");
+        }
 
         setConnectionStatus("error");
       } catch (_error) {
