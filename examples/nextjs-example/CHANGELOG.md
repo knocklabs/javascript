@@ -1,5 +1,11 @@
 # nextjs-example
 
+## 1.1.28
+
+### Patch Changes
+
+- @knocklabs/react@0.7.25
+
 ## 1.1.27
 
 ### Patch Changes
