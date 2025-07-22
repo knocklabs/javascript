@@ -314,6 +314,48 @@ describe("feed store", () => {
       expect(state.items).toEqual([]);
       expect(state.metadata).toEqual(customMetadata);
     });
+
+    test("preserves function implementations when resetting store", () => {
+      const store = createStore();
+
+      // Capture original function references
+      const {
+        setResult: originalSetResult,
+        setMetadata: originalSetMetadata,
+        setNetworkStatus: originalSetNetworkStatus,
+        resetStore: originalResetStore,
+        setItemAttrs: originalSetItemAttrs,
+      } = store.getState();
+
+      // Perform a reset
+      store.getState().resetStore();
+
+      // Obtain the state again after the reset
+      const {
+        setResult,
+        setMetadata,
+        setNetworkStatus,
+        resetStore: newResetStore,
+        setItemAttrs,
+      } = store.getState();
+
+      // All function references should remain identical (not replaced by no-ops)
+      expect(setResult).toBe(originalSetResult);
+      expect(setMetadata).toBe(originalSetMetadata);
+      expect(setNetworkStatus).toBe(originalSetNetworkStatus);
+      expect(newResetStore).toBe(originalResetStore);
+      expect(setItemAttrs).toBe(originalSetItemAttrs);
+
+      // And the implementations should still work – e.g. setMetadata should mutate state
+      const updatedMetadata: FeedMetadata = {
+        total_count: 42,
+        unread_count: 21,
+        unseen_count: 13,
+      };
+      setMetadata(updatedMetadata);
+
+      expect(store.getState().metadata).toEqual(updatedMetadata);
+    });
   });
 
   describe("setItemAttrs", () => {

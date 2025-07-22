@@ -84,7 +84,15 @@ const initalizeStore = () => {
       store.setState((state) => ({ ...state, metadata })),
 
     resetStore: (metadata = initialStoreState.metadata) =>
-      store.setState(() => ({ ...initialStoreState, metadata })),
+      store.setState(() => ({
+        ...initialStoreState,
+        setResult: store.state.setResult,
+        setMetadata: store.state.setMetadata,
+        setNetworkStatus: store.state.setNetworkStatus,
+        resetStore: store.state.resetStore,
+        setItemAttrs: store.state.setItemAttrs,
+        metadata,
+      })),
 
     setItemAttrs: (itemIds: Array<string>, attrs: object) => {
       // Create a map for the items to the updates to be made
