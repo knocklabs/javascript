@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.3
+
+### Patch Changes
+
+- c3efcf9: Resolve logic error in Slack connection status
+- Updated dependencies [befd7b9]
+  - @knocklabs/client@0.15.1
+
 ## 0.7.2
 
 ### Patch Changes

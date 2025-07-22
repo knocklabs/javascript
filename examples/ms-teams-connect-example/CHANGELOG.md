@@ -1,5 +1,11 @@
 # ms-teams-connect-example
 
+## 0.0.13
+
+### Patch Changes
+
+- @knocklabs/react@0.7.25
+
 ## 0.0.12
 
 ### Patch Changes

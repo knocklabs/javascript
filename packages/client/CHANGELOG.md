@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.1
+
+### Patch Changes
+
+- befd7b9: fix: when reseting the feed, real-time notifications stop working
+
 ## 0.15.0
 
 ### Minor Changes
