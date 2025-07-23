@@ -73,7 +73,6 @@ type PredicateOpts = {
   filters?: SelectFilterParams | undefined;
 };
 
-// TODO: Filter out archived guides once we implement throttling.
 const predicate = (
   guide: KnockGuide,
   { location, filters = {} }: PredicateOpts,
@@ -83,6 +82,10 @@ const predicate = (
   }
 
   if (filters.key && filters.key !== guide.key) {
+    return false;
+  }
+
+  if (guide.steps.every((s) => !!s.message.archived_at)) {
     return false;
   }
 
@@ -122,6 +125,35 @@ const predicate = (
   return true;
 };
 
+const checkIfInsideThrottleWindow = (
+  timestamp: string,
+  durationInSeconds: number,
+) => {
+  // 1. Parse the original timestamp string into a Date object.
+  // Date.parse() handles ISO 8601 strings correctly and returns milliseconds since epoch.
+  // This inherently handles timezones by converting everything to a universal time representation (UTC).
+  const throttleWindowStartedDate = new Date(timestamp);
+
+  // Check if the original timestamp string was valid
+  if (isNaN(throttleWindowStartedDate.getTime())) {
+    return false;
+  }
+
+  // 2. Calculate the future timestamp by adding the duration to the original timestamp.
+  // Convert duration from seconds to milliseconds.
+  const durationInMilliseconds = durationInSeconds * 1000;
+  const futureTimestampMilliseconds =
+    throttleWindowStartedDate.getTime() + durationInMilliseconds;
+
+  // 3. Get the current timestamp in milliseconds since epoch.
+  const currentTimestampMilliseconds = new Date().getTime();
+
+  // 4. Compare the current timestamp with the calculated future timestamp.
+  // Both are in milliseconds since epoch (UTC), so direct comparison is accurate
+  // regardless of local timezones.
+  return currentTimestampMilliseconds <= futureTimestampMilliseconds;
+};
+
 export class KnockGuideClient {
   public store: Store<StoreState, (state: StoreState) => StoreState>;
 
@@ -129,7 +161,13 @@ export class KnockGuideClient {
   private socket: Socket | undefined;
   private socketChannel: Channel | undefined;
   private socketChannelTopic: string;
-  private socketEventTypes = ["guide.added", "guide.updated", "guide.removed"];
+  private socketEventTypes = [
+    "guide.added",
+    "guide.updated",
+    "guide.removed",
+    "guide_group.added",
+    "guide_group.updated",
+  ];
 
   // Original history methods to monkey patch, or restore in cleanups.
   private pushStateFn: History["pushState"] | undefined;
@@ -139,6 +177,8 @@ export class KnockGuideClient {
   // and ranked based on its relative order in the group over a duration of time
   // to resolve and render the prevailing one.
   private stage: GroupStage | undefined;
+
+  private intervalId: number | undefined;
 
   constructor(
     readonly knock: Knock,
@@ -154,6 +194,7 @@ export class KnockGuideClient {
 
     this.store = new Store<StoreState>({
       guideGroups: [],
+      guideGroupDisplayLogs: {},
       guides: {},
       queries: {},
       location,
@@ -170,6 +211,8 @@ export class KnockGuideClient {
       this.listenForLocationChangesFromWindow();
     }
 
+    this.startRenderCounterLoop();
+
     this.knock.log("[Guide] Initialized a guide client");
   }
 
@@ -178,10 +221,22 @@ export class KnockGuideClient {
     this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
   }
 
+  private startRenderCounterLoop() {
+    this.intervalId = setInterval(() => {
+      console.log("loop");
+      if (this.stage && this.stage.status !== "closed") return;
+      this.store.setState((state) => ({
+        ...state,
+        counter: state.counter + 1,
+      }));
+    }, 2000);
+  }
+
   cleanup() {
     this.unsubscribe();
     this.removeEventListeners();
     this.clearGroupStage();
+    this.clearInterval();
   }
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
@@ -211,11 +266,18 @@ export class KnockGuideClient {
       >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
-      const { entries, guide_groups: groups } = data;
+      const {
+        entries,
+        guide_groups: groups,
+        guide_group_display_logs: guideGroupDisplayLogs,
+      } = data;
+
+      // console.log(2, guideGroupDisplayLogs);
 
       this.store.setState((state) => ({
         ...state,
         guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
+        guideGroupDisplayLogs,
         guides: byKey(entries.map((g) => this.localCopy(g))),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
@@ -291,6 +353,10 @@ export class KnockGuideClient {
       case "guide.removed":
         return this.removeGuide(payload);
 
+      case "guide_group.added":
+      case "guide_group.updated":
+        return this.addOrReplaceGuideGroup(payload);
+
       default:
         return;
     }
@@ -320,8 +386,29 @@ export class KnockGuideClient {
       return undefined;
     }
 
-    // TODO: Check if guide has ignore limit set, and if so return immediately.
     const [index, guide] = [...result][0]!;
+
+    // If a guide ignores the group limit, then return immediately to render
+    // always.
+    if (guide.bypass_global_group_limit) {
+      return guide;
+    }
+
+    // Check if inside the throttle window, and if so then stop.
+    const throttleWindowStartedTs =
+      this.store.state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
+    const [defaultGroup] = this.store.state.guideGroups;
+    if (
+      defaultGroup &&
+      defaultGroup.display_interval &&
+      throttleWindowStartedTs
+    ) {
+      const throttled = checkIfInsideThrottleWindow(
+        throttleWindowStartedTs,
+        defaultGroup.display_interval,
+      );
+      if (throttled) return undefined;
+    }
 
     // Starting here to the end of this method represents the core logic of how
     // "group stage" works. It provides a mechanism for 1) figuring out which
@@ -356,8 +443,6 @@ export class KnockGuideClient {
       this.stage = this.openGroupStage(); // Assign here to make tsc happy
     }
 
-    // TODO: Need to check if this guide can render now based on the group's
-    // throttle limit.
     switch (this.stage.status) {
       case "open": {
         this.knock.log(`[Guide] Addng to the group stage: ${guide.key}`);
@@ -483,6 +568,8 @@ export class KnockGuideClient {
   //
 
   async markAsSeen(guide: GuideData, step: GuideStepData) {
+    if (step.message.seen_at) return;
+
     this.knock.log(
       `[Guide] Marking as seen (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -537,6 +624,8 @@ export class KnockGuideClient {
   }
 
   async markAsArchived(guide: GuideData, step: GuideStepData) {
+    if (step.message.archived_at) return;
+
     this.knock.log(
       `[Guide] Marking as archived (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -662,9 +751,25 @@ export class KnockGuideClient {
         return step;
       });
       guide.steps = steps;
-
       const guides = { ...state.guides, [guide.key]: guide };
-      return { ...state, guides };
+
+      // If we are marking as archived, reset the group stage so we can render
+      // the next guide in the group.
+      const hasMarkedAsArchived = !!updatedStep && !!attrs.archived_at;
+      if (hasMarkedAsArchived) {
+        this.stage = undefined;
+      }
+
+      // Optimistically update the group display logs so we can apply the
+      // throttle settings.
+      const guideGroupDisplayLogs = hasMarkedAsArchived
+        ? {
+            ...state.guideGroupDisplayLogs,
+            [DEFAULT_GROUP_KEY]: attrs.archived_at!,
+          }
+        : state.guideGroupDisplayLogs;
+
+      return { ...state, guides, guideGroupDisplayLogs };
     });
 
     return updatedStep;
@@ -701,6 +806,36 @@ export class KnockGuideClient {
     this.store.setState((state) => {
       const { [data.guide.key]: _, ...rest } = state.guides;
       return { ...state, guides: rest };
+    });
+  }
+
+  private addOrReplaceGuideGroup({
+    data,
+  }: GuideGroupAddedEvent | GuideGroupUpdatedEvent) {
+    this.patchClosedGroupStage();
+
+    this.store.setState((state) => {
+      const guideGroups = state.guideGroups.map((group) => {
+        return group.key === data.guide_group.key ? data.guide_group : group;
+      });
+
+      const unthrottled = data.guide_group.display_sequence_unthrottled || [];
+      const throttled = data.guide_group.display_sequence_throttled || [];
+      let guides = state.guides;
+
+      guides = unthrottled.reduce((acc, key) => {
+        if (!acc[key]) return acc;
+        const guide = { ...acc[key], bypass_global_group_limit: true };
+        return { ...acc, [key]: guide };
+      }, guides);
+
+      guides = throttled.reduce((acc, key) => {
+        if (!acc[key]) return acc;
+        const guide = { ...acc[key], bypass_global_group_limit: false };
+        return { ...acc, [key]: guide };
+      }, guides);
+
+      return { ...state, guides, guideGroups };
     });
   }
 
@@ -764,6 +899,13 @@ export class KnockGuideClient {
     if (this.replaceStateFn) {
       window.history.replaceState = this.replaceStateFn;
       this.replaceStateFn = undefined;
+    }
+  }
+
+  private clearInterval() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = undefined;
     }
   }
 }
