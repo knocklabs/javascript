@@ -572,28 +572,12 @@ export class KnockGuideClient {
     this.maybeSetStageToPatch();
 
     this.store.setState((state) => {
-      const guides = { ...state.guides, [guide.key]: guide };
-
-      // Expect the latest default group in the event payload.
-      if (data.guide_groups[0]) {
-        return {
-          ...state,
-          guides,
-          guideGroups: data.guide_groups,
-        };
-      }
-
-      // Just in case only for safety. We can remove once we backfill all
-      // accounts with a default global group.
-      const defaultGroup =
-        state.guideGroups[0] || mockDefaultGroup(Object.values(state.guides));
-
-      const updatedGroup = {
-        ...defaultGroup,
-        display_sequence: [...defaultGroup.display_sequence, guide.key],
+      const guides = {
+        ...state.guides,
+        [guide.key]: guide,
       };
 
-      return { ...state, guides, guideGroups: [updatedGroup] };
+      return { ...state, guides };
     });
   }
 
@@ -603,23 +587,7 @@ export class KnockGuideClient {
     this.maybeSetStageToPatch();
 
     this.store.setState((state) => {
-      const isExistingGuide = !!state.guides[guide.key];
       const guides = { ...state.guides, [guide.key]: guide };
-
-      if (data.guide_groups[0]) {
-        return { ...state, guides, guideGroups: data.guide_groups };
-      }
-
-      const defaultGroup =
-        state.guideGroups[0] || mockDefaultGroup(Object.values(state.guides));
-
-      if (!isExistingGuide) {
-        const updatedGroup = {
-          ...defaultGroup,
-          display_sequence: [...defaultGroup.display_sequence, guide.key],
-        };
-        return { ...state, guides, guideGroups: [updatedGroup] };
-      }
 
       return { ...state, guides };
     });

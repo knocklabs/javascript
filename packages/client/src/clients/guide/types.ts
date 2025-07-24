@@ -102,12 +102,12 @@ type SocketEventPayload<E extends SocketEventType, D> = {
 
 export type GuideAddedEvent = SocketEventPayload<
   "guide.added",
-  { guide: GuideData; guide_groups: GuideGroupData[]; eligible: true }
+  { guide: GuideData; eligible: true }
 >;
 
 export type GuideUpdatedEvent = SocketEventPayload<
   "guide.updated",
-  { guide: GuideData; guide_groups: GuideGroupData[]; eligible: boolean }
+  { guide: GuideData; eligible: boolean }
 >;
 
 export type GuideRemovedEvent = SocketEventPayload<
