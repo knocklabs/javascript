@@ -148,10 +148,10 @@ export type QueryStatus = {
 };
 
 export type StoreState = {
-  location: string | undefined;
   guideGroups: GuideGroupData[];
   guides: Record<KnockGuide["key"], KnockGuide>;
   queries: Record<QueryKey, QueryStatus>;
+  location: string | undefined;
   counter: number;
 };
 

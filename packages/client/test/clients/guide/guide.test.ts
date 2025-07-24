@@ -9,14 +9,17 @@ import {
   KnockGuideClient,
   type KnockGuideStep,
 } from "../../../src/clients/guide";
+import { GuideGroupData } from "../../../src/clients/guide/types";
 import Knock from "../../../src/knock";
 
 // Mock @tanstack/store
 const mockStore = {
   getState: vi.fn(() => ({
-    guides: [] as unknown[],
+    guideGroups: [],
+    guides: {},
     queries: {},
     location: undefined,
+    counter: 0,
   })),
   setState: vi.fn((fn) => {
     if (typeof fn === "function") {
@@ -29,9 +32,11 @@ const mockStore = {
     return fn;
   }),
   state: {
-    guides: [] as unknown[],
+    guideGroups: [],
+    guides: {},
     queries: {},
     location: undefined,
+    counter: 0,
   },
 };
 
@@ -86,14 +91,18 @@ describe("KnockGuideClient", () => {
     // Reset store state
     mockStore.setState.mockClear();
     mockStore.getState.mockReturnValue({
-      guides: [],
+      guideGroups: [],
+      guides: {},
       queries: {},
       location: undefined,
+      counter: 0,
     });
     mockStore.state = {
-      guides: [],
+      guideGroups: [],
+      guides: {},
       queries: {},
       location: undefined,
+      counter: 0,
     };
   });
 
@@ -114,9 +123,11 @@ describe("KnockGuideClient", () => {
       expect(client.channelId).toBe(channelId);
       expect(client.targetParams).toEqual({});
       expect(Store).toHaveBeenCalledWith({
-        guides: [],
+        guideGroups: [],
+        guides: {},
         queries: {},
         location: undefined,
+        counter: 0,
       });
     });
 
@@ -137,9 +148,11 @@ describe("KnockGuideClient", () => {
       const _client = new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
-        guides: [],
+        guideGroups: [],
+        guides: {},
         queries: {},
         location: "https://example.com",
+        counter: 0,
       });
     });
 
@@ -148,9 +161,11 @@ describe("KnockGuideClient", () => {
       const _client = new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
-        guides: [],
+        guideGroups: [],
+        guides: {},
         queries: {},
         location: undefined,
+        counter: 0,
       });
     });
   });
@@ -211,9 +226,11 @@ describe("KnockGuideClient", () => {
       if (lastCall) {
         const setStateFunction = lastCall[0];
         const newState = setStateFunction({
-          guides: [],
+          guideGroups: [],
+          guides: {},
           queries: {},
           location: undefined,
+          counter: 0,
         });
         expect(newState.queries).toEqual({
           "/v1/users/user_123/guides": { status: "error", error: mockError },
@@ -463,7 +480,6 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_1",
         key: "onboarding",
-        priority: 10,
         type: "tour",
         semver: "1.0.0",
         steps: [],
@@ -482,7 +498,6 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_2",
         key: "feature_tour",
-        priority: 5,
         type: "tooltip",
         semver: "1.0.0",
         steps: [],
@@ -506,7 +521,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client.selectGuide(stateWithGuides);
 
       // When location is undefined, guides are still included (location rules are skipped)
       expect(result).toHaveLength(2);
@@ -520,7 +535,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides, { key: "onboarding" });
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
 
       expect(result).toHaveLength(1);
       expect(result[0]!.key).toBe("onboarding");
@@ -534,7 +549,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides, { type: "tooltip" });
+      const result = client.selectGuide(stateWithGuides, { type: "tooltip" });
 
       expect(result).toHaveLength(0); // tooltip guide has blocking rule and doesn't match location
     });
@@ -547,7 +562,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client.selectGuide(stateWithGuides);
 
       // Should include the guide with allow directive for /dashboard
       const onboardingGuide = result.find((g) => g.key === "onboarding");
@@ -563,7 +578,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client.selectGuide(stateWithGuides);
 
       // Should exclude the guide with block directive for /settings
       const featureTourGuide = result.find((g) => g.key === "feature_tour");
@@ -608,7 +623,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client.selectGuide(stateWithGuides);
 
       // Should return guides without location rules when location is undefined
       expect(result).toHaveLength(2);
@@ -622,7 +637,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client.selectGuide(stateWithGuides);
 
       if (result.length > 1) {
         expect(result[0]!.priority).toBeGreaterThanOrEqual(result[1]!.priority);

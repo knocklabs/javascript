@@ -149,10 +149,10 @@ export class KnockGuideClient {
       : undefined;
 
     this.store = new Store<StoreState>({
-      location,
       guideGroups: [],
       guides: {},
       queries: {},
+      location,
       // Increment to update the state store and trigger re-selection.
       counter: 0,
     });
