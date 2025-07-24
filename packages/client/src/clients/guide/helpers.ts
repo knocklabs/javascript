@@ -16,8 +16,6 @@ export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
   }
 }
 
-export const DEFAULT_GROUP_KEY = "default";
-
 export const formatFilters = (filters: SelectFilterParams = {}) => {
   return [
     filters.key && `key=${filters.key}`,
@@ -64,3 +62,32 @@ export const findDefaultGroup = (guideGroups: GuideGroupData[]) =>
     (group) =>
       group.key === DEFAULT_GROUP_KEY || group.key === MOCK_DEFAULT_GROUP_KEY,
   );
+
+export const checkIfInsideThrottleWindow = (
+  timestamp: string,
+  durationInSeconds: number,
+) => {
+  // 1. Parse the original timestamp string into a Date object.
+  // Date.parse() handles ISO 8601 strings correctly and returns milliseconds since epoch.
+  // This inherently handles timezones by converting everything to a universal time representation (UTC).
+  const throttleWindowStartedDate = new Date(timestamp);
+
+  // Check if the original timestamp string was valid
+  if (isNaN(throttleWindowStartedDate.getTime())) {
+    return false;
+  }
+
+  // 2. Calculate the future timestamp by adding the duration to the original timestamp.
+  // Convert duration from seconds to milliseconds.
+  const durationInMilliseconds = durationInSeconds * 1000;
+  const futureTimestampMilliseconds =
+    throttleWindowStartedDate.getTime() + durationInMilliseconds;
+
+  // 3. Get the current timestamp in milliseconds since epoch.
+  const currentTimestampMilliseconds = new Date().getTime();
+
+  // 4. Compare the current timestamp with the calculated future timestamp.
+  // Both are in milliseconds since epoch (UTC), so direct comparison is accurate
+  // regardless of local timezones.
+  return currentTimestampMilliseconds <= futureTimestampMilliseconds;
+};
