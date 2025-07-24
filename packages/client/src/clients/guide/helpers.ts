@@ -33,20 +33,29 @@ const sortGuides = <T extends GuideData>(guides: T[]) => {
   );
 };
 
-// Prefixed with a special char to distinguish from the actual default group.
-const MOCK_GROUP_KEY = "$default";
+// Default global guide group key.
+const DEFAULT_GROUP_KEY = "default";
 
-// Build a notional group to fall back on for ordering only without any limits.
-// This is mostly for backward compatibility purposes.
+// Prefixed with a special char $ to distinguish from an actual default group.
+const MOCK_DEFAULT_GROUP_KEY = "$default";
+
+// Build a notional default group to fall back on in case there is none, only
+// for safety as there should always be a default guide group created.
 export const mockDefaultGroup = (entries: GuideData[] = []) => {
   const now = new Date();
 
   return {
     __typename: "GuideGroup",
-    key: MOCK_GROUP_KEY,
+    key: MOCK_DEFAULT_GROUP_KEY,
     display_sequence: sortGuides(entries).map((g) => g.key),
     display_interval: null,
     inserted_at: now.toISOString(),
     updated_at: now.toISOString(),
   } as GuideGroupData;
 };
+
+export const findDefaultGroup = (guideGroups: GuideGroupData[]) =>
+  guideGroups.find(
+    (group) =>
+      group.key === DEFAULT_GROUP_KEY || group.key === MOCK_DEFAULT_GROUP_KEY,
+  );

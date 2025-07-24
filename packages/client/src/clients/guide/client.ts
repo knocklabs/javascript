@@ -8,6 +8,7 @@ import Knock from "../../knock";
 import {
   SelectionResult,
   byKey,
+  findDefaultGroup,
   formatFilters,
   mockDefaultGroup,
 } from "./helpers";
@@ -43,8 +44,7 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   // A map of selected guides as values, with its order index as keys.
   const result = new SelectionResult();
 
-  // Currently we only support one global group at the moment.
-  const defaultGroup = state.guideGroups[0];
+  const defaultGroup = findDefaultGroup(state.guideGroups);
   if (!defaultGroup) return result;
 
   const displaySequence = defaultGroup.display_sequence;
