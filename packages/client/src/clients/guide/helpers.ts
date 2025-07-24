@@ -16,6 +16,8 @@ export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
   }
 }
 
+export const DEFAULT_GROUP_KEY = "default";
+
 export const formatFilters = (filters: SelectFilterParams = {}) => {
   return [
     filters.key && `key=${filters.key}`,

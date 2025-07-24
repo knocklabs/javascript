@@ -7,10 +7,11 @@ import Knock from "../../knock";
 
 import {
   SelectionResult,
+  DEFAULT_GROUP_KEY,
   byKey,
   findDefaultGroup,
   formatFilters,
-  mockDefaultGroup,
+  // mockDefaultGroup,
 } from "./helpers";
 import {
   ConstructorOpts,
@@ -19,6 +20,9 @@ import {
   GroupStage,
   GuideAddedEvent,
   GuideData,
+  GuideGroupAddedEvent,
+  GuideGroupData,
+  GuideGroupUpdatedEvent,
   GuideRemovedEvent,
   GuideSocketEvent,
   GuideStepData,

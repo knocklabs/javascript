@@ -37,6 +37,7 @@ export interface GuideData {
   semver: string;
   steps: GuideStepData[];
   activation_location_rules: GuideActivationLocationRuleData[];
+  bypass_global_group_limit: boolean;
   inserted_at: string;
   updated_at: string;
 }
@@ -45,6 +46,8 @@ export interface GuideGroupData {
   __typename: "GuideGroup";
   key: string;
   display_sequence: Array<GuideData["key"]>;
+  display_sequence_unthrottled: Array<GuideData["key"]> | null;
+  display_sequence_throttled: Array<GuideData["key"]> | null;
   display_interval: number | null;
   inserted_at: string;
   updated_at: string;
@@ -59,6 +62,7 @@ export type GetGuidesQueryParams = {
 export type GetGuidesResponse = {
   entries: GuideData[];
   guide_groups: GuideGroupData[];
+  guide_group_display_logs: Record<GuideGroupData["key"], string>;
 };
 
 //
@@ -92,7 +96,12 @@ export type MarkGuideAsResponse = {
 // Socket events
 //
 
-type SocketEventType = "guide.added" | "guide.updated" | "guide.removed";
+type SocketEventType =
+  | "guide.added"
+  | "guide.updated"
+  | "guide.removed"
+  | "guide_group.added"
+  | "guide_group.updated";
 
 type SocketEventPayload<E extends SocketEventType, D> = {
   topic: string;
@@ -115,10 +124,22 @@ export type GuideRemovedEvent = SocketEventPayload<
   { guide: Pick<GuideData, "key"> }
 >;
 
+export type GuideGroupAddedEvent = SocketEventPayload<
+  "guide_group.added",
+  { guide_group: GuideGroupData }
+>;
+
+export type GuideGroupUpdatedEvent = SocketEventPayload<
+  "guide_group.updated",
+  { guide_group: GuideGroupData }
+>;
+
 export type GuideSocketEvent =
   | GuideAddedEvent
   | GuideUpdatedEvent
-  | GuideRemovedEvent;
+  | GuideRemovedEvent
+  | GuideGroupAddedEvent
+  | GuideGroupUpdatedEvent;
 
 //
 // Guide client
@@ -149,6 +170,7 @@ export type QueryStatus = {
 
 export type StoreState = {
   guideGroups: GuideGroupData[];
+  guideGroupDisplayLogs: Record<GuideGroupData["key"], string>;
   guides: Record<KnockGuide["key"], KnockGuide>;
   queries: Record<QueryKey, QueryStatus>;
   location: string | undefined;
