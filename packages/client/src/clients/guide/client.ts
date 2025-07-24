@@ -36,6 +36,9 @@ import {
   TargetParams,
 } from "./types";
 
+export const guidesApiRootPath = (userId: string | undefined | null) =>
+  `/v1/users/${userId}/guides`;
+
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   // A map of selected guides as values, with its order index as keys.
   const result = new SelectionResult();
@@ -114,9 +117,6 @@ const predicate = (
 
   return true;
 };
-
-export const guidesApiRootPath = (userId: string | undefined | null) =>
-  `/v1/users/${userId}/guides`;
 
 export class KnockGuideClient {
   public store: Store<StoreState, (state: StoreState) => StoreState>;

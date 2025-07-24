@@ -1,4 +1,9 @@
-import { GuideData, GuideGroupData, SelectFilterParams } from "./types";
+import {
+  GuideData,
+  GuideGroupData,
+  KnockGuide,
+  SelectFilterParams,
+} from "./types";
 
 export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
   metadata: { guideGroup: GuideGroupData } | undefined;
