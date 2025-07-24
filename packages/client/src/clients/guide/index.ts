@@ -4,4 +4,4 @@ export type {
   KnockGuideStep,
   TargetParams as KnockGuideTargetParams,
   SelectFilterParams as KnockGuideFilterParams,
-} from "./client";
+} from "./types";

@@ -5,43 +5,32 @@ import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
 
-const formatFilters = (filters: SelectFilterParams = {}) => {
-  return [
-    filters.key && `key=${filters.key}`,
-    filters.type && `type=${filters.type}`,
-  ]
-    .filter((x) => x)
-    .join(", ");
-};
-
-const byKey = <T extends { key: string }>(items: T[]) => {
-  return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});
-};
-
-const sortGuides = <T extends GuideData>(guides: T[]) => {
-  return [...guides].sort(
-    (a, b) =>
-      new Date(a.inserted_at).getTime() - new Date(b.inserted_at).getTime(),
-  );
-};
-
-// Prefixed with a special char to distinguish from the actual default group.
-const MOCK_GROUP_KEY = "$default";
-
-// Build a notional group to fall back on for ordering only without any limits.
-// This is mostly for backward compatibility purposes.
-const mockDefaultGroup = (entries: GuideData[] = []) => {
-  const now = new Date();
-
-  return {
-    __typename: "GuideGroup",
-    key: MOCK_GROUP_KEY,
-    display_sequence: sortGuides(entries).map((g) => g.key),
-    display_interval: null,
-    inserted_at: now.toISOString(),
-    updated_at: now.toISOString(),
-  } as GuideGroupData;
-};
+import { byKey, formatFilters, mockDefaultGroup } from "./helpers";
+import {
+  ConstructorOpts,
+  GetGuidesQueryParams,
+  GetGuidesResponse,
+  GroupStage,
+  GuideAddedEvent,
+  GuideData,
+  GuideGroupData,
+  GuideRemovedEvent,
+  GuideSocketEvent,
+  GuideStepData,
+  GuideUpdatedEvent,
+  KnockGuide,
+  KnockGuideStep,
+  MarkAsArchivedParams,
+  MarkAsInteractedParams,
+  MarkAsSeenParams,
+  MarkGuideAsResponse,
+  QueryFilterParams,
+  QueryStatus,
+  SelectFilterParams,
+  StepMessageState,
+  StoreState,
+  TargetParams,
+} from "./types";
 
 class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
   metadata: { guideGroup: GuideGroupData } | undefined;
@@ -130,176 +119,8 @@ const predicate = (
   return true;
 };
 
-//
-// Guides API (via User client)
-//
-
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
-
-interface StepMessageState {
-  id: string;
-  seen_at: string | null;
-  read_at: string | null;
-  interacted_at: string | null;
-  archived_at: string | null;
-  link_clicked_at: string | null;
-}
-
-interface GuideStepData {
-  ref: string;
-  schema_key: string;
-  schema_semver: string;
-  schema_variant_key: string;
-  message: StepMessageState;
-  // eslint-disable-next-line
-  content: any;
-}
-
-interface GuideActivationLocationRuleData {
-  directive: "allow" | "block";
-  pathname: string;
-}
-
-interface GuideData {
-  __typename: "Guide";
-  channel_id: string;
-  id: string;
-  key: string;
-  type: string;
-  semver: string;
-  steps: GuideStepData[];
-  activation_location_rules: GuideActivationLocationRuleData[];
-  inserted_at: string;
-  updated_at: string;
-}
-
-interface GuideGroupData {
-  __typename: "GuideGroup";
-  key: string;
-  display_sequence: Array<GuideData["key"]>;
-  display_interval: number | null;
-  inserted_at: string;
-  updated_at: string;
-}
-
-export interface KnockGuideStep extends GuideStepData {
-  markAsSeen: () => void;
-  markAsInteracted: (params?: { metadata?: GenericData }) => void;
-  markAsArchived: () => void;
-}
-
-interface KnockGuideActivationLocationRule
-  extends GuideActivationLocationRuleData {
-  pattern: URLPattern;
-}
-
-export interface KnockGuide extends GuideData {
-  steps: KnockGuideStep[];
-  activation_location_rules: KnockGuideActivationLocationRule[];
-}
-
-type GetGuidesQueryParams = {
-  data?: string;
-  tenant?: string;
-  type?: string;
-};
-
-type GetGuidesResponse = {
-  entries: GuideData[];
-  guide_groups: GuideGroupData[];
-};
-
-export type GuideEngagementEventBaseParams = {
-  // Base params required for all engagement update events
-  message_id: string;
-  channel_id: string;
-  guide_key: string;
-  guide_id: string;
-  guide_step_ref: string;
-};
-
-type MarkAsSeenParams = GuideEngagementEventBaseParams & {
-  // Rendered step content seen by the recipient
-  content: GenericData;
-  // Target params
-  data?: GenericData;
-  tenant?: string;
-};
-type MarkAsInteractedParams = GuideEngagementEventBaseParams;
-type MarkAsArchivedParams = GuideEngagementEventBaseParams;
-
-type MarkGuideAsResponse = {
-  status: "ok";
-};
-
-type SocketEventType = "guide.added" | "guide.updated" | "guide.removed";
-
-type SocketEventPayload<E extends SocketEventType, D> = {
-  topic: string;
-  event: E;
-  data: D;
-};
-
-type GuideAddedEvent = SocketEventPayload<
-  "guide.added",
-  { guide: GuideData; guide_groups: GuideGroupData[]; eligible: true }
->;
-
-type GuideUpdatedEvent = SocketEventPayload<
-  "guide.updated",
-  { guide: GuideData; guide_groups: GuideGroupData[]; eligible: boolean }
->;
-
-type GuideRemovedEvent = SocketEventPayload<
-  "guide.removed",
-  { guide: Pick<GuideData, "key"> }
->;
-
-type GuideSocketEvent = GuideAddedEvent | GuideUpdatedEvent | GuideRemovedEvent;
-
-//
-// Guides client
-//
-
-type QueryKey = string;
-
-type QueryStatus = {
-  status: "loading" | "ok" | "error";
-  error?: Error;
-};
-
-type StoreState = {
-  location: string | undefined;
-  guideGroups: GuideGroupData[];
-  guides: Record<KnockGuide["key"], KnockGuide>;
-  queries: Record<QueryKey, QueryStatus>;
-  counter: number;
-};
-
-type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
-
-export type SelectFilterParams = {
-  key?: string;
-  type?: string;
-};
-
-export type TargetParams = {
-  data?: GenericData | undefined;
-  tenant?: string | undefined;
-};
-
-type ConstructorOpts = {
-  trackLocationFromWindow?: boolean;
-  orderResolutionDuration?: number;
-};
-
-type GroupStage = {
-  status: "open" | "closed" | "patch";
-  ordered: Array<KnockGuide["key"]>;
-  resolved?: KnockGuide["key"];
-  timeoutId: number | null;
-};
 
 export class KnockGuideClient {
   public store: Store<StoreState, (state: StoreState) => StoreState>;
@@ -748,8 +569,6 @@ export class KnockGuideClient {
       guide_step_ref: step.ref,
     };
   }
-
-  // XXX: Test this.
 
   private addGuide({ data }: GuideAddedEvent) {
     const guide = this.localCopy(data.guide);
