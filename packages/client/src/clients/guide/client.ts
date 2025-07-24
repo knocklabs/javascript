@@ -269,11 +269,11 @@ export class KnockGuideClient {
 
     switch (event) {
       case "guide.added":
-        return this.addGuide(payload);
+        return this.addOrReplaceGuide(payload);
 
       case "guide.updated":
         return data.eligible
-          ? this.replaceOrAddGuide(payload)
+          ? this.addOrReplaceGuide(payload)
           : this.removeGuide(payload);
 
       case "guide.removed":
@@ -566,22 +566,7 @@ export class KnockGuideClient {
     };
   }
 
-  private addGuide({ data }: GuideAddedEvent) {
-    const guide = this.localCopy(data.guide);
-
-    this.maybeSetStageToPatch();
-
-    this.store.setState((state) => {
-      const guides = {
-        ...state.guides,
-        [guide.key]: guide,
-      };
-
-      return { ...state, guides };
-    });
-  }
-
-  private replaceOrAddGuide({ data }: GuideUpdatedEvent) {
+  private addOrReplaceGuide({ data }: GuideAddedEvent | GuideUpdatedEvent) {
     const guide = this.localCopy(data.guide);
 
     this.maybeSetStageToPatch();
