@@ -5,7 +5,12 @@ import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
 
-import { byKey, formatFilters, mockDefaultGroup } from "./helpers";
+import {
+  SelectionResult,
+  byKey,
+  formatFilters,
+  mockDefaultGroup,
+} from "./helpers";
 import {
   ConstructorOpts,
   GetGuidesQueryParams,
@@ -13,7 +18,6 @@ import {
   GroupStage,
   GuideAddedEvent,
   GuideData,
-  GuideGroupData,
   GuideRemovedEvent,
   GuideSocketEvent,
   GuideStepData,
@@ -31,14 +35,6 @@ import {
   StoreState,
   TargetParams,
 } from "./types";
-
-class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
-  metadata: { guideGroup: GuideGroupData } | undefined;
-
-  constructor() {
-    super();
-  }
-}
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   // A map of selected guides as values, with its order index as keys.

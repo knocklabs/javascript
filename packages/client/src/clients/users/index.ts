@@ -3,8 +3,8 @@ import { GenericData } from "@knocklabs/types";
 import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
-import { GuideEngagementEventBaseParams } from "../guide/types";
 import { guidesApiRootPath } from "../guide/client";
+import { GuideEngagementEventBaseParams } from "../guide/types";
 import {
   GetPreferencesOptions,
   PreferenceOptions,

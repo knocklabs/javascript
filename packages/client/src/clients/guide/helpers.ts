@@ -1,5 +1,13 @@
 import { GuideData, GuideGroupData, SelectFilterParams } from "./types";
 
+export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
+  metadata: { guideGroup: GuideGroupData } | undefined;
+
+  constructor() {
+    super();
+  }
+}
+
 export const formatFilters = (filters: SelectFilterParams = {}) => {
   return [
     filters.key && `key=${filters.key}`,
