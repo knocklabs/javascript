@@ -9,7 +9,7 @@ import {
   KnockGuideClient,
   type KnockGuideStep,
 } from "../../../src/clients/guide";
-import { GuideGroupData } from "../../../src/clients/guide/types";
+import { StoreState, GuideGroupData } from "../../../src/clients/guide/types";
 import Knock from "../../../src/knock";
 
 // Mock @tanstack/store
@@ -20,7 +20,7 @@ const mockStore = {
     queries: {},
     location: undefined,
     counter: 0,
-  })),
+  } as StoreState)),
   setState: vi.fn((fn) => {
     if (typeof fn === "function") {
       const currentState = mockStore.state;
@@ -37,7 +37,7 @@ const mockStore = {
     queries: {},
     location: undefined,
     counter: 0,
-  },
+  } as StoreState,
 };
 
 vi.mock("@tanstack/store", () => ({
@@ -362,14 +362,25 @@ describe("KnockGuideClient", () => {
       updated_at: new Date().toISOString(),
     } as unknown as KnockGuide;
 
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: [mockGuide.key],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
     test("marks guide step as seen", async () => {
       const client = new KnockGuideClient(mockKnock, channelId);
 
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
-        guides: [mockGuide],
+        guideGroups: [mockDefaultGroup],
+        guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -393,9 +404,11 @@ describe("KnockGuideClient", () => {
 
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
-        guides: [mockGuide],
+        guideGroups: [mockDefaultGroup],
+        guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -417,9 +430,11 @@ describe("KnockGuideClient", () => {
 
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
-        guides: [mockGuide],
+        guideGroups: [mockDefaultGroup],
+        guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
