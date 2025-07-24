@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 
-import { version } from "./version";
+import { version } from "../package.json";
 
 type ApiClientOptions = {
   host: string;
