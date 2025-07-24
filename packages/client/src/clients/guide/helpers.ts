@@ -5,6 +5,9 @@ import {
   SelectFilterParams,
 } from "./types";
 
+// Extends the map class to allow having metadata on it, which is used to record
+// the guide group context for the selection result (though currently only a
+// default global group is supported).
 export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
   metadata: { guideGroup: GuideGroupData } | undefined;
 

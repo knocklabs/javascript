@@ -131,8 +131,9 @@ export class KnockGuideClient {
   private pushStateFn: History["pushState"] | undefined;
   private replaceStateFn: History["replaceState"] | undefined;
 
-  // Guides that are competing to render are staged first and ranked based on
-  // its relative order in the group, to resolve the prevailing one.
+  // Guides that are competing to render are "staged" first without rendering
+  // and ranked based on its relative order in the group over a duration of time
+  // to resolve and render the prevailing one.
   private stage: GroupStage | undefined;
 
   constructor(
@@ -152,6 +153,7 @@ export class KnockGuideClient {
       guideGroups: [],
       guides: {},
       queries: {},
+      // Increment to update the state store and trigger re-selection.
       counter: 0,
     });
 
@@ -344,6 +346,8 @@ export class KnockGuideClient {
     }
   }
 
+  // Close the stage and resolve the next guide up for display amongst the ones
+  // that have been staged, then increment the counter to trigger re-render.
   private closeGroupStage() {
     if (!this.stage || this.stage.status === "closed") return;
     this.knock.log("[Guide] Closing the group stage");
@@ -569,7 +573,7 @@ export class KnockGuideClient {
   private addOrReplaceGuide({ data }: GuideAddedEvent | GuideUpdatedEvent) {
     const guide = this.localCopy(data.guide);
 
-    this.maybeSetStageToPatch();
+    this.maybePatchGroupStage();
 
     this.store.setState((state) => {
       const guides = { ...state.guides, [guide.key]: guide };
@@ -579,7 +583,7 @@ export class KnockGuideClient {
   }
 
   private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
-    this.maybeSetStageToPatch();
+    this.maybePatchGroupStage();
 
     this.store.setState((state) => {
       const { [data.guide.key]: _, ...rest } = state.guides;
@@ -587,7 +591,11 @@ export class KnockGuideClient {
     });
   }
 
-  private maybeSetStageToPatch() {
+  // Set the stage status to "patch" so that we can re-run the stage evaluation
+  // with the latest/updated state, while keeping the currently resolved guide
+  // so that it stays rendered until we are finished. Note, must be called ahead
+  // of updating the state store i.e. store.setState().
+  private maybePatchGroupStage() {
     if (this.stage?.status === "closed") {
       const { orderResolutionDuration: delay = 0 } = this.options;
       const timeoutId = setTimeout(() => this.closeGroupStage(), delay);
