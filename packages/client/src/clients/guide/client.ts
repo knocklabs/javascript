@@ -9,7 +9,7 @@ import {
   DEFAULT_GROUP_KEY,
   SelectionResult,
   byKey,
-  checkIfInsideThrottleWindow,
+  checkIfThrottled,
   findDefaultGroup,
   formatFilters,
   mockDefaultGroup,
@@ -370,17 +370,19 @@ export class KnockGuideClient {
       return guide;
     }
 
-    // Check if inside the throttle window, and if so then stop.
-    const throttleWindowStartedTs =
+    // Check if inside the throttle window (i.e. throttled) and if so stop and
+    // return undefined.
+    const defaultGroup = findDefaultGroup(this.store.state.guideGroups);
+    const throttleWindowStartedAt =
       this.store.state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
-    const [defaultGroup] = this.store.state.guideGroups;
+
     if (
       defaultGroup &&
       defaultGroup.display_interval &&
-      throttleWindowStartedTs
+      throttleWindowStartedAt
     ) {
-      const throttled = checkIfInsideThrottleWindow(
-        throttleWindowStartedTs,
+      const throttled = checkIfThrottled(
+        throttleWindowStartedAt,
         defaultGroup.display_interval,
       );
       if (throttled) return undefined;

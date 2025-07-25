@@ -63,31 +63,36 @@ export const findDefaultGroup = (guideGroups: GuideGroupData[]) =>
       group.key === DEFAULT_GROUP_KEY || group.key === MOCK_DEFAULT_GROUP_KEY,
   );
 
-export const checkIfInsideThrottleWindow = (
-  timestamp: string,
-  durationInSeconds: number,
+// Checks whether we are currently throttled (inside a "throttle window").
+// A throttle window opens when a user dismisses (archives) a guide, and lasts
+// for the configured display interval of the guide group used (currently only
+// the default global group).
+export const checkIfThrottled = (
+  throttleWindowStartedAtTs: string,
+  windowDurationInSeconds: number,
 ) => {
-  // 1. Parse the original timestamp string into a Date object.
-  // Date.parse() handles ISO 8601 strings correctly and returns milliseconds since epoch.
-  // This inherently handles timezones by converting everything to a universal time representation (UTC).
-  const throttleWindowStartedDate = new Date(timestamp);
+  // 1. Parse the given timestamp string into a Date object.
+  // Date.parse() handles ISO 8601 strings correctly and returns milliseconds
+  // since epoch. This inherently handles timezones by converting everything to
+  // a universal time representation (UTC).
+  const throttleWindowStartDate = new Date(throttleWindowStartedAtTs);
 
-  // Check if the original timestamp string was valid
-  if (isNaN(throttleWindowStartedDate.getTime())) {
+  // Check if the given throttle window start timestamp string was valid, and
+  // if not disregard.
+  if (isNaN(throttleWindowStartDate.getTime())) {
     return false;
   }
 
-  // 2. Calculate the future timestamp by adding the duration to the original timestamp.
-  // Convert duration from seconds to milliseconds.
-  const durationInMilliseconds = durationInSeconds * 1000;
-  const futureTimestampMilliseconds =
-    throttleWindowStartedDate.getTime() + durationInMilliseconds;
+  // 2. Calculate the throttle window end time in milliseconds by adding the
+  // duration to the throttle window start time.
+  const throttleWindowEndInMilliseconds =
+    throttleWindowStartDate.getTime() + windowDurationInSeconds * 1000;
 
   // 3. Get the current timestamp in milliseconds since epoch.
-  const currentTimestampMilliseconds = new Date().getTime();
+  const currentTimeInMilliseconds = new Date().getTime();
 
   // 4. Compare the current timestamp with the calculated future timestamp.
-  // Both are in milliseconds since epoch (UTC), so direct comparison is accurate
-  // regardless of local timezones.
-  return currentTimestampMilliseconds <= futureTimestampMilliseconds;
+  // Both are in milliseconds since epoch (UTC), so direct comparison is
+  // accurate regardless of local timezones.
+  return currentTimeInMilliseconds <= throttleWindowEndInMilliseconds;
 };
