@@ -179,7 +179,6 @@ describe("KnockGuideClient", () => {
             channel_id: channelId,
             id: "guide_123",
             key: "test_guide",
-            priority: 1,
             type: "test",
             semver: "1.0.0",
             steps: [],
@@ -353,7 +352,6 @@ describe("KnockGuideClient", () => {
       channel_id: channelId,
       id: "guide_123",
       key: "test_guide",
-      priority: 1,
       type: "test",
       semver: "1.0.0",
       steps: [mockStep],
@@ -669,7 +667,6 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_new",
         key: "new_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
         steps: [],
@@ -687,6 +684,7 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](addEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+      expect(client.store.state.guides[mockGuideData.key]).toMatchObject({ key: "new_guide" })
     });
 
     test("handles guide.updated event with eligible=true", () => {
@@ -697,7 +695,6 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_existing",
         key: "existing_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
         steps: [],
@@ -708,12 +705,17 @@ describe("KnockGuideClient", () => {
 
       // Set up initial state with existing guide
       mockStore.state = {
-        guides: [existingGuide],
+        guideGroups: [],
+        guides: {[existingGuide.key]: existingGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
 
-      const updatedGuide = { ...existingGuide, priority: 10 };
+      const updatedGuide = {
+        ...existingGuide,
+        type: "updated-type",
+      };
       const updateEvent = {
         topic: `guides:${channelId}`,
         event: "guide.updated" as const,
@@ -723,6 +725,11 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](updateEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+
+      expect(client.store.state.guides[existingGuide.key]).toMatchObject({
+        key: "existing_guide",
+        type: "updated-type"
+      })
     });
 
     test("handles guide.updated event with eligible=false", () => {
@@ -733,7 +740,6 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_existing",
         key: "existing_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
         steps: [],
@@ -744,9 +750,11 @@ describe("KnockGuideClient", () => {
 
       // Set up initial state with existing guide
       mockStore.state = {
-        guides: [existingGuide],
+        guideGroups: [],
+        guides: {[existingGuide.key]: existingGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
 
       const updateEvent = {
@@ -758,6 +766,7 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](updateEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+      expect(client.store.state.guides[existingGuide.key]).toBeUndefined()
     });
 
     test("handles guide.removed event", () => {
@@ -768,7 +777,6 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_existing",
         key: "existing_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
         steps: [],
@@ -779,9 +787,11 @@ describe("KnockGuideClient", () => {
 
       // Set up initial state with existing guide
       mockStore.state = {
-        guides: [existingGuide],
+        guideGroups: [],
+        guides: {[existingGuide.key]: existingGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
 
       const removeEvent = {
@@ -793,6 +803,7 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](removeEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+      expect(client.store.state.guides[existingGuide.key]).toBeUndefined()
     });
   });
 
