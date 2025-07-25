@@ -31,10 +31,11 @@ export type MsTeamsAuthButtonProps = {
     }
 );
 
-export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = (
-  props: MsTeamsAuthButtonProps,
-) => {
-  const { redirectUrl, onAuthenticationComplete } = props;
+export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
+  redirectUrl,
+  onAuthenticationComplete,
+  ...props
+}) => {
   const graphApiClientId =
     "graphApiClientId" in props ? props.graphApiClientId : props.msTeamsBotId;
 
