@@ -492,7 +492,7 @@ describe("KnockGuideClient", () => {
       channel_id: channelId,
       id: "guide_1",
       key: "onboarding",
-      type: "tour",
+      type: "card",
       semver: "1.0.0",
       steps: [],
       activation_location_rules: [
@@ -655,6 +655,145 @@ describe("KnockGuideClient", () => {
       const result = client["_selectGuide"](stateWithGuides);
 
       expect(result!.key).toBe("feature_tour");
+    });
+
+    test("opens the group stage on the first select and tracks ordered guides", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guides: mockGuides,
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      expect(client["stage"]).toBeUndefined()
+
+      const r1 = client.selectGuide(stateWithGuides, { type: "banner" });
+      expect(r1).toBeUndefined()
+
+      const r2 = client.selectGuide(stateWithGuides, { type: "tooltip" });
+      expect(r2).toBeUndefined()
+
+      const r3 = client.selectGuide(stateWithGuides, { type: "card" });
+      expect(r3).toBeUndefined()
+
+      expect(client["stage"]).toMatchObject({
+        status: 'open',
+        ordered: [ 'feature_tour', 'onboarding', 'system_status' ],
+      })
+    });
+
+    test("closing the group stage resolves the prevailing guide and can return on select", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guides: mockGuides,
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client["stage"] = {
+        status: "open",
+        ordered: [ 'feature_tour', 'onboarding', 'system_status' ],
+        timeoutId: 123,
+      }
+
+      client["closeGroupStage"]()
+
+      expect(client["stage"]).toMatchObject({
+        status: 'closed',
+        ordered: [ 'feature_tour', 'onboarding', 'system_status' ],
+        resolved: 'feature_tour'
+      })
+
+      const r1 = client.selectGuide(stateWithGuides, { type: "banner" });
+      expect(r1).toBeUndefined()
+
+      // Should return the resolved guide.
+      const r2 = client.selectGuide(stateWithGuides, { type: "tooltip" });
+      expect(r2).toMatchObject({ key: "feature_tour", type: "tooltip" })
+
+      const r3 = client.selectGuide(stateWithGuides, { type: "card" });
+      expect(r3).toBeUndefined()
+    });
+
+    test("patching the group stage allows re-evaluation while keeping the current resolved guide in place", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      client["stage"] = {
+        status: "closed",
+        ordered: [ 'feature_tour', 'onboarding', 'system_status' ],
+        resolved: "feature_tour",
+        timeoutId: 123,
+      }
+
+      const mockGuideFour = {
+        __typename: "Guide",
+        channel_id: channelId,
+        id: "guide_4",
+        key: "new_modal",
+        type: "modal",
+        semver: "1.0.0",
+        steps: [],
+        activation_location_rules: [],
+        inserted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as unknown as KnockGuide;
+
+      // Add a new guide, then re-evalute.
+      const stateWithGuides = {
+        guideGroups: [{
+          ...mockDefaultGroup,
+          display_sequence: ["new_modal", "feature_tour", "onboarding", "system_status"]
+        }],
+        guides: {
+          ...mockGuides,
+          [mockGuideFour.key]: mockGuideFour,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      client["maybePatchGroupStage"]();
+
+      expect(client["stage"]).toMatchObject({
+        status: "patch",
+        ordered: [],
+        resolved: "feature_tour",
+      })
+
+      expect(client.selectGuide(stateWithGuides, { type: "banner" })).toBeUndefined()
+
+      // Should return the current resolved guide
+      expect(client.selectGuide(stateWithGuides, { type: "tooltip" })).toMatchObject({
+        key: "feature_tour",
+        type: "tooltip"
+      })
+
+      expect(client.selectGuide(stateWithGuides, { type: "card" })).toBeUndefined()
+      expect(client.selectGuide(stateWithGuides, { type: "modal" })).toBeUndefined()
+
+      client["closeGroupStage"]();
+
+      expect(client["stage"]).toMatchObject({
+        status: "closed",
+        ordered: ["new_modal", "feature_tour", "onboarding", "system_status"],
+        resolved: "new_modal",
+        timeoutId: null,
+      })
+
+      expect(client.selectGuide(stateWithGuides, { type: "banner" })).toBeUndefined()
+      expect(client.selectGuide(stateWithGuides, { type: "tooltip" })).toBeUndefined()
+      expect(client.selectGuide(stateWithGuides, { type: "card" })).toBeUndefined()
+
+      // Now renders the newly resolved guide.
+      expect(client.selectGuide(stateWithGuides, { type: "modal" })).toMatchObject({
+        key: "new_modal",
+        type: "modal"
+      })
     });
   });
 
