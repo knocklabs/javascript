@@ -15,7 +15,7 @@ interface UseMsTeamsAuthOutput {
 }
 
 function useMsTeamsAuth(
-  msTeamsBotId: string,
+  graphApiClientId: string,
   redirectUrl?: string,
 ): UseMsTeamsAuthOutput {
   const knock = useKnockClient();
@@ -43,7 +43,7 @@ function useMsTeamsAuth(
         public_key: knock.apiKey,
         user_token: knock.userToken,
       }),
-      client_id: msTeamsBotId,
+      client_id: graphApiClientId,
       redirect_uri: authRedirectUri,
     };
     return `${MS_TEAMS_ADMINCONSENT_URL}?${new URLSearchParams(rawParams)}`;
@@ -53,7 +53,7 @@ function useMsTeamsAuth(
     knockMsTeamsChannelId,
     knock.apiKey,
     knock.userToken,
-    msTeamsBotId,
+    graphApiClientId,
     authRedirectUri,
   ]);
 

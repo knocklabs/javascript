@@ -1,14 +1,13 @@
-import React from "react";
 import {
-  KnockProvider,
   KnockMsTeamsProvider,
+  KnockProvider,
   MsTeamsAuthButton,
   MsTeamsAuthContainer,
   MsTeamsChannelCombobox,
 } from "@knocklabs/react";
 import { render } from "@testing-library/react";
-import { describe, it  } from "vitest";
-
+import React from "react";
+import { describe, it } from "vitest";
 
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <KnockProvider apiKey="test" userId="user">
@@ -19,7 +18,15 @@ const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 describe("MsTeams components render", () => {
-  it("MsTeamsAuthButton renders", () => {
+  it("MsTeamsAuthButton renders with graphApiClientId prop", () => {
+    render(
+      <Wrapper>
+        <MsTeamsAuthButton graphApiClientId="clientId" />
+      </Wrapper>,
+    );
+  });
+
+  it("MsTeamsAuthButton renders with deprecated msTeamsBotId prop", () => {
     render(
       <Wrapper>
         <MsTeamsAuthButton msTeamsBotId="bot" />
@@ -38,8 +45,13 @@ describe("MsTeams components render", () => {
   it("MsTeamsChannelCombobox renders", () => {
     render(
       <Wrapper>
-        <MsTeamsChannelCombobox msTeamsChannelsRecipientObject={{ objectId: "1", collection: "users" }} />
+        <MsTeamsChannelCombobox
+          msTeamsChannelsRecipientObject={{
+            objectId: "1",
+            collection: "users",
+          }}
+        />
       </Wrapper>,
     );
   });
-}); 
+});
