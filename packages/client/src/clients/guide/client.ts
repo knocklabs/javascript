@@ -45,6 +45,9 @@ import {
 // prevailing guide.
 const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 
+// How often we should refresh the store state to trigger subscribed callbacks.
+const STATE_COUNTER_INTERVAL = 30 * 1000;
+
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
@@ -187,7 +190,7 @@ export class KnockGuideClient {
     }
 
     // Start the counter loop to increment at an interval.
-    this.startCounterLoop();
+    this.startCounterInterval();
 
     this.knock.log("[Guide] Initialized a guide client");
   }
@@ -197,7 +200,10 @@ export class KnockGuideClient {
     this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
   }
 
-  private startCounterLoop() {
+  private startCounterInterval() {
+    const { stateCounterInterval: delay = STATE_COUNTER_INTERVAL } =
+      this.options;
+
     this.intervalId = setInterval(() => {
       this.knock.log("[Guide] Counter interval tick");
 
@@ -207,7 +213,7 @@ export class KnockGuideClient {
         ...state,
         counter: state.counter + 1,
       }));
-    }, 2000);
+    }, delay);
   }
 
   cleanup() {
