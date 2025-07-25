@@ -563,7 +563,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client._selectGuide(stateWithGuides);
+      const result = client["_selectGuide"](stateWithGuides);
 
       // Should select the first guide in the display sequence.
       // When location is undefined, guides are still included (location rules
@@ -581,7 +581,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client._selectGuide(stateWithGuides, { key: "onboarding" });
+      const result = client["_selectGuide"](stateWithGuides, { key: "onboarding" });
 
       expect(result!.key).toBe("onboarding");
     });
@@ -596,7 +596,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client._selectGuide(stateWithGuides, { type: "banner" });
+      const result = client["_selectGuide"](stateWithGuides, { type: "banner" });
 
       expect(result!.key).toBe("system_status");
     });
@@ -611,7 +611,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client._selectGuide(stateWithGuides);
+      const result = client["_selectGuide"](stateWithGuides);
 
       // Should include the guide with allow directive for /dashboard
       expect(result!.key).toBe("onboarding");
@@ -627,7 +627,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client._selectGuide(stateWithGuides);
+      const result = client["_selectGuide"](stateWithGuides);
 
       // Should exclude the guide with block directive for /settings
       expect(result!.key).toBe("system_status");
@@ -652,7 +652,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client._selectGuide(stateWithGuides);
+      const result = client["_selectGuide"](stateWithGuides);
 
       expect(result!.key).toBe("feature_tour");
     });
@@ -971,12 +971,14 @@ describe("KnockGuideClient", () => {
             message: { id: "msg_123", seen_at: null },
           },
         ],
-      };
+      } as unknown as KnockGuide;
 
       mockStore.state = {
-        guides: [mockGuide],
+        guideGroups: [],
+        guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);

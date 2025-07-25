@@ -365,7 +365,7 @@ export class KnockGuideClient {
 
   // Test helper that opens and closes the group stage to return the select
   // result immediately.
-  _selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+  private _selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
     this.stage = undefined;
 
     this.selectGuide(state, filters);
