@@ -309,21 +309,22 @@ export class KnockGuideClient {
       return undefined;
     }
 
-    const { orderResolutionDuration: delay = 0 } = this.options;
-
     // TODO: Check if guide has ignore limit set, and if so return immediately.
-    const [index, guide] = [...result][0]!;
 
     if (!this.stage) {
-      this.knock.log(`[Guide] Opening a new group stage with: ${guide.key}`);
+      this.knock.log("[Guide] Opening a new group stage");
 
-      const ordered = [];
-      ordered[index] = guide.key;
+      const { orderResolutionDuration: delay = 0 } = this.options;
       const timeoutId = setTimeout(() => this.closeGroupStage(), delay);
-      this.stage = { status: "open", ordered, timeoutId };
 
-      return undefined;
+      this.stage = {
+        status: "open",
+        ordered: [],
+        timeoutId,
+      };
     }
+
+    const [index, guide] = [...result][0]!;
 
     // TODO: Need to check if this guide can render now based on the group's
     // throttle limit.
@@ -360,6 +361,16 @@ export class KnockGuideClient {
     };
 
     this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
+  }
+
+  // Test helper that opens and closes the group stage to return the select
+  // result immediately.
+  _selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+    this.stage = undefined;
+
+    this.selectGuide(state, filters);
+    this.closeGroupStage();
+    return this.selectGuide(state, filters);
   }
 
   //

@@ -489,174 +489,174 @@ describe("KnockGuideClient", () => {
   });
 
   describe("select", () => {
-    const mockGuides: KnockGuide[] = [
-      {
-        __typename: "Guide",
-        channel_id: channelId,
-        id: "guide_1",
-        key: "onboarding",
-        type: "tour",
-        semver: "1.0.0",
-        steps: [],
-        activation_location_rules: [
-          {
-            directive: "allow",
-            pathname: "/dashboard",
-            pattern: new URLPattern({ pathname: "/dashboard" }),
-          },
-        ],
-        inserted_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        __typename: "Guide",
-        channel_id: channelId,
-        id: "guide_2",
-        key: "feature_tour",
-        type: "tooltip",
-        semver: "1.0.0",
-        steps: [],
-        activation_location_rules: [
-          {
-            directive: "block",
-            pathname: "/settings",
-            pattern: new URLPattern({ pathname: "/settings" }),
-          },
-        ],
-        inserted_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "tour",
+      semver: "1.0.0",
+      steps: [],
+      activation_location_rules: [
+        {
+          directive: "allow",
+          pathname: "/dashboard",
+          pattern: new URLPattern({ pathname: "/dashboard" }),
+        },
+      ],
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "feature_tour",
+      type: "tooltip",
+      semver: "1.0.0",
+      steps: [],
+      activation_location_rules: [
+        {
+          directive: "block",
+          pathname: "/settings",
+          pattern: new URLPattern({ pathname: "/settings" }),
+        },
+      ],
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const mockGuideThree = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_3",
+      key: "system_status",
+      type: "banner",
+      semver: "1.0.0",
+      steps: [],
+      activation_location_rules: [],
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const mockGuides = {
+      [mockGuideOne.key]: mockGuideOne,
+      [mockGuideTwo.key]: mockGuideTwo,
+      [mockGuideThree.key]: mockGuideThree,
+    }
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["feature_tour", "onboarding", "system_status"],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
 
     test("selects guides without filters", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
         guides: mockGuides,
         queries: {},
         location: undefined,
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides);
+      const result = client._selectGuide(stateWithGuides);
 
-      // When location is undefined, guides are still included (location rules are skipped)
-      expect(result).toHaveLength(2);
+      // Should select the first guide in the display sequence.
+      // When location is undefined, guides are still included (location rules
+      // are skipped).
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by key", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
         guides: mockGuides,
         queries: {},
-        location: undefined, // Change this to undefined to make the test pass
+        location: undefined,
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      const result = client._selectGuide(stateWithGuides, { key: "onboarding" });
 
-      expect(result).toHaveLength(1);
-      expect(result[0]!.key).toBe("onboarding");
+      expect(result!.key).toBe("onboarding");
     });
 
     test("filters guides by type", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
         guides: mockGuides,
         queries: {},
-        location: "/dashboard",
+        location: undefined,
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides, { type: "tooltip" });
+      const result = client._selectGuide(stateWithGuides, { type: "banner" });
 
-      expect(result).toHaveLength(0); // tooltip guide has blocking rule and doesn't match location
+      expect(result!.key).toBe("system_status");
     });
 
     test("filters guides by location rules - allow directive", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
         guides: mockGuides,
         queries: {},
-        location: "https://example.com/dashboard", // Use full URL format
+        location: "https://example.com/dashboard",
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides);
+      const result = client._selectGuide(stateWithGuides);
 
       // Should include the guide with allow directive for /dashboard
-      const onboardingGuide = result.find((g) => g.key === "onboarding");
-      expect(onboardingGuide).toBeDefined();
-      expect(result).toHaveLength(1);
+      expect(result!.key).toBe("onboarding");
     });
 
     test("filters guides by location rules - block directive", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
         guides: mockGuides,
         queries: {},
-        location: "/settings",
+        location: "https://example.com/settings",
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides);
+      const result = client._selectGuide(stateWithGuides);
 
       // Should exclude the guide with block directive for /settings
-      const featureTourGuide = result.find((g) => g.key === "feature_tour");
-      expect(featureTourGuide).toBeUndefined();
+      expect(result!.key).toBe("system_status");
     });
 
     test("handles guides without location when location is undefined", () => {
       // Create guides without location rules
-      const guidesWithoutLocationRules: KnockGuide[] = [
-        {
-          __typename: "Guide",
-          channel_id: channelId,
-          id: "guide_1",
-          key: "onboarding",
-          priority: 10,
-          type: "tour",
-          semver: "1.0.0",
-          steps: [],
-          activation_location_rules: [],
-          inserted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          __typename: "Guide",
-          channel_id: channelId,
-          id: "guide_2",
-          key: "feature_tour",
-          priority: 5,
-          type: "tooltip",
-          semver: "1.0.0",
-          steps: [],
-          activation_location_rules: [],
-          inserted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
+      const g1 = { ...mockGuideOne, activation_location_rules: [] }
+      const g2 = { ...mockGuideTwo, activation_location_rules: [] }
+      const g3 = { ...mockGuideThree, activation_location_rules: [] }
 
       const stateWithGuides = {
-        guides: guidesWithoutLocationRules,
+        guideGroups: [mockDefaultGroup],
+        guides: {
+          [g1.key]: g1,
+          [g2.key]: g2,
+          [g3.key]: g3,
+        },
         queries: {},
-        location: undefined,
+        location: "https://example.com/settings",
+        counter: 0,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides);
+      const result = client._selectGuide(stateWithGuides);
 
-      // Should return guides without location rules when location is undefined
-      expect(result).toHaveLength(2);
-    });
-
-    test("sorts guides by priority and inserted_at", () => {
-      const stateWithGuides = {
-        guides: mockGuides,
-        queries: {},
-        location: "/dashboard", // Location that matches onboarding guide
-      };
-
-      const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuide(stateWithGuides);
-
-      if (result.length > 1) {
-        expect(result[0]!.priority).toBeGreaterThanOrEqual(result[1]!.priority);
-      }
+      expect(result!.key).toBe("feature_tour");
     });
   });
 
