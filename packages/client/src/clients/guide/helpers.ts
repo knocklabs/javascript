@@ -37,7 +37,7 @@ const sortGuides = <T extends GuideData>(guides: T[]) => {
 };
 
 // Default global guide group key.
-const DEFAULT_GROUP_KEY = "default";
+export const DEFAULT_GROUP_KEY = "default";
 
 // Prefixed with a special char $ to distinguish from an actual default group.
 const MOCK_DEFAULT_GROUP_KEY = "$default";

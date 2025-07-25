@@ -6,13 +6,13 @@ import { URLPattern } from "urlpattern-polyfill";
 import Knock from "../../knock";
 
 import {
-  SelectionResult,
   DEFAULT_GROUP_KEY,
+  SelectionResult,
   byKey,
+  checkIfInsideThrottleWindow,
   findDefaultGroup,
   formatFilters,
-  checkIfInsideThrottleWindow,
-  // mockDefaultGroup,
+  mockDefaultGroup,
 } from "./helpers";
 import {
   ConstructorOpts,
@@ -186,7 +186,8 @@ export class KnockGuideClient {
       this.listenForLocationChangesFromWindow();
     }
 
-    this.startRenderCounterLoop();
+    // Start the counter loop to increment at an interval.
+    this.startCounterLoop();
 
     this.knock.log("[Guide] Initialized a guide client");
   }
@@ -196,10 +197,12 @@ export class KnockGuideClient {
     this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
   }
 
-  private startRenderCounterLoop() {
+  private startCounterLoop() {
     this.intervalId = setInterval(() => {
-      console.log("loop");
+      this.knock.log("[Guide] Counter interval tick");
+
       if (this.stage && this.stage.status !== "closed") return;
+
       this.store.setState((state) => ({
         ...state,
         counter: state.counter + 1,
@@ -246,8 +249,6 @@ export class KnockGuideClient {
         guide_groups: groups,
         guide_group_display_logs: guideGroupDisplayLogs,
       } = data;
-
-      // console.log(2, guideGroupDisplayLogs);
 
       this.store.setState((state) => ({
         ...state,
