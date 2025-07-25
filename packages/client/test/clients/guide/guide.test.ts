@@ -16,6 +16,7 @@ import Knock from "../../../src/knock";
 const mockStore = {
   getState: vi.fn(() => ({
     guideGroups: [],
+    guideGroupDisplayLogs: {},
     guides: {},
     queries: {},
     location: undefined,
@@ -33,6 +34,7 @@ const mockStore = {
   }),
   state: {
     guideGroups: [],
+    guideGroupDisplayLogs: {},
     guides: {},
     queries: {},
     location: undefined,
@@ -92,6 +94,7 @@ describe("KnockGuideClient", () => {
     mockStore.setState.mockClear();
     mockStore.getState.mockReturnValue({
       guideGroups: [],
+      guideGroupDisplayLogs: {},
       guides: {},
       queries: {},
       location: undefined,
@@ -99,6 +102,7 @@ describe("KnockGuideClient", () => {
     });
     mockStore.state = {
       guideGroups: [],
+      guideGroupDisplayLogs: {},
       guides: {},
       queries: {},
       location: undefined,
@@ -124,6 +128,7 @@ describe("KnockGuideClient", () => {
       expect(client.targetParams).toEqual({});
       expect(Store).toHaveBeenCalledWith({
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {},
         queries: {},
         location: undefined,
@@ -149,6 +154,7 @@ describe("KnockGuideClient", () => {
 
       expect(Store).toHaveBeenCalledWith({
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {},
         queries: {},
         location: "https://example.com",
@@ -162,6 +168,7 @@ describe("KnockGuideClient", () => {
 
       expect(Store).toHaveBeenCalledWith({
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {},
         queries: {},
         location: undefined,
@@ -183,6 +190,7 @@ describe("KnockGuideClient", () => {
             semver: "1.0.0",
             steps: [],
             activation_location_rules: [],
+            bypass_global_group_limit: false,
             inserted_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -226,6 +234,7 @@ describe("KnockGuideClient", () => {
         const setStateFunction = lastCall[0];
         const newState = setStateFunction({
           guideGroups: [],
+          guideGroupDisplayLogs: {},
           guides: {},
           queries: {},
           location: undefined,
@@ -356,6 +365,7 @@ describe("KnockGuideClient", () => {
       semver: "1.0.0",
       steps: [mockStep],
       activation_location_rules: [],
+      bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as unknown as KnockGuide;
@@ -375,6 +385,7 @@ describe("KnockGuideClient", () => {
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
@@ -403,6 +414,7 @@ describe("KnockGuideClient", () => {
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
@@ -429,6 +441,7 @@ describe("KnockGuideClient", () => {
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
@@ -487,6 +500,25 @@ describe("KnockGuideClient", () => {
   });
 
   describe("select", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
     const mockGuideOne = {
       __typename: "Guide",
       channel_id: channelId,
@@ -494,7 +526,7 @@ describe("KnockGuideClient", () => {
       key: "onboarding",
       type: "card",
       semver: "1.0.0",
-      steps: [],
+      steps: [mockStep],
       activation_location_rules: [
         {
           directive: "allow",
@@ -502,6 +534,7 @@ describe("KnockGuideClient", () => {
           pattern: new URLPattern({ pathname: "/dashboard" }),
         },
       ],
+      bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as unknown as KnockGuide;
@@ -513,7 +546,7 @@ describe("KnockGuideClient", () => {
       key: "feature_tour",
       type: "tooltip",
       semver: "1.0.0",
-      steps: [],
+      steps: [mockStep],
       activation_location_rules: [
         {
           directive: "block",
@@ -521,6 +554,7 @@ describe("KnockGuideClient", () => {
           pattern: new URLPattern({ pathname: "/settings" }),
         },
       ],
+      bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as unknown as KnockGuide;
@@ -532,8 +566,9 @@ describe("KnockGuideClient", () => {
       key: "system_status",
       type: "banner",
       semver: "1.0.0",
-      steps: [],
+      steps: [mockStep],
       activation_location_rules: [],
+      bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as unknown as KnockGuide;
@@ -556,6 +591,7 @@ describe("KnockGuideClient", () => {
     test("selects guides without filters", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: undefined,
@@ -574,6 +610,7 @@ describe("KnockGuideClient", () => {
     test("filters guides by key", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: undefined,
@@ -589,6 +626,7 @@ describe("KnockGuideClient", () => {
     test("filters guides by type", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: undefined,
@@ -604,6 +642,7 @@ describe("KnockGuideClient", () => {
     test("filters guides by location rules - allow directive", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: "https://example.com/dashboard",
@@ -620,6 +659,7 @@ describe("KnockGuideClient", () => {
     test("filters guides by location rules - block directive", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: "https://example.com/settings",
@@ -641,6 +681,7 @@ describe("KnockGuideClient", () => {
 
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: {
           [g1.key]: g1,
           [g2.key]: g2,
@@ -660,6 +701,7 @@ describe("KnockGuideClient", () => {
     test("opens the group stage on the first select and tracks ordered guides", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: undefined,
@@ -687,6 +729,7 @@ describe("KnockGuideClient", () => {
     test("closing the group stage resolves the prevailing guide and can return on select", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
         queries: {},
         location: undefined,
@@ -736,8 +779,9 @@ describe("KnockGuideClient", () => {
         key: "new_modal",
         type: "modal",
         semver: "1.0.0",
-        steps: [],
+        steps: [mockStep],
         activation_location_rules: [],
+        bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       } as unknown as KnockGuide;
@@ -748,6 +792,7 @@ describe("KnockGuideClient", () => {
           ...mockDefaultGroup,
           display_sequence: ["new_modal", "feature_tour", "onboarding", "system_status"]
         }],
+        guideGroupDisplayLogs: {},
         guides: {
           ...mockGuides,
           [mockGuideFour.key]: mockGuideFour,
@@ -810,6 +855,7 @@ describe("KnockGuideClient", () => {
         semver: "1.0.0",
         steps: [],
         activation_location_rules: [],
+        bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -838,6 +884,7 @@ describe("KnockGuideClient", () => {
         semver: "1.0.0",
         steps: [],
         activation_location_rules: [],
+        bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -845,6 +892,7 @@ describe("KnockGuideClient", () => {
       // Set up initial state with existing guide
       mockStore.state = {
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {[existingGuide.key]: existingGuide},
         queries: {},
         location: undefined,
@@ -883,6 +931,7 @@ describe("KnockGuideClient", () => {
         semver: "1.0.0",
         steps: [],
         activation_location_rules: [],
+        bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -890,6 +939,7 @@ describe("KnockGuideClient", () => {
       // Set up initial state with existing guide
       mockStore.state = {
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {[existingGuide.key]: existingGuide},
         queries: {},
         location: undefined,
@@ -920,6 +970,7 @@ describe("KnockGuideClient", () => {
         semver: "1.0.0",
         steps: [],
         activation_location_rules: [],
+        bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -927,6 +978,7 @@ describe("KnockGuideClient", () => {
       // Set up initial state with existing guide
       mockStore.state = {
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {[existingGuide.key]: existingGuide},
         queries: {},
         location: undefined,
@@ -1114,6 +1166,7 @@ describe("KnockGuideClient", () => {
 
       mockStore.state = {
         guideGroups: [],
+        guideGroupDisplayLogs: {},
         guides: {[mockGuide.key]: mockGuide},
         queries: {},
         location: undefined,
