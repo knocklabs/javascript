@@ -310,6 +310,7 @@ export class KnockGuideClient {
     }
 
     // TODO: Check if guide has ignore limit set, and if so return immediately.
+    const [index, guide] = [...result][0]!;
 
     if (!this.stage) {
       this.knock.log("[Guide] Opening a new group stage");
@@ -323,8 +324,6 @@ export class KnockGuideClient {
         timeoutId,
       };
     }
-
-    const [index, guide] = [...result][0]!;
 
     // TODO: Need to check if this guide can render now based on the group's
     // throttle limit.
