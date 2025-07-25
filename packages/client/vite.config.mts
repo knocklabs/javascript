@@ -23,6 +23,14 @@ export default defineConfig(({ mode }) => {
         uploadToken: process.env.CODECOV_TOKEN,
       }),
     ],
+    define: {
+      "process.env.CLIENT_PACKAGE_VERSION": JSON.stringify(
+        // TS doesn't like regular imports from package.json with NodeNext,
+        // so we'll just use require() and ignore the type error.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require("./package.json").version,
+      ),
+    },
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,

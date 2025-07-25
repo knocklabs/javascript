@@ -6,7 +6,8 @@
     "KNOCK_*",
     "NEXT_PUBLIC_KNOCK_*",
     "EXPO_PUBLIC_KNOCK_*",
-    "CODECOV_TOKEN"
+    "CODECOV_TOKEN",
+    "CLIENT_PACKAGE_VERSION"
   ],
   "tasks": {
     "build": {
