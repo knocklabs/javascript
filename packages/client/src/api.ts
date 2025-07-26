@@ -109,6 +109,9 @@ class ApiClient {
   private getUserAgent() {
     // Note: we're following format used in our Stainless SDKs:
     // https://github.com/knocklabs/knock-node/blob/main/src/client.ts#L335
+    // If we add the env var to turbo.json, it caches it so the version
+    // never actually updates.
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     return `Knock/ClientJS ${process.env.CLIENT_PACKAGE_VERSION}`;
   }
 }
