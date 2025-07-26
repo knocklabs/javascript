@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import packageJson from "../package.json";
 import ApiClient from "../src/api";
 
 import { createAxiosMock, mockAxios } from "./test-utils/mocks";
@@ -509,11 +510,8 @@ describe("API Client", () => {
       const axiosClient = (apiClient as unknown as Record<string, unknown>)
         .axiosClient as { defaults: { headers: Record<string, string> } };
 
-      expect(axiosClient.defaults.headers["User-Agent"]).toMatch(
-        /^Knock\/ClientJS \d+\.\d+\.\d+/,
-      );
-      expect(axiosClient.defaults.headers["User-Agent"]).toContain(
-        "Knock/ClientJS",
+      expect(axiosClient.defaults.headers["User-Agent"]).toBe(
+        `Knock/ClientJS ${packageJson.version}`,
       );
     });
 
