@@ -1,5 +1,13 @@
 # ms-teams-connect-example
 
+## 0.0.14
+
+### Patch Changes
+
+- 001690a: Rename `msTeamsBotId` prop of `<MsTeamsAuthButton>` component to `graphApiClientId`
+- Updated dependencies [001690a]
+  - @knocklabs/react@0.7.26
+
 ## 0.0.13
 
 ### Patch Changes

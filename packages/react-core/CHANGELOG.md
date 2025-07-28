@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.4
+
+### Patch Changes
+
+- 001690a: Rename `msTeamsBotId` param of `useMsTeamsAuth` hook to `graphApiClientId`
+
 ## 0.7.3
 
 ### Patch Changes

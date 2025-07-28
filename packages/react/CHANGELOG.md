@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.26
+
+### Patch Changes
+
+- 001690a: Rename `msTeamsBotId` prop of `<MsTeamsAuthButton>` component to `graphApiClientId`
+- Updated dependencies [001690a]
+  - @knocklabs/react-core@0.7.4
+
 ## 0.7.25
 
 ### Patch Changes
