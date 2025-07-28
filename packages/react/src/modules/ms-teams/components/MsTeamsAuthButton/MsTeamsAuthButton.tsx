@@ -12,17 +12,33 @@ import { MsTeamsIcon } from "../MsTeamsIcon";
 
 import "./styles.css";
 
-export interface MsTeamsAuthButtonProps {
-  msTeamsBotId: string;
+export type MsTeamsAuthButtonProps = {
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
-}
+} & (
+  | {
+      /**
+       * The client ID of your Microsoft Graph API-enabled application registered with Microsoft Entra. This should
+       * match the "Graph API client ID" setting of your Microsoft Teams channel in the Knock dashboard.
+       */
+      graphApiClientId: string;
+    }
+  | {
+      /**
+       * @deprecated Use `graphApiClientId` instead. This field will be removed in a future release.
+       */
+      msTeamsBotId: string;
+    }
+);
 
 export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
-  msTeamsBotId,
   redirectUrl,
   onAuthenticationComplete,
+  ...props
 }) => {
+  const graphApiClientId =
+    "graphApiClientId" in props ? props.graphApiClientId : props.msTeamsBotId;
+
   const { t } = useTranslations();
   const knock = useKnockClient();
 
@@ -35,7 +51,7 @@ export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
   } = useKnockMsTeamsClient();
 
   const { buildMsTeamsAuthUrl, disconnectFromMsTeams } = useMsTeamsAuth(
-    msTeamsBotId,
+    graphApiClientId,
     redirectUrl,
   );
 

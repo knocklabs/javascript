@@ -38,7 +38,9 @@ describe("MsTeamsAuthButton", () => {
       errorLabel: null,
     };
 
-    const { getByText } = render(<MsTeamsAuthButton msTeamsBotId="bot" />);
+    const { getByText } = render(
+      <MsTeamsAuthButton graphApiClientId="clientId" />,
+    );
 
     const btn = getByText("msTeamsConnect").closest("button") as HTMLElement;
     fireEvent.click(btn);
@@ -53,7 +55,9 @@ describe("MsTeamsAuthButton", () => {
       errorLabel: "Error",
     };
 
-    const { getByText } = render(<MsTeamsAuthButton msTeamsBotId="bot" />);
+    const { getByText } = render(
+      <MsTeamsAuthButton graphApiClientId="clientId" />,
+    );
 
     expect(getByText("Error")).toBeInTheDocument();
   });
