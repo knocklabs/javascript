@@ -170,6 +170,7 @@ export class KnockGuideClient {
   }
 
   private incrementCounter() {
+    this.knock.log("[Guide] Incrementing the counter");
     this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
   }
 
