@@ -802,12 +802,15 @@ export class KnockGuideClient {
     this.patchClosedGroupStage();
 
     this.store.setState((state) => {
-      const guideGroups = state.guideGroups.map((group) => {
-        return group.key === data.guide_group.key ? data.guide_group : group;
-      });
+      // Currently we only support a single default global group, so we can just
+      // update the list with the added/updated group.
+      const guideGroups = [data.guide_group];
 
+      // A guide group event can include lists of unthrottled vs throttled guide
+      // keys which we can use to bulk update the guides in the store already.
       const unthrottled = data.guide_group.display_sequence_unthrottled || [];
       const throttled = data.guide_group.display_sequence_throttled || [];
+
       let guides = state.guides;
 
       guides = unthrottled.reduce((acc, key) => {

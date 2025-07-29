@@ -949,7 +949,7 @@ describe("KnockGuideClient", () => {
     });
   });
 
-  describe("socket event handling", () => {
+  describe("guide socket event handling", () => {
     test("handles guide.added event", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
 
@@ -1102,6 +1102,173 @@ describe("KnockGuideClient", () => {
 
       expect(mockStore.setState).toHaveBeenCalled();
       expect(client.store.state.guides[existingGuide.key]).toBeUndefined()
+    });
+  });
+
+  describe("guide group socket event handling", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "test",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "guide_one",
+      type: "banner",
+      semver: "1.0.0",
+      steps: [mockStep],
+      activation_location_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "guide_two",
+      type: "banner",
+      semver: "1.0.0",
+      steps: [mockStep],
+      activation_location_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: [mockGuideOne.key, mockGuideTwo.key],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    test("handles guide_group.added event", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      mockStore.state = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {
+          [mockGuideOne.key]: mockGuideOne,
+          [mockGuideTwo.key]: mockGuideTwo,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const event = {
+        topic: `guides:${channelId}`,
+        event: "guide_group.added" as const,
+        data: {
+          guide_group: {
+            ...mockDefaultGroup,
+            display_sequence: [mockGuideTwo.key, mockGuideOne.key],
+            display_sequence_unthrottled: [mockGuideTwo.key, mockGuideOne.key],
+            display_sequence_throttled: [],
+          },
+        },
+      };
+
+      client["handleSocketEvent"](event);
+
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      const [updatedGroup] = client.store.state.guideGroups
+
+      expect(updatedGroup).toMatchObject({
+        __typename: 'GuideGroup',
+        key: 'default',
+        display_sequence: ['guide_two', 'guide_one'],
+        display_interval: null,
+      });
+
+      expect(client.store.state.guides["guide_two"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_two",
+        bypass_global_group_limit: true,
+      })
+
+      expect(client.store.state.guides["guide_one"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_one",
+        bypass_global_group_limit: true,
+      })
+    });
+
+    test("handles guide_group.updated event", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      mockStore.state = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          [mockGuideOne.key]: mockGuideOne,
+          [mockGuideTwo.key]: mockGuideTwo,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const event = {
+        topic: `guides:${channelId}`,
+        event: "guide_group.updated" as const,
+        data: {
+          guide_group: {
+            ...mockDefaultGroup,
+            display_sequence: [mockGuideTwo.key, mockGuideOne.key],
+            display_sequence_unthrottled: [mockGuideTwo.key],
+            display_sequence_throttled: [mockGuideOne.key],
+            display_interval: 3600,
+          },
+        },
+      };
+
+      client["handleSocketEvent"](event);
+
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      const [updatedGroup] = client.store.state.guideGroups
+
+      expect(updatedGroup).toMatchObject({
+        __typename: 'GuideGroup',
+        key: 'default',
+        display_sequence: ['guide_two', 'guide_one'],
+        display_interval: 3600,
+      });
+
+      expect(client.store.state.guides["guide_two"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_two",
+        bypass_global_group_limit: true,
+      })
+
+      expect(client.store.state.guides["guide_one"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_one",
+        bypass_global_group_limit: false,
+      })
     });
   });
 
