@@ -169,6 +169,10 @@ export class KnockGuideClient {
     this.knock.log("[Guide] Initialized a guide client");
   }
 
+  private incrementCounter() {
+    this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
+  }
+
   cleanup() {
     this.unsubscribe();
     this.removeEventListeners();
@@ -304,6 +308,7 @@ export class KnockGuideClient {
     this.knock.log(`[Guide] Selecting guides for: ${formatFilters(filters)}`);
 
     const result = select(state, filters);
+
     if (result.size === 0) {
       this.knock.log("[Guide] Selection returned zero result");
       return undefined;
@@ -312,17 +317,9 @@ export class KnockGuideClient {
     // TODO: Check if guide has ignore limit set, and if so return immediately.
     const [index, guide] = [...result][0]!;
 
+    // If no group stage, then open one.
     if (!this.stage) {
-      this.knock.log("[Guide] Opening a new group stage");
-
-      const { orderResolutionDuration: delay = 0 } = this.options;
-      const timeoutId = setTimeout(() => this.closeGroupStage(), delay);
-
-      this.stage = {
-        status: "open",
-        ordered: [],
-        timeoutId,
-      };
+      this.stage = this.openGroupStage(); // Assign here to make tsc happy.
     }
 
     // TODO: Need to check if this guide can render now based on the group's
@@ -346,11 +343,31 @@ export class KnockGuideClient {
     }
   }
 
-  // Close the stage and resolve the next guide up for display amongst the ones
-  // that have been staged, then increment the counter to trigger re-render.
-  private closeGroupStage() {
+  private openGroupStage() {
+    this.knock.log("[Guide] Opening a new group stage");
+
+    const { orderResolutionDuration: delay = 0 } = this.options;
+
+    const timeoutId = setTimeout(() => {
+      this.closePendingGroupStage();
+      this.incrementCounter();
+    }, delay);
+
+    this.stage = {
+      status: "open",
+      ordered: [],
+      timeoutId,
+    };
+
+    return this.stage;
+  }
+
+  // Close the current non-closed stage to resolve the prevailing guide up next
+  // for display amongst the ones that have been staged.
+  private closePendingGroupStage() {
     if (!this.stage || this.stage.status === "closed") return;
-    this.knock.log("[Guide] Closing the group stage");
+
+    this.knock.log("[Guide] Closing the current group stage");
 
     this.stage = {
       ...this.stage,
@@ -359,16 +376,44 @@ export class KnockGuideClient {
       timeoutId: null,
     };
 
-    this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
+    return this.stage;
+  }
+
+  // Set the currently closed stage status to "patch" to allow re-running
+  // selections and the group stage evaluation with the latest/updated state,
+  // while keeping the currently resolved guide in place so that it stays
+  // rendered until we are ready to update the resolved guide and re-render.
+  // Note, must be called ahead of updating the state store.
+  private patchClosedGroupStage() {
+    if (this.stage?.status !== "closed") return;
+
+    this.knock.log("[Guide] Patching the current group stage");
+
+    const { orderResolutionDuration: delay = 0 } = this.options;
+
+    const timeoutId = setTimeout(() => {
+      this.closePendingGroupStage();
+      this.incrementCounter();
+    }, delay);
+
+    this.stage = {
+      ...this.stage,
+      status: "patch",
+      ordered: [],
+      timeoutId,
+    };
+
+    return this.stage;
   }
 
   // Test helper that opens and closes the group stage to return the select
   // result immediately.
   private _selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
-    this.stage = undefined;
+    this.openGroupStage();
 
     this.selectGuide(state, filters);
-    this.closeGroupStage();
+    this.closePendingGroupStage();
+
     return this.selectGuide(state, filters);
   }
 
@@ -581,9 +626,9 @@ export class KnockGuideClient {
   }
 
   private addOrReplaceGuide({ data }: GuideAddedEvent | GuideUpdatedEvent) {
-    const guide = this.localCopy(data.guide);
+    this.patchClosedGroupStage();
 
-    this.maybePatchGroupStage();
+    const guide = this.localCopy(data.guide);
 
     this.store.setState((state) => {
       const guides = { ...state.guides, [guide.key]: guide };
@@ -593,30 +638,12 @@ export class KnockGuideClient {
   }
 
   private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
-    this.maybePatchGroupStage();
+    this.patchClosedGroupStage();
 
     this.store.setState((state) => {
       const { [data.guide.key]: _, ...rest } = state.guides;
       return { ...state, guides: rest };
     });
-  }
-
-  // Set the stage status to "patch" so that we can re-run the stage evaluation
-  // with the latest/updated state, while keeping the currently resolved guide
-  // so that it stays rendered until we are finished. Note, must be called ahead
-  // of updating the state store i.e. store.setState().
-  private maybePatchGroupStage() {
-    if (this.stage?.status === "closed") {
-      const { orderResolutionDuration: delay = 0 } = this.options;
-      const timeoutId = setTimeout(() => this.closeGroupStage(), delay);
-
-      this.stage = {
-        ...this.stage,
-        status: "patch",
-        ordered: [],
-        timeoutId,
-      };
-    }
   }
 
   // Define as an arrow func property to always bind this to the class instance.
