@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.5
+
+### Patch Changes
+
+- d7e5371: chore(deps): bump @tanstack/react-store from 0.7.1 to 0.7.3
+- Updated dependencies [fb68ce1]
+  - @knocklabs/client@0.15.2
+
 ## 0.7.4
 
 ### Patch Changes
