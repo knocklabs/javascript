@@ -854,7 +854,7 @@ describe("KnockGuideClient", () => {
       })
     });
 
-    test("does not select an archived guide", async () => {
+    test("does not select an archived guide", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
@@ -884,6 +884,68 @@ describe("KnockGuideClient", () => {
       // feature_tour is the first in the order but archived, so should return
       // the next one.
       expect(result!.key).toBe("onboarding");
+    });
+
+    test("does not return a guide inside a throttle window ", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60 // 5 minutes
+          }
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result1 = client["_selectGuide"](stateWithGuides);
+
+      // Even though we have selectable guides to return, we are inside the
+      // configured throttle window, therefore should return nothing.
+      expect(result1).toBeUndefined();
+
+      // Fast forward 10 mins (in ms).
+      vi.advanceTimersByTime(10 * 60 * 1000)
+
+      // We should be outside the configured throttle window, so expect the
+      // first guide in the display queue to be returned.
+      const result2 = client["_selectGuide"](stateWithGuides);
+      expect(result2!.key).toBe("feature_tour");
+    });
+
+    test("can return an unthrottled guide even though inside a throttle window ", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60 // 5 minutes
+          }
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            bypass_global_group_limit: true,
+          }
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      expect(result!.key).toBe("feature_tour");
     });
   });
 

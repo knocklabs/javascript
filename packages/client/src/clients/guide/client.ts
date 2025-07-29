@@ -385,9 +385,9 @@ export class KnockGuideClient {
 
     // Check if inside the throttle window (i.e. throttled) and if so stop and
     // return undefined.
-    const defaultGroup = findDefaultGroup(this.store.state.guideGroups);
+    const defaultGroup = findDefaultGroup(state.guideGroups);
     const throttleWindowStartedAt =
-      this.store.state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
+      state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
 
     if (
       defaultGroup &&
