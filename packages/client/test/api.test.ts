@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import packageJson from "../package.json";
 import ApiClient from "../src/api";
 
 import { createAxiosMock, mockAxios } from "./test-utils/mocks";
@@ -498,6 +499,22 @@ describe("API Client", () => {
   });
 
   describe("Request Configuration", () => {
+    test("sets correct user agent header", () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      // Access the private axios client to check headers
+      const axiosClient = (apiClient as unknown as Record<string, unknown>)
+        .axiosClient as { defaults: { headers: Record<string, string> } };
+
+      expect(axiosClient.defaults.headers["User-Agent"]).toBe(
+        `Knock/ClientJS ${packageJson.version}`,
+      );
+    });
+
     test("supports various HTTP methods", async () => {
       const mockHttp = createAxiosMock();
       const apiClient = new ApiClient({
