@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.2
+
+### Patch Changes
+
+- fb68ce1: feat: adds javascript client version to user agent
+
 ## 0.15.1
 
 ### Patch Changes

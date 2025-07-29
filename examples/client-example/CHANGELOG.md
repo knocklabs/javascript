@@ -1,5 +1,12 @@
 # client-example
 
+## 0.3.16
+
+### Patch Changes
+
+- Updated dependencies [fb68ce1]
+  - @knocklabs/client@0.15.2
+
 ## 0.3.15
 
 ### Patch Changes
