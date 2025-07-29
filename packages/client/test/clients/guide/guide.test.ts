@@ -700,7 +700,7 @@ describe("KnockGuideClient", () => {
         timeoutId: 123,
       }
 
-      client["closeGroupStage"]()
+      client["closePendingGroupStage"]()
 
       expect(client["stage"]).toMatchObject({
         status: 'closed',
@@ -757,7 +757,7 @@ describe("KnockGuideClient", () => {
         counter: 0,
       };
 
-      client["maybePatchGroupStage"]();
+      client["patchClosedGroupStage"]();
 
       expect(client["stage"]).toMatchObject({
         status: "patch",
@@ -776,7 +776,7 @@ describe("KnockGuideClient", () => {
       expect(client.selectGuide(stateWithGuides, { type: "card" })).toBeUndefined()
       expect(client.selectGuide(stateWithGuides, { type: "modal" })).toBeUndefined()
 
-      client["closeGroupStage"]();
+      client["closePendingGroupStage"]();
 
       expect(client["stage"]).toMatchObject({
         status: "closed",

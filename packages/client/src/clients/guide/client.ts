@@ -379,10 +379,10 @@ export class KnockGuideClient {
     return this.stage;
   }
 
-  // Set the currently closed stage status to "patch" to allow re-running
-  // selections and the group stage evaluation with the latest/updated state,
+  // Set the current closed stage status to "patch" to allow re-running
+  // selections and re-building a group stage with the latest/updated state,
   // while keeping the currently resolved guide in place so that it stays
-  // rendered until we are ready to update the resolved guide and re-render.
+  // rendered until we are ready to resolve the updated stage and re-render.
   // Note, must be called ahead of updating the state store.
   private patchClosedGroupStage() {
     if (this.stage?.status !== "closed") return;
