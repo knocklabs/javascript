@@ -90,6 +90,8 @@ describe("KnockGuideClient", () => {
     vi.clearAllMocks();
     // Reset window to undefined by default
     vi.stubGlobal("window", undefined);
+    // Replace global timers with mock versions
+    vi.useFakeTimers();
     // Reset store state
     mockStore.setState.mockClear();
     mockStore.getState.mockReturnValue({
@@ -111,6 +113,7 @@ describe("KnockGuideClient", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -174,6 +177,11 @@ describe("KnockGuideClient", () => {
         location: undefined,
         counter: 0,
       });
+    });
+
+    test("starts the counter interval clock and sets the interval id", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      expect(client["intervalId"]).toBeDefined();
     });
   });
 
@@ -463,7 +471,7 @@ describe("KnockGuideClient", () => {
   });
 
   describe("cleanup", () => {
-    test("removes event listeners and unsubscribes", () => {
+    test("removes event listeners, unsubscribes, and an interval", () => {
       vi.stubGlobal("window", mockWindow);
 
       const client = new KnockGuideClient(
@@ -472,11 +480,15 @@ describe("KnockGuideClient", () => {
         {},
         { trackLocationFromWindow: true },
       );
+
       const unsubscribeSpy = vi.spyOn(client, "unsubscribe");
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
 
       client.cleanup();
 
       expect(unsubscribeSpy).toHaveBeenCalled();
+      expect(clearIntervalSpy).toHaveBeenCalled();
+
       expect(mockWindow.removeEventListener).toHaveBeenCalled();
     });
 
@@ -737,6 +749,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
+
       client["stage"] = {
         status: "open",
         ordered: [ 'feature_tour', 'onboarding', 'system_status' ],
@@ -839,6 +852,38 @@ describe("KnockGuideClient", () => {
         key: "new_modal",
         type: "modal"
       })
+    });
+
+    test("does not select an archived guide", async () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            steps: [
+              {
+                ...mockStep,
+                message: {
+                  ...mockStep.message,
+                  archived_at: new Date().toISOString(),
+                }
+              }
+            ]
+          },
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour is the first in the order but archived, so should return
+      // the next one.
+      expect(result!.key).toBe("onboarding");
     });
   });
 

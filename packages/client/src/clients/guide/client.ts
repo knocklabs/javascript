@@ -156,7 +156,7 @@ export class KnockGuideClient {
   // to resolve and render the prevailing one.
   private stage: GroupStage | undefined;
 
-  private intervalId: number | undefined;
+  private intervalId: ReturnType<typeof setInterval> | undefined;
 
   constructor(
     readonly knock: Knock,
@@ -216,11 +216,18 @@ export class KnockGuideClient {
     }, delay);
   }
 
+  private clearCounterInterval() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = undefined;
+    }
+  }
+
   cleanup() {
     this.unsubscribe();
     this.removeEventListeners();
     this.clearGroupStage();
-    this.clearInterval();
+    this.learCounterInterval();
   }
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
@@ -883,13 +890,6 @@ export class KnockGuideClient {
     if (this.replaceStateFn) {
       window.history.replaceState = this.replaceStateFn;
       this.replaceStateFn = undefined;
-    }
-  }
-
-  private clearInterval() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = undefined;
     }
   }
 }
