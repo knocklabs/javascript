@@ -206,13 +206,9 @@ export class KnockGuideClient {
 
     this.intervalId = setInterval(() => {
       this.knock.log("[Guide] Counter interval tick");
-
       if (this.stage && this.stage.status !== "closed") return;
 
-      this.store.setState((state) => ({
-        ...state,
-        counter: state.counter + 1,
-      }));
+      this.incrementCounter();
     }, delay);
   }
 
