@@ -626,7 +626,10 @@ export class KnockGuideClient {
 
     this.knock.user.markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>(
       "archived",
-      params,
+      {
+        ...params,
+        unthrottled: guide.bypass_global_group_limit,
+      },
     );
 
     return updatedStep;
@@ -747,12 +750,15 @@ export class KnockGuideClient {
       guide.steps = steps;
       const guides = { ...state.guides, [guide.key]: guide };
 
-      const guideGroupDisplayLogs = attrs.archived_at
-        ? {
-            ...state.guideGroupDisplayLogs,
-            [DEFAULT_GROUP_KEY]: attrs.archived_at,
-          }
-        : state.guideGroupDisplayLogs;
+      // If the guide is subject to throttled settings and we are marking as
+      // archived, then update the display logs to start a new throttle window.
+      const guideGroupDisplayLogs =
+        attrs.archived_at && !guide.bypass_global_group_limit
+          ? {
+              ...state.guideGroupDisplayLogs,
+              [DEFAULT_GROUP_KEY]: attrs.archived_at,
+            }
+          : state.guideGroupDisplayLogs;
 
       return { ...state, guides, guideGroupDisplayLogs };
     });

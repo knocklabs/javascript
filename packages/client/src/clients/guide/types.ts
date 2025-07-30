@@ -86,7 +86,9 @@ export type MarkAsSeenParams = GuideEngagementEventBaseParams & {
   tenant?: string;
 };
 export type MarkAsInteractedParams = GuideEngagementEventBaseParams;
-export type MarkAsArchivedParams = GuideEngagementEventBaseParams;
+export type MarkAsArchivedParams = GuideEngagementEventBaseParams & {
+  unthrottled?: boolean;
+};
 
 export type MarkGuideAsResponse = {
   status: "ok";
