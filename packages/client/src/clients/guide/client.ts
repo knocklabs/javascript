@@ -37,6 +37,11 @@ import {
   TargetParams,
 } from "./types";
 
+// How long to wait until we resolve guides order and determine the prevailing
+// guide. By default we use 0 which works well for react apps as this "yields"
+// to react for a render cyle first and close the group stage.
+const DEFAULT_ORDER_RESOLUTION_DURATION = 0; // in milliseconds
+
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
@@ -348,7 +353,9 @@ export class KnockGuideClient {
   private openGroupStage() {
     this.knock.log("[Guide] Opening a new group stage");
 
-    const { orderResolutionDuration: delay = 0 } = this.options;
+    const {
+      orderResolutionDuration: delay = DEFAULT_ORDER_RESOLUTION_DURATION,
+    } = this.options;
 
     const timeoutId = setTimeout(() => {
       this.closePendingGroupStage();
