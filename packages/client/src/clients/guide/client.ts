@@ -211,7 +211,7 @@ export class KnockGuideClient {
 
       this.store.setState((state) => ({
         ...state,
-        guideGroups: groups.length > 0 ? groups : [mockDefaultGroup(entries)],
+        guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
         guides: byKey(entries.map((g) => this.localCopy(g))),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
