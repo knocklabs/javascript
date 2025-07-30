@@ -177,6 +177,7 @@ export class KnockGuideClient {
   cleanup() {
     this.unsubscribe();
     this.removeEventListeners();
+    this.clearGroupStage();
   }
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
@@ -293,7 +294,7 @@ export class KnockGuideClient {
 
   setLocation(href: string) {
     // Make sure to clear out the stage.
-    this.stage = undefined;
+    this.clearGroupStage();
 
     this.store.setState((state) => ({ ...state, location: href }));
   }
@@ -370,6 +371,10 @@ export class KnockGuideClient {
 
     this.knock.log("[Guide] Closing the current group stage");
 
+    // Should have been cleared already since this method should be called as a
+    // callback to a setTimeout, but just to be safe.
+    this.ensureClearTimeout();
+
     this.stage = {
       ...this.stage,
       status: "closed",
@@ -397,6 +402,9 @@ export class KnockGuideClient {
       this.incrementCounter();
     }, delay);
 
+    // Just to be safe.
+    this.ensureClearTimeout();
+
     this.stage = {
       ...this.stage,
       status: "patch",
@@ -405,6 +413,21 @@ export class KnockGuideClient {
     };
 
     return this.stage;
+  }
+
+  private clearGroupStage() {
+    if (!this.stage) return;
+
+    this.knock.log("[Guide] Clearing the current group stage");
+
+    this.ensureClearTimeout();
+    this.stage = undefined;
+  }
+
+  private ensureClearTimeout() {
+    if (this.stage?.timeoutId) {
+      clearTimeout(this.stage.timeoutId);
+    }
   }
 
   // Test helper that opens and closes the group stage to return the select
