@@ -223,7 +223,7 @@ export class KnockGuideClient {
     this.unsubscribe();
     this.removeEventListeners();
     this.clearGroupStage();
-    this.learCounterInterval();
+    this.clearCounterInterval();
   }
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
