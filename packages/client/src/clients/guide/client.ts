@@ -46,7 +46,7 @@ import {
 const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 
 // How often we should refresh the store state to trigger subscribed callbacks.
-const STATE_COUNTER_INTERVAL = 30 * 1000;
+const DEFAULT_STATE_COUNTER_INTERVAL = 30 * 1000; // in milliseconds
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
@@ -201,7 +201,7 @@ export class KnockGuideClient {
   }
 
   private startCounterInterval() {
-    const { stateCounterInterval: delay = STATE_COUNTER_INTERVAL } =
+    const { stateCounterInterval: delay = DEFAULT_STATE_COUNTER_INTERVAL } =
       this.options;
 
     this.intervalId = setInterval(() => {
