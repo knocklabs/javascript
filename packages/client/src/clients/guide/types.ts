@@ -176,5 +176,5 @@ export type GroupStage = {
   status: "open" | "closed" | "patch";
   ordered: Array<KnockGuide["key"]>;
   resolved?: KnockGuide["key"];
-  timeoutId: number | null;
+  timeoutId: ReturnType<typeof setTimeout> | null;
 };
