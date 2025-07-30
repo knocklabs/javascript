@@ -723,41 +723,44 @@ export class KnockGuideClient {
   ) {
     let updatedStep: KnockGuideStep | undefined;
 
-    this.store.setState((state) => {
-      const guide = state.guides[guideKey];
-      if (!guide) return state;
+    const guide = this.store.state.guides[guideKey];
+    if (!guide) return;
 
-      const steps = guide.steps.map((step) => {
-        if (step.ref !== stepRef) return step;
+    const steps = guide.steps.map((step) => {
+      if (step.ref !== stepRef) return step;
 
-        // Mutate in place and maintain the same obj ref so to make it easier
-        // to use in hook deps.
-        step.message = { ...step.message, ...attrs };
-        updatedStep = step;
+      // Mutate in place and maintain the same obj ref so to make it easier
+      // to use in hook deps.
+      step.message = { ...step.message, ...attrs };
+      updatedStep = step;
 
-        return step;
-      });
-      guide.steps = steps;
-      const guides = { ...state.guides, [guide.key]: guide };
-
-      // If we are marking as archived, reset the group stage so we can render
-      // the next guide in the group.
-      const hasMarkedAsArchived = !!updatedStep && !!attrs.archived_at;
-      if (hasMarkedAsArchived) {
-        this.stage = undefined;
-      }
-
-      // Optimistically update the group display logs so we can apply the
-      // throttle settings.
-      const guideGroupDisplayLogs = hasMarkedAsArchived
-        ? {
-            ...state.guideGroupDisplayLogs,
-            [DEFAULT_GROUP_KEY]: attrs.archived_at!,
-          }
-        : state.guideGroupDisplayLogs;
-
-      return { ...state, guides, guideGroupDisplayLogs };
+      return step;
     });
+
+    // Mutate in place and maintain the same obj ref.
+    guide.steps = steps;
+    const guides = { ...this.store.state.guides, [guide.key]: guide };
+
+    // If we are marking as archived, reset the group stage so we can render
+    // the next guide in the group.
+    const hasMarkedAsArchived = !!updatedStep && !!attrs.archived_at;
+
+    // Optimistically update the group display logs so we can apply the
+    // throttle settings.
+    const guideGroupDisplayLogs = hasMarkedAsArchived
+      ? {
+          ...this.store.state.guideGroupDisplayLogs,
+          [DEFAULT_GROUP_KEY]: attrs.archived_at!,
+        }
+      : this.store.state.guideGroupDisplayLogs;
+
+    // If we are marking as archived, clear the group stage so we can render
+    // the next guide in the group.
+    if (hasMarkedAsArchived) {
+      this.clearGroupStage();
+    }
+
+    this.store.setState({ ...this.store.state, guides, guideGroupDisplayLogs });
 
     return updatedStep;
   }
