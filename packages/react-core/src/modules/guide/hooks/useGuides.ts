@@ -9,13 +9,6 @@ interface UseGuidesReturn extends UseGuideContextReturn {
 
 export const useGuides = (filters: KnockGuideFilterParams): UseGuidesReturn => {
   const context = useGuideContext();
-
-  if (!filters.key && !filters.type) {
-    throw new Error(
-      "useGuides must be given at least one filter: { key?: string; type?: string; }",
-    );
-  }
-
   const { client, colorMode } = context;
 
   const guides = useStore(client.store, (state) =>
