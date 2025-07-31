@@ -17,7 +17,7 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
 
   if (!filters.key && !filters.type) {
     throw new Error(
-      "useGuide must be used with at least one filter: either a guide key or a guide type",
+      "useGuide must be given at least one filter: { key?: string; type?: string; }",
     );
   }
 
@@ -27,7 +27,7 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
     client.selectGuide(state, filters),
   );
 
-  const step = guide && guide.steps.find((s) => !s.message.archived_at);
+  const step = guide && guide.getStep();
 
   return { client, colorMode, guide, step };
 };

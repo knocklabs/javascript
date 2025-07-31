@@ -161,6 +161,7 @@ interface KnockGuideActivationLocationRule
 export interface KnockGuide extends GuideData {
   steps: KnockGuideStep[];
   activation_location_rules: KnockGuideActivationLocationRule[];
+  getStep: () => KnockGuideStep | undefined;
 }
 
 type QueryKey = string;

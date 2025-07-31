@@ -358,11 +358,30 @@ export class KnockGuideClient {
   // Store selector
   //
 
+  selectGuides(state: StoreState, filters: SelectFilterParams = {}) {
+    if (Object.keys(state.guides).length === 0) {
+      return [];
+    }
+    this.knock.log(`[Guide] Selecting guides for: ${formatFilters(filters)}`);
+
+    const result = select(state, filters);
+
+    if (result.size === 0) {
+      this.knock.log("[Guide] Selection returned zero result");
+      return [];
+    }
+
+    // Return all selected guides, since we cannot apply the one-at-a-time limit
+    // or throttle settings, but rather defer to the caller to decide which ones
+    // to render. Note
+    return [...result.values()];
+  }
+
   selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
     if (Object.keys(state.guides).length === 0) {
       return undefined;
     }
-    this.knock.log(`[Guide] Selecting guides for: ${formatFilters(filters)}`);
+    this.knock.log(`[Guide] Selecting a guide for: ${formatFilters(filters)}`);
 
     const result = select(state, filters);
 
@@ -644,7 +663,15 @@ export class KnockGuideClient {
     const self = this;
 
     // Build a local copy with helper methods added.
-    const localGuide = { ...remoteGuide };
+    const localGuide = {
+      ...remoteGuide,
+      // Get the next unarchived step.
+      getStep() {
+        return this.steps.find((s) => !s.message.archived_at);
+      },
+    } as KnockGuide;
+
+    localGuide.getStep = localGuide.getStep.bind(localGuide);
 
     localGuide.steps = remoteGuide.steps.map(({ message, ...rest }) => {
       const localStep = {
@@ -683,7 +710,7 @@ export class KnockGuideClient {
         };
       });
 
-    return localGuide as KnockGuide;
+    return localGuide;
   }
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
