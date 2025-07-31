@@ -1185,7 +1185,7 @@ describe("KnockGuideClient", () => {
       const result = client.selectGuides(stateWithGuides);
 
       expect(result).toHaveLength(3);
-      expect(result.map(g => g.key).sort()).toEqual(["changelog", "system_status", "onboarding"]);
+      expect(result.map(g => g.key)).toEqual(["changelog", "system_status", "onboarding"]);
     });
 
     test("filters guides by key", () => {
@@ -1245,7 +1245,7 @@ describe("KnockGuideClient", () => {
 
       // Should exclude guides where all steps are archived
       expect(result).toHaveLength(2);
-      expect(result.map(g => g.key).sort()).toEqual(["system_status", "onboarding"]);
+      expect(result.map(g => g.key)).toEqual(["system_status", "onboarding"]);
     });
   });
 

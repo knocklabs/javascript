@@ -371,6 +371,8 @@ export class KnockGuideClient {
       return [];
     }
 
+    // console.log([...result.values()])
+
     // Return all selected guides, since we cannot apply the one-at-a-time limit
     // or throttle settings, but rather defer to the caller to decide which ones
     // to render. Note
