@@ -324,9 +324,37 @@ export class KnockGuideClient {
     // TODO: Check if guide has ignore limit set, and if so return immediately.
     const [index, guide] = [...result][0]!;
 
-    // If no group stage, then open one.
+    // Starting here to the end of this method represents the core logic of how
+    // "group stage" works. It provides a mechanism for 1) figuring out which
+    // guide components are about to render on a page, 2) determining which
+    // among them ranks highest in the configured display sequence, and 3)
+    // returning only the prevailing guide to render at a time.
+    //
+    // Imagine N number of components that use the `useGuide()` hook which
+    // calls this `selectGuide()` method, and the logic works like this:
+    // * The first time this method is called, we don't have an "open" group
+    //   stage, so we open one (this occurs when a new page/route is rendering).
+    //   * While it is open, we record which guide was selected and its order
+    //     index from each call, but we do NOT return any guide to render yet.
+    //   * When a group stage opens, it schedules a timer to close itself. How
+    //     long this timer waits is configurable. Note, `setTimeout` with 0
+    //     delay seems to work well for React apps, where we "yield" to React
+    //     for one render cycle and close the group right after.
+    // * When a group stage closes, we evaluate which guides were selected and
+    //   recorded, then determine the winning guide (i.e. the one with the
+    //   lowest order index value).
+    //   * Then increment the internal counter to trigger a store state update,
+    //     which allows `useGuide()` and `selectGuide()` to re-run. This second
+    //     round of `selectGuide()` calls, occurring when the group stage is
+    //     closed, results in returning the prevailing guide.
+    // * Whenever a user navigates to a new page, we repeat the same process
+    //   above.
+    // * There's a third status called "patch," which is for handling real-time
+    //   updates received from the API. It's similar to the "open" to "closed"
+    //   flow, except we keep the resolved guide in place while we recalculate.
+    //   This is done so that we don't cause flickers or CLS.
     if (!this.stage) {
-      this.stage = this.openGroupStage(); // Assign here to make tsc happy.
+      this.stage = this.openGroupStage(); // Assign here to make tsc happy
     }
 
     // TODO: Need to check if this guide can render now based on the group's
