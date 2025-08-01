@@ -45,8 +45,9 @@ import {
 // prevailing guide.
 const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 
-// How often we should refresh the store state to trigger subscribed callbacks.
-const DEFAULT_STATE_COUNTER_INTERVAL = 30 * 1000; // in milliseconds
+// How often we should increment the counter to refresh the store state and
+// trigger subscribed callbacks.
+const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
@@ -156,7 +157,7 @@ export class KnockGuideClient {
   // to resolve and render the prevailing one.
   private stage: GroupStage | undefined;
 
-  private intervalId: ReturnType<typeof setInterval> | undefined;
+  private counterIntervalId: ReturnType<typeof setInterval> | undefined;
 
   constructor(
     readonly knock: Knock,
@@ -201,10 +202,11 @@ export class KnockGuideClient {
   }
 
   private startCounterInterval() {
-    const { stateCounterInterval: delay = DEFAULT_STATE_COUNTER_INTERVAL } =
-      this.options;
+    const {
+      throttleCheckInterval: delay = DEFAULT_COUNTER_INCREMENT_INTERVAL,
+    } = this.options;
 
-    this.intervalId = setInterval(() => {
+    this.counterIntervalId = setInterval(() => {
       this.knock.log("[Guide] Counter interval tick");
       if (this.stage && this.stage.status !== "closed") return;
 
@@ -213,9 +215,9 @@ export class KnockGuideClient {
   }
 
   private clearCounterInterval() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = undefined;
+    if (this.counterIntervalId) {
+      clearInterval(this.counterIntervalId);
+      this.counterIntervalId = undefined;
     }
   }
 

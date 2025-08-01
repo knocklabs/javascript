@@ -1,13 +1,32 @@
 import {
   Banner,
   Card,
+  CardView,
   KnockGuideProvider,
   KnockProvider,
   Modal,
+  useGuide
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, Route, Routes } from "react-router";
+
+const ChangelogCard = () => {
+  const { guide, step } = useGuide({ type: "changelog-card" });
+
+  useEffect(() => {
+    if (step) step.markAsSeen();
+  }, [step]);
+
+  if (!guide || !step) return null;
+
+  return (
+    <CardView.Default
+      content={step.content}
+      onDismiss={() => step.markAsArchived()}
+    />
+  );
+}
 
 const Navigation = () => {
   return (
@@ -66,6 +85,8 @@ function App() {
           <Card />
           <div style={{ marginTop: "20px" }} />
           <Modal />
+          <div style={{ marginTop: "20px" }} />
+          <ChangelogCard />
 
           <Routes>
             <Route index element={<Page title="home" />} />

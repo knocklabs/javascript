@@ -195,7 +195,7 @@ export type TargetParams = {
 export type ConstructorOpts = {
   trackLocationFromWindow?: boolean;
   orderResolutionDuration?: number;
-  stateCounterInterval?: number;
+  throttleCheckInterval?: number;
 };
 
 export type GroupStage = {
