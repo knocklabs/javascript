@@ -1,5 +1,4 @@
 ---
-"guide-example": minor
 "@knocklabs/react-core": minor
 "@knocklabs/client": minor
 ---
