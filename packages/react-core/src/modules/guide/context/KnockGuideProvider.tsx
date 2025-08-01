@@ -23,6 +23,7 @@ type Props = {
   colorMode?: ColorMode;
   targetParams?: KnockGuideTargetParams;
   trackLocationFromWindow?: boolean;
+  orderResolutionDuration?: number;
 };
 
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
@@ -32,6 +33,9 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   colorMode = "light",
   targetParams = {},
   trackLocationFromWindow = true,
+  // Default to 0 which works well for react apps as this "yields" to react for
+  // one render cyle first and close the group stage.
+  orderResolutionDuration = 0,
   children,
 }) => {
   let knock: Knock;
@@ -47,8 +51,15 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   const knockGuideClient = React.useMemo(() => {
     return new KnockGuideClient(knock, channelId, stableTargetParams, {
       trackLocationFromWindow,
+      orderResolutionDuration,
     });
-  }, [knock, channelId, stableTargetParams, trackLocationFromWindow]);
+  }, [
+    knock,
+    channelId,
+    stableTargetParams,
+    trackLocationFromWindow,
+    orderResolutionDuration,
+  ]);
 
   React.useEffect(() => {
     if (readyToTarget) {
