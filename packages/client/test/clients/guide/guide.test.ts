@@ -349,6 +349,7 @@ describe("KnockGuideClient", () => {
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
 
     const mockDefaultGroup = {
@@ -468,6 +469,7 @@ describe("KnockGuideClient", () => {
         ...mockGuide,
         bypass_global_group_limit: true,
         steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
       } as unknown as KnockGuide;
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -520,6 +522,7 @@ describe("KnockGuideClient", () => {
       const throttledGuide = {
         ...mockGuide,
         steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
       } as unknown as KnockGuide;
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -575,6 +578,7 @@ describe("KnockGuideClient", () => {
         ...mockGuide,
         bypass_global_group_limit: true,
         steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
       } as unknown as KnockGuide;
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -684,6 +688,7 @@ describe("KnockGuideClient", () => {
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
 
     const mockGuideTwo = {
@@ -704,6 +709,7 @@ describe("KnockGuideClient", () => {
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
 
     const mockGuideThree = {
@@ -718,6 +724,7 @@ describe("KnockGuideClient", () => {
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
 
     const mockGuides = {
@@ -1084,6 +1091,164 @@ describe("KnockGuideClient", () => {
     });
   });
 
+  describe("selectGuides", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      steps: [mockStep],
+      activation_location_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "changelog",
+      type: "card",
+      semver: "1.0.0",
+      steps: [mockStep],
+      activation_location_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideThree = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_3",
+      key: "system_status",
+      type: "banner",
+      semver: "1.0.0",
+      steps: [mockStep],
+      activation_location_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuides = {
+      [mockGuideOne.key]: mockGuideOne,
+      [mockGuideTwo.key]: mockGuideTwo,
+      [mockGuideThree.key]: mockGuideThree,
+    };
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["changelog", "system_status", "onboarding"],
+      display_interval: 60,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    const stateWithGuides = {
+      guideGroups: [mockDefaultGroup],
+      guideGroupDisplayLogs: {},
+      guides: mockGuides,
+      queries: {},
+      location: undefined,
+      counter: 0,
+    };
+
+    test("returns all guides without filters", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithGuides);
+
+      expect(result).toHaveLength(3);
+      expect(result.map(g => g.key)).toEqual(["changelog", "system_status", "onboarding"]);
+    });
+
+    test("filters guides by key", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithGuides, { key: "onboarding" });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].key).toBe("onboarding");
+    });
+
+    test("filters guides by type", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithGuides, { type: "card" });
+
+      expect(result).toHaveLength(2);
+
+      expect(result[0].key).toBe("changelog");
+      expect(result[0].type).toBe("card");
+
+      expect(result[1].key).toBe("onboarding");
+      expect(result[1].type).toBe("card");
+    });
+
+    test("returns empty array when no guides match filters", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithGuides, { type: "nonexistent" });
+
+      expect(result).toEqual([]);
+    });
+
+    test("excludes guides where all steps are archived", () => {
+      const stateWithArchivedGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            steps: [
+              {
+                ...mockStep,
+                message: {
+                  ...mockStep.message,
+                  archived_at: new Date().toISOString(),
+                }
+              }
+            ]
+          },
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithArchivedGuide);
+
+      // Should exclude guides where all steps are archived
+      expect(result).toHaveLength(2);
+      expect(result.map(g => g.key)).toEqual(["system_status", "onboarding"]);
+    });
+  });
+
   describe("guide socket event handling", () => {
     test("handles guide.added event", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1272,6 +1437,7 @@ describe("KnockGuideClient", () => {
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
 
     const mockGuideTwo = {
@@ -1286,6 +1452,7 @@ describe("KnockGuideClient", () => {
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
 
     const mockDefaultGroup = {
