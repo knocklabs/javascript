@@ -185,7 +185,7 @@ describe("KnockGuideClient", () => {
 
     test("starts the counter interval clock and sets the interval id", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-      expect(client["intervalId"]).toBeDefined();
+      expect(client["counterIntervalId"]).toBeDefined();
     });
   });
 
