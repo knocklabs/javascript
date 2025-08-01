@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.0
+
+### Minor Changes
+
+- 48e9c77: - Support guides ordering and throttle settings
+  - Add `useGuides` hook
+
+### Patch Changes
+
+- Updated dependencies [48e9c77]
+  - @knocklabs/client@0.16.0
+
 ## 0.7.5
 
 ### Patch Changes
