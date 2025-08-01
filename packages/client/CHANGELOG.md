@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.16.0
+
+### Minor Changes
+
+- 48e9c77: - Support guides ordering and throttle settings
+  - Add `useGuides` hook
+
 ## 0.15.2
 
 ### Patch Changes
