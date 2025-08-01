@@ -64,6 +64,34 @@ describe("KnockGuideClient", () => {
   let mockKnock: Knock;
 
   beforeEach(() => {
+    // Clear all mocks first
+    vi.clearAllMocks();
+
+    // Reset window to undefined by default
+    vi.stubGlobal("window", undefined);
+    // Replace global timers with mock versions
+    vi.useFakeTimers();
+
+    // Reset store state
+    mockStore.setState.mockClear();
+    mockStore.getState.mockClear();
+    mockStore.getState.mockReturnValue({
+      guideGroups: [],
+      guideGroupDisplayLogs: {},
+      guides: {},
+      queries: {},
+      location: undefined,
+      counter: 0,
+    });
+    mockStore.state = {
+      guideGroups: [],
+      guideGroupDisplayLogs: {},
+      guides: {},
+      queries: {},
+      location: undefined,
+      counter: 0,
+    };
+
     mockApiClient = {
       makeRequest: vi.fn().mockResolvedValue({ statusCode: "ok" }),
       socket: undefined,
@@ -86,30 +114,6 @@ describe("KnockGuideClient", () => {
         markGuideStepAs: vi.fn().mockResolvedValue({ status: "ok" }),
       },
     } as unknown as Knock;
-
-    vi.clearAllMocks();
-    // Reset window to undefined by default
-    vi.stubGlobal("window", undefined);
-    // Replace global timers with mock versions
-    vi.useFakeTimers();
-    // Reset store state
-    mockStore.setState.mockClear();
-    mockStore.getState.mockReturnValue({
-      guideGroups: [],
-      guideGroupDisplayLogs: {},
-      guides: {},
-      queries: {},
-      location: undefined,
-      counter: 0,
-    });
-    mockStore.state = {
-      guideGroups: [],
-      guideGroupDisplayLogs: {},
-      guides: {},
-      queries: {},
-      location: undefined,
-      counter: 0,
-    };
   });
 
   afterEach(() => {
@@ -314,37 +318,6 @@ describe("KnockGuideClient", () => {
   });
 
   describe("guide operations", () => {
-    let makeRequestSpy: ReturnType<typeof vi.fn>;
-    let markGuideStepAsSpy: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-      makeRequestSpy = vi.fn().mockResolvedValue({ statusCode: "ok" });
-      markGuideStepAsSpy = vi.fn().mockResolvedValue({ status: "ok" });
-
-      mockApiClient.makeRequest = makeRequestSpy;
-
-      // Mock the knock.user.markGuideStepAs method
-      mockKnock = {
-        ...mockKnock,
-        user: {
-          getGuides: vi
-            .fn()
-            .mockImplementation(() => Promise.resolve({ entries: [] })),
-          markGuideStepAs: markGuideStepAsSpy,
-        },
-      } as unknown as Knock;
-
-      vi.mocked(mockKnock.client).mockReturnValue({
-        ...mockApiClient,
-        makeRequest: makeRequestSpy,
-        host: "https://api.knock.app",
-        apiKey: "test_key",
-        userToken: "test_token",
-        axiosClient: {},
-        canRetryRequest: () => true,
-      } as unknown as ApiClient);
-    });
-
     const mockStep = {
       ref: "step_1",
       schema_key: "test",
@@ -404,7 +377,7 @@ describe("KnockGuideClient", () => {
 
       await client.markAsSeen(mockGuide, mockStep);
 
-      expect(markGuideStepAsSpy).toHaveBeenCalledWith("seen", {
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("seen", {
         message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
@@ -433,7 +406,7 @@ describe("KnockGuideClient", () => {
 
       await client.markAsInteracted(mockGuide, mockStep, { action: "clicked" });
 
-      expect(markGuideStepAsSpy).toHaveBeenCalledWith("interacted", {
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("interacted", {
         message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
@@ -460,13 +433,175 @@ describe("KnockGuideClient", () => {
 
       await client.markAsArchived(mockGuide, mockStep);
 
-      expect(markGuideStepAsSpy).toHaveBeenCalledWith("archived", {
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("archived", {
         message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
         guide_step_ref: "step_1",
+        unthrottled: false,
       });
+    });
+
+    test("marks guide step as archived with bypass_global_group_limit true", async () => {
+      // Create a fresh mock step for this test
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const unthrottledGuide = {
+        ...mockGuide,
+        bypass_global_group_limit: true,
+        steps: [freshMockStep],
+      } as unknown as KnockGuide;
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {[unthrottledGuide.key]: unthrottledGuide},
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(unthrottledGuide, freshMockStep);
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("archived", {
+        message_id: "msg_123",
+        channel_id: channelId,
+        guide_key: "test_guide",
+        guide_id: "guide_123",
+        guide_step_ref: "step_1",
+        unthrottled: true,
+      });
+    });
+
+    test("updates guideGroupDisplayLogs when archiving throttled guide", async () => {
+      // Create a fresh mock step for this test
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const throttledGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+      } as unknown as KnockGuide;
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {[throttledGuide.key]: throttledGuide},
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(throttledGuide, freshMockStep);
+
+      // Check that setState was called with a function that updates guideGroupDisplayLogs
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(call => typeof call[0] === "function")?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+      expect(newState.guideGroupDisplayLogs).toHaveProperty("default");
+      expect(newState.guideGroupDisplayLogs.default).toBeTruthy();
+    });
+
+    test("does not update guideGroupDisplayLogs when archiving unthrottled guide", async () => {
+      // Create a fresh mock step for this test
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const unthrottledGuide = {
+        ...mockGuide,
+        bypass_global_group_limit: true,
+        steps: [freshMockStep],
+      } as unknown as KnockGuide;
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {[unthrottledGuide.key]: unthrottledGuide},
+        queries: {},
+        location: undefined,
+        counter: 0,
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(unthrottledGuide, freshMockStep);
+
+      // Check that setState was called with a function that does NOT update guideGroupDisplayLogs
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(call => typeof call[0] === "function")?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+      expect(newState.guideGroupDisplayLogs).toEqual({});
     });
   });
 
