@@ -23,7 +23,8 @@ type Props = {
   colorMode?: ColorMode;
   targetParams?: KnockGuideTargetParams;
   trackLocationFromWindow?: boolean;
-  orderResolutionDuration?: number;
+  orderResolutionDuration?: number; // in milliseconds
+  throttleCheckInterval?: number; // in milliseconds
 };
 
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
@@ -36,6 +37,7 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   // Default to 0 which works well for react apps as this "yields" to react for
   // one render cyle first and close the group stage.
   orderResolutionDuration = 0,
+  throttleCheckInterval,
   children,
 }) => {
   let knock: Knock;
@@ -52,6 +54,7 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
     return new KnockGuideClient(knock, channelId, stableTargetParams, {
       trackLocationFromWindow,
       orderResolutionDuration,
+      throttleCheckInterval,
     });
   }, [
     knock,
@@ -59,6 +62,7 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
     stableTargetParams,
     trackLocationFromWindow,
     orderResolutionDuration,
+    throttleCheckInterval,
   ]);
 
   React.useEffect(() => {

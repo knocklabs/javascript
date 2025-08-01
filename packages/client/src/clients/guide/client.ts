@@ -45,8 +45,9 @@ import {
 // prevailing guide.
 const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 
-// How often we should refresh the store state to trigger subscribed callbacks.
-const DEFAULT_STATE_COUNTER_INTERVAL = 30 * 1000; // in milliseconds
+// How often we should increment the counter to refresh the store state and
+// trigger subscribed callbacks.
+const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
@@ -201,8 +202,9 @@ export class KnockGuideClient {
   }
 
   private startCounterInterval() {
-    const { stateCounterInterval: delay = DEFAULT_STATE_COUNTER_INTERVAL } =
-      this.options;
+    const {
+      throttleCheckInterval: delay = DEFAULT_COUNTER_INCREMENT_INTERVAL,
+    } = this.options;
 
     this.counterIntervalId = setInterval(() => {
       this.knock.log("[Guide] Counter interval tick");
