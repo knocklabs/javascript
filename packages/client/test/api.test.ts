@@ -499,7 +499,7 @@ describe("API Client", () => {
   });
 
   describe("Request Configuration", () => {
-    test("sets correct user agent header", () => {
+    test("sets correct x-knock-client header", () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
         apiKey: "pk_test_12345",
@@ -510,7 +510,7 @@ describe("API Client", () => {
       const axiosClient = (apiClient as unknown as Record<string, unknown>)
         .axiosClient as { defaults: { headers: Record<string, string> } };
 
-      expect(axiosClient.defaults.headers["User-Agent"]).toBe(
+      expect(axiosClient.defaults.headers["X-Knock-Client"]).toBe(
         `Knock/ClientJS ${packageJson.version}`,
       );
     });

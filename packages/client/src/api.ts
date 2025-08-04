@@ -38,7 +38,7 @@ class ApiClient {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
         "X-Knock-User-Token": this.userToken,
-        "User-Agent": this.getUserAgent(),
+        "X-Knock-Client": this.getUserAgent(),
       },
     });
 
