@@ -3855,7 +3855,7 @@ __metadata:
     react-native: "npm:^0.79.2"
     react-native-gesture-handler: "npm:^2.27.1"
     react-native-reanimated: "npm:~3.17.4"
-    react-native-safe-area-context: "npm:5.4.0"
+    react-native-safe-area-context: "npm:5.5.2"
     react-native-screens: "npm:~4.13.1"
     react-native-web: "npm:~0.20.0"
     react-native-webview: "npm:13.13.5"
@@ -15997,13 +15997,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:5.4.0":
-  version: 5.4.0
-  resolution: "react-native-safe-area-context@npm:5.4.0"
+"react-native-safe-area-context@npm:5.5.2":
+  version: 5.5.2
+  resolution: "react-native-safe-area-context@npm:5.5.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/729fef1f768d57b905f51882374aa93b209d54576b8a0cf328e0a349c8dc9705ae8f9032e572fd7a7c9e94b588105f44760c0bb15ab9911b7977073d6754b54d
+  checksum: 10c0/529cafcafbc1d994f6d9c9be41ae4f78768b7c103a22265d3fe5223a930249e0a07a934b5ec358ce510622061f339a20c2147b620bd15032366b12b4258c2ce5
   languageName: node
   linkType: hard
 
