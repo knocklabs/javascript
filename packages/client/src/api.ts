@@ -38,7 +38,7 @@ class ApiClient {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
         "X-Knock-User-Token": this.userToken,
-        "User-Agent": this.getUserAgent(),
+        "X-Knock-Client": this.getKnockClientHeader(),
       },
     });
 
@@ -106,7 +106,7 @@ class ApiClient {
     return false;
   }
 
-  private getUserAgent() {
+  private getKnockClientHeader() {
     // Note: we're following format used in our Stainless SDKs:
     // https://github.com/knocklabs/knock-node/blob/main/src/client.ts#L335
     // If we add the env var to turbo.json, it caches it so the version
