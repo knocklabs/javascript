@@ -3782,7 +3782,7 @@ __metadata:
     "@codecov/vite-plugin": "npm:^1.9.1"
     "@knocklabs/types": "workspace:^"
     "@tanstack/store": "npm:^0.7.1"
-    "@types/jsonwebtoken": "npm:^9.0.9"
+    "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/phoenix": "npm:^1.6.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
     "@typescript-eslint/parser": "npm:^8.32.1"
@@ -6761,13 +6761,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsonwebtoken@npm:^9.0.9":
-  version: 9.0.9
-  resolution: "@types/jsonwebtoken@npm:9.0.9"
+"@types/jsonwebtoken@npm:^9.0.10":
+  version: 9.0.10
+  resolution: "@types/jsonwebtoken@npm:9.0.10"
   dependencies:
     "@types/ms": "npm:*"
     "@types/node": "npm:*"
-  checksum: 10c0/d754a7b65fc021b298fc94e8d7a7d71f35dedf24296ac89286f80290abc5dbb0c7830a21440ee9ecbb340efc1b0a21f5609ea298a35b874cae5ad29a65440741
+  checksum: 10c0/0688ac8fb75f809201cb7e18a12b9d80ce539cb9dd27e1b01e11807cb1a337059e899b8ee3abc3f2c9417f02e363a3069d9eab9ef9724b1da1f0e10713514f94
   languageName: node
   linkType: hard
 
@@ -14605,7 +14605,7 @@ __metadata:
   resolution: "ms-teams-connect-example@workspace:examples/ms-teams-connect-example"
   dependencies:
     "@knocklabs/react": "npm:0.7.28"
-    "@types/jsonwebtoken": "npm:^9.0.9"
+    "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^22"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
@@ -17309,7 +17309,7 @@ __metadata:
   resolution: "slack-connect-example@workspace:examples/slack-connect-example"
   dependencies:
     "@knocklabs/react": "npm:0.7.28"
-    "@types/jsonwebtoken": "npm:^9.0.9"
+    "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^22"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
