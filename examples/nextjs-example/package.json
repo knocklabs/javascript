@@ -14,7 +14,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@faker-js/faker": "^9.9.0",
-    "@knocklabs/node": "^1.2.0",
+    "@knocklabs/node": "^1.11.2",
     "@knocklabs/react": "workspace:^",
     "@telegraph/button": "^0.1.1",
     "@telegraph/combobox": "^0.1.1",
