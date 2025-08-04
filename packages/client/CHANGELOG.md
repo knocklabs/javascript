@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.1
+
+### Patch Changes
+
+- 35b5445: chore(deps): bump axios from 1.10.0 to 1.11.0
+- 5d758d7: fix: fixes refused to set unsafe header "User-Agent"
+- d2fd092: chore(deps-dev): bump @types/jsonwebtoken from 9.0.9 to 9.0.10
+
 ## 0.16.0
 
 ### Minor Changes
