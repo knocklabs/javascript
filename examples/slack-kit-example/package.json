@@ -11,7 +11,7 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@knocklabs/node": "^1.2.0",
+    "@knocklabs/node": "^1.11.2",
     "@knocklabs/react": "0.7.28",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.3",
