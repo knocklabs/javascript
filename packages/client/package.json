@@ -72,7 +72,7 @@
     "@knocklabs/types": "workspace:^",
     "@tanstack/store": "^0.7.1",
     "@types/phoenix": "^1.6.6",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
