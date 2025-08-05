@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.31
+
+### Patch Changes
+
+- 79204f0: fix: export useGuides hook to react package
+- Updated dependencies [79204f0]
+  - @knocklabs/react-core@0.8.3
+  - @knocklabs/client@0.16.3
+
 ## 0.7.30
 
 ### Patch Changes
