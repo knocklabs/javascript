@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.2
+
+### Patch Changes
+
+- Updated dependencies [5a19d82]
+  - @knocklabs/client@0.16.2
+
 ## 0.8.1
 
 ### Patch Changes
