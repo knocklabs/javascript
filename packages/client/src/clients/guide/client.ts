@@ -255,11 +255,7 @@ export class KnockGuideClient {
       >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
-      const {
-        entries,
-        guide_groups: groups,
-        guide_group_display_logs,
-      } = data;
+      const { entries, guide_groups: groups, guide_group_display_logs } = data;
 
       this.store.setState((state) => ({
         ...state,
