@@ -7,7 +7,9 @@ interface UseGuidesReturn extends UseGuideContextReturn {
   guides: KnockGuide[];
 }
 
-export const useGuides = (filters: KnockGuideFilterParams): UseGuidesReturn => {
+export const useGuides = (
+  filters: Pick<KnockGuideFilterParams, "type">,
+): UseGuidesReturn => {
   const context = useGuideContext();
   const { client, colorMode } = context;
 

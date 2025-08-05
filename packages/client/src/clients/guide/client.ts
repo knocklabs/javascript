@@ -255,16 +255,12 @@ export class KnockGuideClient {
       >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
-      const {
-        entries,
-        guide_groups: groups,
-        guide_group_display_logs: guideGroupDisplayLogs,
-      } = data;
+      const { entries, guide_groups: groups, guide_group_display_logs } = data;
 
       this.store.setState((state) => ({
         ...state,
         guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
-        guideGroupDisplayLogs,
+        guideGroupDisplayLogs: guide_group_display_logs || {},
         guides: byKey(entries.map((g) => this.localCopy(g))),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));

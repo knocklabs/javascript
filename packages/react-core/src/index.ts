@@ -30,6 +30,7 @@ export {
   KnockGuideProvider,
   KnockGuideContext,
   useGuide,
+  useGuides,
 } from "./modules/guide";
 export {
   type MsTeamsChannelQueryOptions,
