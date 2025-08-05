@@ -14,17 +14,15 @@ vi.mock("@knocklabs/client", () => ({
 }));
 
 // Mock API responses
-mockApiClient.makeRequest.mockImplementation(
-  async ({ method, url, params }) => {
-    if (method === "PUT" && url.match(/\/v1\/users\/.+/)) {
-      return {
-        statusCode: "ok",
-        body: { id: knock.userId, ...params },
-      };
-    }
-    return { statusCode: "ok", body: {} };
-  },
-);
+mockApiClient.makeRequest.mockImplementation(async ({ method, url, data }) => {
+  if (method === "PUT" && url.match(/\/v1\/users\/.+/)) {
+    return {
+      statusCode: "ok",
+      body: { id: knock.userId, ...(data ?? {}) },
+    };
+  }
+  return { statusCode: "ok", body: {} };
+});
 
 afterEach(() => {
   cleanup();
@@ -85,7 +83,7 @@ describe("KnockProvider", () => {
       expect.objectContaining({
         method: "PUT",
         url: "/v1/users/test_user_id",
-        params: { name: "John" },
+        data: { name: "John" },
       }),
     );
 
@@ -107,7 +105,7 @@ describe("KnockProvider", () => {
       expect.objectContaining({
         method: "PUT",
         url: "/v1/users/test_user_id_2",
-        params: { name: "Jane" },
+        data: { name: "Jane" },
       }),
     );
   });
