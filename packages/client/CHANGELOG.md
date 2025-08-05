@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.3
+
+### Patch Changes
+
+- 79204f0: fix: export useGuides hook to react package
+
 ## 0.16.2
 
 ### Patch Changes
