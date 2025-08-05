@@ -40,7 +40,7 @@ class UserClient {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/users/${this.instance.userId}`,
-      params: props,
+      data: props,
     });
 
     return this.handleResponse<User>(result);

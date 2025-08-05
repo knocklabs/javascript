@@ -85,7 +85,7 @@ describe("KnockProvider", () => {
       expect.objectContaining({
         method: "PUT",
         url: "/v1/users/test_user_id",
-        params: { name: "John" },
+        data: { name: "John" },
       }),
     );
 
@@ -107,7 +107,7 @@ describe("KnockProvider", () => {
       expect.objectContaining({
         method: "PUT",
         url: "/v1/users/test_user_id_2",
-        params: { name: "Jane" },
+        data: { name: "Jane" },
       }),
     );
   });

@@ -102,7 +102,7 @@ describe("User Client", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
           url: "/v1/users/user_123",
-          params: props,
+          data: props,
         });
         expect(result).toEqual(updatedUser);
       });
@@ -137,7 +137,7 @@ describe("User Client", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
           url: "/v1/users/user_123",
-          params: comprehensiveProps,
+          data: comprehensiveProps,
         });
       });
 
