@@ -26,6 +26,7 @@ class Knock {
   public userToken?: string;
   public logLevel?: LogLevel;
   private tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
+  private branch?: string;
   readonly feeds = new FeedClient(this);
   readonly objects = new ObjectClient(this);
   readonly preferences = new Preferences(this);
@@ -40,6 +41,7 @@ class Knock {
   ) {
     this.host = options.host || DEFAULT_HOST;
     this.logLevel = options.logLevel;
+    this.branch = options.branch;
 
     this.log("Initialized Knock instance");
 
@@ -187,6 +189,7 @@ class Knock {
       apiKey: this.apiKey,
       host: this.host,
       userToken: this.userToken,
+      branch: this.branch,
     });
   }
 
