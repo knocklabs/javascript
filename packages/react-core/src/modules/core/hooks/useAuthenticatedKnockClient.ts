@@ -86,6 +86,7 @@ function useAuthenticatedKnockClient(
     const knock = new Knock(apiKey, {
       host: stableOptions.host,
       logLevel: stableOptions.logLevel,
+      branch: stableOptions.branch,
     });
 
     authenticateWithOptions(
