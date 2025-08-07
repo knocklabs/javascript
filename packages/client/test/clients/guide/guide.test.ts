@@ -267,7 +267,11 @@ describe("KnockGuideClient", () => {
     test("subscribes to socket events when socket is available", () => {
       const mockChannel = {
         join: vi.fn().mockReturnValue({
-          receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn()
+            })
+          }),
         }),
         on: vi.fn(),
         off: vi.fn(),
@@ -301,6 +305,107 @@ describe("KnockGuideClient", () => {
         }),
       );
       expect(mockChannel.join).toHaveBeenCalled();
+    });
+
+    test("handles successful channel join", () => {
+      let okCallback: Function;
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn((event, callback) => {
+            if (event === "ok") {
+              okCallback = callback;
+            }
+            return {
+              receive: vi.fn().mockReturnValue({ receive: vi.fn() })
+            };
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+      client.subscribe();
+
+      // Trigger the ok callback
+      okCallback!();
+
+      expect(mockKnock.log).toHaveBeenCalledWith("[Guide] Successfully joined channel");
+    });
+
+    test("unsubscribes after reaching max retry limit", () => {
+      let errorCallback: Function;
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn((event, callback) => {
+            if (event === "error") {
+              errorCallback = callback;
+            }
+            return { receive: vi.fn() };
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      const unsubscribeSpy = vi.spyOn(client, "unsubscribe");
+
+      client.subscribe();
+
+      // Initial fail. The retry count starts at 0 and is incremented on each
+      // error to represent the next retry.
+      errorCallback!({ reason: "auth_error" });
+
+      // First retry fail
+      expect(client["subscribeRetryCount"]).toBe(1);
+      errorCallback!({ reason: "auth_error" });
+
+      // Second retry fail
+      expect(client["subscribeRetryCount"]).toBe(2);
+      errorCallback!({ reason: "auth_error" });
+
+      // Third retry fail
+      expect(client["subscribeRetryCount"]).toBe(3);
+      errorCallback!({ reason: "auth_error" });
+
+      // Check that the max retry limit message was logged
+      expect(mockKnock.log).toHaveBeenCalledWith(
+        "[Guide] Channel join max retry limit reached: 3"
+      );
+
+      expect(unsubscribeSpy).toHaveBeenCalled();
     });
 
     test("unsubscribes from socket events", () => {
