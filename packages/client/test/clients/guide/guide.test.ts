@@ -356,7 +356,21 @@ describe("KnockGuideClient", () => {
             if (event === "error") {
               errorCallback = callback;
             }
-            return { receive: vi.fn() };
+            return {
+              receive: vi.fn((event, callback) => {
+                if (event === "error") {
+                  errorCallback = callback;
+                }
+                return {
+                  receive: vi.fn((event, callback) => {
+                    if (event === "error") {
+                      errorCallback = callback;
+                    }
+                    return { receive: vi.fn() };
+                  })
+                };
+              })
+            };
           }),
         }),
         on: vi.fn(),
