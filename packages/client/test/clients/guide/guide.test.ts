@@ -308,7 +308,7 @@ describe("KnockGuideClient", () => {
     });
 
     test("handles successful channel join", () => {
-      let okCallback: Function;
+      let okCallback: () => void;
       const mockChannel = {
         join: vi.fn().mockReturnValue({
           receive: vi.fn((event, callback) => {
@@ -349,7 +349,7 @@ describe("KnockGuideClient", () => {
     });
 
     test("unsubscribes after reaching max retry limit", () => {
-      let errorCallback: Function;
+      let errorCallback: (resp: { reason: string }) => void;
       const mockChannel = {
         join: vi.fn().mockReturnValue({
           receive: vi.fn((event, callback) => {
