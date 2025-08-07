@@ -49,6 +49,9 @@ const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 // trigger subscribed callbacks.
 const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 
+// Maximum number of retry attempts for channel subscription
+const SUBSCRIBE_RETRY_LIMIT = 3;
+
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
   if (typeof window !== "undefined") {
@@ -154,6 +157,7 @@ export class KnockGuideClient {
     "guide_group.added",
     "guide_group.updated",
   ];
+  private subscribeRetryCount = 0;
 
   // Original history methods to monkey patch, or restore in cleanups.
   private pushStateFn: History["pushState"] | undefined;
@@ -306,11 +310,42 @@ export class KnockGuideClient {
     }
 
     if (["closed", "errored"].includes(newChannel.state)) {
-      newChannel.join();
+      // Reset retry count for new subscription attempt
+      this.subscribeRetryCount = 0;
+
+      newChannel
+        .join()
+        .receive("ok", () => {
+          this.knock.log("[Guide] Successfully joined channel");
+        })
+        .receive("error", (resp) => {
+          this.knock.log(
+            `[Guide] Failed to join channel: ${JSON.stringify(resp)}`,
+          );
+          this.handleChannelJoinError();
+        })
+        .receive("timeout", () => {
+          this.knock.log("[Guide] Channel join timed out");
+          this.handleChannelJoinError();
+        });
     }
 
     // Track the joined channel.
     this.socketChannel = newChannel;
+  }
+
+  private handleChannelJoinError() {
+    // Prevent phx channel to keep retrying forever from either network or other
+    // errors (e.g. auth error, invalid channel etc)
+    if (this.subscribeRetryCount >= SUBSCRIBE_RETRY_LIMIT) {
+      this.knock.log(
+        `[Guide] Channel join max retry limit reached: ${this.subscribeRetryCount}`,
+      );
+      this.unsubscribe();
+      return;
+    }
+
+    this.subscribeRetryCount++;
   }
 
   unsubscribe() {
