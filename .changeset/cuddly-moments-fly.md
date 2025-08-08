@@ -16,6 +16,6 @@ const knock = useAuthenticatedKnockClient(
   process.env.KNOCK_PUBLIC_API_KEY,
   { id: user.id },
   undefined, // userToken when needed
-  { branch: "my-feature-branch" },
+  { branch: "my-branch-slug" },
 );
 ```
