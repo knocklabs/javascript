@@ -8,6 +8,7 @@ export type LogLevel = "debug";
 export interface KnockOptions {
   host?: string;
   logLevel?: LogLevel;
+  branch?: string;
 }
 
 export interface KnockObject<T = GenericData> {
