@@ -335,8 +335,8 @@ export class KnockGuideClient {
   }
 
   private handleChannelJoinError() {
-    // Prevent phx channel to keep retrying forever from either network or other
-    // errors (e.g. auth error, invalid channel etc)
+    // Prevent phx channel from retrying forever in case of either network or
+    // other errors (e.g. auth error, invalid channel etc)
     if (this.subscribeRetryCount >= SUBSCRIBE_RETRY_LIMIT) {
       this.knock.log(
         `[Guide] Channel join max retry limit reached: ${this.subscribeRetryCount}`,
