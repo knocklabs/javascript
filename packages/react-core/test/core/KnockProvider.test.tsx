@@ -5,6 +5,8 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { createMockKnock } from "../../../client/test/test-utils/mocks";
 import { KnockProvider, useKnockClient } from "../../src";
 
+const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
+
 // Create a mock Knock instance that we'll use across tests
 const { knock, mockApiClient } = createMockKnock("test_api_key");
 
@@ -43,6 +45,26 @@ describe("KnockProvider", () => {
 
     expect(getByTestId("consumer-msg")).toHaveTextContent(
       "API Key: test_api_key",
+    );
+  });
+
+  test("renders as expected with branch", () => {
+    const TestConsumer = () => {
+      const knock = useKnockClient();
+      return <div data-testid="consumer-msg">Branch: {knock.branch}</div>;
+    };
+    const { getByTestId } = render(
+      <KnockProvider
+        apiKey="test_api_key"
+        user={{ id: "test_user_id" }}
+        branch={TEST_BRANCH_SLUG}
+      >
+        <TestConsumer />
+      </KnockProvider>,
+    );
+
+    expect(getByTestId("consumer-msg")).toHaveTextContent(
+      "Branch: lorem-ipsum-dolor-branch",
     );
   });
 
