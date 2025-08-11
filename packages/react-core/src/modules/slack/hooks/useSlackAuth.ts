@@ -93,7 +93,7 @@ function useSlackAuth(
         channel_id: knockSlackChannelId,
         public_key: knock.apiKey,
         user_token: knock.userToken,
-        branch_slug: knock.branch,
+        branch_slug: knock.branch ?? undefined,
       }),
       client_id: slackClientId,
       scope: combinedScopes.join(","),
