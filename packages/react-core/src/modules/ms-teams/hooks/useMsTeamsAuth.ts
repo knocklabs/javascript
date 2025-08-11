@@ -42,6 +42,7 @@ function useMsTeamsAuth(
         channel_id: knockMsTeamsChannelId,
         public_key: knock.apiKey,
         user_token: knock.userToken,
+        branch_slug: knock.branch,
       }),
       client_id: graphApiClientId,
       redirect_uri: authRedirectUri,
@@ -53,6 +54,7 @@ function useMsTeamsAuth(
     knockMsTeamsChannelId,
     knock.apiKey,
     knock.userToken,
+    knock.branch,
     graphApiClientId,
     authRedirectUri,
   ]);
