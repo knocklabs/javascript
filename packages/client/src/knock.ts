@@ -41,7 +41,7 @@ class Knock {
   ) {
     this.host = options.host || DEFAULT_HOST;
     this.logLevel = options.logLevel;
-    this.branch = options.branch;
+    this.branch = options.branch || undefined;
 
     this.log("Initialized Knock instance");
 
