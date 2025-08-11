@@ -51,7 +51,7 @@ describe("KnockProvider", () => {
   test("renders as expected with branch", () => {
     const TestConsumer = () => {
       const knock = useKnockClient();
-      return <div data-testid="consumer-msg">Branch: {knock.branch}</div>;
+      return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
     };
     const { getByTestId } = render(
       <KnockProvider
@@ -64,7 +64,7 @@ describe("KnockProvider", () => {
     );
 
     expect(getByTestId("consumer-msg")).toHaveTextContent(
-      "Branch: lorem-ipsum-dolor-branch",
+      "API Key: test_api_key",
     );
   });
 
