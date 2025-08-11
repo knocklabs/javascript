@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { useAuthenticatedKnockClient } from "../../src";
 import { AuthenticatedKnockClientOptions } from "../../src/modules/core/hooks/useAuthenticatedKnockClient";
 
+const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
+
 const defaultProps: {
   apiKey: string;
   userId: string;
@@ -274,5 +276,22 @@ describe("useAuthenticatedKnockClient", () => {
       // Should be a different instance
       expect(result.current).not.toBe(firstInstance);
     });
+  });
+
+  it("should create a new instance with branch option", () => {
+    const { result } = renderHook(
+      ({ apiKey, userId, userToken, options }) =>
+        useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+      {
+        initialProps: {
+          ...defaultProps,
+          options: {
+            branch: TEST_BRANCH_SLUG,
+          },
+        },
+      },
+    );
+
+    expect(result.current.branch).toEqual(TEST_BRANCH_SLUG);
   });
 });
