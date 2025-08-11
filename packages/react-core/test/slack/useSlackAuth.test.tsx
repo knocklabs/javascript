@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import useSlackAuth from "../../src/modules/slack/hooks/useSlackAuth";
 
+const TEST_BRANCH_SLUG = "lorem-ipsum-branch";
+
 const mockSetConnectionStatus = vi.fn();
 const mockSetActionLabel = vi.fn();
 
@@ -24,6 +26,7 @@ vi.mock("../../src/modules/core", () => ({
     slack: mockSlackClient,
     apiKey: "test_api_key",
     userToken: "test_user_token",
+    branch: TEST_BRANCH_SLUG,
   }),
 }));
 
@@ -53,6 +56,7 @@ describe("useSlackAuth", () => {
       channel_id: "test_channel_id",
       public_key: "test_api_key",
       user_token: "test_user_token",
+      branch_slug: TEST_BRANCH_SLUG,
     });
   });
 
