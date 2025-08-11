@@ -45,6 +45,7 @@ export default function Home() {
       userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
+      branch={process.env.NEXT_PUBLIC_KNOCK_BRANCH}
       onUserTokenExpiring={tokenRefreshHandler}
       timeBeforeExpirationInMs={5000}
       logLevel="debug"
