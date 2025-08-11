@@ -83,21 +83,27 @@ function useSlackAuth(
   ]);
 
   const buildSlackAuthUrl = useCallback(() => {
+    const state: Record<string, unknown> = {
+      redirect_url: redirectUrl,
+      access_token_object: {
+        object_id: tenantId,
+        collection: TENANT_OBJECT_COLLECTION,
+      },
+      channel_id: knockSlackChannelId,
+      public_key: knock.apiKey,
+      user_token: knock.userToken,
+    };
+
+    if (knock.branch) {
+      state.branch_slug = knock.branch;
+    }
+
     const rawParams = {
-      state: JSON.stringify({
-        redirect_url: redirectUrl,
-        access_token_object: {
-          object_id: tenantId,
-          collection: TENANT_OBJECT_COLLECTION,
-        },
-        channel_id: knockSlackChannelId,
-        public_key: knock.apiKey,
-        user_token: knock.userToken,
-        branch_slug: knock.branch,
-      }),
+      state: JSON.stringify(state),
       client_id: slackClientId,
       scope: combinedScopes.join(","),
     };
+
     return `${SLACK_AUTHORIZE_URL}?${new URLSearchParams(rawParams)}`;
   }, [
     redirectUrl,
