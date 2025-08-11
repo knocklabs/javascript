@@ -25,8 +25,8 @@ class Knock {
   public userId: string | undefined | null;
   public userToken?: string;
   public logLevel?: LogLevel;
+  public readonly branch?: string;
   private tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
-  private branch?: string;
   readonly feeds = new FeedClient(this);
   readonly objects = new ObjectClient(this);
   readonly preferences = new Preferences(this);
