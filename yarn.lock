@@ -3781,7 +3781,7 @@ __metadata:
     "@babel/runtime": "npm:^7.27.1"
     "@codecov/vite-plugin": "npm:^1.9.1"
     "@knocklabs/types": "workspace:^"
-    "@tanstack/store": "npm:^0.7.1"
+    "@tanstack/store": "npm:^0.7.2"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/phoenix": "npm:^1.6.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
@@ -6237,17 +6237,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/store@npm:0.7.2":
+"@tanstack/store@npm:0.7.2, @tanstack/store@npm:^0.7.2":
   version: 0.7.2
   resolution: "@tanstack/store@npm:0.7.2"
   checksum: 10c0/7b9764d156365d0a65b8be87fc67dcad16a45dd260b43e7c90162b39a940a1c764701e6b5f9e5e1e34ec77c86348332db343c658901f67972119d6f1ddf58f1f
-  languageName: node
-  linkType: hard
-
-"@tanstack/store@npm:^0.7.1":
-  version: 0.7.1
-  resolution: "@tanstack/store@npm:0.7.1"
-  checksum: 10c0/bc1ebf0e8ced2717ec89b7bfac94da436fd23b0ea485b7805b594bee6c6870d67e1184efd5f140cd8d64d9192ee09adad155abea9a2f5bc1ba96f21645299cd8
   languageName: node
   linkType: hard
 
