@@ -11903,28 +11903,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^12.4.10":
-  version: 12.12.1
-  resolution: "framer-motion@npm:12.12.1"
-  dependencies:
-    motion-dom: "npm:^12.12.1"
-    motion-utils: "npm:^12.12.1"
-    tslib: "npm:^2.4.0"
-  peerDependencies:
-    "@emotion/is-prop-valid": "*"
-    react: ^18.0.0 || ^19.0.0
-    react-dom: ^18.0.0 || ^19.0.0
-  peerDependenciesMeta:
-    "@emotion/is-prop-valid":
-      optional: true
-    react:
-      optional: true
-    react-dom:
-      optional: true
-  checksum: 10c0/a782ffa3613f35d23b550123e5409504dadd1f708af40d6014969a8c78dae31046ab9c35a44cbb768e20cec837675d1e240e06e01818b250386af6d0ff570593
-  languageName: node
-  linkType: hard
-
 "freeport-async@npm:^2.0.0":
   version: 2.0.0
   resolution: "freeport-async@npm:2.0.0"
@@ -14611,28 +14589,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.12.1":
-  version: 12.12.1
-  resolution: "motion-dom@npm:12.12.1"
-  dependencies:
-    motion-utils: "npm:^12.12.1"
-  checksum: 10c0/d80cdde894d07042e792ae69f47d7b58aa20691d4e4da7ce803af246295855fd59fdbd7a9e0def8554e22fd105c407cc672bd85e0a79a660d523adee7989d61d
-  languageName: node
-  linkType: hard
-
 "motion-dom@npm:^12.23.12":
   version: 12.23.12
   resolution: "motion-dom@npm:12.23.12"
   dependencies:
     motion-utils: "npm:^12.23.6"
   checksum: 10c0/1b6a4b86c1aed5b5da7b8a5d1f8310ad169125235bdc1953b8c41cf9f4e2c460ee90bb48ffdae54daecb8db1d7006566ceb5f5c9ccdc82606d548c527cb2631e
-  languageName: node
-  linkType: hard
-
-"motion-utils@npm:^12.12.1":
-  version: 12.12.1
-  resolution: "motion-utils@npm:12.12.1"
-  checksum: 10c0/880a174769d1be42b46cfb34af81b4a629c068d30d5cf7e07d249fbf2f5121d577482d3ea5bdc1db549c0288733e1e987efecb195fae350995270651559c6697
   languageName: node
   linkType: hard
 
@@ -14874,7 +14836,7 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.3.5"
-    framer-motion: "npm:^12.4.10"
+    framer-motion: "npm:^12.23.12"
     lucide-react: "npm:^0.525.0"
     next: "npm:next@^15.3.3"
     next-seo: "npm:^6.8.0"
@@ -14915,7 +14877,7 @@ __metadata:
     "@types/react-dom": "npm:^19.1.6"
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
-    framer-motion: "npm:^12.4.10"
+    framer-motion: "npm:^12.23.12"
     lucide-react: "npm:^0.525.0"
     next: "npm:15.3.3"
     next-seo: "npm:^6.8.0"
