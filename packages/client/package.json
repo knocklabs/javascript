@@ -55,7 +55,7 @@
     "@codecov/vite-plugin": "^1.9.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
-    "@typescript-eslint/parser": "^8.32.1",
+    "@typescript-eslint/parser": "^8.39.1",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "eslint": "^8.56.0",
