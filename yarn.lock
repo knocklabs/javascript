@@ -3956,8 +3956,8 @@ __metadata:
     "@knocklabs/react-core": "workspace:^"
     "@popperjs/core": "npm:^2.11.8"
     "@radix-ui/react-dialog": "npm:^1.1.14"
-    "@telegraph/combobox": "npm:^0.1.2"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/combobox": "npm:^0.1.3"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/layout": "npm:^0.2.1"
     "@telegraph/tokens": "npm:^0.1.1"
     "@telegraph/typography": "npm:^0.1.23"
@@ -3978,7 +3978,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.14"
     jsdom: "npm:^26.1.0"
     lodash.debounce: "npm:^4.0.8"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     rimraf: "npm:^6.0.1"
@@ -6190,50 +6190,50 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/button@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@telegraph/button@npm:0.1.1"
+"@telegraph/button@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "@telegraph/button@npm:0.1.2"
   dependencies:
     "@telegraph/helpers": "npm:^0.0.13"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/layout": "npm:^0.2.1"
     "@telegraph/style-engine": "npm:^0.1.15"
     "@telegraph/typography": "npm:^0.1.23"
     clsx: "npm:^2.1.1"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/fffc01916d00456ee45108be5fa53df688d3a8e4760d10fe6cc8a5cb8948c2c085013f171ef8f039231c80658e47a9c9a9629d67bad441d32f0f95aae7b1b436
+  checksum: 10c0/9e4934c974b811cc0dbf7db4fd876de9951172cce51b53e5abe588c318eb39223da46757c61434dff1447217c09f530c18210d59cfa1874896e1cd7e409e7ee1
   languageName: node
   linkType: hard
 
-"@telegraph/combobox@npm:0.1.2, @telegraph/combobox@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "@telegraph/combobox@npm:0.1.2"
+"@telegraph/combobox@npm:0.1.3, @telegraph/combobox@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "@telegraph/combobox@npm:0.1.3"
   dependencies:
     "@radix-ui/react-dismissable-layer": "npm:^1.1.10"
     "@radix-ui/react-menu": "npm:^2.1.15"
     "@radix-ui/react-portal": "npm:^1.1.9"
     "@radix-ui/react-use-controllable-state": "npm:^1.2.2"
     "@radix-ui/react-visually-hidden": "npm:^1.2.3"
-    "@telegraph/button": "npm:^0.1.1"
+    "@telegraph/button": "npm:^0.1.2"
     "@telegraph/compose-refs": "npm:^0.0.7"
     "@telegraph/helpers": "npm:^0.0.13"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/input": "npm:^0.1.1"
     "@telegraph/layout": "npm:^0.2.1"
-    "@telegraph/menu": "npm:^0.1.2"
-    "@telegraph/tag": "npm:^0.0.95"
+    "@telegraph/menu": "npm:^0.1.3"
+    "@telegraph/tag": "npm:^0.0.96"
     "@telegraph/tooltip": "npm:^0.0.55"
     "@telegraph/truncate": "npm:^0.0.10"
     "@telegraph/typography": "npm:^0.1.23"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
     motion: "npm:^12.23.12"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/ab7746eb4e9949f795a7c97dde5eca2f530370410492db5e5ac582f8861addb56c7c73c2b0f69a7a5774349565cb77b6ed62fab83fc051aaa784652102122f66
+  checksum: 10c0/43ba4c446e68bee7f9ad54c709d8b54294fe8b8c454c2b7cb72e9bad8c189534cfc1697515016f362d89b58cbfd39baaf0cd7f0bf5ef29a3d1feeb62f5c80433
   languageName: node
   linkType: hard
 
@@ -6257,18 +6257,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/icon@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "@telegraph/icon@npm:0.2.1"
+"@telegraph/icon@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@telegraph/icon@npm:0.2.2"
   dependencies:
     "@telegraph/helpers": "npm:^0.0.13"
     "@telegraph/typography": "npm:^0.1.23"
     clsx: "npm:^2.1.1"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/fb87a7c25fd73d1537e5ee58b8681fe1005af233127917932c6678929aa371401e1b5f64a51dc602680001190c255e86e5692b759131da11623ad2522dc8ab17
+  checksum: 10c0/dbc110a451962f8593926ff87a573b5df28dd4a499993221bc7901e2dcb6113f930fb5737a7b90091dd32a5f16236fcd7b56e3b7b64428508228fe913e22e8ed
   languageName: node
   linkType: hard
 
@@ -6304,35 +6304,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/menu@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "@telegraph/menu@npm:0.1.2"
+"@telegraph/menu@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "@telegraph/menu@npm:0.1.3"
   dependencies:
     "@radix-ui/react-menu": "npm:^2.1.15"
     "@radix-ui/react-use-controllable-state": "npm:^1.2.2"
-    "@telegraph/button": "npm:^0.1.1"
+    "@telegraph/button": "npm:^0.1.2"
     "@telegraph/helpers": "npm:^0.0.13"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/layout": "npm:^0.2.1"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
     motion: "npm:^12.23.12"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/b22be8295467938f87a602752ae956bd28707c327ed164263dd60ec3f920b9c8f8e155638245686ce92ead23c1a495bf69b52a664176b821b3640f214f5df1c1
+  checksum: 10c0/96e6853f95832e5acdeacdcafd7902fff7a2c64081f778c4f00dcc1d9407469b3d50cffb07346fecdd3dfcea48b69ba10dfca7a24dd3677d02c5c8ce856ba260
   languageName: node
   linkType: hard
 
-"@telegraph/select@npm:^0.0.56":
-  version: 0.0.56
-  resolution: "@telegraph/select@npm:0.0.56"
+"@telegraph/select@npm:^0.0.57":
+  version: 0.0.57
+  resolution: "@telegraph/select@npm:0.0.57"
   dependencies:
-    "@telegraph/combobox": "npm:0.1.2"
+    "@telegraph/combobox": "npm:0.1.3"
     "@telegraph/helpers": "npm:0.0.13"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/a569985aa90b04875000ca140cc8107d98c82355d050efb467d3692efbcd0036b1f0a65e36e9b79ffc74830a64385a6708bdbce8f6fb45c273512f427a18a892
+  checksum: 10c0/53c1ce3f35c4e7519c628a056b64e9e5be5d3e122169c97f9e5db80241a8bbcd377286093df783ba62c10c2114067366847697d6524be870b59bb582a0c3630b
   languageName: node
   linkType: hard
 
@@ -6349,24 +6349,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/tag@npm:^0.0.95":
-  version: 0.0.95
-  resolution: "@telegraph/tag@npm:0.0.95"
+"@telegraph/tag@npm:^0.0.96":
+  version: 0.0.96
+  resolution: "@telegraph/tag@npm:0.0.96"
   dependencies:
-    "@telegraph/button": "npm:^0.1.1"
+    "@telegraph/button": "npm:^0.1.2"
     "@telegraph/compose-refs": "npm:^0.0.7"
     "@telegraph/helpers": "npm:^0.0.13"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/layout": "npm:^0.2.1"
     "@telegraph/tooltip": "npm:^0.0.55"
     "@telegraph/typography": "npm:^0.1.23"
     clsx: "npm:^2.1.1"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
     motion: "npm:^12.23.12"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/1fac8cf8b89cc89d0d8df00384ef73f8d9ad9f10907d9b9d822ea901deb55ca1d936f881ae83e20857b0f58ad1818fa1f4ef53a13c42c4b45a7d28769a52ad18
+  checksum: 10c0/a1ee216a3c175273acf4c18cad43a4bd0fe76ad771c42fddfe5e8fd89036d4d29d7f4440ab46d2bf19a552ac9e5dad25a8fe60751aa8c1c01c22f3650345d26e
   languageName: node
   linkType: hard
 
@@ -13888,12 +13888,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^0.525.0":
-  version: 0.525.0
-  resolution: "lucide-react@npm:0.525.0"
+"lucide-react@npm:^0.539.0":
+  version: 0.539.0
+  resolution: "lucide-react@npm:0.539.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/81c4438e2cf1c86ea2ebe0a97b378201512450894283cccce766a89bc6a4e47c8df1d9115d845d98f582bb0a10be31c454aa232520fea35018dac1cd8466ea9b
+  checksum: 10c0/ae85244dc23a78c51cc5f829ee09321cf68201333ab3d5614ed73cda77a4cd12284d3630a5a2167a39e31e02811056336de76a597c6874b28bb9984baf876494
   languageName: node
   linkType: hard
 
@@ -14683,12 +14683,12 @@ __metadata:
     "@knocklabs/react": "workspace:*"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.3.1"
-    "@telegraph/button": "npm:^0.1.1"
-    "@telegraph/combobox": "npm:^0.1.2"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/button": "npm:^0.1.2"
+    "@telegraph/combobox": "npm:^0.1.3"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/input": "npm:^0.1.1"
     "@telegraph/layout": "npm:^0.2.1"
-    "@telegraph/select": "npm:^0.0.56"
+    "@telegraph/select": "npm:^0.0.57"
     "@telegraph/textarea": "npm:^0.1.1"
     "@telegraph/tokens": "npm:^0.1.1"
     "@telegraph/typography": "npm:^0.1.23"
@@ -14700,7 +14700,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.3.5"
     framer-motion: "npm:^12.23.12"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
     next: "npm:next@^15.3.3"
     next-seo: "npm:^6.8.0"
     react: "npm:^19.0.0"
@@ -14725,12 +14725,12 @@ __metadata:
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.3.1"
-    "@telegraph/button": "npm:^0.1.1"
-    "@telegraph/combobox": "npm:^0.1.2"
-    "@telegraph/icon": "npm:^0.2.1"
+    "@telegraph/button": "npm:^0.1.2"
+    "@telegraph/combobox": "npm:^0.1.3"
+    "@telegraph/icon": "npm:^0.2.2"
     "@telegraph/input": "npm:^0.1.1"
     "@telegraph/layout": "npm:^0.2.1"
-    "@telegraph/select": "npm:^0.0.56"
+    "@telegraph/select": "npm:^0.0.57"
     "@telegraph/textarea": "npm:^0.1.1"
     "@telegraph/tokens": "npm:^0.1.1"
     "@telegraph/typography": "npm:^0.1.23"
@@ -14741,7 +14741,7 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     framer-motion: "npm:^12.23.12"
-    lucide-react: "npm:^0.525.0"
+    lucide-react: "npm:^0.539.0"
     next: "npm:15.3.3"
     next-seo: "npm:^6.8.0"
     react: "npm:^19.0.0"
