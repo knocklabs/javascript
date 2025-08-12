@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.32
+
+### Patch Changes
+
+- aadfd6f: chore(deps): bump the telegraph-packages group with 4 updates
+- 4aa17ab: chore(deps): bump the telegraph-packages group with 2 updates
+
 ## 0.7.31
 
 ### Patch Changes
