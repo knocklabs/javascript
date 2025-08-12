@@ -1,5 +1,12 @@
 {
   "extends": ["expo", "plugin:prettier/recommended"],
   "ignorePatterns": ["dist/*"],
-  "root": true
+  "root": true,
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
+    }
+  }
 }
