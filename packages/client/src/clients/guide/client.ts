@@ -860,6 +860,8 @@ export class KnockGuideClient {
 
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
+    if (!window?.location) return;
+
     const href = window.location.href;
     if (this.store.state.location === href) return;
 
@@ -908,6 +910,8 @@ export class KnockGuideClient {
   }
 
   private removeEventListeners() {
+    if (!window?.history) return;
+
     window.removeEventListener("popstate", this.handleLocationChange);
     window.removeEventListener("hashchange", this.handleLocationChange);
 
