@@ -3768,6 +3768,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     eslint: "npm:^8.56.0"
     eslint-config-expo: "npm:~9.2.0"
+    eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-prettier: "npm:^5.5.1"
     expo: "npm:~53.0.17"
     expo-blur: "npm:~14.1.5"
@@ -10721,7 +10722,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import@npm:^2.30.0":
+"eslint-plugin-import@npm:^2.30.0, eslint-plugin-import@npm:^2.32.0":
   version: 2.32.0
   resolution: "eslint-plugin-import@npm:2.32.0"
   dependencies:
