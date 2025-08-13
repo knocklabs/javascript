@@ -49,6 +49,13 @@ const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 // trigger subscribed callbacks.
 const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 
+// Return the global window object if defined, so to safely guard against SSR.
+const checkForWindow = () => {
+  if (typeof window !== "undefined") {
+    return window;
+  }
+};
+
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
@@ -166,10 +173,9 @@ export class KnockGuideClient {
     readonly options: ConstructorOpts = {},
   ) {
     const { trackLocationFromWindow = true } = options;
+    const win = checkForWindow();
 
-    const location = trackLocationFromWindow
-      ? window?.location.href
-      : undefined;
+    const location = trackLocationFromWindow ? win?.location.href : undefined;
 
     this.store = new Store<StoreState>({
       guideGroups: [],
@@ -860,7 +866,10 @@ export class KnockGuideClient {
 
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
-    const href = window.location.href;
+    const win = checkForWindow();
+    if (!win?.location) return;
+
+    const href = win.location.href;
     if (this.store.state.location === href) return;
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
@@ -868,19 +877,20 @@ export class KnockGuideClient {
   };
 
   private listenForLocationChangesFromWindow() {
-    if (window?.history) {
+    const win = checkForWindow();
+    if (win?.history) {
       // 1. Listen for browser back/forward button clicks.
-      window.addEventListener("popstate", this.handleLocationChange);
+      win.addEventListener("popstate", this.handleLocationChange);
 
       // 2. Listen for hash changes in case it's used for routing.
-      window.addEventListener("hashchange", this.handleLocationChange);
+      win.addEventListener("hashchange", this.handleLocationChange);
 
       // 3. Monkey-patch history methods to catch programmatic navigation.
-      const pushStateFn = window.history.pushState;
-      const replaceStateFn = window.history.replaceState;
+      const pushStateFn = win.history.pushState;
+      const replaceStateFn = win.history.replaceState;
 
       // Use setTimeout to allow the browser state to potentially settle.
-      window.history.pushState = new Proxy(pushStateFn, {
+      win.history.pushState = new Proxy(pushStateFn, {
         apply: (target, history, args) => {
           Reflect.apply(target, history, args);
           setTimeout(() => {
@@ -888,7 +898,7 @@ export class KnockGuideClient {
           }, 0);
         },
       });
-      window.history.replaceState = new Proxy(replaceStateFn, {
+      win.history.replaceState = new Proxy(replaceStateFn, {
         apply: (target, history, args) => {
           Reflect.apply(target, history, args);
           setTimeout(() => {
@@ -908,15 +918,18 @@ export class KnockGuideClient {
   }
 
   private removeEventListeners() {
-    window.removeEventListener("popstate", this.handleLocationChange);
-    window.removeEventListener("hashchange", this.handleLocationChange);
+    const win = checkForWindow();
+    if (!win?.history) return;
+
+    win.removeEventListener("popstate", this.handleLocationChange);
+    win.removeEventListener("hashchange", this.handleLocationChange);
 
     if (this.pushStateFn) {
-      window.history.pushState = this.pushStateFn;
+      win.history.pushState = this.pushStateFn;
       this.pushStateFn = undefined;
     }
     if (this.replaceStateFn) {
-      window.history.replaceState = this.replaceStateFn;
+      win.history.replaceState = this.replaceStateFn;
       this.replaceStateFn = undefined;
     }
   }

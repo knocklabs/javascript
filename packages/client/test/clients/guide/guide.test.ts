@@ -57,6 +57,10 @@ const mockWindow = {
   location: { href: "https://example.com" },
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
+  history: {
+    pushState: vi.fn(),
+    replaceState: vi.fn(),
+  },
 };
 
 describe("KnockGuideClient", () => {
