@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.4
+
+### Patch Changes
+
+- 49f791b: fix: guard against undefined window object in ssr
+
 ## 0.16.3
 
 ### Patch Changes
