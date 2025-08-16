@@ -6,6 +6,7 @@ type ApiClientOptions = {
   host: string;
   apiKey: string;
   userToken: string | undefined;
+  branch?: string;
 };
 
 export interface ApiResponse {
@@ -21,6 +22,7 @@ class ApiClient {
   private host: string;
   private apiKey: string;
   private userToken: string | null;
+  private branch: string | null;
   private axiosClient: AxiosInstance;
 
   public socket: Socket | undefined;
@@ -29,6 +31,7 @@ class ApiClient {
     this.host = options.host;
     this.apiKey = options.apiKey;
     this.userToken = options.userToken || null;
+    this.branch = options.branch || null;
 
     // Create a retryable axios client
     this.axiosClient = axios.create({
@@ -39,6 +42,7 @@ class ApiClient {
         Authorization: `Bearer ${this.apiKey}`,
         "X-Knock-User-Token": this.userToken,
         "X-Knock-Client": this.getKnockClientHeader(),
+        "X-Knock-Branch": this.branch,
       },
     });
 
@@ -47,6 +51,7 @@ class ApiClient {
         params: {
           user_token: this.userToken,
           api_key: this.apiKey,
+          branch_slug: this.branch,
         },
       });
     }
