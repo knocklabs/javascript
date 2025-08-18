@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.5
+
+### Patch Changes
+
+- dc84f25: chore: limit retries for guide client real time subscription
+
 ## 0.16.4
 
 ### Patch Changes
