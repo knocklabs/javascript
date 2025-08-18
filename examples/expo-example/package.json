@@ -13,7 +13,7 @@
     "@expo/vector-icons": "^14.1.0",
     "@knocklabs/expo": "workspace:^",
     "@react-navigation/bottom-tabs": "^7.3.10",
-    "@react-navigation/elements": "^2.3.8",
+    "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.6",
     "expo": "~53.0.17",
     "expo-blur": "~14.1.5",
