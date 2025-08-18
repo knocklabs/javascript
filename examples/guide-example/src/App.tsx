@@ -5,14 +5,46 @@ import {
   KnockGuideProvider,
   KnockProvider,
   Modal,
-  useGuide
+  useGuide,
+  useGuideContentTypes,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
 import { useState, useEffect } from "react";
 import { Link, Route, Routes } from "react-router";
 
+interface BannerContent {
+  title: string;
+  body: string;
+  ctaLabel?: string;
+}
+
+interface ChangelogCardContent {
+  headline: string;
+  title: string;
+  body: string;
+}
+
+type GuideContentTypes = {
+  key: {
+    "welcome-banner": BannerContent;
+    "changelog-20250818": ChangelogCardContent;
+  };
+  type: {
+    "banner": BannerContent;
+    "changelog-card": ChangelogCardContent;
+  };
+};
+
 const ChangelogCard = () => {
-  const { guide, step } = useGuide({ type: "changelog-card" });
+  // Option 1. Use `useGuideContentTypes` helper to bind a content types mapping
+  // once, then use `useGuide` or `useGuides` with a filter arg "as const" to
+  // let typescript infer it as the filter types.
+  const hooks = useGuideContentTypes<GuideContentTypes>()
+  const { guide, step } = hooks.useGuide({ type: "card" } as const);
+
+  // Option 2. Use `useGuide` hook directly and pass in both type mappings and
+  // filters type params.
+  useGuide<GuideContentTypes, { type: "card" }>({ type: "card" });
 
   useEffect(() => {
     if (step) step.markAsSeen();
