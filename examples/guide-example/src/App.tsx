@@ -80,7 +80,7 @@ function App() {
           </div>
 
           <div style={{ marginTop: "20px" }} />
-          <Banner guideKey="snow-day-banner" />
+          <Banner />
           <div style={{ marginTop: "20px" }} />
           <Card />
           <div style={{ marginTop: "20px" }} />
