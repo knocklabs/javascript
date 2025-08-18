@@ -4381,12 +4381,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/eslint-plugin-next@npm:15.3.5":
-  version: 15.3.5
-  resolution: "@next/eslint-plugin-next@npm:15.3.5"
+"@next/eslint-plugin-next@npm:15.4.6":
+  version: 15.4.6
+  resolution: "@next/eslint-plugin-next@npm:15.4.6"
   dependencies:
     fast-glob: "npm:3.3.1"
-  checksum: 10c0/fb86ead7d0c0b47cd670d866e4c1dfd28d288f30d2db8756a57b5c63a0e47db874202e69e5cf7990815a1e75fb012876acc602d90b43ad4eeeb2b167e20949b6
+  checksum: 10c0/5a1a216474882bdeedf2033e6cae52c3add92436a9f781e3b68dccc7b9f2d24373536d8fd2d934cc5535352d7ca17529281fb6f61859cec5bed6366ee9c372cc
   languageName: node
   linkType: hard
 
@@ -10836,11 +10836,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-next@npm:15.3.5":
-  version: 15.3.5
-  resolution: "eslint-config-next@npm:15.3.5"
+"eslint-config-next@npm:15.4.6":
+  version: 15.4.6
+  resolution: "eslint-config-next@npm:15.4.6"
   dependencies:
-    "@next/eslint-plugin-next": "npm:15.3.5"
+    "@next/eslint-plugin-next": "npm:15.4.6"
     "@rushstack/eslint-patch": "npm:^1.10.3"
     "@typescript-eslint/eslint-plugin": "npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
     "@typescript-eslint/parser": "npm:^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
@@ -10856,7 +10856,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/fae92e297d834202ed327873946d279bda458041db663f1c7f4bbe7426af54a4de3c8f4b6a3193d2bebee32e48e138de044e4f05668e30c2fe0822e413f08117
+  checksum: 10c0/06d139af13a03d196509a905375730280f928e9609d79934d8be49126899739580117a28473ba4fbaad47a3dfd6b0623c1cd5b73c9f3be910bcae4ff03d5a340
   languageName: node
   linkType: hard
 
@@ -14986,7 +14986,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     eslint: "npm:^8.56.0"
-    eslint-config-next: "npm:15.3.5"
+    eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:15.3.3"
     react: "npm:^19.0.0"
@@ -15187,7 +15187,7 @@ __metadata:
     "@types/react-dom": "npm:^19.1.6"
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
-    eslint-config-next: "npm:15.3.5"
+    eslint-config-next: "npm:15.4.6"
     framer-motion: "npm:^12.23.12"
     lucide-react: "npm:^0.539.0"
     next: "npm:next@^15.3.3"
@@ -17699,7 +17699,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     eslint: "npm:^8.56.0"
-    eslint-config-next: "npm:15.3.5"
+    eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:15.3.3"
     react: "npm:^19.0.0"
@@ -17719,7 +17719,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     eslint: "npm:^8.56.0"
-    eslint-config-next: "npm:15.3.5"
+    eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.2"
     next: "npm:15.3.3"
     postcss: "npm:^8"
