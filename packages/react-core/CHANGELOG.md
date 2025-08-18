@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.5
+
+### Patch Changes
+
+- Updated dependencies [dc84f25]
+  - @knocklabs/client@0.16.5
+
 ## 0.8.4
 
 ### Patch Changes
