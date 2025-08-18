@@ -92,6 +92,7 @@ export {
   KnockGuideContext,
   useGuide,
   useGuides,
+  useGuideContentTypes,
   type MsTeamsChannelQueryOptions,
   type MsTeamsTeamQueryOptions,
   KnockMsTeamsProvider,
