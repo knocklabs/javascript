@@ -57,7 +57,7 @@ export type GetGuidesQueryParams = {
   data?: string;
   tenant?: string;
   type?: string;
-  return_all_guides?: boolean;
+  force_all_guides?: boolean;
 };
 
 export type GetGuidesResponse = {
@@ -173,7 +173,7 @@ export type QueryStatus = {
 };
 
 export type DebugState = {
-  forcedGuideKey: string | null;
+  forcedGuideKey?: string | null;
 };
 
 export type StoreState = {

@@ -89,7 +89,11 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
     const guide = state.guides[guideKey];
     if (!guide) continue;
 
-    const affirmed = predicate(guide, { location, filters });
+    const affirmed = predicate(guide, {
+      location,
+      filters,
+      debug: state.debug,
+    });
     if (!affirmed) continue;
 
     result.set(index, guide);
@@ -102,12 +106,18 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
 type PredicateOpts = {
   location?: string | undefined;
   filters?: SelectFilterParams | undefined;
+  debug: DebugState;
 };
 
 const predicate = (
   guide: KnockGuide,
-  { location, filters = {} }: PredicateOpts,
+  { location, filters = {}, debug = {} }: PredicateOpts,
 ) => {
+  // Bypass filtering if debugging the current guide.
+  if (debug?.forcedGuideKey && guide.key) {
+    return true;
+  }
+
   if (filters.type && filters.type !== guide.type) {
     return false;
   }
@@ -449,7 +459,10 @@ export class KnockGuideClient {
 
     // If a guide ignores the group limit, then return immediately to render
     // always.
-    if (guide.bypass_global_group_limit) {
+    if (
+      guide.bypass_global_group_limit ||
+      state.debug.forcedGuideKey === guide.key
+    ) {
       return guide;
     }
 
@@ -722,6 +735,11 @@ export class KnockGuideClient {
       ...remoteGuide,
       // Get the next unarchived step.
       getStep() {
+        // If debugging this guide, return the first step regardless of archive status
+        if (self.store.state.debug.forcedGuideKey === this.key) {
+          return this.steps[0];
+        }
+
         return this.steps.find((s) => !s.message.archived_at);
       },
     } as KnockGuide;
@@ -770,7 +788,16 @@ export class KnockGuideClient {
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
     // Combine the target params with the given filter params.
-    const combinedParams = { ...this.targetParams, ...filterParams };
+    const combinedParams: GenericData = {
+      ...this.targetParams,
+      ...filterParams,
+    };
+
+    // Append debug params
+    const debugState = this.store.state.debug;
+    if (debugState.forcedGuideKey) {
+      combinedParams.force_all_guides = true;
+    }
 
     // Prune out any keys that have an undefined or null value.
     let params = Object.fromEntries(
