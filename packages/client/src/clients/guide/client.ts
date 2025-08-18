@@ -16,6 +16,7 @@ import {
 } from "./helpers";
 import {
   ConstructorOpts,
+  DebugState,
   GetGuidesQueryParams,
   GetGuidesResponse,
   GroupStage,
@@ -61,6 +62,18 @@ const checkForWindow = () => {
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
+
+// Detect debug params like "knock_guide_key" from URL.
+const detectDebugParams = (): DebugState => {
+  if (typeof window === "undefined") {
+    return { forcedGuideKey: null };
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const forcedGuideKey = urlParams.get("knock_guide_key");
+
+  return { forcedGuideKey };
+};
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   // A map of selected guides as values, with its order index as keys.
@@ -181,6 +194,8 @@ export class KnockGuideClient {
 
     const location = trackLocationFromWindow ? win?.location.href : undefined;
 
+    const debug = detectDebugParams();
+
     this.store = new Store<StoreState>({
       guideGroups: [],
       guideGroupDisplayLogs: {},
@@ -189,6 +204,7 @@ export class KnockGuideClient {
       location,
       // Increment to update the state store and trigger re-selection.
       counter: 0,
+      debug,
     });
 
     // In server environments we might not have a socket connection.
@@ -908,6 +924,21 @@ export class KnockGuideClient {
     if (this.store.state.location === href) return;
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
+
+    const newDebugParams = detectDebugParams();
+    const currentDebugParams = this.store.state.debug;
+
+    if (newDebugParams.forcedGuideKey !== currentDebugParams.forcedGuideKey) {
+      this.knock.log(`[Guide] Debug params changed`);
+
+      this.store.setState((state) => ({
+        ...state,
+        debug: newDebugParams,
+      }));
+
+      this.fetch();
+    }
+
     this.setLocation(href);
   };
 
