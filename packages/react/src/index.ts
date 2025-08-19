@@ -42,6 +42,8 @@ export {
   BannerView,
   Card,
   CardView,
+  GuideDevTools,
+  KnockGuideProvider,
   Modal,
   ModalView,
 } from "./modules/guide";
@@ -88,7 +90,6 @@ export {
   useKnockFeed,
   useNotificationStore,
   useNotifications,
-  KnockGuideProvider,
   KnockGuideContext,
   useGuide,
   useGuides,
