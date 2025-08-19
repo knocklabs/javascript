@@ -29,8 +29,10 @@ export {
 export {
   KnockGuideProvider,
   KnockGuideContext,
+  type KnockGuideProviderProps,
   useGuide,
   useGuides,
+  useGuideContext,
 } from "./modules/guide";
 export {
   type MsTeamsChannelQueryOptions,

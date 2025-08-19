@@ -16,7 +16,7 @@ export const KnockGuideContext = React.createContext<
   KnockGuideProviderValue | undefined
 >(undefined);
 
-type Props = {
+export type KnockGuideProviderProps = {
   channelId: string;
   readyToTarget: boolean;
   listenForUpdates?: boolean;
@@ -27,7 +27,9 @@ type Props = {
   throttleCheckInterval?: number; // in milliseconds
 };
 
-export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
+export const KnockGuideProvider: React.FC<
+  React.PropsWithChildren<KnockGuideProviderProps>
+> = ({
   channelId,
   readyToTarget,
   listenForUpdates = true,
