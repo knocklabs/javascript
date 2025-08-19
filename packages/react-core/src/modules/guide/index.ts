@@ -1,2 +1,6 @@
-export { KnockGuideProvider, KnockGuideContext } from "./context";
-export { useGuide, useGuides } from "./hooks";
+export {
+  KnockGuideProvider,
+  KnockGuideContext,
+  type KnockGuideProviderProps,
+} from "./context";
+export { useGuide, useGuides, useGuideContext } from "./hooks";
