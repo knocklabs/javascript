@@ -25,6 +25,7 @@ export type KnockProviderProps = {
   // i18n translations
   i18n?: I18nContent;
   logLevel?: LogLevel;
+  branch?: string;
 } & (
   | {
       /**
@@ -61,6 +62,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   timeBeforeExpirationInMs,
   children,
   i18n,
+  branch,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -72,8 +74,9 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       onUserTokenExpiring,
       timeBeforeExpirationInMs,
       logLevel,
+      branch,
     }),
-    [host, onUserTokenExpiring, timeBeforeExpirationInMs, logLevel],
+    [host, onUserTokenExpiring, timeBeforeExpirationInMs, logLevel, branch],
   );
 
   const knock = useAuthenticatedKnockClient(
