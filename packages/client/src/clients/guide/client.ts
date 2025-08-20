@@ -341,7 +341,13 @@ export class KnockGuideClient {
     }
 
     // Join the channel topic and subscribe to supported events.
-    const params = { ...this.targetParams, user_id: this.knock.userId };
+    const debugState = this.store.state.debug;
+    const params = {
+      ...this.targetParams,
+      user_id: this.knock.userId,
+      force_all_guides: debugState.forcedGuideKey ? true : undefined,
+    };
+
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
 
     for (const eventType of this.socketEventTypes) {
@@ -399,6 +405,13 @@ export class KnockGuideClient {
 
     // Unset the channel.
     this.socketChannel = undefined;
+  }
+
+  resubscribe() {
+    if (!this.socket) return;
+    this.knock.log("[Guide] Resubscribing to websocket channel");
+    this.unsubscribe();
+    this.subscribe();
   }
 
   private handleSocketEvent(payload: GuideSocketEvent) {
@@ -978,16 +991,22 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
 
+    // If entering/exiting debug mode, refetch guides and resubscribe to the
+    // websocket channel.
     const newDebugParams = detectDebugParams();
     this.setLocation(href, { debug: newDebugParams });
 
     // If entering debug mode, fetch all guides.
     const currentDebugParams = this.store.state.debug;
-    if (!currentDebugParams.forcedGuideKey && !!newDebugParams.forcedGuideKey) {
+    if (
+      Boolean(currentDebugParams.forcedGuideKey) !==
+      Boolean(newDebugParams.forcedGuideKey)
+    ) {
       this.knock.log(
-        `[Guide] Entering debug mode for key: ${newDebugParams.forcedGuideKey}`,
+        `[Guide] ${newDebugParams.forcedGuideKey ? "Entering" : "Exiting"} debug mode`,
       );
       this.fetch();
+      this.resubscribe();
     }
   };
 

@@ -450,6 +450,52 @@ describe("KnockGuideClient", () => {
       expect(mockChannel.off).toHaveBeenCalled();
       expect(mockChannel.leave).toHaveBeenCalled();
     });
+
+    test("subscribe includes force_all_guides when debug state has forcedGuideKey", () => {
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn(),
+            }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      // Set debug state with forced guide key
+      client.store.state.debug = { forcedGuideKey: "test_guide" };
+
+      client.subscribe();
+
+      expect(mockSocket.channel).toHaveBeenCalledWith(
+        `guides:${channelId}`,
+        expect.objectContaining({
+          user_id: mockKnock.userId,
+          data: defaultTargetParams.data,
+          tenant: defaultTargetParams.tenant,
+          force_all_guides: true,
+        }),
+      );
+    });
   });
 
   describe("guide operations", () => {
@@ -1903,6 +1949,68 @@ describe("KnockGuideClient", () => {
       };
       expect(windowWithHistory.history.pushState).toBe(originalPushState);
       expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
+    });
+
+    test("handleLocationChange calls resubscribe when entering debug mode", () => {
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        location: {
+          href: "https://example.com/dashboard?knock_guide_key=test_guide",
+          search: "?knock_guide_key=test_guide",
+        },
+      });
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+
+      client.store.state.debug = { forcedGuideKey: null };
+      client.store.state.location = "https://example.com/dashboard";
+
+      const resubscribeSpy = vi
+        .spyOn(client, "resubscribe")
+        .mockImplementation(() => {});
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+
+      client["handleLocationChange"]();
+
+      expect(fetchSpy).toHaveBeenCalled();
+      expect(resubscribeSpy).toHaveBeenCalled();
+    });
+
+    test("handleLocationChange calls resubscribe when exiting debug mode", () => {
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        location: {
+          href: "https://example.com/dashboard",
+          search: "",
+        },
+      });
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+
+      client.store.state.debug = { forcedGuideKey: "test_guide" };
+      client.store.state.location =
+        "https://example.com/dashboard?knock_guide_key=test_guide";
+
+      const resubscribeSpy = vi
+        .spyOn(client, "resubscribe")
+        .mockImplementation(() => {});
+
+      client["handleLocationChange"]();
+
+      expect(resubscribeSpy).toHaveBeenCalled();
     });
   });
 
