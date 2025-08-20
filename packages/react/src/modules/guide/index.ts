@@ -3,7 +3,6 @@ export {
   BannerView,
   Card,
   CardView,
-  GuideDevTools,
   Modal,
   ModalView,
 } from "./components";

@@ -42,7 +42,6 @@ export {
   BannerView,
   Card,
   CardView,
-  GuideDevTools,
   KnockGuideProvider,
   Modal,
   ModalView,
