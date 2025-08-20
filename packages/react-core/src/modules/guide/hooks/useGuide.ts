@@ -7,12 +7,14 @@ import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-interface UseGuideReturn extends UseGuideContextReturn {
-  guide: KnockGuide | undefined;
-  step: KnockGuideStep | undefined;
+interface UseGuideReturn<GuideContent> extends UseGuideContextReturn {
+  guide: KnockGuide<GuideContent> | undefined;
+  step: KnockGuideStep<GuideContent> | undefined;
 }
 
-export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
+export const useGuide = <GuideContent = any>(
+  filters: KnockGuideFilterParams,
+): UseGuideReturn<GuideContent> => {
   const context = useGuideContext();
 
   if (!filters.key && !filters.type) {
