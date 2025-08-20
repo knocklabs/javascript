@@ -36,15 +36,15 @@ type GuideContentTypes = {
 };
 
 const ChangelogCard = () => {
-  // Option 1. Use `useGuideContentTypes` helper to bind a content types mapping
+  // Use `useGuide` hook directly and pass in both type mappings and filters
+  // type params.
+  useGuide<GuideContentTypes, { type: "card" }>({ type: "card" });
+
+  // OR, use `useGuideContentTypes` helper to bind a content types mapping
   // once, then use `useGuide` or `useGuides` with a filter arg "as const" to
   // let typescript infer it as the filter types.
   const hooks = useGuideContentTypes<GuideContentTypes>()
   const { guide, step } = hooks.useGuide({ type: "card" } as const);
-
-  // Option 2. Use `useGuide` hook directly and pass in both type mappings and
-  // filters type params.
-  useGuide<GuideContentTypes, { type: "card" }>({ type: "card" });
 
   useEffect(() => {
     if (step) step.markAsSeen();
