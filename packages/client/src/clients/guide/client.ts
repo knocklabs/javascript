@@ -985,10 +985,12 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
 
-    // If entering/exiting debug mode, refetch guides and resubscribe to the
-    // websocket channel.
     const newDebugParams = detectDebugParams();
     const currentDebugParams = this.store.state.debug;
+    this.setLocation(href, { debug: newDebugParams });
+
+    // If entering/exiting debug mode, refetch guides and resubscribe to the
+    // websocket channel.
     if (
       Boolean(currentDebugParams.forcedGuideKey) !==
       Boolean(newDebugParams.forcedGuideKey)
@@ -999,8 +1001,6 @@ export class KnockGuideClient {
       this.fetch();
       this.resubscribe();
     }
-
-    this.setLocation(href, { debug: newDebugParams });
   };
 
   private listenForLocationChangesFromWindow() {
