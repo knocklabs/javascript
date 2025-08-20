@@ -4,6 +4,9 @@ import { GenericData } from "@knocklabs/types";
 // Fetch guides API
 //
 
+// eslint-disable-next-line
+export type Any = any;
+
 export interface StepMessageState {
   id: string;
   seen_at: string | null;
@@ -13,14 +16,13 @@ export interface StepMessageState {
   link_clicked_at: string | null;
 }
 
-export interface GuideStepData {
+export interface GuideStepData<TContent = Any> {
   ref: string;
   schema_key: string;
   schema_semver: string;
   schema_variant_key: string;
   message: StepMessageState;
-  // eslint-disable-next-line
-  content: any;
+  content: TContent;
 }
 
 interface GuideActivationLocationRuleData {
@@ -28,14 +30,14 @@ interface GuideActivationLocationRuleData {
   pathname: string;
 }
 
-export interface GuideData {
+export interface GuideData<TContent = Any> {
   __typename: "Guide";
   channel_id: string;
   id: string;
   key: string;
   type: string;
   semver: string;
-  steps: GuideStepData[];
+  steps: GuideStepData<TContent>[];
   activation_location_rules: GuideActivationLocationRuleData[];
   bypass_global_group_limit: boolean;
   inserted_at: string;
@@ -148,7 +150,8 @@ export type GuideSocketEvent =
 // Guide client
 //
 
-export interface KnockGuideStep extends GuideStepData {
+export interface KnockGuideStep<TContent = Any>
+  extends GuideStepData<TContent> {
   markAsSeen: () => void;
   markAsInteracted: (params?: { metadata?: GenericData }) => void;
   markAsArchived: () => void;
@@ -159,10 +162,10 @@ interface KnockGuideActivationLocationRule
   pattern: URLPattern;
 }
 
-export interface KnockGuide extends GuideData {
-  steps: KnockGuideStep[];
+export interface KnockGuide<TContent = Any> extends GuideData<TContent> {
+  steps: KnockGuideStep<TContent>[];
   activation_location_rules: KnockGuideActivationLocationRule[];
-  getStep: () => KnockGuideStep | undefined;
+  getStep: () => KnockGuideStep<TContent> | undefined;
 }
 
 type QueryKey = string;

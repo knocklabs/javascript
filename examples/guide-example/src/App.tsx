@@ -11,8 +11,14 @@ import "@knocklabs/react/dist/index.css";
 import { useEffect, useState } from "react";
 import { Link, Route, Routes } from "react-router";
 
+interface ChangelogCardContent {
+  headline: string;
+  title: string;
+  body: string;
+}
+
 const ChangelogCard = () => {
-  const { guide, step } = useGuide({ type: "changelog-card" });
+  const { guide, step } = useGuide<ChangelogCardContent>({ type: "changelog-card" });
 
   useEffect(() => {
     if (step) step.markAsSeen();

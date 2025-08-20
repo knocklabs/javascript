@@ -15,6 +15,7 @@ import {
   mockDefaultGroup,
 } from "./helpers";
 import {
+  Any,
   ConstructorOpts,
   DebugState,
   GetGuidesQueryParams,
@@ -465,7 +466,10 @@ export class KnockGuideClient {
     return [...result.values()];
   }
 
-  selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+  selectGuide<GuideContent = Any>(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+  ): KnockGuide<GuideContent> | undefined {
     if (Object.keys(state.guides).length === 0) {
       return undefined;
     }
