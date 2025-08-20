@@ -5,10 +5,10 @@ import {
   KnockGuideProvider,
   KnockProvider,
   Modal,
-  useGuide
+  useGuide,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, Route, Routes } from "react-router";
 
 const ChangelogCard = () => {
@@ -26,7 +26,7 @@ const ChangelogCard = () => {
       onDismiss={() => step.markAsArchived()}
     />
   );
-}
+};
 
 const Navigation = () => {
   return (
