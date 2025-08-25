@@ -24,7 +24,7 @@
     "@telegraph/tokens": "^0.1.1",
     "@telegraph/typography": "^0.1.23",
     "framer-motion": "^12.23.12",
-    "lucide-react": "^0.539.0",
+    "lucide-react": "^0.541.0",
     "next": "npm:next@^15.3.3",
     "next-seo": "^6.8.0",
     "react": "^19.0.0",
