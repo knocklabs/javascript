@@ -104,7 +104,8 @@ type SocketEventType =
   | "guide.updated"
   | "guide.removed"
   | "guide_group.added"
-  | "guide_group.updated";
+  | "guide_group.updated"
+  | "guide.preview_updated";
 
 type SocketEventPayload<E extends SocketEventType, D> = {
   topic: string;
@@ -137,12 +138,18 @@ export type GuideGroupUpdatedEvent = SocketEventPayload<
   { guide_group: GuideGroupData }
 >;
 
+export type GuidePreviewUpdatedEvent = SocketEventPayload<
+  "guide.preview_updated",
+  { guide: GuideData; eligible: boolean }
+>;
+
 export type GuideSocketEvent =
   | GuideAddedEvent
   | GuideUpdatedEvent
   | GuideRemovedEvent
   | GuideGroupAddedEvent
-  | GuideGroupUpdatedEvent;
+  | GuideGroupUpdatedEvent
+  | GuidePreviewUpdatedEvent;
 
 //
 // Guide client
@@ -174,12 +181,14 @@ export type QueryStatus = {
 
 export type DebugState = {
   forcedGuideKey?: string | null;
+  sessionId?: string | null;
 };
 
 export type StoreState = {
   guideGroups: GuideGroupData[];
   guideGroupDisplayLogs: Record<GuideGroupData["key"], string>;
   guides: Record<KnockGuide["key"], KnockGuide>;
+  previewGuides: Record<KnockGuide["key"], KnockGuide>;
   queries: Record<QueryKey, QueryStatus>;
   location: string | undefined;
   counter: number;
