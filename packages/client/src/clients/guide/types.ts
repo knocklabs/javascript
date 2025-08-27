@@ -57,6 +57,7 @@ export type GetGuidesQueryParams = {
   data?: string;
   tenant?: string;
   type?: string;
+  force_all_guides?: boolean;
 };
 
 export type GetGuidesResponse = {
@@ -171,6 +172,10 @@ export type QueryStatus = {
   error?: Error;
 };
 
+export type DebugState = {
+  forcedGuideKey?: string | null;
+};
+
 export type StoreState = {
   guideGroups: GuideGroupData[];
   guideGroupDisplayLogs: Record<GuideGroupData["key"], string>;
@@ -178,6 +183,7 @@ export type StoreState = {
   queries: Record<QueryKey, QueryStatus>;
   location: string | undefined;
   counter: number;
+  debug: DebugState;
 };
 
 export type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
