@@ -1,3 +1,4 @@
+import { DEBUG_QUERY_PARAMS } from "@knocklabs/client";
 import { useGuideContext } from "@knocklabs/react-core";
 import { useStore } from "@tanstack/react-store";
 import { Button } from "@telegraph/button";
@@ -28,7 +29,8 @@ export const GuideToolbar = () => {
     }
 
     const url = new URL(window.location.href);
-    url.searchParams.delete("knock_guide_key");
+    url.searchParams.delete(DEBUG_QUERY_PARAMS.GUIDE_KEY);
+    url.searchParams.delete(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
     window.location.href = url.toString();
   };
 

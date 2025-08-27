@@ -28,6 +28,7 @@ import {
   GuideData,
   GuideGroupAddedEvent,
   GuideGroupUpdatedEvent,
+  GuideLivePreviewUpdatedEvent,
   GuideRemovedEvent,
   GuideSocketEvent,
   GuideStepData,
@@ -58,7 +59,10 @@ const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 const SUBSCRIBE_RETRY_LIMIT = 3;
 
 // Debug query param keys
-const DEBUG_GUIDE_KEY_PARAM = "knock_guide_key";
+export const DEBUG_QUERY_PARAMS = {
+  GUIDE_KEY: "knock_guide_key",
+  PREVIEW_SESSION_ID: "knock_preview_session_id",
+};
 
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
@@ -74,13 +78,14 @@ export const guidesApiRootPath = (userId: string | undefined | null) =>
 const detectDebugParams = (): DebugState => {
   const win = checkForWindow();
   if (!win) {
-    return { forcedGuideKey: null };
+    return { forcedGuideKey: null, previewSessionId: null };
   }
 
   const urlParams = new URLSearchParams(win.location.search);
-  const forcedGuideKey = urlParams.get(DEBUG_GUIDE_KEY_PARAM);
+  const forcedGuideKey = urlParams.get(DEBUG_QUERY_PARAMS.GUIDE_KEY);
+  const previewSessionId = urlParams.get(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
 
-  return { forcedGuideKey };
+  return { forcedGuideKey, previewSessionId };
 };
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
@@ -103,7 +108,7 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   }
 
   for (const [index, guideKey] of displaySequence.entries()) {
-    const guide = state.guides[guideKey];
+    let guide = state.guides[guideKey];
     if (!guide) continue;
 
     const affirmed = predicate(guide, {
@@ -112,6 +117,14 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
       debug: state.debug,
     });
     if (!affirmed) continue;
+
+    // Use preview guide if it exists and matches the forced guide key
+    if (
+      state.debug.forcedGuideKey === guideKey &&
+      state.previewGuides[guideKey]
+    ) {
+      guide = state.previewGuides[guideKey];
+    }
 
     result.set(index, guide);
   }
@@ -177,6 +190,7 @@ export class KnockGuideClient {
     "guide.removed",
     "guide_group.added",
     "guide_group.updated",
+    "guide.live_preview_updated",
   ];
   private subscribeRetryCount = 0;
 
@@ -208,6 +222,7 @@ export class KnockGuideClient {
       guideGroups: [],
       guideGroupDisplayLogs: {},
       guides: {},
+      previewGuides: {},
       queries: {},
       location,
       // Increment to update the state store and trigger re-selection.
@@ -331,6 +346,7 @@ export class KnockGuideClient {
       ...this.targetParams,
       user_id: this.knock.userId,
       force_all_guides: debugState.forcedGuideKey ? true : undefined,
+      preview_session_id: debugState.previewSessionId || undefined,
     };
 
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
@@ -411,6 +427,9 @@ export class KnockGuideClient {
       case "guide_group.updated":
         return this.addOrReplaceGuideGroup(payload);
 
+      case "guide.live_preview_updated":
+        return this.updatePreviewGuide(payload);
+
       default:
         return;
     }
@@ -420,11 +439,19 @@ export class KnockGuideClient {
     // Make sure to clear out the stage.
     this.clearGroupStage();
 
-    this.store.setState((state) => ({
-      ...state,
-      ...additionalParams,
-      location: href,
-    }));
+    this.store.setState((state) => {
+      // Clear preview guides if no longer in preview mode
+      const previewGuides = additionalParams?.debug?.previewSessionId
+        ? state.previewGuides
+        : {};
+
+      return {
+        ...state,
+        ...additionalParams,
+        previewGuides,
+        location: href,
+      };
+    });
   }
 
   //
@@ -965,6 +992,15 @@ export class KnockGuideClient {
     });
   }
 
+  private updatePreviewGuide({ data }: GuideLivePreviewUpdatedEvent) {
+    const guide = this.localCopy(data.guide);
+
+    this.store.setState((state) => {
+      const previewGuides = { ...state.previewGuides, [guide.key]: guide };
+      return { ...state, previewGuides };
+    });
+  }
+
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
     const win = checkForWindow();
@@ -980,19 +1016,29 @@ export class KnockGuideClient {
     const newDebugParams = detectDebugParams();
     this.setLocation(href, { debug: newDebugParams });
 
-    // If entering/exiting debug mode, refetch guides and resubscribe to the
-    // websocket channel.
-    if (
-      Boolean(currentDebugParams.forcedGuideKey) !==
-      Boolean(newDebugParams.forcedGuideKey)
-    ) {
+    // If debug state has changed, refetch guides and resubscribe to the websocket channel
+    const debugStateChanged = this.checkDebugStateChanged(
+      currentDebugParams,
+      newDebugParams,
+    );
+
+    if (debugStateChanged) {
       this.knock.log(
-        `[Guide] ${newDebugParams.forcedGuideKey ? "Entering" : "Exiting"} debug mode`,
+        `[Guide] Debug state changed, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch();
       this.subscribe();
     }
   };
+
+  // Returns whether debug params have changed. For guide key, we only check
+  // presence since the exact value has no impact on fetch/subscribe
+  private checkDebugStateChanged(a: DebugState, b: DebugState): boolean {
+    return (
+      Boolean(a.forcedGuideKey) !== Boolean(b.forcedGuideKey) ||
+      a.previewSessionId !== b.previewSessionId
+    );
+  }
 
   private listenForLocationChangesFromWindow() {
     const win = checkForWindow();
