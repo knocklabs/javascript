@@ -4176,7 +4176,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.14"
     jsdom: "npm:^26.1.0"
     lodash.debounce: "npm:^4.0.8"
-    lucide-react: "npm:^0.539.0"
+    lucide-react: "npm:^0.541.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     rimraf: "npm:^6.0.1"
@@ -14444,6 +14444,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.541.0":
+  version: 0.541.0
+  resolution: "lucide-react@npm:0.541.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/ffa23a9c9ead0832c7e0bb1eb7ed44e9f38bbf083d94b4d36a66eb23fa2099d4a52e1677c91eb7e8ea922621fa98e730f5d513bc56b3111b14b835bd8ab823ab
+  languageName: node
+  linkType: hard
+
 "lz-string@npm:^1.5.0":
   version: 1.5.0
   resolution: "lz-string@npm:1.5.0"
@@ -15256,7 +15265,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     framer-motion: "npm:^12.23.12"
-    lucide-react: "npm:^0.539.0"
+    lucide-react: "npm:^0.541.0"
     next: "npm:next@^15.3.3"
     next-seo: "npm:^6.8.0"
     react: "npm:^19.0.0"
@@ -15297,7 +15306,7 @@ __metadata:
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     framer-motion: "npm:^12.23.12"
-    lucide-react: "npm:^0.539.0"
+    lucide-react: "npm:^0.541.0"
     next: "npm:15.3.3"
     next-seo: "npm:^6.8.0"
     react: "npm:^19.0.0"
