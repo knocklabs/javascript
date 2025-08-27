@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.35
+
+### Patch Changes
+
+- 7fb9334: chore(deps): bump lucide-react from 0.539.0 to 0.541.0
+
 ## 0.7.34
 
 ### Patch Changes
