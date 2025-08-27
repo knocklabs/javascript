@@ -6947,7 +6947,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^22":
+"@types/node@npm:*":
   version: 22.15.19
   resolution: "@types/node@npm:22.15.19"
   dependencies:
@@ -6960,6 +6960,15 @@ __metadata:
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
   checksum: 10c0/3b190bb0410047d489c49bbaab592d2e6630de6a50f00ba3d7d513d59401d279972a8f5a598b5bb8ddc1702f8a2f4ec57a65d93852f9c329639738e7053637d1
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^24":
+  version: 24.3.0
+  resolution: "@types/node@npm:24.3.0"
+  dependencies:
+    undici-types: "npm:~7.10.0"
+  checksum: 10c0/96bdeca01f690338957c2dcc92cb9f76c262c10398f8d91860865464412b0f9d309c24d9b03d0bdd26dd47fa7ee3f8227893d5c89bc2009d919a525a22512030
   languageName: node
   linkType: hard
 
@@ -15040,7 +15049,7 @@ __metadata:
   dependencies:
     "@knocklabs/react": "npm:0.7.34"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     eslint: "npm:^8.56.0"
@@ -15240,7 +15249,7 @@ __metadata:
     "@telegraph/tokens": "npm:^0.1.1"
     "@telegraph/typography": "npm:^0.1.23"
     "@types/eslint": "npm:^8.44.7"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     "@types/uuid": "npm:^10.0.0"
@@ -15282,7 +15291,7 @@ __metadata:
     "@telegraph/tokens": "npm:^0.1.1"
     "@telegraph/typography": "npm:^0.1.23"
     "@types/eslint": "npm:^8.44.7"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     "@types/uuid": "npm:^10.0.0"
@@ -17753,7 +17762,7 @@ __metadata:
   dependencies:
     "@knocklabs/react": "npm:0.7.34"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     eslint: "npm:^8.56.0"
@@ -17773,7 +17782,7 @@ __metadata:
     "@knocklabs/node": "npm:^1.11.2"
     "@knocklabs/react": "npm:0.7.34"
     "@tailwindcss/postcss": "npm:^4.1.12"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     eslint: "npm:^8.56.0"
@@ -18998,6 +19007,13 @@ __metadata:
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
   checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.10.0":
+  version: 7.10.0
+  resolution: "undici-types@npm:7.10.0"
+  checksum: 10c0/8b00ce50e235fe3cc601307f148b5e8fb427092ee3b23e8118ec0a5d7f68eca8cee468c8fc9f15cbb2cf2a3797945ebceb1cbd9732306a1d00e0a9b6afa0f635
   languageName: node
   linkType: hard
 
