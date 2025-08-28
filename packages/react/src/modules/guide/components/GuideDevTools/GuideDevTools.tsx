@@ -14,12 +14,17 @@ export const GuideDevTools = () => {
 
   const { client } = useGuideContext();
 
-  const debugState = useStore(client.store, (state) => {
-    console.log("state", state);
-    return state.debug;
-  });
+  const debugState = useStore(client.store, (state) => state.debug);
 
-  const isGuideMissing = true;
+  const isGuideMissing = useStore(client.store, (state) => {
+    return (
+      !!state.debug.forcedGuideKey &&
+      !(
+        state.guides[state.debug.forcedGuideKey] ||
+        state.previewGuides[state.debug.forcedGuideKey]
+      )
+    );
+  });
 
   if (!debugState?.forcedGuideKey) {
     return null;
