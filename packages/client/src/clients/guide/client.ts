@@ -56,7 +56,7 @@ const SUBSCRIBE_RETRY_LIMIT = 3;
 
 // Debug query param keys
 const DEBUG_GUIDE_KEY_PARAM = "knock_guide_key";
-const DEBUG_SESSION_ID_PARAM = "knock_session_id";
+const DEBUG_SESSION_ID_PARAM = "knock_preview_session_id";
 
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
