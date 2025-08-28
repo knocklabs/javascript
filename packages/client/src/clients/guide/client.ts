@@ -470,7 +470,7 @@ export class KnockGuideClient {
     const result = select(state, filters);
 
     if (result.size === 0) {
-      this.knock.log("[Guide] Selection returned zero result");
+      this.knock.log("[Guide] Selection returned zero results");
       return [];
     }
 
@@ -492,7 +492,7 @@ export class KnockGuideClient {
     const result = select(state, filters);
 
     if (result.size === 0) {
-      this.knock.log("[Guide] Selection returned zero result");
+      this.knock.log("[Guide] Selection returned zero results");
       return undefined;
     }
 
