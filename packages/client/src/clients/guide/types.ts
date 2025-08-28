@@ -23,7 +23,14 @@ export interface GuideStepData {
   content: any;
 }
 
-interface GuideActivationLocationRuleData {
+export interface GuideActivationUrlRuleData {
+  directive: "allow" | "block";
+  variable: "pathname";
+  operator: "equal_to" | "contains";
+  argument: string;
+}
+
+interface GuideActivationUrlPatternData {
   directive: "allow" | "block";
   pathname: string;
 }
@@ -36,7 +43,8 @@ export interface GuideData {
   type: string;
   semver: string;
   steps: GuideStepData[];
-  activation_location_rules: GuideActivationLocationRuleData[];
+  activation_url_rules: GuideActivationUrlRuleData[];
+  activation_url_patterns: GuideActivationUrlPatternData[];
   bypass_global_group_limit: boolean;
   inserted_at: string;
   updated_at: string;
@@ -153,14 +161,14 @@ export interface KnockGuideStep extends GuideStepData {
   markAsArchived: () => void;
 }
 
-interface KnockGuideActivationLocationRule
-  extends GuideActivationLocationRuleData {
+interface KnockGuideActivationUrlPattern extends GuideActivationUrlPatternData {
   pattern: URLPattern;
 }
 
 export interface KnockGuide extends GuideData {
   steps: KnockGuideStep[];
-  activation_location_rules: KnockGuideActivationLocationRule[];
+  activation_url_patterns: KnockGuideActivationUrlPattern[];
+  activation_location_rules: KnockGuideActivationUrlPattern[];
   getStep: () => KnockGuideStep | undefined;
 }
 
