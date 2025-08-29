@@ -181,7 +181,7 @@ export type QueryStatus = {
 
 export type DebugState = {
   forcedGuideKey?: string | null;
-  sessionId?: string | null;
+  previewSessionId?: string | null;
 };
 
 export type StoreState = {

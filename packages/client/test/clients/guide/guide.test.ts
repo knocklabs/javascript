@@ -24,7 +24,7 @@ const mockStore = {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       }) as StoreState,
   ),
   setState: vi.fn((fn) => {
@@ -45,7 +45,7 @@ const mockStore = {
     queries: {},
     location: undefined,
     counter: 0,
-    debug: { forcedGuideKey: null, sessionId: null },
+    debug: { forcedGuideKey: null, previewSessionId: null },
   } as StoreState,
 };
 
@@ -94,7 +94,7 @@ describe("KnockGuideClient", () => {
       queries: {},
       location: undefined,
       counter: 0,
-      debug: { forcedGuideKey: null, sessionId: null },
+      debug: { forcedGuideKey: null, previewSessionId: null },
     });
     mockStore.state = {
       guideGroups: [],
@@ -104,7 +104,7 @@ describe("KnockGuideClient", () => {
       queries: {},
       location: undefined,
       counter: 0,
-      debug: { forcedGuideKey: null, sessionId: null },
+      debug: { forcedGuideKey: null, previewSessionId: null },
     };
 
     mockApiClient = {
@@ -156,7 +156,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       });
     });
 
@@ -184,7 +184,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com",
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       });
     });
 
@@ -200,7 +200,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       });
     });
 
@@ -491,7 +491,7 @@ describe("KnockGuideClient", () => {
       // Set debug state with forced guide key
       client.store.state.debug = {
         forcedGuideKey: "test_guide",
-        sessionId: "test-session-id",
+        previewSessionId: "test-session-id",
       };
 
       client.subscribe();
@@ -564,7 +564,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -595,7 +595,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -627,7 +627,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -683,7 +683,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -738,7 +738,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -798,7 +798,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
@@ -961,7 +961,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -982,7 +982,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1002,7 +1002,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1022,7 +1022,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1041,7 +1041,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/settings",
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1069,7 +1069,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/settings",
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1087,7 +1087,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1117,7 +1117,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1193,7 +1193,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       client["patchClosedGroupStage"]();
@@ -1274,7 +1274,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1312,7 +1312,7 @@ describe("KnockGuideClient", () => {
         counter: 0,
         debug: {
           forcedGuideKey: mockGuideTwo.key,
-          session_id: "test-session-id",
+          preview_session_id: "test-session-id",
         }, // Force the archived guide
       };
 
@@ -1356,7 +1356,7 @@ describe("KnockGuideClient", () => {
         counter: 0,
         debug: {
           forcedGuideKey: mockGuideTwo.key,
-          session_id: "test-session-id",
+          preview_session_id: "test-session-id",
         },
       };
 
@@ -1388,7 +1388,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1429,7 +1429,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1527,7 +1527,7 @@ describe("KnockGuideClient", () => {
       queries: {},
       location: undefined,
       counter: 0,
-      debug: { forcedGuideKey: null, sessionId: null },
+      debug: { forcedGuideKey: null, previewSessionId: null },
     };
 
     test("returns all guides without filters", () => {
@@ -1597,7 +1597,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1668,7 +1668,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const updatedGuide = {
@@ -1718,7 +1718,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const updateEvent = {
@@ -1760,7 +1760,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const removeEvent = {
@@ -1849,7 +1849,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const event = {
@@ -1905,7 +1905,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const event = {
@@ -2185,7 +2185,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, sessionId: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);

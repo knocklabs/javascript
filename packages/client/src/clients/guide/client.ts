@@ -72,14 +72,14 @@ export const guidesApiRootPath = (userId: string | undefined | null) =>
 const detectDebugParams = (): DebugState => {
   const win = checkForWindow();
   if (!win) {
-    return { forcedGuideKey: null, sessionId: null };
+    return { forcedGuideKey: null, previewSessionId: null };
   }
 
   const urlParams = new URLSearchParams(win.location.search);
   const forcedGuideKey = urlParams.get(DEBUG_GUIDE_KEY_PARAM);
-  const sessionId = urlParams.get(DEBUG_SESSION_ID_PARAM);
+  const previewSessionId = urlParams.get(DEBUG_SESSION_ID_PARAM);
 
-  return { forcedGuideKey, sessionId };
+  return { forcedGuideKey, previewSessionId };
 };
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
@@ -350,7 +350,7 @@ export class KnockGuideClient {
       ...this.targetParams,
       user_id: this.knock.userId,
       force_all_guides: debugState.forcedGuideKey ? true : undefined,
-      session_id: debugState.sessionId || undefined,
+      preview_session_id: debugState.previewSessionId || undefined,
     };
 
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
