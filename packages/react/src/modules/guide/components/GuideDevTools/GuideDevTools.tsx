@@ -4,7 +4,7 @@ import { Button } from "@telegraph/button";
 import { Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
 import { Text } from "@telegraph/typography";
-import { Minimize2, Undo2, Wrench } from "lucide-react";
+import { AlertOctagon, Minimize2, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
 
 import "./styles.css";
@@ -13,7 +13,18 @@ export const GuideDevTools = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { client } = useGuideContext();
+
   const debugState = useStore(client.store, (state) => state.debug);
+
+  const isGuideMissing = useStore(client.store, (state) => {
+    return (
+      !!state.debug.forcedGuideKey &&
+      !(
+        state.guides[state.debug.forcedGuideKey] ||
+        state.previewGuides[state.debug.forcedGuideKey]
+      )
+    );
+  });
 
   if (!debugState?.forcedGuideKey) {
     return null;
@@ -22,7 +33,7 @@ export const GuideDevTools = () => {
   const handleExit = () => {
     const url = new URL(window.location.href);
     url.searchParams.delete("knock_guide_key");
-    url.searchParams.delete("knock_session_id");
+    url.searchParams.delete("knock_preview_session_id");
     window.location.href = url.toString();
   };
 
@@ -75,6 +86,7 @@ export const GuideDevTools = () => {
 
   return (
     <Stack
+      direction="column"
       gap="2"
       align="center"
       position="fixed"
@@ -89,7 +101,7 @@ export const GuideDevTools = () => {
       px="3"
       data-tgph-appearance="dark"
     >
-      <Stack gap="2" align="center" direction="row">
+      <Stack gap="2" align="center" direction="row" w="full">
         <Tag
           color="green"
           variant="soft"
@@ -126,9 +138,23 @@ export const GuideDevTools = () => {
           onClick={handleToggleCollapse}
           size="1"
           variant="soft"
+          px="0_5"
           leadingIcon={{ icon: Minimize2, alt: "Collapse guide devtools" }}
         />
       </Stack>
+      {isGuideMissing && (
+        <Tag
+          color="red"
+          variant="soft"
+          w="full"
+          textProps={{
+            maxWidth: "full",
+          }}
+          icon={{ icon: AlertOctagon, "aria-hidden": true }}
+        >
+          Selected guide is not rendered on this page
+        </Tag>
+      )}
     </Stack>
   );
 };
