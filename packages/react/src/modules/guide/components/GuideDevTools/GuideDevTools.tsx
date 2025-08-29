@@ -22,6 +22,7 @@ export const GuideDevTools = () => {
   const handleExit = () => {
     const url = new URL(window.location.href);
     url.searchParams.delete("knock_guide_key");
+    url.searchParams.delete("knock_session_id");
     window.location.href = url.toString();
   };
 

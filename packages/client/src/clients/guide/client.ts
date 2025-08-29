@@ -24,6 +24,7 @@ import {
   GuideData,
   GuideGroupAddedEvent,
   GuideGroupUpdatedEvent,
+  GuidePreviewUpdatedEvent,
   GuideRemovedEvent,
   GuideSocketEvent,
   GuideStepData,
@@ -55,6 +56,7 @@ const SUBSCRIBE_RETRY_LIMIT = 3;
 
 // Debug query param keys
 const DEBUG_GUIDE_KEY_PARAM = "knock_guide_key";
+const DEBUG_SESSION_ID_PARAM = "knock_session_id";
 
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
@@ -70,13 +72,14 @@ export const guidesApiRootPath = (userId: string | undefined | null) =>
 const detectDebugParams = (): DebugState => {
   const win = checkForWindow();
   if (!win) {
-    return { forcedGuideKey: null };
+    return { forcedGuideKey: null, previewSessionId: null };
   }
 
   const urlParams = new URLSearchParams(win.location.search);
   const forcedGuideKey = urlParams.get(DEBUG_GUIDE_KEY_PARAM);
+  const previewSessionId = urlParams.get(DEBUG_SESSION_ID_PARAM);
 
-  return { forcedGuideKey };
+  return { forcedGuideKey, previewSessionId };
 };
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
@@ -90,8 +93,16 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   const location = state.location;
 
   for (const [index, guideKey] of displaySequence.entries()) {
-    const guide = state.guides[guideKey];
+    let guide = state.guides[guideKey];
     if (!guide) continue;
+
+    // Use preview guide if it exists and matches the forced guide key
+    if (
+      state.debug.forcedGuideKey === guideKey &&
+      state.previewGuides[guideKey]
+    ) {
+      guide = state.previewGuides[guideKey];
+    }
 
     const affirmed = predicate(guide, {
       location,
@@ -183,6 +194,7 @@ export class KnockGuideClient {
     "guide.removed",
     "guide_group.added",
     "guide_group.updated",
+    "guide.preview_updated",
   ];
   private subscribeRetryCount = 0;
 
@@ -214,6 +226,7 @@ export class KnockGuideClient {
       guideGroups: [],
       guideGroupDisplayLogs: {},
       guides: {},
+      previewGuides: {},
       queries: {},
       location,
       // Increment to update the state store and trigger re-selection.
@@ -337,6 +350,7 @@ export class KnockGuideClient {
       ...this.targetParams,
       user_id: this.knock.userId,
       force_all_guides: debugState.forcedGuideKey ? true : undefined,
+      preview_session_id: debugState.previewSessionId || undefined,
     };
 
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
@@ -423,6 +437,9 @@ export class KnockGuideClient {
       case "guide_group.added":
       case "guide_group.updated":
         return this.addOrReplaceGuideGroup(payload);
+
+      case "guide.preview_updated":
+        return this.updatePreview(payload);
 
       default:
         return;
@@ -975,6 +992,15 @@ export class KnockGuideClient {
     });
   }
 
+  private updatePreview({ data }: GuidePreviewUpdatedEvent) {
+    const guide = this.localCopy(data.guide);
+
+    this.store.setState((state) => {
+      const previewGuides = { ...state.previewGuides, [guide.key]: guide };
+      return { ...state, previewGuides };
+    });
+  }
+
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
     const win = checkForWindow();
@@ -989,15 +1015,11 @@ export class KnockGuideClient {
     const currentDebugParams = this.store.state.debug;
     this.setLocation(href, { debug: newDebugParams });
 
-    // If entering/exiting debug mode, refetch guides and resubscribe to the
+    // If debug state has changed, refetch guides and resubscribe to the
     // websocket channel.
-    if (
-      Boolean(currentDebugParams.forcedGuideKey) !==
-      Boolean(newDebugParams.forcedGuideKey)
-    ) {
-      this.knock.log(
-        `[Guide] ${newDebugParams.forcedGuideKey ? "Entering" : "Exiting"} debug mode`,
-      );
+    const debugStateChanged =
+      JSON.stringify(currentDebugParams) !== JSON.stringify(newDebugParams);
+    if (debugStateChanged) {
       this.fetch();
       this.resubscribe();
     }
