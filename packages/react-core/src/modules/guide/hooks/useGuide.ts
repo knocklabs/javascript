@@ -1,19 +1,27 @@
 import {
   KnockGuide,
+  KnockGuideContentTypesMapping,
   KnockGuideFilterParams,
+  KnockGuideMatchContentType,
   KnockGuideStep,
 } from "@knocklabs/client";
 import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-interface UseGuideReturn extends UseGuideContextReturn {
-  guide: KnockGuide | undefined;
-  step: KnockGuideStep | undefined;
+interface UseGuideReturn<M extends KnockGuideContentTypesMapping, C>
+  extends UseGuideContextReturn<M> {
+  guide: KnockGuide<C> | undefined;
+  step: KnockGuideStep<C> | undefined;
 }
 
-export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
-  const context = useGuideContext();
+export const useGuide = <
+  M extends KnockGuideContentTypesMapping = KnockGuideContentTypesMapping,
+  F extends KnockGuideFilterParams = KnockGuideFilterParams,
+>(
+  filters: F,
+): UseGuideReturn<M, KnockGuideMatchContentType<M, F>> => {
+  const context = useGuideContext<M>();
 
   if (!filters.key && !filters.type) {
     throw new Error(
@@ -31,3 +39,10 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
 
   return { client, colorMode, guide, step };
 };
+
+// Helper type to bind useGuide with the content types mapping, so that the
+// filter arg "as const" for the hook can be inferred by ts.
+export type UseGuideWithContentTypes<M extends KnockGuideContentTypesMapping> =
+  <F extends KnockGuideFilterParams>(
+    filters: F,
+  ) => UseGuideReturn<M, KnockGuideMatchContentType<M, F>>;

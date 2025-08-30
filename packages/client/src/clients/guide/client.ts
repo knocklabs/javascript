@@ -16,6 +16,7 @@ import {
 } from "./helpers";
 import {
   ConstructorOpts,
+  ContentTypesMapping,
   GetGuidesQueryParams,
   GetGuidesResponse,
   GroupStage,
@@ -33,6 +34,7 @@ import {
   MarkAsInteractedParams,
   MarkAsSeenParams,
   MarkGuideAsResponse,
+  MatchContentType,
   QueryFilterParams,
   QueryStatus,
   SelectFilterParams,
@@ -143,7 +145,9 @@ const predicate = (
   return true;
 };
 
-export class KnockGuideClient {
+export class KnockGuideClient<
+  TMapping extends ContentTypesMapping = ContentTypesMapping,
+> {
   public store: Store<StoreState, (state: StoreState) => StoreState>;
 
   // Phoenix channels for real time guide updates over websocket
@@ -397,7 +401,10 @@ export class KnockGuideClient {
   // Store selector
   //
 
-  selectGuides(state: StoreState, filters: SelectFilterParams = {}) {
+  selectGuides<TFilters extends SelectFilterParams = SelectFilterParams>(
+    state: StoreState,
+    filters: TFilters = {} as TFilters,
+  ): KnockGuide<MatchContentType<TMapping, TFilters>>[] {
     if (Object.keys(state.guides).length === 0) {
       return [];
     }
@@ -416,7 +423,10 @@ export class KnockGuideClient {
     return [...result.values()];
   }
 
-  selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+  selectGuide<TFilters extends SelectFilterParams = SelectFilterParams>(
+    state: StoreState,
+    filters: TFilters = {} as TFilters,
+  ): KnockGuide<MatchContentType<TMapping, TFilters>> | undefined {
     if (Object.keys(state.guides).length === 0) {
       return undefined;
     }
@@ -596,13 +606,18 @@ export class KnockGuideClient {
 
   // Test helper that opens and closes the group stage to return the select
   // result immediately.
-  private _selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+  private _selectGuide<
+    TFilters extends SelectFilterParams = SelectFilterParams,
+  >(
+    state: StoreState,
+    filters: TFilters = {} as TFilters,
+  ): KnockGuide<MatchContentType<TMapping, TFilters>> | undefined {
     this.openGroupStage();
 
-    this.selectGuide(state, filters);
+    this.selectGuide<TFilters>(state, filters);
     this.closePendingGroupStage();
 
-    return this.selectGuide(state, filters);
+    return this.selectGuide<TFilters>(state, filters);
   }
 
   //
