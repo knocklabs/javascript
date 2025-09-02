@@ -407,13 +407,6 @@ export class KnockGuideClient {
     this.socketChannel = undefined;
   }
 
-  resubscribe() {
-    if (!this.socket) return;
-    this.knock.log("[Guide] Resubscribing to websocket channel");
-    this.unsubscribe();
-    this.subscribe();
-  }
-
   private handleSocketEvent(payload: GuideSocketEvent) {
     const { event, data } = payload;
 
@@ -1006,7 +999,7 @@ export class KnockGuideClient {
         `[Guide] ${newDebugParams.forcedGuideKey ? "Entering" : "Exiting"} debug mode`,
       );
       this.fetch();
-      this.resubscribe();
+      this.subscribe();
     }
   };
 
