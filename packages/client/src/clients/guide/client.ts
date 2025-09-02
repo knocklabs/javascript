@@ -86,8 +86,17 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   const defaultGroup = findDefaultGroup(state.guideGroups);
   if (!defaultGroup) return result;
 
-  const displaySequence = defaultGroup.display_sequence;
+  const displaySequence = [...defaultGroup.display_sequence];
   const location = state.location;
+
+  // If in debug mode, put the forced guide at the beginning of the display sequence.
+  if (state.debug.forcedGuideKey) {
+    const forcedKeyIndex = displaySequence.indexOf(state.debug.forcedGuideKey);
+    if (forcedKeyIndex > -1) {
+      displaySequence.splice(forcedKeyIndex, 1);
+    }
+    displaySequence.unshift(state.debug.forcedGuideKey);
+  }
 
   for (const [index, guideKey] of displaySequence.entries()) {
     const guide = state.guides[guideKey];
@@ -422,8 +431,8 @@ export class KnockGuideClient {
 
     this.store.setState((state) => ({
       ...state,
-      location: href,
       ...additionalParams,
+      location: href,
     }));
   }
 
@@ -467,10 +476,7 @@ export class KnockGuideClient {
 
     // If a guide ignores the group limit, then return immediately to render
     // always.
-    if (
-      guide.bypass_global_group_limit ||
-      state.debug.forcedGuideKey === guide.key
-    ) {
+    if (guide.bypass_global_group_limit) {
       return guide;
     }
 
@@ -577,7 +583,7 @@ export class KnockGuideClient {
     this.ensureClearTimeout();
 
     // If in debug mode, try to resolve the forced guide, otherwise return the first non-undefined guide.
-    let resolved = null;
+    let resolved = undefined;
     if (this.store.state.debug.forcedGuideKey) {
       resolved = this.stage.ordered.find(
         (x) => x === this.store.state.debug.forcedGuideKey,
@@ -972,8 +978,10 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
 
-    // If entering debug mode, fetch all guides.
     const newDebugParams = detectDebugParams();
+    this.setLocation(href, { debug: newDebugParams });
+
+    // If entering debug mode, fetch all guides.
     const currentDebugParams = this.store.state.debug;
     if (!currentDebugParams.forcedGuideKey && !!newDebugParams.forcedGuideKey) {
       this.knock.log(
@@ -981,8 +989,6 @@ export class KnockGuideClient {
       );
       this.fetch();
     }
-
-    this.setLocation(href, { debug: newDebugParams });
   };
 
   private listenForLocationChangesFromWindow() {

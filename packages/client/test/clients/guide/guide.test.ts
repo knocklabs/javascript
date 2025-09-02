@@ -279,8 +279,8 @@ describe("KnockGuideClient", () => {
         join: vi.fn().mockReturnValue({
           receive: vi.fn().mockReturnValue({
             receive: vi.fn().mockReturnValue({
-              receive: vi.fn()
-            })
+              receive: vi.fn(),
+            }),
           }),
         }),
         on: vi.fn(),
@@ -326,7 +326,7 @@ describe("KnockGuideClient", () => {
               okCallback = callback;
             }
             return {
-              receive: vi.fn().mockReturnValue({ receive: vi.fn() })
+              receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
             };
           }),
         }),
@@ -355,7 +355,9 @@ describe("KnockGuideClient", () => {
       // Trigger the ok callback
       okCallback!();
 
-      expect(mockKnock.log).toHaveBeenCalledWith("[Guide] Successfully joined channel");
+      expect(mockKnock.log).toHaveBeenCalledWith(
+        "[Guide] Successfully joined channel",
+      );
     });
 
     test("unsubscribes after reaching max retry limit", () => {
@@ -377,9 +379,9 @@ describe("KnockGuideClient", () => {
                       errorCallback = callback;
                     }
                     return { receive: vi.fn() };
-                  })
+                  }),
                 };
-              })
+              }),
             };
           }),
         }),
@@ -426,7 +428,7 @@ describe("KnockGuideClient", () => {
 
       // Check that the max retry limit message was logged
       expect(mockKnock.log).toHaveBeenCalledWith(
-        "[Guide] Channel join max retry limit reached: 3"
+        "[Guide] Channel join max retry limit reached: 3",
       );
 
       expect(unsubscribeSpy).toHaveBeenCalled();
@@ -1213,7 +1215,7 @@ describe("KnockGuideClient", () => {
 
     test("returns an archived guide when forced guide key is set", () => {
       const archivedGuide = {
-        ...mockGuideTwo,
+        ...mockGuideThree,
         steps: [
           {
             ...mockStep,
@@ -1230,19 +1232,19 @@ describe("KnockGuideClient", () => {
         guideGroupDisplayLogs: {},
         guides: {
           ...mockGuides,
-          [mockGuideTwo.key]: archivedGuide,
+          [mockGuideThree.key]: archivedGuide,
         },
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: mockGuideTwo.key }, // Force the archived guide
+        debug: { forcedGuideKey: mockGuideThree.key }, // Force the archived guide
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithArchivedGuide);
 
       // Should return the forced guide even though it's archived
-      expect(result!.key).toBe("feature_tour");
+      expect(result!.key).toBe("system_status");
       expect(result!.steps[0]!.message.archived_at).toBeTruthy();
     });
 
