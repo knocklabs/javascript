@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { GuideDevTools } from "../../src/modules/guide/components/GuideDevTools/GuideDevTools";
+import { GuideToolbar } from "../../src/modules/guide/components/GuideToolbar/GuideToolbar";
 
 const mockDebugState: { forcedGuideKey: string | null } = {
   forcedGuideKey: "test-guide-key",
@@ -26,11 +26,11 @@ vi.mock("@knocklabs/react-core", async () => {
   };
 });
 
-describe("GuideDevTools", () => {
+describe("GuideToolbar", () => {
   test("renders debug component when forcedGuideKey exists", () => {
     mockDebugState.forcedGuideKey = "test-guide-key";
 
-    const { getByText } = render(<GuideDevTools />);
+    const { getByText } = render(<GuideToolbar />);
     expect(getByText("Debug")).toBeInTheDocument();
     expect(getByText("test-guide-key")).toBeInTheDocument();
     expect(getByText("Exit")).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("GuideDevTools", () => {
   test("does not render when forcedGuideKey is null", () => {
     mockDebugState.forcedGuideKey = null;
 
-    const { container } = render(<GuideDevTools />);
+    const { container } = render(<GuideToolbar />);
     expect(container.firstChild).toBeNull();
   });
 
@@ -58,7 +58,7 @@ describe("GuideDevTools", () => {
 
     mockDebugState.forcedGuideKey = "test-guide-key";
 
-    const { getByText } = render(<GuideDevTools />);
+    const { getByText } = render(<GuideToolbar />);
 
     const exitButton = getByText("Exit");
     fireEvent.click(exitButton);

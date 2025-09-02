@@ -7,9 +7,11 @@ import { Text } from "@telegraph/typography";
 import { Minimize2, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
 
+import { checkForWindow } from "../../../core";
+
 import "./styles.css";
 
-export const GuideDevTools = () => {
+export const GuideToolbar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { client } = useGuideContext();
@@ -20,6 +22,11 @@ export const GuideDevTools = () => {
   }
 
   const handleExit = () => {
+    const window = checkForWindow();
+    if (!window) {
+      return;
+    }
+
     const url = new URL(window.location.href);
     url.searchParams.delete("knock_guide_key");
     window.location.href = url.toString();
@@ -44,7 +51,7 @@ export const GuideDevTools = () => {
         h="10"
         variant="soft"
         data-tgph-appearance="dark"
-        aria-label="Expand guide devtools"
+        aria-label="Expand guide toolbar"
       >
         <svg
           width="40"
@@ -125,7 +132,7 @@ export const GuideDevTools = () => {
           onClick={handleToggleCollapse}
           size="1"
           variant="soft"
-          leadingIcon={{ icon: Minimize2, alt: "Collapse guide devtools" }}
+          leadingIcon={{ icon: Minimize2, alt: "Collapse guide toolbar" }}
         />
       </Stack>
     </Stack>
