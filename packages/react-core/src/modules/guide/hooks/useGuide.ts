@@ -29,7 +29,7 @@ export const useGuide = <C = Any>(
   const { client, colorMode } = context;
 
   const guide = useStore(client.store, (state) =>
-    client.selectGuide(state, filters),
+    client.selectGuide<C>(state, filters),
   );
 
   const step = guide && guide.getStep();

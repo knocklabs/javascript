@@ -17,7 +17,7 @@ export const useGuides = <C = Any>(
   const { client, colorMode } = context;
 
   const guides = useStore(client.store, (state) =>
-    client.selectGuides(state, filters),
+    client.selectGuides<C>(state, filters),
   );
 
   return { client, colorMode, guides };
