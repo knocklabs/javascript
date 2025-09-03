@@ -7,14 +7,17 @@ import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-interface UseGuideReturn<GuideContent> extends UseGuideContextReturn {
-  guide: KnockGuide<GuideContent> | undefined;
-  step: KnockGuideStep<GuideContent> | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Any = any;
+
+interface UseGuideReturn<C = Any> extends UseGuideContextReturn {
+  guide: KnockGuide<C> | undefined;
+  step: KnockGuideStep<C> | undefined;
 }
 
-export const useGuide = <GuideContent = any>(
+export const useGuide = <C = Any>(
   filters: KnockGuideFilterParams,
-): UseGuideReturn<GuideContent> => {
+): UseGuideReturn<C> => {
   const context = useGuideContext();
 
   if (!filters.key && !filters.type) {

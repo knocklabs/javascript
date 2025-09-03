@@ -466,10 +466,10 @@ export class KnockGuideClient {
     return [...result.values()];
   }
 
-  selectGuide<GuideContent = Any>(
+  selectGuide<C = Any>(
     state: StoreState,
     filters: SelectFilterParams = {},
-  ): KnockGuide<GuideContent> | undefined {
+  ): KnockGuide<C> | undefined {
     if (Object.keys(state.guides).length === 0) {
       return undefined;
     }
