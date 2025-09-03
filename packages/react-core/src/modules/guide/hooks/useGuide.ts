@@ -7,12 +7,17 @@ import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-interface UseGuideReturn extends UseGuideContextReturn {
-  guide: KnockGuide | undefined;
-  step: KnockGuideStep | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Any = any;
+
+interface UseGuideReturn<C = Any> extends UseGuideContextReturn {
+  guide: KnockGuide<C> | undefined;
+  step: KnockGuideStep<C> | undefined;
 }
 
-export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
+export const useGuide = <C = Any>(
+  filters: KnockGuideFilterParams,
+): UseGuideReturn<C> => {
   const context = useGuideContext();
 
   if (!filters.key && !filters.type) {
@@ -24,7 +29,7 @@ export const useGuide = (filters: KnockGuideFilterParams): UseGuideReturn => {
   const { client, colorMode } = context;
 
   const guide = useStore(client.store, (state) =>
-    client.selectGuide(state, filters),
+    client.selectGuide<C>(state, filters),
   );
 
   const step = guide && guide.getStep();

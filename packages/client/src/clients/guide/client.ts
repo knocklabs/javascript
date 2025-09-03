@@ -15,6 +15,7 @@ import {
   mockDefaultGroup,
 } from "./helpers";
 import {
+  Any,
   ConstructorOpts,
   DebugState,
   GetGuidesQueryParams,
@@ -446,7 +447,10 @@ export class KnockGuideClient {
   // Store selector
   //
 
-  selectGuides(state: StoreState, filters: SelectFilterParams = {}) {
+  selectGuides<C = Any>(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+  ): KnockGuide<C>[] {
     if (Object.keys(state.guides).length === 0) {
       return [];
     }
@@ -465,7 +469,10 @@ export class KnockGuideClient {
     return [...result.values()];
   }
 
-  selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+  selectGuide<C = Any>(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+  ): KnockGuide<C> | undefined {
     if (Object.keys(state.guides).length === 0) {
       return undefined;
     }
