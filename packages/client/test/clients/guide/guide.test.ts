@@ -1951,7 +1951,7 @@ describe("KnockGuideClient", () => {
       expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
     });
 
-    test("handleLocationChange calls resubscribe when entering debug mode", () => {
+    test("handleLocationChange calls subscribe when entering debug mode", () => {
       vi.stubGlobal("window", {
         ...mockWindow,
         location: {
@@ -1970,8 +1970,8 @@ describe("KnockGuideClient", () => {
       client.store.state.debug = { forcedGuideKey: null };
       client.store.state.location = "https://example.com/dashboard";
 
-      const resubscribeSpy = vi
-        .spyOn(client, "resubscribe")
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
         .mockImplementation(() => {});
 
       const fetchSpy = vi
@@ -1981,10 +1981,10 @@ describe("KnockGuideClient", () => {
       client["handleLocationChange"]();
 
       expect(fetchSpy).toHaveBeenCalled();
-      expect(resubscribeSpy).toHaveBeenCalled();
+      expect(subscribeSpy).toHaveBeenCalled();
     });
 
-    test("handleLocationChange calls resubscribe when exiting debug mode", () => {
+    test("handleLocationChange calls subscribe when exiting debug mode", () => {
       vi.stubGlobal("window", {
         ...mockWindow,
         location: {
@@ -2004,13 +2004,13 @@ describe("KnockGuideClient", () => {
       client.store.state.location =
         "https://example.com/dashboard?knock_guide_key=test_guide";
 
-      const resubscribeSpy = vi
-        .spyOn(client, "resubscribe")
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
         .mockImplementation(() => {});
 
       client["handleLocationChange"]();
 
-      expect(resubscribeSpy).toHaveBeenCalled();
+      expect(subscribeSpy).toHaveBeenCalled();
     });
   });
 
