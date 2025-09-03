@@ -20,3 +20,9 @@ export const openPopupWindow = (url: string) => {
 
   window.open(url, "_blank", features);
 };
+
+export const checkForWindow = () => {
+  if (typeof window !== "undefined") {
+    return window;
+  }
+};

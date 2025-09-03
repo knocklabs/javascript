@@ -6,3 +6,4 @@ export {
   Modal,
   ModalView,
 } from "./components";
+export { KnockGuideProvider } from "./providers";
