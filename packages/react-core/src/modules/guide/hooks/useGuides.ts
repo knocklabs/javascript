@@ -3,13 +3,16 @@ import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
-interface UseGuidesReturn extends UseGuideContextReturn {
-  guides: KnockGuide[];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Any = any;
+
+interface UseGuidesReturn<C = Any> extends UseGuideContextReturn {
+  guides: KnockGuide<C>[];
 }
 
-export const useGuides = (
+export const useGuides = <C = Any>(
   filters: Pick<KnockGuideFilterParams, "type">,
-): UseGuidesReturn => {
+): UseGuidesReturn<C> => {
   const context = useGuideContext();
   const { client, colorMode } = context;
 

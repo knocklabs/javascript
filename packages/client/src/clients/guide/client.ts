@@ -447,7 +447,10 @@ export class KnockGuideClient {
   // Store selector
   //
 
-  selectGuides(state: StoreState, filters: SelectFilterParams = {}) {
+  selectGuides<C = Any>(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+  ): KnockGuide<C>[] {
     if (Object.keys(state.guides).length === 0) {
       return [];
     }
