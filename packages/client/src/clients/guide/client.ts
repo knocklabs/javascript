@@ -16,6 +16,7 @@ import {
 } from "./helpers";
 import {
   ConstructorOpts,
+  DebugState,
   GetGuidesQueryParams,
   GetGuidesResponse,
   GroupStage,
@@ -52,6 +53,9 @@ const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 // Maximum number of retry attempts for channel subscription
 const SUBSCRIBE_RETRY_LIMIT = 3;
 
+// Debug query param keys
+const DEBUG_GUIDE_KEY_PARAM = "knock_guide_key";
+
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
   if (typeof window !== "undefined") {
@@ -62,6 +66,19 @@ const checkForWindow = () => {
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
+// Detect debug params like "knock_guide_key" from URL.
+const detectDebugParams = (): DebugState => {
+  const win = checkForWindow();
+  if (!win) {
+    return { forcedGuideKey: null };
+  }
+
+  const urlParams = new URLSearchParams(win.location.search);
+  const forcedGuideKey = urlParams.get(DEBUG_GUIDE_KEY_PARAM);
+
+  return { forcedGuideKey };
+};
+
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   // A map of selected guides as values, with its order index as keys.
   const result = new SelectionResult();
@@ -69,14 +86,27 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   const defaultGroup = findDefaultGroup(state.guideGroups);
   if (!defaultGroup) return result;
 
-  const displaySequence = defaultGroup.display_sequence;
+  const displaySequence = [...defaultGroup.display_sequence];
   const location = state.location;
+
+  // If in debug mode, put the forced guide at the beginning of the display sequence.
+  if (state.debug.forcedGuideKey) {
+    const forcedKeyIndex = displaySequence.indexOf(state.debug.forcedGuideKey);
+    if (forcedKeyIndex > -1) {
+      displaySequence.splice(forcedKeyIndex, 1);
+    }
+    displaySequence.unshift(state.debug.forcedGuideKey);
+  }
 
   for (const [index, guideKey] of displaySequence.entries()) {
     const guide = state.guides[guideKey];
     if (!guide) continue;
 
-    const affirmed = predicate(guide, { location, filters });
+    const affirmed = predicate(guide, {
+      location,
+      filters,
+      debug: state.debug,
+    });
     if (!affirmed) continue;
 
     result.set(index, guide);
@@ -89,12 +119,18 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
 type PredicateOpts = {
   location?: string | undefined;
   filters?: SelectFilterParams | undefined;
+  debug: DebugState;
 };
 
 const predicate = (
   guide: KnockGuide,
-  { location, filters = {} }: PredicateOpts,
+  { location, filters = {}, debug = {} }: PredicateOpts,
 ) => {
+  // Bypass filtering if debugging the current guide.
+  if (debug.forcedGuideKey === guide.key) {
+    return true;
+  }
+
   if (filters.type && filters.type !== guide.type) {
     return false;
   }
@@ -181,6 +217,8 @@ export class KnockGuideClient {
 
     const location = trackLocationFromWindow ? win?.location.href : undefined;
 
+    const debug = detectDebugParams();
+
     this.store = new Store<StoreState>({
       guideGroups: [],
       guideGroupDisplayLogs: {},
@@ -189,6 +227,7 @@ export class KnockGuideClient {
       location,
       // Increment to update the state store and trigger re-selection.
       counter: 0,
+      debug,
     });
 
     // In server environments we might not have a socket connection.
@@ -386,11 +425,15 @@ export class KnockGuideClient {
     }
   }
 
-  setLocation(href: string) {
+  setLocation(href: string, additionalParams: Partial<StoreState> = {}) {
     // Make sure to clear out the stage.
     this.clearGroupStage();
 
-    this.store.setState((state) => ({ ...state, location: href }));
+    this.store.setState((state) => ({
+      ...state,
+      ...additionalParams,
+      location: href,
+    }));
   }
 
   //
@@ -539,10 +582,22 @@ export class KnockGuideClient {
     // callback to a setTimeout, but just to be safe.
     this.ensureClearTimeout();
 
+    // If in debug mode, try to resolve the forced guide, otherwise return the first non-undefined guide.
+    let resolved = undefined;
+    if (this.store.state.debug.forcedGuideKey) {
+      resolved = this.stage.ordered.find(
+        (x) => x === this.store.state.debug.forcedGuideKey,
+      );
+    }
+
+    if (!resolved) {
+      resolved = this.stage.ordered.find((x) => x !== undefined);
+    }
+
     this.stage = {
       ...this.stage,
       status: "closed",
-      resolved: this.stage.ordered.find((x) => x !== undefined),
+      resolved,
       timeoutId: null,
     };
 
@@ -706,6 +761,11 @@ export class KnockGuideClient {
       ...remoteGuide,
       // Get the next unarchived step.
       getStep() {
+        // If debugging this guide, return the first step regardless of archive status
+        if (self.store.state.debug.forcedGuideKey === this.key) {
+          return this.steps[0];
+        }
+
         return this.steps.find((s) => !s.message.archived_at);
       },
     } as KnockGuide;
@@ -754,7 +814,16 @@ export class KnockGuideClient {
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
     // Combine the target params with the given filter params.
-    const combinedParams = { ...this.targetParams, ...filterParams };
+    const combinedParams: GenericData = {
+      ...this.targetParams,
+      ...filterParams,
+    };
+
+    // Append debug params
+    const debugState = this.store.state.debug;
+    if (debugState.forcedGuideKey) {
+      combinedParams.force_all_guides = true;
+    }
 
     // Prune out any keys that have an undefined or null value.
     let params = Object.fromEntries(
@@ -908,7 +977,18 @@ export class KnockGuideClient {
     if (this.store.state.location === href) return;
 
     this.knock.log(`[Guide] Handle Location change: ${href}`);
-    this.setLocation(href);
+
+    const newDebugParams = detectDebugParams();
+    this.setLocation(href, { debug: newDebugParams });
+
+    // If entering debug mode, fetch all guides.
+    const currentDebugParams = this.store.state.debug;
+    if (!currentDebugParams.forcedGuideKey && !!newDebugParams.forcedGuideKey) {
+      this.knock.log(
+        `[Guide] Entering debug mode for key: ${newDebugParams.forcedGuideKey}`,
+      );
+      this.fetch();
+    }
   };
 
   private listenForLocationChangesFromWindow() {
