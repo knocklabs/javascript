@@ -68,6 +68,14 @@ const checkForWindow = () => {
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
+const newUrl = (location: string) => {
+  try {
+    return new URL(location);
+  } catch {
+    return undefined;
+  }
+};
+
 // Detect debug params like "knock_guide_key" from URL.
 const detectDebugParams = (): DebugState => {
   const win = checkForWindow();
@@ -146,10 +154,9 @@ const predicate = (
   }
 
   const urlRules = guide.activation_url_rules || [];
+  const url = location ? newUrl(location) : undefined;
 
-  if (urlRules.length > 0 && location) {
-    const url = new URL(location);
-
+  if (urlRules.length > 0 && url) {
     const allowed = urlRules.reduce<boolean | undefined>((acc, urlRule) => {
       // Any matched block rule prevails so no need to evaluate further
       // as soon as there is one.
