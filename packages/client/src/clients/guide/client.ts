@@ -144,35 +144,38 @@ const predicate = (
     return false;
   }
 
-  const locationRules = guide.activation_location_rules || [];
+  const urlPatterns = guide.activation_url_patterns || [];
 
-  if (locationRules.length > 0 && location) {
-    const allowed = locationRules.reduce<boolean | undefined>((acc, rule) => {
-      // Any matched block rule prevails so no need to evaluate further
-      // as soon as there is one.
-      if (acc === false) return false;
+  if (urlPatterns.length > 0 && location) {
+    const allowed = urlPatterns.reduce<boolean | undefined>(
+      (acc, urlPattern) => {
+        // Any matched block rule prevails so no need to evaluate further
+        // as soon as there is one.
+        if (acc === false) return false;
 
-      // At this point we either have a matched allow rule (acc is true),
-      // or no matched rule found yet (acc is undefined).
+        // At this point we either have a matched allow rule (acc is true),
+        // or no matched rule found yet (acc is undefined).
 
-      switch (rule.directive) {
-        case "allow": {
-          // No need to evaluate more allow rules once we matched one
-          // since any matched allowed rule means allow.
-          if (acc === true) return true;
+        switch (urlPattern.directive) {
+          case "allow": {
+            // No need to evaluate more allow rules once we matched one
+            // since any matched allowed rule means allow.
+            if (acc === true) return true;
 
-          const matched = rule.pattern.test(location);
-          return matched ? true : undefined;
+            const matched = urlPattern.pattern.test(location);
+            return matched ? true : undefined;
+          }
+
+          case "block": {
+            // Always test block rules (unless already matched to block)
+            // because they'd prevail over matched allow rules.
+            const matched = urlPattern.pattern.test(location);
+            return matched ? false : acc;
+          }
         }
-
-        case "block": {
-          // Always test block rules (unless already matched to block)
-          // because they'd prevail over matched allow rules.
-          const matched = rule.pattern.test(location);
-          return matched ? false : acc;
-        }
-      }
-    }, undefined);
+      },
+      undefined,
+    );
 
     if (!allowed) return false;
   }
@@ -814,8 +817,8 @@ export class KnockGuideClient {
       return localStep;
     });
 
-    localGuide.activation_location_rules =
-      remoteGuide.activation_location_rules.map((rule) => {
+    localGuide.activation_url_patterns =
+      remoteGuide.activation_url_patterns.map((rule) => {
         return {
           ...rule,
           pattern: new URLPattern({ pathname: rule.pathname }),
