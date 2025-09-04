@@ -9,7 +9,7 @@ import {
   KnockGuideClient,
   type KnockGuideStep,
 } from "../../../src/clients/guide";
-import { GuideGroupData, StoreState } from "../../../src/clients/guide/types";
+import { GuideGroupData, StoreState, GuideActivationUrlRuleData } from "../../../src/clients/guide/types";
 import Knock from "../../../src/knock";
 
 // Mock @tanstack/store
@@ -215,7 +215,8 @@ describe("KnockGuideClient", () => {
             type: "test",
             semver: "1.0.0",
             steps: [],
-            activation_location_rules: [],
+            activation_url_rules: [],
+            activation_url_patterns: [],
             bypass_global_group_limit: false,
             inserted_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -526,7 +527,8 @@ describe("KnockGuideClient", () => {
       type: "test",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_rules: [],
+      activation_url_patterns: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -872,7 +874,8 @@ describe("KnockGuideClient", () => {
       type: "card",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [
+      activation_url_rules: [],
+      activation_url_patterns: [
         {
           directive: "allow",
           pathname: "/dashboard",
@@ -893,7 +896,8 @@ describe("KnockGuideClient", () => {
       type: "tooltip",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [
+      activation_url_rules: [],
+      activation_url_patterns: [
         {
           directive: "block",
           pathname: "/settings",
@@ -914,7 +918,8 @@ describe("KnockGuideClient", () => {
       type: "banner",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_rules: [],
+      activation_url_patterns: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -994,7 +999,7 @@ describe("KnockGuideClient", () => {
       expect(result!.key).toBe("system_status");
     });
 
-    test("filters guides by location rules - allow directive", () => {
+    test("filters guides by url patterns - allow directive", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
@@ -1012,7 +1017,7 @@ describe("KnockGuideClient", () => {
       expect(result!.key).toBe("onboarding");
     });
 
-    test("filters guides by location rules - block directive", () => {
+    test("filters guides by url patterns - block directive", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
@@ -1030,11 +1035,313 @@ describe("KnockGuideClient", () => {
       expect(result!.key).toBe("system_status");
     });
 
+    test("filters guides by activation_url_rules - allow directive with equal_to", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/dashboard",
+          },
+        ] as GuideActivationUrlRuleData[],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should include the guide with allow rule for /dashboard
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("filters guides by activation_url_rules - allow directive with contains", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "contains",
+            argument: "dash",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should include the guide with contains rule matching "dash"
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("filters guides by activation_url_rules - block directive with equal_to", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideTwo,
+        activation_url_rules: [
+          {
+            directive: "block",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/settings",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/settings",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should exclude the guide with block rule for /settings
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by activation_url_rules - block directive with contains", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideTwo,
+        activation_url_rules: [
+          {
+            directive: "block",
+            variable: "pathname",
+            operator: "contains",
+            argument: "setting",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/user/settings",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should exclude the guide with block rule containing "setting"
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by activation_url_rules - mixed allow and block rules (block prevails)", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "contains",
+            argument: "admin",
+          },
+          {
+            directive: "block",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/admin/settings",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/admin/settings",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Block rule should prevail even if allow rule also matches
+      // feature_tour is excluded because it has url_patterns that don't match this location
+      // onboarding is excluded because block rule prevails
+      // system_status has no rules and is included
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by activation_url_rules - multiple allow rules (any match allows)", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/home",
+          },
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/dashboard",
+          },
+        ] as GuideActivationUrlRuleData[],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should allow the guide when any allow rule matches
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("filters guides by activation_url_rules - handles leading slash in arguments", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "dashboard", // No leading slash
+          }
+        ] as GuideActivationUrlRuleData[],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should handle argument without leading slash correctly
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("filters guides by activation_url_rules - no match when url rules don't match", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/admin",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        debug: { forcedGuideKey: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should not match the guide when url rules don't match
+      // feature_tour is excluded because it has url_patterns that don't match this location
+      // onboarding is excluded because its url_rules don't match
+      // system_status has no rules and is included
+      expect(result!.key).toBe("system_status");
+    });
+
     test("handles guides without location when location is undefined", () => {
       // Create guides without location rules
-      const g1 = { ...mockGuideOne, activation_location_rules: [] };
-      const g2 = { ...mockGuideTwo, activation_location_rules: [] };
-      const g3 = { ...mockGuideThree, activation_location_rules: [] };
+      const g1 = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [],
+      };
+      const g2 = {
+        ...mockGuideTwo,
+        activation_url_patterns: [],
+        activation_url_rules: [],
+      };
+      const g3 = {
+        ...mockGuideThree,
+        activation_url_patterns: [],
+        activation_url_rules: [],
+      };
 
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
@@ -1141,7 +1448,8 @@ describe("KnockGuideClient", () => {
         type: "modal",
         semver: "1.0.0",
         steps: [mockStep],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
         bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -1387,7 +1695,8 @@ describe("KnockGuideClient", () => {
       type: "card",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_patterns: [],
+      activation_url_rules: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -1402,7 +1711,8 @@ describe("KnockGuideClient", () => {
       type: "card",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_patterns: [],
+      activation_url_rules: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -1417,7 +1727,8 @@ describe("KnockGuideClient", () => {
       type: "banner",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_patterns: [],
+      activation_url_rules: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -1539,7 +1850,8 @@ describe("KnockGuideClient", () => {
         type: "test",
         semver: "1.0.0",
         steps: [],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
         bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -1570,10 +1882,14 @@ describe("KnockGuideClient", () => {
         type: "test",
         semver: "1.0.0",
         steps: [],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
         bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        getStep() {
+          return this.steps.find((s) => !s.message.archived_at);
+        }
       };
 
       // Set up initial state with existing guide
@@ -1618,10 +1934,14 @@ describe("KnockGuideClient", () => {
         type: "test",
         semver: "1.0.0",
         steps: [],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
         bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        getStep() {
+          return this.steps.find((s) => !s.message.archived_at);
+        }
       };
 
       // Set up initial state with existing guide
@@ -1658,10 +1978,14 @@ describe("KnockGuideClient", () => {
         type: "test",
         semver: "1.0.0",
         steps: [],
-        activation_location_rules: [],
+        activation_url_rules: [],
+        activation_url_patterns: [],
         bypass_global_group_limit: false,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        getStep() {
+          return this.steps.find((s) => !s.message.archived_at);
+        }
       };
 
       // Set up initial state with existing guide
@@ -1716,7 +2040,8 @@ describe("KnockGuideClient", () => {
       type: "banner",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_patterns: [],
+      activation_url_rules: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -1731,7 +2056,8 @@ describe("KnockGuideClient", () => {
       type: "banner",
       semver: "1.0.0",
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_patterns: [],
+      activation_url_rules: [],
       bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
