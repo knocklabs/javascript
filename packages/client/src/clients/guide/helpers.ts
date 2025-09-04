@@ -1,4 +1,5 @@
 import {
+  GuideActivationUrlRuleData,
   GuideData,
   GuideGroupData,
   KnockGuide,
@@ -95,4 +96,28 @@ export const checkIfThrottled = (
   // Both are in milliseconds since epoch (UTC), so direct comparison is
   // accurate regardless of local timezones.
   return currentTimeInMilliseconds <= throttleWindowEndInMilliseconds;
+};
+
+// Evaluates whether the given location url satisfies the url rule.
+export const evaluateUrlRule = (
+  urlRule: GuideActivationUrlRuleData,
+  url: URL,
+) => {
+  if (urlRule.variable === "pathname") {
+    if (urlRule.operator === "equal_to") {
+      const argument = urlRule.argument.startsWith("/")
+        ? urlRule.argument
+        : `/${urlRule.argument}`;
+
+      return argument === url.pathname;
+    }
+
+    if (urlRule.operator === "contains") {
+      return url.pathname.includes(urlRule.argument);
+    }
+
+    return false;
+  }
+
+  return false;
 };

@@ -25,6 +25,13 @@ export interface GuideStepData<TContent = Any> {
   content: TContent;
 }
 
+export interface GuideActivationUrlRuleData {
+  directive: "allow" | "block";
+  variable: "pathname";
+  operator: "equal_to" | "contains";
+  argument: string;
+}
+
 interface GuideActivationUrlPatternData {
   directive: "allow" | "block";
   pathname: string;
@@ -38,6 +45,7 @@ export interface GuideData<TContent = Any> {
   type: string;
   semver: string;
   steps: GuideStepData<TContent>[];
+  activation_url_rules: GuideActivationUrlRuleData[];
   activation_url_patterns: GuideActivationUrlPatternData[];
   bypass_global_group_limit: boolean;
   inserted_at: string;

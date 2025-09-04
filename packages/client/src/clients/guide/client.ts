@@ -10,6 +10,7 @@ import {
   SelectionResult,
   byKey,
   checkIfThrottled,
+  evaluateUrlRule,
   findDefaultGroup,
   formatFilters,
   mockDefaultGroup,
@@ -142,6 +143,41 @@ const predicate = (
 
   if (guide.steps.every((s) => !!s.message.archived_at)) {
     return false;
+  }
+
+  const urlRules = guide.activation_url_rules || [];
+
+  if (urlRules.length > 0 && location) {
+    const url = new URL(location);
+
+    const allowed = urlRules.reduce<boolean | undefined>((acc, urlRule) => {
+      // Any matched block rule prevails so no need to evaluate further
+      // as soon as there is one.
+      if (acc === false) return false;
+
+      // At this point we either have a matched allow rule (acc is true),
+      // or no matched rule found yet (acc is undefined).
+
+      switch (urlRule.directive) {
+        case "allow": {
+          // No need to evaluate more allow rules once we matched one
+          // since any matched allowed rule means allow.
+          if (acc === true) return true;
+
+          const matched = evaluateUrlRule(urlRule, url);
+          return matched ? true : undefined;
+        }
+
+        case "block": {
+          // Always test block rules (unless already matched to block)
+          // because they'd prevail over matched allow rules.
+          const matched = evaluateUrlRule(urlRule, url);
+          return matched ? false : acc;
+        }
+      }
+    }, undefined);
+
+    if (!allowed) return false;
   }
 
   const urlPatterns = guide.activation_url_patterns || [];
