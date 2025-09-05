@@ -165,7 +165,8 @@ export interface KnockGuideStep<TContent = Any>
   markAsArchived: () => void;
 }
 
-interface KnockGuideActivationUrlPattern extends GuideActivationUrlPatternData {
+export interface KnockGuideActivationUrlPattern
+  extends GuideActivationUrlPatternData {
   pattern: URLPattern;
 }
 

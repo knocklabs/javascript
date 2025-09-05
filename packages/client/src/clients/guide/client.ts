@@ -10,10 +10,11 @@ import {
   SelectionResult,
   byKey,
   checkIfThrottled,
-  evaluateUrlRule,
   findDefaultGroup,
   formatFilters,
   mockDefaultGroup,
+  predicateUrlPatterns,
+  predicateUrlRules,
 } from "./helpers";
 import {
   Any,
@@ -153,73 +154,17 @@ const predicate = (
     return false;
   }
 
-  const urlRules = guide.activation_url_rules || [];
   const url = location ? newUrl(location) : undefined;
 
-  if (urlRules.length > 0 && url) {
-    const allowed = urlRules.reduce<boolean | undefined>((acc, urlRule) => {
-      // Any matched block rule prevails so no need to evaluate further
-      // as soon as there is one.
-      if (acc === false) return false;
-
-      // At this point we either have a matched allow rule (acc is true),
-      // or no matched rule found yet (acc is undefined).
-
-      switch (urlRule.directive) {
-        case "allow": {
-          // No need to evaluate more allow rules once we matched one
-          // since any matched allowed rule means allow.
-          if (acc === true) return true;
-
-          const matched = evaluateUrlRule(urlRule, url);
-          return matched ? true : undefined;
-        }
-
-        case "block": {
-          // Always test block rules (unless already matched to block)
-          // because they'd prevail over matched allow rules.
-          const matched = evaluateUrlRule(urlRule, url);
-          return matched ? false : acc;
-        }
-      }
-    }, undefined);
-
-    if (!allowed) return false;
-  }
-
+  const urlRules = guide.activation_url_rules || [];
   const urlPatterns = guide.activation_url_patterns || [];
 
-  if (urlPatterns.length > 0 && location) {
-    const allowed = urlPatterns.reduce<boolean | undefined>(
-      (acc, urlPattern) => {
-        // Any matched block rule prevails so no need to evaluate further
-        // as soon as there is one.
-        if (acc === false) return false;
-
-        // At this point we either have a matched allow rule (acc is true),
-        // or no matched rule found yet (acc is undefined).
-
-        switch (urlPattern.directive) {
-          case "allow": {
-            // No need to evaluate more allow rules once we matched one
-            // since any matched allowed rule means allow.
-            if (acc === true) return true;
-
-            const matched = urlPattern.pattern.test(location);
-            return matched ? true : undefined;
-          }
-
-          case "block": {
-            // Always test block rules (unless already matched to block)
-            // because they'd prevail over matched allow rules.
-            const matched = urlPattern.pattern.test(location);
-            return matched ? false : acc;
-          }
-        }
-      },
-      undefined,
-    );
-
+  // A guide can have either activation url rules XOR url patterns, but not both.
+  if (url && urlRules.length > 0) {
+    const allowed = predicateUrlRules(url, urlRules);
+    if (!allowed) return false;
+  } else if (url && urlPatterns.length > 0) {
+    const allowed = predicateUrlPatterns(url, urlPatterns);
     if (!allowed) return false;
   }
 
