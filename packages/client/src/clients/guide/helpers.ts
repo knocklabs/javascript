@@ -1,7 +1,9 @@
 import {
+  GuideActivationUrlRuleData,
   GuideData,
   GuideGroupData,
   KnockGuide,
+  KnockGuideActivationUrlPattern,
   SelectFilterParams,
 } from "./types";
 
@@ -95,4 +97,101 @@ export const checkIfThrottled = (
   // Both are in milliseconds since epoch (UTC), so direct comparison is
   // accurate regardless of local timezones.
   return currentTimeInMilliseconds <= throttleWindowEndInMilliseconds;
+};
+
+// Safely parse and build a new URL object.
+export const newUrl = (location: string) => {
+  try {
+    return new URL(location);
+  } catch {
+    return undefined;
+  }
+};
+
+// Evaluates whether the given location url satisfies the url rule.
+export const evaluateUrlRule = (
+  url: URL,
+  urlRule: GuideActivationUrlRuleData,
+) => {
+  if (urlRule.variable === "pathname") {
+    if (urlRule.operator === "equal_to") {
+      const argument = urlRule.argument.startsWith("/")
+        ? urlRule.argument
+        : `/${urlRule.argument}`;
+
+      return argument === url.pathname;
+    }
+
+    if (urlRule.operator === "contains") {
+      return url.pathname.includes(urlRule.argument);
+    }
+
+    return false;
+  }
+
+  return false;
+};
+
+export const predicateUrlRules = (
+  url: URL,
+  urlRules: GuideActivationUrlRuleData[],
+) => {
+  return urlRules.reduce<boolean | undefined>((acc, urlRule) => {
+    // Any matched block rule prevails so no need to evaluate further
+    // as soon as there is one.
+    if (acc === false) return false;
+
+    // At this point we either have a matched allow rule (acc is true),
+    // or no matched rule found yet (acc is undefined).
+
+    switch (urlRule.directive) {
+      case "allow": {
+        // No need to evaluate more allow rules once we matched one
+        // since any matched allowed rule means allow.
+        if (acc === true) return true;
+
+        const matched = evaluateUrlRule(url, urlRule);
+        return matched ? true : undefined;
+      }
+
+      case "block": {
+        // Always test block rules (unless already matched to block)
+        // because they'd prevail over matched allow rules.
+        const matched = evaluateUrlRule(url, urlRule);
+        return matched ? false : acc;
+      }
+    }
+  }, undefined);
+};
+
+export const predicateUrlPatterns = (
+  url: URL,
+  urlPatterns: KnockGuideActivationUrlPattern[],
+) => {
+  return urlPatterns.reduce<boolean | undefined>((acc, urlPattern) => {
+    // Any matched block rule prevails so no need to evaluate further
+    // as soon as there is one.
+    if (acc === false) return false;
+
+    // At this point we either have a matched allow rule (acc is true),
+    // or no matched rule found yet (acc is undefined).
+
+    switch (urlPattern.directive) {
+      case "allow": {
+        // No need to evaluate more allow rules once we matched one
+        // since any matched allowed rule means allow.
+        if (acc === true) return true;
+
+        const matched = urlPattern.pattern.test(url);
+        return matched ? true : undefined;
+      }
+
+      case "block": {
+        // Always test block rules (unless already matched to block)
+        // because they'd prevail over matched allow rules.
+        const matched = urlPattern.pattern.test(url);
+        return matched ? false : acc;
+      }
+    }
+  }, undefined);
 };
