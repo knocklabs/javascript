@@ -109,7 +109,10 @@ export const newUrl = (location: string) => {
 };
 
 // Evaluates whether the given location url satisfies the url rule.
-const evaluateUrlRule = (url: URL, urlRule: GuideActivationUrlRuleData) => {
+export const evaluateUrlRule = (
+  url: URL,
+  urlRule: GuideActivationUrlRuleData,
+) => {
   if (urlRule.variable === "pathname") {
     if (urlRule.operator === "equal_to") {
       const argument = urlRule.argument.startsWith("/")

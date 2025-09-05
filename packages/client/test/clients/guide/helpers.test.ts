@@ -14,7 +14,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("matches exact pathname without leading slash", () => {
@@ -26,7 +26,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("does not match different pathname", () => {
@@ -38,7 +38,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/settings");
 
-      expect(evaluateUrlRule(rule, url)).toBe(false);
+      expect(evaluateUrlRule(url, rule)).toBe(false);
     });
 
     test("does not match partial pathname", () => {
@@ -50,7 +50,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard");
 
-      expect(evaluateUrlRule(rule, url)).toBe(false);
+      expect(evaluateUrlRule(url, rule)).toBe(false);
     });
 
     test("matches nested pathnames exactly", () => {
@@ -62,7 +62,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/admin/settings");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
   });
 
@@ -76,7 +76,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("matches when pathname contains the argument in the middle", () => {
@@ -88,7 +88,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/super/admin/settings");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("does not match when pathname doesn't contain the argument", () => {
@@ -100,7 +100,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard");
 
-      expect(evaluateUrlRule(rule, url)).toBe(false);
+      expect(evaluateUrlRule(url, rule)).toBe(false);
     });
 
     test("is case sensitive", () => {
@@ -112,7 +112,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/admin");
 
-      expect(evaluateUrlRule(rule, url)).toBe(false);
+      expect(evaluateUrlRule(url, rule)).toBe(false);
     });
 
     test("matches with special characters", () => {
@@ -124,7 +124,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/settings/user-profile/edit");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
   });
 
@@ -138,7 +138,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/settings");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("works with block directive and contains", () => {
@@ -150,7 +150,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/user/private/data");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
   });
 
@@ -164,7 +164,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("handles empty argument with contains", () => {
@@ -177,7 +177,7 @@ describe("evaluateUrlRule", () => {
       const url = new URL("https://example.com/dashboard");
 
       // Empty string is contained in any string
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("handles URLs with query parameters", () => {
@@ -191,7 +191,7 @@ describe("evaluateUrlRule", () => {
         "https://example.com/dashboard?tab=overview&user=123",
       );
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("handles URLs with hash fragments", () => {
@@ -203,7 +203,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard#section-1");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("handles pathnames with trailing slashes", () => {
@@ -215,7 +215,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard/");
 
-      expect(evaluateUrlRule(rule, url)).toBe(true);
+      expect(evaluateUrlRule(url, rule)).toBe(true);
     });
 
     test("distinguishes between paths with and without trailing slashes", () => {
@@ -227,7 +227,7 @@ describe("evaluateUrlRule", () => {
       };
       const url = new URL("https://example.com/dashboard/");
 
-      expect(evaluateUrlRule(rule, url)).toBe(false);
+      expect(evaluateUrlRule(url, rule)).toBe(false);
     });
   });
 });
