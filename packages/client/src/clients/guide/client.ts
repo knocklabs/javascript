@@ -13,6 +13,7 @@ import {
   findDefaultGroup,
   formatFilters,
   mockDefaultGroup,
+  newUrl,
   predicateUrlPatterns,
   predicateUrlRules,
 } from "./helpers";
@@ -68,14 +69,6 @@ const checkForWindow = () => {
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
-
-const newUrl = (location: string) => {
-  try {
-    return new URL(location);
-  } catch {
-    return undefined;
-  }
-};
 
 // Detect debug params like "knock_guide_key" from URL.
 const detectDebugParams = (): DebugState => {
