@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.8.0
+
+### Minor Changes
+
+- c761e7c: feat: support live previewing guides content
+- b8b64e4: feat(beta): add support for basic guide debugging
+
+### Patch Changes
+
+- 3558784: add support for activation url rules in guide client
+- 7fb9334: chore(deps): bump lucide-react from 0.539.0 to 0.541.0
+- Updated dependencies [c761e7c]
+- Updated dependencies [3558784]
+- Updated dependencies [b8b64e4]
+  - @knocklabs/client@0.17.0
+  - @knocklabs/react-core@0.9.0
+
 ## 0.7.34
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.17.0
+
+### Minor Changes
+
+- c761e7c: feat: support live previewing guides content
+- b8b64e4: feat(beta): add support for basic guide debugging
+
+### Patch Changes
+
+- 3558784: add support for activation url rules in guide client
+
 ## 0.16.5
 
 ### Patch Changes

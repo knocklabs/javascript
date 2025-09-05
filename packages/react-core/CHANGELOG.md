@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0
+
+### Minor Changes
+
+- b8b64e4: feat(beta): add support for basic guide debugging
+
+### Patch Changes
+
+- Updated dependencies [c761e7c]
+- Updated dependencies [3558784]
+- Updated dependencies [b8b64e4]
+  - @knocklabs/client@0.17.0
+
 ## 0.8.5
 
 ### Patch Changes
