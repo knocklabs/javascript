@@ -5,6 +5,8 @@ import Knock from "../src/knock";
 
 import { authenticateKnock, createMockKnock } from "./test-utils/mocks";
 
+const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
+
 // ✅ Mock the named export `jwtDecode` from the "jwt-decode" module.
 // It will always return a decoded token with an `exp` 61 seconds in the future.
 vi.mock("jwt-decode", () => ({
@@ -46,10 +48,12 @@ describe("Knock Client", () => {
         const knock = new Knock("pk_test_12345", {
           logLevel: "debug",
           host: "https://custom.knock.app",
+          branch: TEST_BRANCH_SLUG,
         });
 
         expect(knock).toBeInstanceOf(Knock);
         expect(knock.apiKey).toBe("pk_test_12345");
+        expect(knock.branch).toBe(TEST_BRANCH_SLUG);
       } finally {
         consoleSpy.mockRestore();
       }
