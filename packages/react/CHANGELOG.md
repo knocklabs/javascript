@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.1
+
+### Patch Changes
+
+- 5b77f18: fix: increase z-index of guide toolbar
+- Updated dependencies [5b77f18]
+  - @knocklabs/client@0.17.1
+  - @knocklabs/react-core@0.9.1
+
 ## 0.8.0
 
 ### Minor Changes
