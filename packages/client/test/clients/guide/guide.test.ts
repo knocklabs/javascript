@@ -1630,7 +1630,9 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client["_selectGuide"](stateWithArchivedGuide);
+      const result = client["_selectGuide"](stateWithArchivedGuide, {
+        key: mockGuideThree.key,
+      });
 
       // Should return the forced guide even though it's archived
       expect(result!.key).toBe("system_status");
@@ -1678,6 +1680,78 @@ describe("KnockGuideClient", () => {
 
       // Verify it's the preview guide, not the regular guide
       expect(result!.type).not.toBe("regular-type");
+    });
+
+    test("doesn't return the preview guide when filtered by a different key", () => {
+      const previewGuide = {
+        ...mockGuideTwo,
+        type: "preview-type",
+        steps: [
+          {
+            ...mockStep,
+            content: { title: "Preview Content" },
+          },
+        ],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        previewGuides: {
+          [mockGuideTwo.key]: previewGuide,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          preview_session_id: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides, {
+        key: "onboarding",
+      });
+
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("doesn't return the preview guide when filtered by a different type", () => {
+      const previewGuide = {
+        ...mockGuideTwo,
+        type: "preview-type",
+        steps: [
+          {
+            ...mockStep,
+            content: { title: "Preview Content" },
+          },
+        ],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        previewGuides: {
+          [mockGuideTwo.key]: previewGuide,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          preview_session_id: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides, {
+        type: "banner",
+      });
+
+      expect(result!.key).toBe("system_status");
     });
 
     test("does not return a guide inside a throttle window ", () => {

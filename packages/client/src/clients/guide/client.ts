@@ -98,12 +98,23 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   const displaySequence = [...defaultGroup.display_sequence];
   const location = state.location;
 
+  // If in debug mode, put the forced guide at the beginning of the display sequence.
+  if (state.debug.forcedGuideKey) {
+    const forcedKeyIndex = displaySequence.indexOf(state.debug.forcedGuideKey);
+    if (forcedKeyIndex > -1) {
+      displaySequence.splice(forcedKeyIndex, 1);
+    }
+    displaySequence.unshift(state.debug.forcedGuideKey);
+  }
+
   for (const [index, guideKey] of displaySequence.entries()) {
     let guide = state.guides[guideKey];
-    const isPreviewGuide = state.debug.forcedGuideKey === guideKey;
 
     // Use preview guide if it exists and matches the forced guide key
-    if (isPreviewGuide && state.previewGuides[guideKey]) {
+    if (
+      state.debug.forcedGuideKey === guideKey &&
+      state.previewGuides[guideKey]
+    ) {
       guide = state.previewGuides[guideKey];
     }
 
@@ -114,18 +125,6 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
       filters,
       debug: state.debug,
     });
-
-    // If in debug mode and the forced guide matches the given filters,
-    // put the forced guide at the beginning of the display sequence.
-    if (isPreviewGuide && affirmed) {
-      const forcedKeyIndex = displaySequence.indexOf(
-        state.debug.forcedGuideKey!,
-      );
-      if (forcedKeyIndex > -1) {
-        displaySequence.splice(forcedKeyIndex, 1);
-      }
-      displaySequence.unshift(state.debug.forcedGuideKey!);
-    }
 
     if (!affirmed) continue;
 
@@ -146,23 +145,19 @@ const predicate = (
   guide: KnockGuide,
   { location, filters = {}, debug = {} }: PredicateOpts,
 ) => {
-  // Bypass filtering if the debugged guide matches the given filters.
-  if (debug.forcedGuideKey === guide.key) {
-    if (filters.key === guide.key) {
-      return true;
-    }
-
-    if (filters.type === guide.type) {
-      return true;
-    }
-  }
-
   if (filters.type && filters.type !== guide.type) {
     return false;
   }
 
   if (filters.key && filters.key !== guide.key) {
     return false;
+  }
+
+  // Bypass filtering if the debugged guide matches the given filters.
+  // This should always run AFTER checking the filters but BEFORE
+  // checking archived status and location rules.
+  if (debug.forcedGuideKey === guide.key) {
+    return true;
   }
 
   if (guide.steps.every((s) => !!s.message.archived_at)) {
@@ -478,8 +473,6 @@ export class KnockGuideClient {
 
     const result = select(state, filters);
 
-    console.log({ result });
-
     if (result.size === 0) {
       this.knock.log("[Guide] Selection returned zero result");
       return [];
@@ -501,8 +494,6 @@ export class KnockGuideClient {
     this.knock.log(`[Guide] Selecting a guide for: ${formatFilters(filters)}`);
 
     const result = select(state, filters);
-
-    console.log({ result });
 
     if (result.size === 0) {
       this.knock.log("[Guide] Selection returned zero result");
