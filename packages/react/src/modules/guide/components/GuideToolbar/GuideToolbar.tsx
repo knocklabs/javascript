@@ -12,6 +12,8 @@ import { checkForWindow } from "../../../core";
 
 import "./styles.css";
 
+const MAX_Z_INDEX = 2147483647;
+
 export const GuideToolbar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -45,7 +47,6 @@ export const GuideToolbar = () => {
         position="fixed"
         top="4"
         right="4"
-        zIndex="sticky"
         bg="surface-2"
         shadow="3"
         rounded="3"
@@ -54,6 +55,7 @@ export const GuideToolbar = () => {
         variant="soft"
         data-tgph-appearance="dark"
         aria-label="Expand guide toolbar"
+        style={{ zIndex: MAX_Z_INDEX }}
       >
         <svg
           width="40"
@@ -88,7 +90,6 @@ export const GuideToolbar = () => {
       position="fixed"
       top="4"
       right="4"
-      zIndex="sticky"
       backgroundColor="surface-2"
       bg="surface-2"
       shadow="3"
@@ -96,6 +97,7 @@ export const GuideToolbar = () => {
       py="2"
       px="3"
       data-tgph-appearance="dark"
+      style={{ zIndex: MAX_Z_INDEX }}
     >
       <Stack gap="2" align="center" direction="row">
         <Tag

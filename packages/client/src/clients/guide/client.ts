@@ -109,14 +109,6 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
 
   for (const [index, guideKey] of displaySequence.entries()) {
     let guide = state.guides[guideKey];
-    if (!guide) continue;
-
-    const affirmed = predicate(guide, {
-      location,
-      filters,
-      debug: state.debug,
-    });
-    if (!affirmed) continue;
 
     // Use preview guide if it exists and matches the forced guide key
     if (
@@ -125,6 +117,15 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
     ) {
       guide = state.previewGuides[guideKey];
     }
+
+    if (!guide) continue;
+
+    const affirmed = predicate(guide, {
+      location,
+      filters,
+      debug: state.debug,
+    });
+    if (!affirmed) continue;
 
     result.set(index, guide);
   }
@@ -211,6 +212,7 @@ export class KnockGuideClient {
     readonly targetParams: TargetParams = {},
     readonly options: ConstructorOpts = {},
   ) {
+    this.knock.log("[Guide] My debug statement");
     const { trackLocationFromWindow = true } = options;
     const win = checkForWindow();
 
