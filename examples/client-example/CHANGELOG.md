@@ -1,5 +1,12 @@
 # client-example
 
+## 0.3.24
+
+### Patch Changes
+
+- Updated dependencies [5b77f18]
+  - @knocklabs/client@0.17.1
+
 ## 0.3.23
 
 ### Patch Changes
