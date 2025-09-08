@@ -109,14 +109,6 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
 
   for (const [index, guideKey] of displaySequence.entries()) {
     let guide = state.guides[guideKey];
-    if (!guide) continue;
-
-    const affirmed = predicate(guide, {
-      location,
-      filters,
-      debug: state.debug,
-    });
-    if (!affirmed) continue;
 
     // Use preview guide if it exists and matches the forced guide key
     if (
@@ -125,6 +117,16 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
     ) {
       guide = state.previewGuides[guideKey];
     }
+
+    if (!guide) continue;
+
+    const affirmed = predicate(guide, {
+      location,
+      filters,
+      debug: state.debug,
+    });
+
+    if (!affirmed) continue;
 
     result.set(index, guide);
   }
@@ -143,17 +145,19 @@ const predicate = (
   guide: KnockGuide,
   { location, filters = {}, debug = {} }: PredicateOpts,
 ) => {
-  // Bypass filtering if debugging the current guide.
-  if (debug.forcedGuideKey === guide.key) {
-    return true;
-  }
-
   if (filters.type && filters.type !== guide.type) {
     return false;
   }
 
   if (filters.key && filters.key !== guide.key) {
     return false;
+  }
+
+  // Bypass filtering if the debugged guide matches the given filters.
+  // This should always run AFTER checking the filters but BEFORE
+  // checking archived status and location rules.
+  if (debug.forcedGuideKey === guide.key) {
+    return true;
   }
 
   if (guide.steps.every((s) => !!s.message.archived_at)) {
