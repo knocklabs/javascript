@@ -1638,11 +1638,6 @@ describe("KnockGuideClient", () => {
     });
 
     test("returns preview guide when forced guide key matches and preview guide exists", () => {
-      const regularGuide = {
-        ...mockGuideTwo,
-        type: "regular-type",
-      };
-
       const previewGuide = {
         ...mockGuideTwo,
         type: "preview-type",
@@ -1659,7 +1654,7 @@ describe("KnockGuideClient", () => {
         guideGroupDisplayLogs: {},
         guides: {
           ...mockGuides,
-          [mockGuideTwo.key]: regularGuide,
+          [mockGuideTwo.key]: undefined as unknown as KnockGuide,
         },
         previewGuides: {
           [mockGuideTwo.key]: previewGuide,
