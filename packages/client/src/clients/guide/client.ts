@@ -160,11 +160,8 @@ const predicate = (
     return true;
   }
 
-  // If we're in debug mode, replicate some server side filtering
-  if (debug.forcedGuideKey) {
-    if (!guide.active) {
-      return false;
-    }
+  if (!guide.active) {
+    return false;
   }
 
   if (guide.steps.every((s) => !!s.message.archived_at)) {
