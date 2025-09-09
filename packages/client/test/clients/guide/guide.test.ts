@@ -1084,6 +1084,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1118,6 +1119,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1152,6 +1154,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/settings",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1186,6 +1189,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/user/settings",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1226,6 +1230,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/admin/settings",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1269,6 +1274,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1303,6 +1309,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1337,6 +1344,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        previewGuides: {},
         debug: { forcedGuideKey: null },
       };
 
@@ -1991,6 +1999,31 @@ describe("KnockGuideClient", () => {
       // Should exclude guides where all steps are archived
       expect(result).toHaveLength(2);
       expect(result.map((g) => g.key)).toEqual(["system_status", "onboarding"]);
+    });
+
+    test("can return a preview guide when no other guides are available", () => {
+      const stateWithOnlyPreviewGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        previewGuides: {
+          [mockGuideTwo.key]: mockGuideTwo,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          previewSessionId: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithOnlyPreviewGuide, {
+        key: mockGuideTwo.key,
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0]!.key).toBe(mockGuideTwo.key);
     });
   });
 

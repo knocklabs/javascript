@@ -466,7 +466,10 @@ export class KnockGuideClient {
     state: StoreState,
     filters: SelectFilterParams = {},
   ): KnockGuide<C>[] {
-    if (Object.keys(state.guides).length === 0) {
+    if (
+      Object.keys(state.guides).length === 0 &&
+      Object.keys(state.previewGuides).length === 0
+    ) {
       return [];
     }
     this.knock.log(`[Guide] Selecting guides for: ${formatFilters(filters)}`);
@@ -488,7 +491,10 @@ export class KnockGuideClient {
     state: StoreState,
     filters: SelectFilterParams = {},
   ): KnockGuide<C> | undefined {
-    if (Object.keys(state.guides).length === 0) {
+    if (
+      Object.keys(state.guides).length === 0 &&
+      Object.keys(state.previewGuides).length === 0
+    ) {
       return undefined;
     }
     this.knock.log(`[Guide] Selecting a guide for: ${formatFilters(filters)}`);
