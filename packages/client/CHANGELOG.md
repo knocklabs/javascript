@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.2
+
+### Patch Changes
+
+- 23b7057: fix: return preview guides even if no other guides are present
+- 1c24f68: fix: filter out inactive guides in preview mode
+
 ## 0.17.1
 
 ### Patch Changes

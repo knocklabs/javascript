@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.2
+
+### Patch Changes
+
+- 00d3f8c: chore(deps): bump the telegraph-packages group with 2 updates
+- Updated dependencies [23b7057]
+- Updated dependencies [1c24f68]
+  - @knocklabs/client@0.17.2
+  - @knocklabs/react-core@0.9.2
+
 ## 0.8.1
 
 ### Patch Changes
