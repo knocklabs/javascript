@@ -7,6 +7,14 @@ const mockDebugState: { forcedGuideKey: string | null } = {
   forcedGuideKey: "test-guide-key",
 };
 
+const mockGuideContext = {
+  client: {
+    stage: {},
+    store: {},
+  },
+  colorMode: "light",
+};
+
 vi.mock("@tanstack/react-store", () => ({
   useStore: vi.fn((_store, selector) => {
     return selector({ debug: mockDebugState });
@@ -17,12 +25,7 @@ vi.mock("@knocklabs/react-core", async () => {
   const actual = await vi.importActual("@knocklabs/react-core");
   return {
     ...actual,
-    useGuideContext: () => ({
-      client: {
-        store: {},
-      },
-      colorMode: "light",
-    }),
+    useGuideContext: () => mockGuideContext,
   };
 });
 
@@ -71,5 +74,21 @@ describe("GuideToolbar", () => {
       value: originalLocation,
       writable: true,
     });
+  });
+
+  test("renders guide missing when the forced guide key is not in the stage", () => {
+    mockDebugState.forcedGuideKey = "test-guide-key";
+
+    mockGuideContext.client.stage = {
+      status: "closed",
+      ordered: ["site-banner"],
+      timeoutId: null,
+      resolved: "site-banner",
+    };
+
+    const { getByText } = render(<GuideToolbar />);
+    expect(
+      getByText("Selected guide is not rendered on this page"),
+    ).toBeInTheDocument();
   });
 });

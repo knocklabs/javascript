@@ -205,7 +205,7 @@ export class KnockGuideClient {
   // Guides that are competing to render are "staged" first without rendering
   // and ranked based on its relative order in the group over a duration of time
   // to resolve and render the prevailing one.
-  private stage: GroupStage | undefined;
+  public stage: GroupStage | undefined;
 
   private counterIntervalId: ReturnType<typeof setInterval> | undefined;
 

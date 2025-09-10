@@ -5,7 +5,7 @@ import { Button } from "@telegraph/button";
 import { Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
 import { Text } from "@telegraph/typography";
-import { AlertOctagon, Minimize2, Undo2, Wrench } from "lucide-react";
+import { AlertOctagon, Minimize2, Radio, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
 
 import { checkForWindow } from "../../../core";
@@ -20,18 +20,14 @@ export const GuideToolbar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { client } = useGuideContext();
-
-  const debugState = useStore(client.store, (state) => state.debug);
-
-  const isGuideMissing = useStore(client.store, (state) => {
-    return (
-      !!state.debug.forcedGuideKey &&
-      !(
-        state.guides[state.debug.forcedGuideKey] ||
-        state.previewGuides[state.debug.forcedGuideKey]
-      )
-    );
+  const { debugState, isGuideMissing } = useStore(client.store, (state) => {
+    const isGuideMissing =
+      client.stage?.status === "closed" &&
+      client.stage?.resolved !== state.debug.forcedGuideKey;
+    return { debugState: state.debug, isGuideMissing };
   });
+
+  const isLivePreviewing = Boolean(debugState.previewSessionId);
 
   if (!debugState?.forcedGuideKey) {
     return null;
@@ -117,9 +113,12 @@ export const GuideToolbar = () => {
         <Tag
           color="green"
           variant="soft"
-          icon={{ icon: Wrench, "aria-hidden": true }}
+          icon={{
+            icon: isLivePreviewing ? Radio : Wrench,
+            "aria-hidden": true,
+          }}
         >
-          Debug
+          {isLivePreviewing ? "Live preview" : "Debug"}
         </Tag>
 
         <Text
