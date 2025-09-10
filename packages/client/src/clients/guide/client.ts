@@ -160,6 +160,10 @@ const predicate = (
     return true;
   }
 
+  if (!guide.active) {
+    return false;
+  }
+
   if (guide.steps.every((s) => !!s.message.archived_at)) {
     return false;
   }

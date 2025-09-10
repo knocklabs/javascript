@@ -225,6 +225,7 @@ describe("KnockGuideClient", () => {
             key: "test_guide",
             type: "test",
             semver: "1.0.0",
+            active: true,
             steps: [],
             activation_url_rules: [],
             activation_url_patterns: [],
@@ -540,6 +541,7 @@ describe("KnockGuideClient", () => {
       key: "test_guide",
       type: "test",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_rules: [],
       activation_url_patterns: [],
@@ -893,6 +895,7 @@ describe("KnockGuideClient", () => {
       key: "onboarding",
       type: "card",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_rules: [],
       activation_url_patterns: [
@@ -915,6 +918,7 @@ describe("KnockGuideClient", () => {
       key: "feature_tour",
       type: "tooltip",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_rules: [],
       activation_url_patterns: [
@@ -937,6 +941,7 @@ describe("KnockGuideClient", () => {
       key: "system_status",
       type: "banner",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_rules: [],
       activation_url_patterns: [],
@@ -1483,6 +1488,7 @@ describe("KnockGuideClient", () => {
         key: "new_modal",
         type: "modal",
         semver: "1.0.0",
+        active: true,
         steps: [mockStep],
         activation_url_patterns: [],
         activation_url_rules: [],
@@ -1856,6 +1862,7 @@ describe("KnockGuideClient", () => {
       key: "onboarding",
       type: "card",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_patterns: [],
       activation_url_rules: [],
@@ -1872,6 +1879,7 @@ describe("KnockGuideClient", () => {
       key: "changelog",
       type: "card",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_patterns: [],
       activation_url_rules: [],
@@ -1889,6 +1897,7 @@ describe("KnockGuideClient", () => {
       type: "banner",
       semver: "1.0.0",
       steps: [mockStep],
+      active: true,
       activation_url_patterns: [],
       activation_url_rules: [],
       bypass_global_group_limit: false,
@@ -2025,6 +2034,35 @@ describe("KnockGuideClient", () => {
       expect(result).toHaveLength(1);
       expect(result[0]!.key).toBe(mockGuideTwo.key);
     });
+
+    test("does not return an inactive guide when forced guide key is set", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            active: false,
+          },
+        },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideThree.key,
+          previewSessionId: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client.selectGuides(stateWithGuides);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]!.key).toBe(mockGuideThree.key);
+      expect(result[1]!.key).toBe(mockGuideOne.key);
+    });
   });
 
   describe("guide socket event handling", () => {
@@ -2038,6 +2076,7 @@ describe("KnockGuideClient", () => {
         key: "new_guide",
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
         activation_url_patterns: [],
         activation_url_rules: [],
@@ -2070,6 +2109,7 @@ describe("KnockGuideClient", () => {
         key: "existing_guide",
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
         activation_url_patterns: [],
         activation_url_rules: [],
@@ -2077,7 +2117,7 @@ describe("KnockGuideClient", () => {
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         getStep() {
-          return this.steps.find((s) => !s.message.archived_at);
+          return this.steps.find((s: KnockGuideStep) => !s.message.archived_at);
         },
       };
 
@@ -2123,6 +2163,7 @@ describe("KnockGuideClient", () => {
         key: "existing_guide",
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
         activation_url_patterns: [],
         activation_url_rules: [],
@@ -2130,7 +2171,7 @@ describe("KnockGuideClient", () => {
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         getStep() {
-          return this.steps.find((s) => !s.message.archived_at);
+          return this.steps.find((s: KnockGuideStep) => !s.message.archived_at);
         },
       };
 
@@ -2168,6 +2209,7 @@ describe("KnockGuideClient", () => {
         key: "existing_guide",
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
         activation_url_rules: [],
         activation_url_patterns: [],
@@ -2175,7 +2217,7 @@ describe("KnockGuideClient", () => {
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         getStep() {
-          return this.steps.find((s) => !s.message.archived_at);
+          return this.steps.find((s: KnockGuideStep) => !s.message.archived_at);
         },
       };
 
@@ -2231,6 +2273,7 @@ describe("KnockGuideClient", () => {
       key: "guide_one",
       type: "banner",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_patterns: [],
       activation_url_rules: [],
@@ -2247,6 +2290,7 @@ describe("KnockGuideClient", () => {
       key: "guide_two",
       type: "banner",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
       activation_url_patterns: [],
       activation_url_rules: [],

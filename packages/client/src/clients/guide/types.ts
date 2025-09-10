@@ -44,6 +44,7 @@ export interface GuideData<TContent = Any> {
   key: string;
   type: string;
   semver: string;
+  active: boolean;
   steps: GuideStepData<TContent>[];
   activation_url_rules: GuideActivationUrlRuleData[];
   activation_url_patterns: GuideActivationUrlPatternData[];
