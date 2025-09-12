@@ -405,7 +405,6 @@ export class KnockGuideClient {
     // Track the joined channel.
     this.socketChannel = newChannel;
 
-    // Start auto-disconnect management if enabled
     this.socketAutoDisconnectManager?.start();
   }
 

@@ -43,9 +43,6 @@ export class SocketAutoDisconnectManager {
     this.isConnected = params.isConnected;
     this.log = params.log;
 
-    this.log(
-      `[SocketAutoDisconnectManager] Initialized with options: ${JSON.stringify(this.options)}`,
-    );
     this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
   }
 
@@ -53,16 +50,11 @@ export class SocketAutoDisconnectManager {
    * Start listening for visibility changes and managing socket connections
    */
   start(): void {
-    this.log("[SocketAutoDisconnectManager] Starting");
     if (!this.options.enabled || this.isListenerConnected) {
-      this.log(
-        "[SocketAutoDisconnectManager] Not enabled or listener already connected, skipping",
-      );
       return;
     }
 
     if (typeof document === "undefined") {
-      this.log("[SocketAutoDisconnectManager] Document is undefined, skipping");
       return;
     }
 
@@ -88,29 +80,10 @@ export class SocketAutoDisconnectManager {
     }
   }
 
-  /**
-   * Update the configuration options
-   */
-  updateOptions(options: SocketAutoDisconnectOptions): void {
-    const wasEnabled = this.options.enabled;
-    this.options = options;
-
-    if (!wasEnabled && options.enabled) {
-      this.start();
-    } else if (wasEnabled && !options.enabled) {
-      this.stop();
-    }
-  }
-
   private handleVisibilityChange(): void {
     const delay = this.options.delay ?? DEFAULT_DISCONNECT_DELAY;
 
-    // TODO: Clean up logs
     if (document.visibilityState === "hidden") {
-      this.log(
-        `[SocketAutoDisconnectManager] Tab hidden, scheduling disconnect in ${delay}ms`,
-      );
-
       // When the tab is hidden, disconnect the socket after a delay
       this.disconnectTimer = setTimeout(() => {
         this.log(
@@ -120,14 +93,9 @@ export class SocketAutoDisconnectManager {
         this.disconnectTimer = null;
       }, delay);
     } else if (document.visibilityState === "visible") {
-      this.log("[SocketAutoDisconnectManager] Tab visible");
-
       // When the tab becomes visible, clear the disconnect timer if active
       // This handles cases where the tab is only briefly hidden
       if (this.disconnectTimer) {
-        this.log(
-          "[SocketAutoDisconnectManager] Cancelling scheduled disconnect",
-        );
         clearTimeout(this.disconnectTimer);
         this.disconnectTimer = null;
       }

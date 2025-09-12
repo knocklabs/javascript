@@ -939,7 +939,6 @@ describe("Feed", () => {
           mockSocketManager as unknown as FeedSocketManager,
         );
 
-        // Start listening for updates to trigger the visibility listener setup
         feed.listenForUpdates();
 
         expect(mockAddEventListener).toHaveBeenCalledWith(
@@ -998,7 +997,6 @@ describe("Feed", () => {
           mockSocketManager as unknown as FeedSocketManager,
         );
 
-        // Start listening for updates to trigger the visibility listener setup
         feed.listenForUpdates();
 
         // Simulate visibility change to hidden
@@ -1058,7 +1056,6 @@ describe("Feed", () => {
           mockSocketManager as unknown as FeedSocketManager,
         );
 
-        // Start listening for updates to trigger the visibility listener setup
         feed.listenForUpdates();
 
         // Simulate visibility change to visible
@@ -1109,7 +1106,6 @@ describe("Feed", () => {
           mockSocketManager as unknown as FeedSocketManager,
         );
 
-        // Start listening for updates to trigger the visibility listener setup
         feed.listenForUpdates();
 
         feed.dispose();

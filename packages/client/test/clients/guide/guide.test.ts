@@ -2726,7 +2726,6 @@ describe("KnockGuideClient", () => {
         },
       );
 
-      // Should initialize the manager
       expect(client["socketAutoDisconnectManager"]).toBeDefined();
 
       const startSpy = vi.spyOn(
@@ -2735,11 +2734,9 @@ describe("KnockGuideClient", () => {
       );
       const stopSpy = vi.spyOn(client["socketAutoDisconnectManager"]!, "stop");
 
-      // Should start on subscribe
       client.subscribe();
       expect(startSpy).toHaveBeenCalled();
 
-      // Should stop on cleanup
       client.cleanup();
       expect(stopSpy).toHaveBeenCalled();
     });
@@ -2757,10 +2754,8 @@ describe("KnockGuideClient", () => {
         },
       );
 
-      // Should not initialize manager when no socket available
       expect(client["socketAutoDisconnectManager"]).toBeUndefined();
 
-      // Should not throw error when no auto-disconnect manager exists
       expect(() => client.subscribe()).not.toThrow();
       expect(() => client.cleanup()).not.toThrow();
     });
@@ -2776,7 +2771,6 @@ describe("KnockGuideClient", () => {
       mockApiClient.socket = mockSocket as unknown as Socket;
       vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
 
-      // Test enabled=false
       const disabledClient = new KnockGuideClient(
         mockKnock,
         channelId,
@@ -2786,10 +2780,8 @@ describe("KnockGuideClient", () => {
         },
       );
 
-      // Manager is still created but with enabled=false
       expect(disabledClient["socketAutoDisconnectManager"]).toBeDefined();
 
-      // Test default (disabled)
       const defaultClient = new KnockGuideClient(mockKnock, channelId);
       expect(defaultClient["socketAutoDisconnectManager"]).toBeDefined();
     });
