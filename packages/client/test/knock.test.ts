@@ -195,6 +195,118 @@ describe("Knock Client", () => {
     });
   });
 
+  describe("Inline identification strategy", () => {
+    test("defaults to inline identification when no strategy is specified", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate(
+        { id: "user_123", name: "John Doe", email: "john@example.com" },
+        "token_456",
+      );
+
+      expect(identify).toHaveBeenCalledWith({
+        name: "John Doe",
+        email: "john@example.com",
+      });
+    });
+
+    test("performs inline identification when strategy is explicitly set to 'inline'", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate(
+        { id: "user_123", name: "John Doe", email: "john@example.com" },
+        "token_456",
+        {
+          identificationStrategy: "inline",
+        },
+      );
+
+      expect(identify).toHaveBeenCalledWith({
+        name: "John Doe",
+        email: "john@example.com",
+      });
+    });
+
+    test("skips inline identification when strategy is set to 'skip'", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate(
+        { id: "user_123", name: "John Doe", email: "john@example.com" },
+        "token_456",
+        {
+          identificationStrategy: "skip",
+        },
+      );
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+
+    test("does not identify when authenticating with string userId regardless of strategy", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate("user_123", "token_456", {
+        identificationStrategy: "inline",
+      });
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+
+    test("does not identify with string userId when strategy is 'skip'", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate("user_123", "token_456", {
+        identificationStrategy: "skip",
+      });
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+
+    test("logs appropriate message when skipping identification", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      try {
+        const knock = new Knock("pk_test_12345", { logLevel: "debug" });
+        const identify = vi.spyOn(knock.user, "identify");
+
+        knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456", {
+          identificationStrategy: "skip",
+        });
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[Knock] Skipping inline user identification",
+        );
+        expect(identify).not.toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
+    test("logs appropriate message when performing inline identification", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      try {
+        const knock = new Knock("pk_test_12345", { logLevel: "debug" });
+        const identify = vi.spyOn(knock.user, "identify");
+
+        knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456", {
+          identificationStrategy: "inline",
+        });
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[Knock] Identifying user user_123 inline",
+        );
+        expect(identify).toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+  });
+
   describe("Client Management", () => {
     test("provides API client after setup", () => {
       const { knock, mockApiClient } = createMockKnock();

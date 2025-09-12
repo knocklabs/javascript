@@ -37,9 +37,11 @@ export type KnockProviderProps = {
        */
       userId: Knock["userId"];
       user?: never;
+      identificationStrategy?: never;
     }
   | {
       user: UserWithProperties;
+      identificationStrategy?: AuthenticateOptions["identificationStrategy"];
       /**
        * @deprecated The `userId` prop is deprecated and will be removed in a future version.
        * Please pass the `user` prop instead containing an `id` value.
@@ -61,6 +63,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   timeBeforeExpirationInMs,
   children,
   i18n,
+  identificationStrategy,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -72,8 +75,15 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       onUserTokenExpiring,
       timeBeforeExpirationInMs,
       logLevel,
+      identificationStrategy,
     }),
-    [host, onUserTokenExpiring, timeBeforeExpirationInMs, logLevel],
+    [
+      host,
+      onUserTokenExpiring,
+      timeBeforeExpirationInMs,
+      logLevel,
+      identificationStrategy,
+    ],
   );
 
   const knock = useAuthenticatedKnockClient(

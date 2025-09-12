@@ -17,6 +17,7 @@ function authenticateWithOptions(
   knock.authenticate(userIdOrUserWithProperties, userToken, {
     onUserTokenExpiring: options?.onUserTokenExpiring,
     timeBeforeExpirationInMs: options?.timeBeforeExpirationInMs,
+    identificationStrategy: options?.identificationStrategy,
   });
 }
 

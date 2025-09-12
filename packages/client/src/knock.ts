@@ -86,6 +86,7 @@ class Knock {
     let reinitializeApi = false;
     const currentApiClient = this.apiClient;
     const userId = this.getUserId(userIdOrUserWithProperties);
+    const identificationStrategy = options?.identificationStrategy || "inline";
 
     // If we've previously been initialized and the values have now changed, then we
     // need to reinitialize any stateful connections we have
@@ -120,11 +121,20 @@ class Knock {
       this.log("Reinitialized real-time connections");
     }
 
-    // Inline identify the user if we've been given an object with an id.
+    // We explicitly skip the inline identification if the strategy is set to "skip"
+    if (identificationStrategy === "skip") {
+      this.log("Skipping inline user identification");
+      return;
+    }
+
+    // Inline identify the user if we've been given an object with an id
+    // and the strategy is set to "inline".
     if (
+      identificationStrategy === "inline" &&
       typeof userIdOrUserWithProperties === "object" &&
       userIdOrUserWithProperties?.id
     ) {
+      this.log(`Identifying user ${userIdOrUserWithProperties.id} inline`);
       const { id, ...properties } = userIdOrUserWithProperties;
       this.user.identify(properties);
     }

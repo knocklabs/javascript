@@ -133,4 +133,146 @@ describe("useAuthenticatedKnockClient", () => {
 
     expect(result.current.userId).toEqual("user_123");
   });
+
+  describe("Inline identification strategy", () => {
+    it("creates instance with user object containing properties", () => {
+      const { result } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userId: {
+              id: "user_123",
+              name: "John Doe",
+              email: "john@example.com",
+            },
+          },
+        },
+      );
+
+      expect(result.current.userId).toEqual("user_123");
+      expect(result.current).toBeInstanceOf(Knock);
+    });
+
+    it("creates instance with explicit 'inline' identification strategy", () => {
+      const { result } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userId: {
+              id: "user_123",
+              name: "John Doe",
+              email: "john@example.com",
+            },
+            options: { identificationStrategy: "inline" as const },
+          },
+        },
+      );
+
+      expect(result.current.userId).toEqual("user_123");
+      expect(result.current).toBeInstanceOf(Knock);
+    });
+
+    it("creates instance with 'skip' identification strategy", () => {
+      const { result } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userId: {
+              id: "user_123",
+              name: "John Doe",
+              email: "john@example.com",
+            },
+            options: { identificationStrategy: "skip" as const },
+          },
+        },
+      );
+
+      expect(result.current.userId).toEqual("user_123");
+      expect(result.current).toBeInstanceOf(Knock);
+    });
+
+    it("creates instance with string userId and identificationStrategy option", () => {
+      const { result } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userId: "user_123",
+            options: { identificationStrategy: "inline" as const },
+          },
+        },
+      );
+
+      expect(result.current.userId).toEqual("user_123");
+      expect(result.current).toBeInstanceOf(Knock);
+    });
+
+    it("maintains userId when identificationStrategy changes", () => {
+      const { result, rerender } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userId: { id: "user_123", name: "John Doe" },
+            options: { identificationStrategy: "skip" as const },
+          },
+        },
+      );
+
+      expect(result.current).toBeInstanceOf(Knock);
+      expect(result.current.userId).toEqual("user_123");
+
+      // Change identification strategy
+      rerender({
+        ...defaultProps,
+        userId: { id: "user_123", name: "John Doe" },
+        // @ts-expect-error Testing options change from skip to inline
+        options: { identificationStrategy: "inline" as const },
+      });
+
+      // Should maintain the same userId after options change
+      expect(result.current.userId).toEqual("user_123");
+      expect(result.current).toBeInstanceOf(Knock);
+    });
+
+    it("should teardown and create new instance when identificationStrategy changes", () => {
+      const { result, rerender } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userId: { id: "user_123", name: "John Doe" },
+            options: { identificationStrategy: "skip" as const },
+          },
+        },
+      );
+
+      expect(result.current).toBeInstanceOf(Knock);
+
+      const teardownSpy = vi.spyOn(result.current, "teardown");
+      const firstInstance = result.current;
+
+      // Change identification strategy (should trigger new instance creation)
+      rerender({
+        ...defaultProps,
+        userId: { id: "user_123", name: "John Doe" },
+        // @ts-expect-error Testing options change from skip to inline
+        options: { identificationStrategy: "inline" as const },
+      });
+
+      expect(teardownSpy).toHaveBeenCalledOnce();
+      expect(result.current).toBeInstanceOf(Knock);
+      // Should be a different instance
+      expect(result.current).not.toBe(firstInstance);
+    });
+  });
 });
