@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0
+
+### Minor Changes
+
+- 5fc0af9: feat: adds `identificationStrategy` option for user identification control
+
 ## 0.17.2
 
 ### Patch Changes

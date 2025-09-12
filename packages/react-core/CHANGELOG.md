@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0
+
+### Minor Changes
+
+- 5fc0af9: feat: adds `identificationStrategy` option for user identification control
+
+### Patch Changes
+
+- Updated dependencies [5fc0af9]
+  - @knocklabs/client@0.18.0
+
 ## 0.9.2
 
 ### Patch Changes
