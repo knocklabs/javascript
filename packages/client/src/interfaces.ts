@@ -54,6 +54,7 @@ export type UserTokenExpiringCallback = (
 export interface AuthenticateOptions {
   onUserTokenExpiring?: UserTokenExpiringCallback;
   timeBeforeExpirationInMs?: number;
+  identificationStrategy?: "inline" | "skip";
 }
 
 export interface BulkOperation {
