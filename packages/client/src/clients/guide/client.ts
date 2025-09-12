@@ -209,7 +209,7 @@ export class KnockGuideClient {
   // Guides that are competing to render are "staged" first without rendering
   // and ranked based on its relative order in the group over a duration of time
   // to resolve and render the prevailing one.
-  private stage: GroupStage | undefined;
+  public stage: GroupStage | undefined;
 
   private counterIntervalId: ReturnType<typeof setInterval> | undefined;
 
@@ -481,7 +481,7 @@ export class KnockGuideClient {
     const result = select(state, filters);
 
     if (result.size === 0) {
-      this.knock.log("[Guide] Selection returned zero result");
+      this.knock.log("[Guide] Selection returned zero results");
       return [];
     }
 
@@ -506,7 +506,7 @@ export class KnockGuideClient {
     const result = select(state, filters);
 
     if (result.size === 0) {
-      this.knock.log("[Guide] Selection returned zero result");
+      this.knock.log("[Guide] Selection returned zero results");
       return undefined;
     }
 
