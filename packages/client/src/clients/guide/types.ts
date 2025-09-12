@@ -223,6 +223,10 @@ export type ConstructorOpts = {
   trackLocationFromWindow?: boolean;
   orderResolutionDuration?: number;
   throttleCheckInterval?: number;
+  /** Automatically manage socket connections based on tab visibility (defaults to false) */
+  auto_manage_socket_connection?: boolean;
+  /** Delay in milliseconds before disconnecting socket when tab becomes inactive (defaults to 2000) */
+  auto_manage_socket_connection_delay?: number;
 };
 
 export type GroupStage = {

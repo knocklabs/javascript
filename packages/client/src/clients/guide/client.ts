@@ -4,6 +4,7 @@ import { Channel, Socket } from "phoenix";
 import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
+import { SocketAutoDisconnectManager } from "../shared/socketAutoDisconnectManager";
 
 import {
   DEFAULT_GROUP_KEY,
@@ -213,6 +214,8 @@ export class KnockGuideClient {
 
   private counterIntervalId: ReturnType<typeof setInterval> | undefined;
 
+  private socketAutoDisconnectManager: SocketAutoDisconnectManager | undefined;
+
   constructor(
     readonly knock: Knock,
     readonly channelId: string,
@@ -242,6 +245,20 @@ export class KnockGuideClient {
     const { socket: maybeSocket } = this.knock.client();
     this.socket = maybeSocket;
     this.socketChannelTopic = `guides:${channelId}`;
+
+    // Initialize socket auto-disconnect manager if we have a socket
+    if (this.socket) {
+      this.socketAutoDisconnectManager = new SocketAutoDisconnectManager({
+        onDisconnect: () => this.socket?.disconnect(),
+        onConnect: () => this.socket?.connect(),
+        isConnected: () => this.socket?.isConnected() ?? false,
+        log: (message) => this.knock.log(message),
+        options: {
+          enabled: options.auto_manage_socket_connection ?? false,
+          delay: options.auto_manage_socket_connection_delay,
+        },
+      });
+    }
 
     if (trackLocationFromWindow) {
       this.listenForLocationChangesFromWindow();
@@ -283,6 +300,7 @@ export class KnockGuideClient {
     this.removeEventListeners();
     this.clearGroupStage();
     this.clearCounterInterval();
+    this.socketAutoDisconnectManager?.stop();
   }
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
@@ -386,6 +404,9 @@ export class KnockGuideClient {
 
     // Track the joined channel.
     this.socketChannel = newChannel;
+
+    // Start auto-disconnect management if enabled
+    this.socketAutoDisconnectManager?.start();
   }
 
   private handleChannelJoinError() {
