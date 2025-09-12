@@ -9,6 +9,7 @@ import {
   BulkUpdateMessagesInChannelProperties,
   MessageEngagementStatus,
 } from "../messages/interfaces";
+import { SocketAutoDisconnectManager } from "../shared/socketAutoDisconnectManager";
 
 import {
   FeedClientOptions,
@@ -40,8 +41,6 @@ const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
   archived: "exclude",
 };
 
-const DEFAULT_DISCONNECT_DELAY = 2000;
-
 const CLIENT_REF_ID_PREFIX = "client_";
 
 class Feed {
@@ -52,10 +51,8 @@ class Feed {
   private userFeedId: string;
   private broadcaster: EventEmitter;
   private broadcastChannel!: BroadcastChannel | null;
-  private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: boolean = false;
-  private visibilityChangeHandler: () => void = () => {};
-  private visibilityChangeListenerConnected: boolean = false;
+  private socketAutoDisconnectManager: SocketAutoDisconnectManager | undefined;
 
   // The raw store instance, used for binding in React and other environments
   public store: FeedStore;
@@ -116,12 +113,7 @@ class Feed {
 
     this.socketManager?.leave(this);
 
-    this.tearDownVisibilityListeners();
-
-    if (this.disconnectTimer) {
-      clearTimeout(this.disconnectTimer);
-      this.disconnectTimer = null;
-    }
+    this.socketAutoDisconnectManager?.stop();
 
     if (this.broadcastChannel) {
       this.broadcastChannel.close();
@@ -154,6 +146,8 @@ class Feed {
     }
 
     this.unsubscribeFromSocketEvents = this.socketManager?.join(this);
+
+    this.socketAutoDisconnectManager?.start();
   }
 
   /* Binds a handler to be invoked when event occurs */
@@ -773,13 +767,27 @@ class Feed {
     }
   }
 
+  private initializeSocketAutoDisconnectManager() {
+    const client = this.knock.client();
+    if (!client.socket) return;
+
+    this.socketAutoDisconnectManager = new SocketAutoDisconnectManager({
+      onDisconnect: () => client.socket?.disconnect(),
+      onConnect: () => client.socket?.connect(),
+      isConnected: () => client.socket?.isConnected() ?? false,
+      log: (message) => this.knock.log(message),
+      options: {
+        enabled: this.defaultOptions.auto_manage_socket_connection ?? false,
+        delay: this.defaultOptions.auto_manage_socket_connection_delay,
+      },
+    });
+  }
+
   private initializeRealtimeConnection() {
     // In server environments we might not have a socket connection
     if (!this.socketManager) return;
 
-    if (this.defaultOptions.auto_manage_socket_connection) {
-      this.setUpVisibilityListeners();
-    }
+    this.initializeSocketAutoDisconnectManager();
 
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
@@ -800,33 +808,6 @@ class Feed {
     }
   }
 
-  /**
-   * Listen for changes to document visibility and automatically disconnect
-   * or reconnect the socket after a delay
-   */
-  private setUpVisibilityListeners() {
-    if (
-      typeof document === "undefined" ||
-      this.visibilityChangeListenerConnected
-    ) {
-      return;
-    }
-
-    this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
-    this.visibilityChangeListenerConnected = true;
-    document.addEventListener("visibilitychange", this.visibilityChangeHandler);
-  }
-
-  private tearDownVisibilityListeners() {
-    if (typeof document === "undefined") return;
-
-    document.removeEventListener(
-      "visibilitychange",
-      this.visibilityChangeHandler,
-    );
-    this.visibilityChangeListenerConnected = false;
-  }
-
   private emitEvent(
     type:
       | MessageEngagementStatus
@@ -843,34 +824,6 @@ class Feed {
     this.broadcaster.emit(`items:${type}`, { items });
     // Internal events only need `items:`
     this.broadcastOverChannel(`items:${type}`, { items });
-  }
-
-  private handleVisibilityChange() {
-    const disconnectDelay =
-      this.defaultOptions.auto_manage_socket_connection_delay ??
-      DEFAULT_DISCONNECT_DELAY;
-
-    const client = this.knock.client();
-
-    if (document.visibilityState === "hidden") {
-      // When the tab is hidden, clean up the socket connection after a delay
-      this.disconnectTimer = setTimeout(() => {
-        client.socket?.disconnect();
-        this.disconnectTimer = null;
-      }, disconnectDelay);
-    } else if (document.visibilityState === "visible") {
-      // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
-      // This handles cases where the tab is only briefly hidden to avoid unnecessary disconnects
-      if (this.disconnectTimer) {
-        clearTimeout(this.disconnectTimer);
-        this.disconnectTimer = null;
-      }
-
-      // If the socket is not connected, try to reconnect
-      if (!client.socket?.isConnected()) {
-        client.socket?.connect();
-      }
-    }
   }
 }
 
