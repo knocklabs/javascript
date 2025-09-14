@@ -479,7 +479,7 @@ export class KnockGuideClient {
     filters: SelectFilterParams = {},
   ): KnockGuide<C>[] {
     this.knock.log(
-      `[Guide] .selectGuides (state: ${formatState(state)}; filters: ${formatFilters(filters)})`,
+      `[Guide] .selectGuides (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
     );
     if (
       Object.keys(state.guides).length === 0 &&
@@ -507,7 +507,7 @@ export class KnockGuideClient {
     filters: SelectFilterParams = {},
   ): KnockGuide<C> | undefined {
     this.knock.log(
-      `[Guide] .selectGuide (state: ${formatState(state)}; filters: ${formatFilters(filters)})`,
+      `[Guide] .selectGuide (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
     );
     if (
       Object.keys(state.guides).length === 0 &&
