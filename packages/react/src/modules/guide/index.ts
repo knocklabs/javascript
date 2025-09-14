@@ -5,5 +5,6 @@ export {
   CardView,
   Modal,
   ModalView,
+  GuideToolbar,
 } from "./components";
 export { KnockGuideProvider } from "./providers";
