@@ -1,10 +1,12 @@
 import {
+  GroupStage,
   GuideActivationUrlRuleData,
   GuideData,
   GuideGroupData,
   KnockGuide,
   KnockGuideActivationUrlPattern,
   SelectFilterParams,
+  StoreState,
 } from "./types";
 
 // Extends the map class to allow having metadata on it, which is used to record
@@ -17,6 +19,14 @@ export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
     super();
   }
 }
+
+export const formatGroupStage = (stage: GroupStage) => {
+  return `status=${stage.status}, resolved=${stage.resolved}`;
+};
+
+export const formatState = (state: StoreState) => {
+  return `loc=${state.location}`;
+};
 
 export const formatFilters = (filters: SelectFilterParams = {}) => {
   return [
