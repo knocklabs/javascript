@@ -1,5 +1,11 @@
 # @knocklabs/expo
 
+## 0.3.43
+
+### Patch Changes
+
+- 02ba8e7: chore: update expo to ~53.0.22
+
 ## 0.3.42
 
 ### Patch Changes
