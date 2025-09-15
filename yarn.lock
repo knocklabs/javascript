@@ -3971,7 +3971,7 @@ __metadata:
     expo-blur: "npm:~14.1.5"
     expo-constants: "npm:~17.1.7"
     expo-device: "npm:^7.1.4"
-    expo-font: "npm:~13.3.2"
+    expo-font: "npm:~14.0.8"
     expo-haptics: "npm:~14.1.4"
     expo-image: "npm:~2.4.0"
     expo-linking: "npm:~7.1.7"
@@ -11818,6 +11818,19 @@ __metadata:
     expo: "*"
     react: "*"
   checksum: 10c0/00711fbdb380f076594b43caddf06ad6f70a5261caaccce564dabf01a02054f89987ac0367c96ad8cb38b4edbf904e99839ab2a446d7b57e7e84b29145da4ccd
+  languageName: node
+  linkType: hard
+
+"expo-font@npm:~14.0.8":
+  version: 14.0.8
+  resolution: "expo-font@npm:14.0.8"
+  dependencies:
+    fontfaceobserver: "npm:^2.1.0"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/1238c23436431f283687bc465e9ce99702db3fc99e00bd3ebe0391090d5378a4c186fd6f9c124f3e00874dc5259c6304cf16bc0e8842674e590d7d46016dd5dc
   languageName: node
   linkType: hard
 
