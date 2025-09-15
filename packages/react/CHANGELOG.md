@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.4
+
+### Patch Changes
+
+- 74366b3: export useStore from react-core to include in use client directive
+- Updated dependencies [74366b3]
+  - @knocklabs/react-core@0.10.1
+  - @knocklabs/client@0.18.1
+
 ## 0.8.3
 
 ### Patch Changes

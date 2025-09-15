@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.1
+
+### Patch Changes
+
+- 74366b3: export useStore from react-core to include in use client directive
+
 ## 0.18.0
 
 ### Minor Changes
