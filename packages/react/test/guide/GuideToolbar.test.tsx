@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom/vitest";
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
@@ -6,12 +7,6 @@ import { GuideToolbar } from "../../src/modules/guide/components/GuideToolbar/Gu
 const mockDebugState: { forcedGuideKey: string | null } = {
   forcedGuideKey: "test-guide-key",
 };
-
-vi.mock("@tanstack/react-store", () => ({
-  useStore: vi.fn((_store, selector) => {
-    return selector({ debug: mockDebugState });
-  }),
-}));
 
 vi.mock("@knocklabs/react-core", async () => {
   const actual = await vi.importActual("@knocklabs/react-core");
@@ -22,6 +17,9 @@ vi.mock("@knocklabs/react-core", async () => {
         store: {},
       },
       colorMode: "light",
+    }),
+    useStore: vi.fn((_store, selector) => {
+      return selector({ debug: mockDebugState });
     }),
   };
 });

@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/expo",
-  "version": "0.3.41",
+  "version": "0.3.43",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -66,7 +66,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.14",
-    "expo": "~53.0.17",
+    "expo": "~53.0.22",
     "expo-constants": "~17.1.7",
     "expo-device": "^7.1.4",
     "expo-notifications": "^0.31.4",
