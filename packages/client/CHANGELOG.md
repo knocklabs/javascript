@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.2
+
+### Patch Changes
+
+- 1fc802b: fix(feed): optimistically update when unarchiving an item
+
 ## 0.18.1
 
 ### Patch Changes
