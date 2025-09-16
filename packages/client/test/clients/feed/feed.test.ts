@@ -265,6 +265,138 @@ describe("Feed", () => {
     });
   });
 
+  describe("Optimistic Updates", () => {
+    test("marks a single item as archived and correctly removes it from the store", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const originalItem = createUnreadFeedItem();
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: {
+            entries: [originalItem],
+            meta: {
+              total_count: 1,
+              unread_count: 0,
+              unseen_count: 0,
+            },
+            page_info: {
+              before: null,
+              after: null,
+              page_size: 50,
+            },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            archived: "exclude",
+          },
+          undefined,
+        );
+
+        await feed.fetch();
+
+        expect(feed.store.getState().items).toHaveLength(1);
+
+        const feedItem = {
+          ...originalItem,
+          archived_at: new Date().toISOString(),
+        };
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: [feedItem],
+        });
+
+        const result = await feed.markAsArchived(feedItem);
+
+        expect(mockApiClient.makeRequest).toHaveBeenNthCalledWith(2, {
+          method: "POST",
+          url: "/v1/messages/batch/archived",
+          data: { message_ids: [feedItem.id] },
+        });
+        expect(result).toEqual([feedItem]);
+
+        expect(feed.store.getState().items).toHaveLength(0);
+        expect(feed.store.getState().metadata.total_count).toBe(0);
+        expect(feed.store.getState().metadata.unread_count).toBe(0);
+        expect(feed.store.getState().metadata.unseen_count).toBe(0);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("marks a single item as unarchived and correctly removes it from the store", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const originalItem = createUnreadFeedItem({
+          archived_at: new Date().toISOString(),
+        });
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: {
+            entries: [originalItem],
+            meta: {
+              total_count: 1,
+              unread_count: 0,
+              unseen_count: 0,
+            },
+            page_info: {
+              before: null,
+              after: null,
+              page_size: 50,
+            },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            archived: "only",
+          },
+          undefined,
+        );
+
+        await feed.fetch();
+
+        expect(feed.store.getState().items).toHaveLength(1);
+
+        const feedItem = {
+          ...originalItem,
+          archived_at: null,
+        };
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: [feedItem],
+        });
+
+        const result = await feed.markAsUnarchived(feedItem);
+
+        expect(mockApiClient.makeRequest).toHaveBeenNthCalledWith(2, {
+          method: "POST",
+          url: "/v1/messages/batch/unarchived",
+          data: { message_ids: [feedItem.id] },
+        });
+        expect(result).toEqual([feedItem]);
+
+        expect(feed.store.getState().items).toHaveLength(0);
+        expect(feed.store.getState().metadata.total_count).toBe(0);
+        expect(feed.store.getState().metadata.unread_count).toBe(0);
+        expect(feed.store.getState().metadata.unseen_count).toBe(0);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
   describe("Bulk Operations", () => {
     test("marks all items as seen", async () => {
       const { knock, mockApiClient, cleanup } = getTestSetup();
