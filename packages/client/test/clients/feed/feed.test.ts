@@ -322,6 +322,9 @@ describe("Feed", () => {
         expect(result).toEqual([feedItem]);
 
         expect(feed.store.getState().items).toHaveLength(0);
+        expect(feed.store.getState().metadata.total_count).toBe(0);
+        expect(feed.store.getState().metadata.unread_count).toBe(0);
+        expect(feed.store.getState().metadata.unseen_count).toBe(0);
       } finally {
         cleanup();
       }
@@ -385,6 +388,9 @@ describe("Feed", () => {
         expect(result).toEqual([feedItem]);
 
         expect(feed.store.getState().items).toHaveLength(0);
+        expect(feed.store.getState().metadata.total_count).toBe(0);
+        expect(feed.store.getState().metadata.unread_count).toBe(0);
+        expect(feed.store.getState().metadata.unseen_count).toBe(0);
       } finally {
         cleanup();
       }

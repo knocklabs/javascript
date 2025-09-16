@@ -490,7 +490,7 @@ class Feed {
       // Build the new metadata
       const updatedMetadata = {
         ...state.metadata,
-        // Ensure that the counts don't ever go below 0 on archiving where the client state
+        // Ensure that the counts don't ever go below 0 on unarchiving where the client state
         // gets out of sync with the server state
         total_count: Math.max(0, state.metadata.total_count - items.length),
         unseen_count: Math.max(0, state.metadata.unseen_count - unseenCount),
