@@ -1045,17 +1045,33 @@ describe("Feed", () => {
           visibilityState: "visible",
         } as unknown as Document;
 
+        const mockSocket = {
+          disconnect: vi.fn(),
+          isConnected: vi.fn().mockReturnValue(true),
+          connect: vi.fn(),
+        };
+
+        const mockClient = {
+          socket: mockSocket,
+        };
+
+        vi.spyOn(knock, "client").mockReturnValue(
+          mockClient as unknown as ApiClient,
+        );
+
         const mockSocketManager = {
           join: vi.fn().mockReturnValue(vi.fn()),
           leave: vi.fn(),
         };
 
-        new Feed(
+        const feed = new Feed(
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           { auto_manage_socket_connection: true },
           mockSocketManager as unknown as FeedSocketManager,
         );
+
+        feed.listenForUpdates();
 
         expect(mockAddEventListener).toHaveBeenCalledWith(
           "visibilitychange",
@@ -1103,7 +1119,7 @@ describe("Feed", () => {
           leave: vi.fn(),
         };
 
-        new Feed(
+        const feed = new Feed(
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           {
@@ -1112,6 +1128,8 @@ describe("Feed", () => {
           },
           mockSocketManager as unknown as FeedSocketManager,
         );
+
+        feed.listenForUpdates();
 
         // Simulate visibility change to hidden
         mockDocument.visibilityState = "hidden";
@@ -1163,12 +1181,14 @@ describe("Feed", () => {
           leave: vi.fn(),
         };
 
-        new Feed(
+        const feed = new Feed(
           knock,
           "01234567-89ab-cdef-0123-456789abcdef",
           { auto_manage_socket_connection: true },
           mockSocketManager as unknown as FeedSocketManager,
         );
+
+        feed.listenForUpdates();
 
         // Simulate visibility change to visible
         mockDocument.visibilityState = "visible";
@@ -1192,6 +1212,20 @@ describe("Feed", () => {
           visibilityState: "visible",
         } as unknown as Document;
 
+        const mockSocket = {
+          disconnect: vi.fn(),
+          isConnected: vi.fn().mockReturnValue(true),
+          connect: vi.fn(),
+        };
+
+        const mockClient = {
+          socket: mockSocket,
+        };
+
+        vi.spyOn(knock, "client").mockReturnValue(
+          mockClient as unknown as ApiClient,
+        );
+
         const mockSocketManager = {
           join: vi.fn().mockReturnValue(vi.fn()),
           leave: vi.fn(),
@@ -1203,6 +1237,8 @@ describe("Feed", () => {
           { auto_manage_socket_connection: true },
           mockSocketManager as unknown as FeedSocketManager,
         );
+
+        feed.listenForUpdates();
 
         feed.dispose();
 

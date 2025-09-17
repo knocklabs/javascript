@@ -2690,6 +2690,103 @@ describe("KnockGuideClient", () => {
     });
   });
 
+  describe("Socket Auto-Disconnect Management", () => {
+    test("manages socket auto-disconnect lifecycle when enabled", () => {
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn(),
+            }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+        {
+          auto_manage_socket_connection: true,
+          auto_manage_socket_connection_delay: 1000,
+        },
+      );
+
+      expect(client["socketAutoDisconnectManager"]).toBeDefined();
+
+      const startSpy = vi.spyOn(
+        client["socketAutoDisconnectManager"]!,
+        "start",
+      );
+      const stopSpy = vi.spyOn(client["socketAutoDisconnectManager"]!, "stop");
+
+      client.subscribe();
+      expect(startSpy).toHaveBeenCalled();
+
+      client.cleanup();
+      expect(stopSpy).toHaveBeenCalled();
+    });
+
+    test("handles missing socket gracefully", () => {
+      mockApiClient.socket = undefined;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+        {
+          auto_manage_socket_connection: true,
+        },
+      );
+
+      expect(client["socketAutoDisconnectManager"]).toBeUndefined();
+
+      expect(() => client.subscribe()).not.toThrow();
+      expect(() => client.cleanup()).not.toThrow();
+    });
+
+    test("respects configuration options", () => {
+      const mockSocket = {
+        channel: vi.fn(),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const disabledClient = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+        {
+          auto_manage_socket_connection: false,
+        },
+      );
+
+      expect(disabledClient["socketAutoDisconnectManager"]).toBeDefined();
+
+      const defaultClient = new KnockGuideClient(mockKnock, channelId);
+      expect(defaultClient["socketAutoDisconnectManager"]).toBeDefined();
+    });
+  });
+
   describe("fetch with filters", () => {
     test("fetches guides with type filter", async () => {
       const client = new KnockGuideClient(mockKnock, channelId);

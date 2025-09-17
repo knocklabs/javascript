@@ -86,7 +86,8 @@ describe("FeedClient", () => {
       feedClient.initialize("feed-3", defaultOptions);
 
       // Socket manager should only be created once
-      expect(mockKnock.client).toHaveBeenCalledTimes(3); // Once per feed
+      // But client() is called twice per feed: once for socket manager init, once for auto-disconnect manager init
+      expect(mockKnock.client).toHaveBeenCalledTimes(6); // Twice per feed (socket manager + auto-disconnect)
     });
   });
 
