@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.3
+
+### Patch Changes
+
+- 9f0d317: fix(KNO-9711) Add step_ref to NotificationSource
+
+  Add optional nullable field corresponding to API spec
+
 ## 0.18.2
 
 ### Patch Changes
