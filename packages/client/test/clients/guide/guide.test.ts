@@ -208,6 +208,31 @@ describe("KnockGuideClient", () => {
       });
     });
 
+    test("handles localStorage errors gracefully during initialization", () => {
+      const mockLocalStorageWithErrors = {
+        getItem: vi.fn().mockImplementation(() => {
+          throw new Error("Privacy mode or quota exceeded");
+        }),
+        setItem: vi.fn().mockImplementation(() => {
+          throw new Error("Privacy mode or quota exceeded");
+        }),
+      };
+
+      vi.stubGlobal("window", {
+        location: {
+          search:
+            "?knock_guide_key=test_guide&knock_preview_session_id=session123",
+        },
+        localStorage: mockLocalStorageWithErrors,
+      });
+
+      expect(() => {
+        new KnockGuideClient(mockKnock, channelId);
+      }).not.toThrow();
+
+      expect(mockLocalStorageWithErrors.setItem).toHaveBeenCalled();
+    });
+
     test("starts the counter interval clock and sets the interval id", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       expect(client["counterIntervalId"]).toBeDefined();
@@ -2512,12 +2537,18 @@ describe("KnockGuideClient", () => {
     });
 
     test("handleLocationChange calls subscribe when entering debug mode", () => {
+      const mockLocalStorage = {
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+      };
+
       vi.stubGlobal("window", {
         ...mockWindow,
         location: {
           href: "https://example.com/dashboard?knock_guide_key=test_guide",
           search: "?knock_guide_key=test_guide",
         },
+        localStorage: mockLocalStorage,
       });
 
       const client = new KnockGuideClient(
@@ -2542,15 +2573,36 @@ describe("KnockGuideClient", () => {
 
       expect(fetchSpy).toHaveBeenCalled();
       expect(subscribeSpy).toHaveBeenCalled();
+
+      // Should persist debug parameters to localStorage when detected in URL
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "knock_debug_guide_key",
+        "test_guide",
+      );
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "knock_debug_preview_session_id",
+        "",
+      );
     });
 
     test("handleLocationChange calls subscribe when exiting debug mode", () => {
+      const mockLocalStorage = {
+        getItem: vi.fn().mockImplementation((key: string) => {
+          // Simulate localStorage having stored debug values from previous session
+          if (key === "knock_debug_guide_key") return "stored_guide";
+          if (key === "knock_debug_preview_session_id") return "stored_session";
+          return null;
+        }),
+        setItem: vi.fn(),
+      };
+
       vi.stubGlobal("window", {
         ...mockWindow,
         location: {
           href: "https://example.com/dashboard",
           search: "",
         },
+        localStorage: mockLocalStorage,
       });
 
       const client = new KnockGuideClient(
@@ -2571,6 +2623,14 @@ describe("KnockGuideClient", () => {
       client["handleLocationChange"]();
 
       expect(subscribeSpy).toHaveBeenCalled();
+
+      // Should read from localStorage when no URL parameters are present
+      expect(mockLocalStorage.getItem).toHaveBeenCalledWith(
+        "knock_debug_guide_key",
+      );
+      expect(mockLocalStorage.getItem).toHaveBeenCalledWith(
+        "knock_debug_preview_session_id",
+      );
     });
   });
 
