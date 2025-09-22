@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/react-native",
-  "version": "0.6.42",
+  "version": "0.6.43",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
