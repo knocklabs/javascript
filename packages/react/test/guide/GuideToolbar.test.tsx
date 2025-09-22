@@ -15,6 +15,14 @@ vi.mock("@knocklabs/react-core", async () => {
     useGuideContext: () => ({
       client: {
         store: {},
+        exitDebugMode: vi.fn(() => {
+          // Mock the URL parameter removal behavior
+          const url = new URL(window.location.href);
+          url.searchParams.delete("knock_guide_key");
+          url.searchParams.delete("knock_preview_session_id");
+          // Update the mocked location href
+          window.location.href = url.toString();
+        }),
       },
       colorMode: "light",
     }),
