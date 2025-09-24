@@ -305,6 +305,30 @@ describe("Knock Client", () => {
         consoleSpy.mockRestore();
       }
     });
+
+    test("logs error when inline identification fails", async () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      try {
+        const knock = new Knock("pk_test_12345", { logLevel: "debug" });
+        const identify = vi
+          .spyOn(knock.user, "identify")
+          .mockRejectedValue(new Error("The system is down"));
+
+        knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456", {
+          identificationStrategy: "inline",
+        });
+
+        await vi.runAllTimersAsync();
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[Knock] Error identifying user user_123 inline:\nThe system is down",
+        );
+        expect(identify).toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
   });
 
   describe("Client Management", () => {

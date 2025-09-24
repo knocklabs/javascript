@@ -136,7 +136,14 @@ class Knock {
     ) {
       this.log(`Identifying user ${userIdOrUserWithProperties.id} inline`);
       const { id, ...properties } = userIdOrUserWithProperties;
-      this.user.identify(properties);
+      this.user.identify(properties).catch((err) => {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+
+        this.log(
+          `Error identifying user ${userIdOrUserWithProperties.id} inline:\n${errorMessage}`,
+        );
+      });
     }
 
     return;
