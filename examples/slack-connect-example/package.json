@@ -1,6 +1,6 @@
 {
   "name": "slack-connect-example",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,7 +11,7 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@knocklabs/react": "0.8.6",
+    "@knocklabs/react": "0.8.7",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.3",
     "react": "^19.0.0",

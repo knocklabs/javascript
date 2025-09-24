@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.44
+
+### Patch Changes
+
+- Updated dependencies [c64098e]
+  - @knocklabs/client@0.18.4
+  - @knocklabs/react-core@0.10.4
+
 ## 0.6.43
 
 ### Patch Changes

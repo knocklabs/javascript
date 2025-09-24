@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.4
+
+### Patch Changes
+
+- c64098e: fix: handle promise rejection when identifying a user inline
+
 ## 0.18.3
 
 ### Patch Changes
