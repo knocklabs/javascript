@@ -1,0 +1,1029 @@
+---
+layout: docs
+sidebar_position: 1
+---
+
+[**@knocklabs/javascript v0.1.0-rc.0**](../../index.mdx)
+
+***
+
+[@knocklabs/javascript](../../modules.mdx) / react-core/src
+
+# react-core/src
+
+## Enumerations
+
+### FilterStatus
+
+Defined in: [packages/react-core/src/modules/core/constants.ts:1](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/constants.ts#L1)
+
+#### Enumeration Members
+
+##### All
+
+> **All**: `"all"`
+
+Defined in: [packages/react-core/src/modules/core/constants.ts:2](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/constants.ts#L2)
+
+##### Read
+
+> **Read**: `"read"`
+
+Defined in: [packages/react-core/src/modules/core/constants.ts:3](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/constants.ts#L3)
+
+##### Unseen
+
+> **Unseen**: `"unseen"`
+
+Defined in: [packages/react-core/src/modules/core/constants.ts:4](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/constants.ts#L4)
+
+##### Unread
+
+> **Unread**: `"unread"`
+
+Defined in: [packages/react-core/src/modules/core/constants.ts:5](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/constants.ts#L5)
+
+## Interfaces
+
+- [KnockProviderState](interfaces/KnockProviderState.mdx)
+- [KnockFeedProviderState](interfaces/KnockFeedProviderState.mdx)
+- [KnockFeedProviderProps](interfaces/KnockFeedProviderProps.mdx)
+- [KnockI18nProviderProps](interfaces/KnockI18nProviderProps.mdx)
+- [Translations](interfaces/Translations.mdx)
+- [I18nContent](interfaces/I18nContent.mdx)
+- [KnockMsTeamsProviderState](interfaces/KnockMsTeamsProviderState.mdx)
+- [KnockMsTeamsProviderProps](interfaces/KnockMsTeamsProviderProps.mdx)
+- [KnockSlackProviderState](interfaces/KnockSlackProviderState.mdx)
+
+## Type Aliases
+
+- [RecipientObject](type-aliases/RecipientObject.mdx)
+- [ColorMode](type-aliases/ColorMode.mdx)
+- [KnockProviderProps](type-aliases/KnockProviderProps.mdx)
+- [Selector](type-aliases/Selector.mdx)
+- [KnockGuideProviderProps](type-aliases/KnockGuideProviderProps.mdx)
+- [MsTeamsTeamQueryOptions](type-aliases/MsTeamsTeamQueryOptions.mdx)
+- [MsTeamsChannelQueryOptions](type-aliases/MsTeamsChannelQueryOptions.mdx)
+- [KnockSlackProviderProps](type-aliases/KnockSlackProviderProps.mdx)
+- [ContainerObject](type-aliases/ContainerObject.mdx)
+- [SlackChannelQueryOptions](type-aliases/SlackChannelQueryOptions.mdx)
+
+## Variables
+
+### KnockProvider
+
+> `const` **KnockProvider**: `React.FC`\<`PropsWithChildren`\<[`KnockProviderProps`](type-aliases/KnockProviderProps.mdx)\>\>
+
+Defined in: [packages/react-core/src/modules/core/context/KnockProvider.tsx:57](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/context/KnockProvider.tsx#L57)
+
+***
+
+### KnockFeedProvider
+
+> `const` **KnockFeedProvider**: `React.FC`\<`PropsWithChildren`\<[`KnockFeedProviderProps`](interfaces/KnockFeedProviderProps.mdx)\>\>
+
+Defined in: [packages/react-core/src/modules/feed/context/KnockFeedProvider.tsx:33](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/context/KnockFeedProvider.tsx#L33)
+
+***
+
+### KnockGuideContext
+
+> `const` **KnockGuideContext**: `Context`\<`undefined` \| `KnockGuideProviderValue`\>
+
+Defined in: [packages/react-core/src/modules/guide/context/KnockGuideProvider.tsx:15](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/guide/context/KnockGuideProvider.tsx#L15)
+
+***
+
+### KnockGuideProvider
+
+> `const` **KnockGuideProvider**: `React.FC`\<`React.PropsWithChildren`\<[`KnockGuideProviderProps`](type-aliases/KnockGuideProviderProps.mdx)\>\>
+
+Defined in: [packages/react-core/src/modules/guide/context/KnockGuideProvider.tsx:30](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/guide/context/KnockGuideProvider.tsx#L30)
+
+***
+
+### I18nContext
+
+> `const` **I18nContext**: `Context`\<[`I18nContent`](interfaces/I18nContent.mdx)\>
+
+Defined in: [packages/react-core/src/modules/i18n/context/KnockI18nProvider.tsx:6](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/i18n/context/KnockI18nProvider.tsx#L6)
+
+***
+
+### KnockI18nProvider
+
+> `const` **KnockI18nProvider**: `FunctionComponent`\<`PropsWithChildren`\<[`KnockI18nProviderProps`](interfaces/KnockI18nProviderProps.mdx)\>\>
+
+Defined in: [packages/react-core/src/modules/i18n/context/KnockI18nProvider.tsx:12](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/i18n/context/KnockI18nProvider.tsx#L12)
+
+***
+
+### locales
+
+> `const` **locales**: `object`
+
+Defined in: [packages/react-core/src/modules/i18n/languages/index.ts:55](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/i18n/languages/index.ts#L55)
+
+#### Type Declaration
+
+##### en
+
+> **en**: [`I18nContent`](interfaces/I18nContent.mdx)
+
+##### de
+
+> **de**: [`I18nContent`](interfaces/I18nContent.mdx)
+
+***
+
+### KnockMsTeamsProvider
+
+> `const` **KnockMsTeamsProvider**: `React.FC`\<`PropsWithChildren`\<[`KnockMsTeamsProviderProps`](interfaces/KnockMsTeamsProviderProps.mdx)\>\>
+
+Defined in: [packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx:28](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx#L28)
+
+***
+
+### KnockSlackProvider
+
+> `const` **KnockSlackProvider**: `React.FC`\<`PropsWithChildren`\<[`KnockSlackProviderProps`](type-aliases/KnockSlackProviderProps.mdx)\>\>
+
+Defined in: [packages/react-core/src/modules/slack/context/KnockSlackProvider.tsx:40](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/slack/context/KnockSlackProvider.tsx#L40)
+
+## Functions
+
+### useKnockClient()
+
+> **useKnockClient**(): `Knock`
+
+Defined in: [packages/react-core/src/modules/core/context/KnockProvider.tsx:103](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/context/KnockProvider.tsx#L103)
+
+#### Returns
+
+`Knock`
+
+***
+
+### ~~useAuthenticatedKnockClient()~~
+
+#### Call Signature
+
+> **useAuthenticatedKnockClient**(`apiKey`, `userIdOrUserWithProperties`, `userToken?`, `options?`): `Knock`
+
+Defined in: [packages/react-core/src/modules/core/hooks/useAuthenticatedKnockClient.ts:35](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/hooks/useAuthenticatedKnockClient.ts#L35)
+
+##### Parameters
+
+###### apiKey
+
+`string`
+
+###### userIdOrUserWithProperties
+
+`UserId`
+
+###### userToken?
+
+`any`
+
+###### options?
+
+`any`
+
+##### Returns
+
+`Knock`
+
+##### Deprecated
+
+Passing `userId` as a `string` is deprecated and will be removed in a future version.
+Please pass a `user` object instead containing an `id` value.
+example:
+```ts
+useAuthenticatedKnockClient("pk_test_12345", { id: "user_123" });
+```
+
+#### Call Signature
+
+> **useAuthenticatedKnockClient**(`apiKey`, `userIdOrUserWithProperties`, `userToken?`, `options?`): `Knock`
+
+Defined in: [packages/react-core/src/modules/core/hooks/useAuthenticatedKnockClient.ts:41](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/hooks/useAuthenticatedKnockClient.ts#L41)
+
+##### Parameters
+
+###### apiKey
+
+`string`
+
+###### userIdOrUserWithProperties
+
+`UserIdOrUserWithProperties`
+
+###### userToken?
+
+`any`
+
+###### options?
+
+`any`
+
+##### Returns
+
+`Knock`
+
+##### Deprecated
+
+Passing `userId` as a `string` is deprecated and will be removed in a future version.
+Please pass a `user` object instead containing an `id` value.
+example:
+```ts
+useAuthenticatedKnockClient("pk_test_12345", { id: "user_123" });
+```
+
+***
+
+### useStableOptions()
+
+> **useStableOptions**\<`T`\>(`options`): `T`
+
+Defined in: [packages/react-core/src/modules/core/hooks/useStableOptions.ts:4](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/hooks/useStableOptions.ts#L4)
+
+#### Type Parameters
+
+##### T
+
+`T`
+
+#### Parameters
+
+##### options
+
+`T`
+
+#### Returns
+
+`T`
+
+***
+
+### formatBadgeCount()
+
+> **formatBadgeCount**(`count`): `string` \| `number`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:5](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L5)
+
+#### Parameters
+
+##### count
+
+`number`
+
+#### Returns
+
+`string` \| `number`
+
+***
+
+### formatTimestamp()
+
+> **formatTimestamp**(`ts`, `options`): `string`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:13](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L13)
+
+#### Parameters
+
+##### ts
+
+`string`
+
+##### options
+
+`FormatTimestampOptions` = `{}`
+
+#### Returns
+
+`string`
+
+***
+
+### toSentenceCase()
+
+> **toSentenceCase**(`string`): `string`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:29](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L29)
+
+#### Parameters
+
+##### string
+
+`string`
+
+#### Returns
+
+`string`
+
+***
+
+### renderNodeOrFallback()
+
+> **renderNodeOrFallback**(`node`, `fallback`): `ReactNode`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:33](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L33)
+
+#### Parameters
+
+##### node
+
+`ReactNode`
+
+##### fallback
+
+`ReactNode`
+
+#### Returns
+
+`ReactNode`
+
+***
+
+### feedProviderKey()
+
+> **feedProviderKey**(`userId`, `feedId`, `options`): `string`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:41](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L41)
+
+#### Parameters
+
+##### userId
+
+`Knock`
+
+##### feedId
+
+`string`
+
+##### options
+
+`FeedClientOptions` = `{}`
+
+#### Returns
+
+`string`
+
+***
+
+### slackProviderKey()
+
+> **slackProviderKey**(`__namedParameters`): `string`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:62](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L62)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+###### knockSlackChannelId
+
+`string`
+
+###### tenantId
+
+`string`
+
+###### connectionStatus
+
+`string`
+
+###### errorLabel
+
+`null` \| `string`
+
+#### Returns
+
+`string`
+
+***
+
+### msTeamsProviderKey()
+
+> **msTeamsProviderKey**(`__namedParameters`): `string`
+
+Defined in: [packages/react-core/src/modules/core/utils.ts:82](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/core/utils.ts#L82)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+###### knockMsTeamsChannelId
+
+`string`
+
+###### tenantId
+
+`string`
+
+###### connectionStatus
+
+`string`
+
+###### errorLabel
+
+`null` \| `string`
+
+#### Returns
+
+`string`
+
+***
+
+### useKnockFeed()
+
+> **useKnockFeed**(): [`KnockFeedProviderState`](interfaces/KnockFeedProviderState.mdx)
+
+Defined in: [packages/react-core/src/modules/feed/context/KnockFeedProvider.tsx:61](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/context/KnockFeedProvider.tsx#L61)
+
+#### Returns
+
+[`KnockFeedProviderState`](interfaces/KnockFeedProviderState.mdx)
+
+***
+
+### useFeedSettings()
+
+> **useFeedSettings**(`feedClient`): `object`
+
+Defined in: [packages/react-core/src/modules/feed/hooks/useFeedSettings.ts:10](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/hooks/useFeedSettings.ts#L10)
+
+#### Parameters
+
+##### feedClient
+
+`Feed`
+
+#### Returns
+
+`object`
+
+##### settings
+
+> **settings**: `null` \| `FeedSettings`
+
+##### loading
+
+> **loading**: `boolean`
+
+***
+
+### useCreateNotificationStore()
+
+> **useCreateNotificationStore**(`feedClient`): \<`T`\>(`selector?`) => `T`
+
+Defined in: [packages/react-core/src/modules/feed/hooks/useNotificationStore.ts:12](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/hooks/useNotificationStore.ts#L12)
+
+Create a hook factory that provides access to the TanStack Store with optional selector support.
+This pattern allows for flexible store access with or without selectors while maintaining
+type safety. The selector can be passed either to useCreateNotificationStore or
+useNotificationStore, with the latter taking precedence.
+
+#### Parameters
+
+##### feedClient
+
+`Feed`
+
+#### Returns
+
+> \<`T`\>(`selector?`): `T`
+
+##### Type Parameters
+
+###### T
+
+`T` = `FeedStoreState`
+
+##### Parameters
+
+###### selector?
+
+[`Selector`](type-aliases/Selector.mdx)\<`T`\>
+
+##### Returns
+
+`T`
+
+***
+
+### useNotificationStore()
+
+#### Call Signature
+
+> **useNotificationStore**(`feedClient`): `FeedStoreState`
+
+Defined in: [packages/react-core/src/modules/feed/hooks/useNotificationStore.ts:44](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/hooks/useNotificationStore.ts#L44)
+
+A hook used to access content within the notification store.
+
+##### Parameters
+
+###### feedClient
+
+`Feed`
+
+##### Returns
+
+`FeedStoreState`
+
+##### Examples
+
+```ts
+const { items, metadata } = useNotificationStore(feedClient);
+```
+
+A selector can be used to access a subset of the store state.
+
+```ts
+const { items, metadata } = useNotificationStore(feedClient, (state) => ({
+  items: state.items,
+  metadata: state.metadata,
+}));
+```
+
+#### Call Signature
+
+> **useNotificationStore**\<`T`\>(`feedClient`, `selector`): `T`
+
+Defined in: [packages/react-core/src/modules/feed/hooks/useNotificationStore.ts:45](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/hooks/useNotificationStore.ts#L45)
+
+A hook used to access content within the notification store.
+
+##### Type Parameters
+
+###### T
+
+`T`
+
+##### Parameters
+
+###### feedClient
+
+`Feed`
+
+###### selector
+
+[`Selector`](type-aliases/Selector.mdx)\<`T`\>
+
+##### Returns
+
+`T`
+
+##### Examples
+
+```ts
+const { items, metadata } = useNotificationStore(feedClient);
+```
+
+A selector can be used to access a subset of the store state.
+
+```ts
+const { items, metadata } = useNotificationStore(feedClient, (state) => ({
+  items: state.items,
+  metadata: state.metadata,
+}));
+```
+
+***
+
+### useNotifications()
+
+> **useNotifications**(`knock`, `feedChannelId`, `options`): `Feed`
+
+Defined in: [packages/react-core/src/modules/feed/hooks/useNotifications.ts:11](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/feed/hooks/useNotifications.ts#L11)
+
+#### Parameters
+
+##### knock
+
+`Knock`
+
+##### feedChannelId
+
+`string`
+
+##### options
+
+`FeedClientOptions` = `{}`
+
+#### Returns
+
+`Feed`
+
+***
+
+### useGuide()
+
+> **useGuide**\<`C`\>(`filters`): `UseGuideReturn`\<`C`\>
+
+Defined in: [packages/react-core/src/modules/guide/hooks/useGuide.ts:72](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/guide/hooks/useGuide.ts#L72)
+
+Hook for retrieving and managing a specific guide based on filters.
+
+This hook allows you to access a specific guide from the Knock system by providing
+filter criteria such as key or type. It returns the guide object along with its
+current step and provides access to the guide context.
+
+#### Type Parameters
+
+##### C
+
+`C` = `any`
+
+The custom data type for guide content
+
+#### Parameters
+
+##### filters
+
+`KnockGuideFilterParams`
+
+Filter parameters to identify the guide
+
+#### Returns
+
+`UseGuideReturn`\<`C`\>
+
+An object containing:
+- `guide`: The matched guide object or undefined if no match
+- `step`: The current step of the guide or undefined
+- `client`: The Knock client instance from context
+- `colorMode`: The current color mode from context
+
+#### Throws
+
+When neither key nor type filters are provided
+
+#### Examples
+
+```typescript
+// Get a guide by key
+const { guide, step, client } = useGuide({ key: 'onboarding-guide' });
+
+if (guide) {
+  console.log('Guide title:', guide.title);
+  if (step) {
+    console.log('Current step:', step.title);
+  }
+}
+```
+
+```typescript
+// Get a guide by type
+const { guide, step } = useGuide({ type: 'tutorial' });
+
+// Use with custom content type
+interface CustomGuideData {
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+const { guide } = useGuide<CustomGuideData>({ key: 'advanced-tutorial' });
+```
+
+***
+
+### useGuideContext()
+
+> **useGuideContext**(): `UseGuideContextReturn`
+
+Defined in: [packages/react-core/src/modules/guide/hooks/useGuideContext.ts:11](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/guide/hooks/useGuideContext.ts#L11)
+
+#### Returns
+
+`UseGuideContextReturn`
+
+***
+
+### useGuides()
+
+> **useGuides**\<`C`\>(`filters`): `UseGuidesReturn`\<`C`\>
+
+Defined in: [packages/react-core/src/modules/guide/hooks/useGuides.ts:62](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/guide/hooks/useGuides.ts#L62)
+
+Hook for retrieving and managing multiple guides based on type filters.
+
+This hook allows you to access multiple guides from the Knock system by providing
+a type filter. It returns an array of guide objects that match the specified type
+along with access to the guide context.
+
+#### Type Parameters
+
+##### C
+
+`C` = `any`
+
+The custom data type for guide content
+
+#### Parameters
+
+##### filters
+
+`Pick`\<[`FilterStatus`](../../react/src/index.mdx#filterstatus), `"type"`\>
+
+Filter parameters to identify guides
+
+#### Returns
+
+`UseGuidesReturn`\<`C`\>
+
+An object containing:
+- `guides`: Array of guides matching the filter
+- `client`: The Knock client instance from context
+- `colorMode`: The current color mode from context
+
+#### Examples
+
+```typescript
+// Get all tutorial guides
+const { guides, client } = useGuides({ type: 'tutorial' });
+
+console.log(`Found ${guides.length} tutorial guides`);
+guides.forEach(guide => {
+  console.log('Guide:', guide.title);
+});
+```
+
+```typescript
+// Use with custom content type
+interface TutorialData {
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: number;
+}
+
+const { guides } = useGuides<TutorialData>({ type: 'tutorial' });
+
+// Filter by difficulty
+const beginnerGuides = guides.filter(guide => 
+  guide.data?.difficulty === 'beginner'
+);
+```
+
+***
+
+### useTranslations()
+
+> **useTranslations**(): `object`
+
+Defined in: [packages/react-core/src/modules/i18n/hooks/useTranslations.ts:6](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/i18n/hooks/useTranslations.ts#L6)
+
+#### Returns
+
+`object`
+
+##### locale
+
+> **locale**: `string`
+
+##### t()
+
+> **t**: (`key`) => `undefined` \| `string`
+
+###### Parameters
+
+###### key
+
+keyof [`Translations`](interfaces/Translations.mdx)
+
+###### Returns
+
+`undefined` \| `string`
+
+***
+
+### useKnockMsTeamsClient()
+
+> **useKnockMsTeamsClient**(): [`KnockMsTeamsProviderState`](interfaces/KnockMsTeamsProviderState.mdx)
+
+Defined in: [packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx:66](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx#L66)
+
+#### Returns
+
+[`KnockMsTeamsProviderState`](interfaces/KnockMsTeamsProviderState.mdx)
+
+***
+
+### useConnectedMsTeamsChannels()
+
+> **useConnectedMsTeamsChannels**(`__namedParameters`): `UseConnectedMsTeamsChannelsOutput`
+
+Defined in: [packages/react-core/src/modules/ms-teams/hooks/useConnectedMsTeamsChannels.ts:27](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/hooks/useConnectedMsTeamsChannels.ts#L27)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`UseConnectedMsTeamsChannelsProps`
+
+#### Returns
+
+`UseConnectedMsTeamsChannelsOutput`
+
+***
+
+### useMsTeamsAuth()
+
+> **useMsTeamsAuth**(`graphApiClientId`, `redirectUrl?`): `UseMsTeamsAuthOutput`
+
+Defined in: [packages/react-core/src/modules/ms-teams/hooks/useMsTeamsAuth.ts:17](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/hooks/useMsTeamsAuth.ts#L17)
+
+#### Parameters
+
+##### graphApiClientId
+
+`string`
+
+##### redirectUrl?
+
+`string`
+
+#### Returns
+
+`UseMsTeamsAuthOutput`
+
+***
+
+### useMsTeamsChannels()
+
+> **useMsTeamsChannels**(`__namedParameters`): `UseMsTeamsChannelsOutput`
+
+Defined in: [packages/react-core/src/modules/ms-teams/hooks/useMsTeamsChannels.ts:21](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/hooks/useMsTeamsChannels.ts#L21)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`UseMsTeamsChannelsProps`
+
+#### Returns
+
+`UseMsTeamsChannelsOutput`
+
+***
+
+### useMsTeamsConnectionStatus()
+
+> **useMsTeamsConnectionStatus**(`knock`, `knockMsTeamsChannelId`, `tenantId`): `UseMsTeamsConnectionStatusOutput`
+
+Defined in: [packages/react-core/src/modules/ms-teams/hooks/useMsTeamsConnectionStatus.ts:22](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/hooks/useMsTeamsConnectionStatus.ts#L22)
+
+#### Parameters
+
+##### knock
+
+`Knock`
+
+##### knockMsTeamsChannelId
+
+`string`
+
+##### tenantId
+
+`string`
+
+#### Returns
+
+`UseMsTeamsConnectionStatusOutput`
+
+***
+
+### useMsTeamsTeams()
+
+> **useMsTeamsTeams**(`__namedParameters`): `UseMsTeamsTeamsOutput`
+
+Defined in: [packages/react-core/src/modules/ms-teams/hooks/useMsTeamsTeams.ts:43](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/hooks/useMsTeamsTeams.ts#L43)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`UseMsTeamsTeamsOptions`
+
+#### Returns
+
+`UseMsTeamsTeamsOutput`
+
+***
+
+### usePreferences()
+
+> **usePreferences**(`options`): `UsePreferencesReturn`
+
+Defined in: [packages/react-core/src/modules/preferences/hooks/usePreferences.ts:21](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/preferences/hooks/usePreferences.ts#L21)
+
+#### Parameters
+
+##### options
+
+`GetPreferencesOptions` = `{}`
+
+#### Returns
+
+`UsePreferencesReturn`
+
+***
+
+### useKnockSlackClient()
+
+> **useKnockSlackClient**(): [`KnockSlackProviderState`](interfaces/KnockSlackProviderState.mdx)
+
+Defined in: [packages/react-core/src/modules/slack/context/KnockSlackProvider.tsx:83](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/slack/context/KnockSlackProvider.tsx#L83)
+
+#### Returns
+
+[`KnockSlackProviderState`](interfaces/KnockSlackProviderState.mdx)
+
+***
+
+### useConnectedSlackChannels()
+
+> **useConnectedSlackChannels**(`__namedParameters`): `UseConnectedSlackChannelsOutput`
+
+Defined in: [packages/react-core/src/modules/slack/hooks/useConnectedSlackChannels.ts:27](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/slack/hooks/useConnectedSlackChannels.ts#L27)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`UseConnectedSlackChannelsProps`
+
+#### Returns
+
+`UseConnectedSlackChannelsOutput`
+
+***
+
+### useSlackAuth()
+
+> **useSlackAuth**(`slackClientId`, `redirectUrl?`, `options?`): `UseSlackAuthOutput`
+
+Defined in: [packages/react-core/src/modules/slack/hooks/useSlackAuth.ts:48](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/slack/hooks/useSlackAuth.ts#L48)
+
+#### Parameters
+
+##### slackClientId
+
+`string`
+
+##### redirectUrl?
+
+`string`
+
+##### options?
+
+`string`[] | `UseSlackAuthOptions`
+
+#### Returns
+
+`UseSlackAuthOutput`
+
+***
+
+### useSlackChannels()
+
+> **useSlackChannels**(`__namedParameters`): `UseSlackChannelOutput`
+
+Defined in: [packages/react-core/src/modules/slack/hooks/useSlackChannels.ts:44](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/slack/hooks/useSlackChannels.ts#L44)
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`UseSlackChannelsOptions`
+
+#### Returns
+
+`UseSlackChannelOutput`
+
+***
+
+### useSlackConnectionStatus()
+
+> **useSlackConnectionStatus**(`knock`, `knockSlackChannelId`, `tenantId`): `UseSlackConnectionStatusOutput`
+
+Defined in: [packages/react-core/src/modules/slack/hooks/useSlackConnectionStatus.ts:34](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/slack/hooks/useSlackConnectionStatus.ts#L34)
+
+#### Parameters
+
+##### knock
+
+`Knock`
+
+##### knockSlackChannelId
+
+`string`
+
+##### tenantId
+
+`string`
+
+#### Returns
+
+`UseSlackConnectionStatusOutput`

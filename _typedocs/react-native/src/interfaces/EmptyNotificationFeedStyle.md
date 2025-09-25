@@ -1,0 +1,41 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [react-native/src](../README.md) / EmptyNotificationFeedStyle
+
+# Interface: EmptyNotificationFeedStyle
+
+Defined in: [packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx:11](https://github.com/knocklabs/javascript/blob/main/packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx#L11)
+
+## Properties
+
+### titleString?
+
+> `optional` **titleString**: `string`
+
+Defined in: [packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx:12](https://github.com/knocklabs/javascript/blob/main/packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx#L12)
+
+***
+
+### subtitleString?
+
+> `optional` **subtitleString**: `string`
+
+Defined in: [packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx:13](https://github.com/knocklabs/javascript/blob/main/packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx#L13)
+
+***
+
+### titleStyle?
+
+> `optional` **titleStyle**: `TextStyle`
+
+Defined in: [packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx:14](https://github.com/knocklabs/javascript/blob/main/packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx#L14)
+
+***
+
+### subtitleStyle?
+
+> `optional` **subtitleStyle**: `TextStyle`
+
+Defined in: [packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx:15](https://github.com/knocklabs/javascript/blob/main/packages/react-native/src/modules/feed/components/NotificationFeedComponents/EmptyNotificationFeed.tsx#L15)

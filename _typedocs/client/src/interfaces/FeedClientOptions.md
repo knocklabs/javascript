@@ -1,0 +1,133 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / FeedClientOptions
+
+# Interface: FeedClientOptions
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:18](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L18)
+
+## Properties
+
+### before?
+
+> `optional` **before**: `string`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:19](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L19)
+
+***
+
+### after?
+
+> `optional` **after**: `string`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:20](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L20)
+
+***
+
+### page\_size?
+
+> `optional` **page\_size**: `number`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:21](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L21)
+
+***
+
+### status?
+
+> `optional` **status**: `"unread"` \| `"read"` \| `"unseen"` \| `"seen"` \| `"all"`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:22](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L22)
+
+***
+
+### source?
+
+> `optional` **source**: `string`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:24](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L24)
+
+***
+
+### tenant?
+
+> `optional` **tenant**: `string`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:26](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L26)
+
+***
+
+### has\_tenant?
+
+> `optional` **has\_tenant**: `boolean`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:28](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L28)
+
+***
+
+### workflow\_categories?
+
+> `optional` **workflow\_categories**: `string`[]
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:30](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L30)
+
+***
+
+### archived?
+
+> `optional` **archived**: `"include"` \| `"exclude"` \| `"only"`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:32](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L32)
+
+***
+
+### trigger\_data?
+
+> `optional` **trigger\_data**: [`TriggerData`](TriggerData.md)
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:34](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L34)
+
+***
+
+### \_\_experimentalCrossBrowserUpdates?
+
+> `optional` **\_\_experimentalCrossBrowserUpdates**: `boolean`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:36](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L36)
+
+***
+
+### auto\_manage\_socket\_connection?
+
+> `optional` **auto\_manage\_socket\_connection**: `boolean`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:38](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L38)
+
+***
+
+### auto\_manage\_socket\_connection\_delay?
+
+> `optional` **auto\_manage\_socket\_connection\_delay**: `number`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:41](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L41)
+
+***
+
+### inserted\_at\_date\_range?
+
+> `optional` **inserted\_at\_date\_range**: `object`
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:43](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L43)
+
+#### start?
+
+> `optional` **start**: `string`
+
+#### end?
+
+> `optional` **end**: `string`
+
+#### inclusive?
+
+> `optional` **inclusive**: `boolean`

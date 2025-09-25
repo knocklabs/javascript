@@ -1,0 +1,25 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / UserTokenExpiringCallback
+
+# Type Alias: UserTokenExpiringCallback()
+
+> **UserTokenExpiringCallback** = (`currentToken`, `decodedToken`) => `Promise`\<`string` \| `void`\>
+
+Defined in: [packages/client/src/interfaces.ts:49](https://github.com/knocklabs/javascript/blob/main/packages/client/src/interfaces.ts#L49)
+
+## Parameters
+
+### currentToken
+
+`string`
+
+### decodedToken
+
+`JwtPayload`
+
+## Returns
+
+`Promise`\<`string` \| `void`\>

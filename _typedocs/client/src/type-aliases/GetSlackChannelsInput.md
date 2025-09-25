@@ -1,0 +1,55 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / GetSlackChannelsInput
+
+# Type Alias: GetSlackChannelsInput
+
+> **GetSlackChannelsInput** = `object`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:8](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L8)
+
+## Properties
+
+### tenant
+
+> **tenant**: `string`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:9](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L9)
+
+***
+
+### knockChannelId
+
+> **knockChannelId**: `string`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:10](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L10)
+
+***
+
+### queryOptions?
+
+> `optional` **queryOptions**: `object`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:11](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L11)
+
+#### limit?
+
+> `optional` **limit**: `number`
+
+#### cursor?
+
+> `optional` **cursor**: `string`
+
+#### excludeArchived?
+
+> `optional` **excludeArchived**: `boolean`
+
+#### teamId?
+
+> `optional` **teamId**: `string`
+
+#### types?
+
+> `optional` **types**: `string`

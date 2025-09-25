@@ -1,0 +1,41 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / NotificationSource
+
+# Interface: NotificationSource
+
+Defined in: [packages/client/src/clients/messages/interfaces.ts:13](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/messages/interfaces.ts#L13)
+
+## Properties
+
+### key
+
+> **key**: `string`
+
+Defined in: [packages/client/src/clients/messages/interfaces.ts:14](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/messages/interfaces.ts#L14)
+
+***
+
+### version\_id
+
+> **version\_id**: `string`
+
+Defined in: [packages/client/src/clients/messages/interfaces.ts:15](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/messages/interfaces.ts#L15)
+
+***
+
+### categories
+
+> **categories**: `string`[]
+
+Defined in: [packages/client/src/clients/messages/interfaces.ts:16](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/messages/interfaces.ts#L16)
+
+***
+
+### step\_ref?
+
+> `optional` **step\_ref**: `null` \| `string`
+
+Defined in: [packages/client/src/clients/messages/interfaces.ts:17](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/messages/interfaces.ts#L17)

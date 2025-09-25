@@ -13,24 +13,27 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}ℹ️  Cleaning previous documentation...${NC}"
-yarn docs:clean
-
 echo -e "${BLUE}ℹ️  Generating TypeDoc documentation...${NC}"
-yarn docs:generate
+yarn docs:build
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Documentation generated successfully!${NC}"
-    echo -e "${GREEN}📁 Documentation location: ./_typedocs${NC}"
+    echo -e "${GREEN}📁 HTML Documentation: ./_typedocs${NC}"
+    echo -e "${GREEN}📁 Markdown Documentation: ./_typedocs-markdown${NC}"
     echo ""
     echo -e "${YELLOW}📖 To view the documentation:${NC}"
-    echo -e "   - Open ./_typedocs/index.mdx to see the main index"
-    echo -e "   - Browse ./_typedocs/globals.mdx for the full API reference"
-    echo -e "   - All files are in MDX format for easy integration with documentation sites"
+    echo -e "   HTML (for local viewing):"
+    echo -e "   - Open ./_typedocs/index.html in your browser"
+    echo -e "   - Browse package modules in ./_typedocs/modules/"
+    echo ""
+    echo -e "   Markdown/MDX (for documentation sites):"
+    echo -e "   - Main index: ./_typedocs-markdown/index.mdx"
+    echo -e "   - Package modules: ./_typedocs-markdown/[package-name]/src/"
+    echo -e "   - All files have frontmatter for easy integration"
     echo ""
     echo -e "${YELLOW}🔗 Quick links:${NC}"
-    echo -e "   - Main index: file://$(pwd)/_typedocs/index.mdx"
-    echo -e "   - API reference: file://$(pwd)/_typedocs/globals.mdx"
+    echo -e "   - HTML main page: file://$(pwd)/_typedocs/index.html"
+    echo -e "   - MDX main index: file://$(pwd)/_typedocs-markdown/index.mdx"
 else
     echo -e "${RED}❌ Documentation generation failed!${NC}"
     exit 1

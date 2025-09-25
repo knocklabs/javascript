@@ -1,0 +1,21 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / TriggerData
+
+# Interface: TriggerData
+
+Defined in: [packages/client/src/clients/feed/interfaces.ts:14](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/feed/interfaces.ts#L14)
+
+`trigger_data` may only specify flat key-value pairs, not nested objects
+Specifying a nested object will result in a 422 "invalid_params" error
+https://docs.knock.app/reference#trigger-data-filtering
+
+## Extends
+
+- `GenericData`
+
+## Indexable
+
+\[`key`: `string`\]: `null` \| `string` \| `number` \| `boolean`

@@ -1,0 +1,59 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / MsTeamsChannel
+
+# Type Alias: MsTeamsChannel
+
+> **MsTeamsChannel** = `object`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:47](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L47)
+
+## Properties
+
+### id
+
+> **id**: `string`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:48](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L48)
+
+***
+
+### displayName
+
+> **displayName**: `string`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:49](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L49)
+
+***
+
+### description?
+
+> `optional` **description**: `string`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:50](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L50)
+
+***
+
+### membershipType?
+
+> `optional` **membershipType**: `string`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:51](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L51)
+
+***
+
+### isArchived?
+
+> `optional` **isArchived**: `boolean`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:52](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L52)
+
+***
+
+### createdDateTime?
+
+> `optional` **createdDateTime**: `string`
+
+Defined in: [packages/client/src/clients/ms-teams/interfaces.ts:53](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/ms-teams/interfaces.ts#L53)

@@ -1,0 +1,51 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / SlackChannel
+
+# Type Alias: SlackChannel
+
+> **SlackChannel** = `object`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:25](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L25)
+
+## Properties
+
+### name
+
+> **name**: `string`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:26](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L26)
+
+***
+
+### id
+
+> **id**: `string`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:27](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L27)
+
+***
+
+### is\_private
+
+> **is\_private**: `boolean`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:28](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L28)
+
+***
+
+### is\_im
+
+> **is\_im**: `boolean`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:29](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L29)
+
+***
+
+### context\_team\_id
+
+> **context\_team\_id**: `boolean`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:30](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L30)

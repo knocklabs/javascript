@@ -1,0 +1,27 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [client/src](../README.md) / GetSlackChannelsResponse
+
+# Type Alias: GetSlackChannelsResponse
+
+> **GetSlackChannelsResponse** = `object`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:20](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L20)
+
+## Properties
+
+### slack\_channels
+
+> **slack\_channels**: [`SlackChannel`](SlackChannel.md)[]
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:21](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L21)
+
+***
+
+### next\_cursor
+
+> **next\_cursor**: `string` \| `null`
+
+Defined in: [packages/client/src/clients/slack/interfaces.ts:22](https://github.com/knocklabs/javascript/blob/main/packages/client/src/clients/slack/interfaces.ts#L22)

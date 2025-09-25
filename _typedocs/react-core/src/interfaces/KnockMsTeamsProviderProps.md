@@ -1,0 +1,25 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [react-core/src](../README.md) / KnockMsTeamsProviderProps
+
+# Interface: KnockMsTeamsProviderProps
+
+Defined in: [packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx:23](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx#L23)
+
+## Properties
+
+### knockMsTeamsChannelId
+
+> **knockMsTeamsChannelId**: `string`
+
+Defined in: [packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx:24](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx#L24)
+
+***
+
+### tenantId
+
+> **tenantId**: `string`
+
+Defined in: [packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx:25](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/context/KnockMsTeamsProvider.tsx#L25)

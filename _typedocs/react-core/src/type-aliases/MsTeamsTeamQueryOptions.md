@@ -1,0 +1,43 @@
+[**@knocklabs/javascript v0.1.0-rc.0**](../../../README.md)
+
+***
+
+[@knocklabs/javascript](../../../modules.md) / [react-core/src](../README.md) / MsTeamsTeamQueryOptions
+
+# Type Alias: MsTeamsTeamQueryOptions
+
+> **MsTeamsTeamQueryOptions** = `object`
+
+Defined in: [packages/react-core/src/modules/ms-teams/interfaces.ts:1](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/interfaces.ts#L1)
+
+## Properties
+
+### maxCount?
+
+> `optional` **maxCount**: `number`
+
+Defined in: [packages/react-core/src/modules/ms-teams/interfaces.ts:2](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/interfaces.ts#L2)
+
+***
+
+### limitPerPage?
+
+> `optional` **limitPerPage**: `number`
+
+Defined in: [packages/react-core/src/modules/ms-teams/interfaces.ts:3](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/interfaces.ts#L3)
+
+***
+
+### filter?
+
+> `optional` **filter**: `string`
+
+Defined in: [packages/react-core/src/modules/ms-teams/interfaces.ts:4](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/interfaces.ts#L4)
+
+***
+
+### select?
+
+> `optional` **select**: `string`
+
+Defined in: [packages/react-core/src/modules/ms-teams/interfaces.ts:5](https://github.com/knocklabs/javascript/blob/main/packages/react-core/src/modules/ms-teams/interfaces.ts#L5)

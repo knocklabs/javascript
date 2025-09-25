@@ -1,35 +1,44 @@
-# TypeDoc Setup Summary
+# TypeDoc Setup Summary (Clerk Style)
 
-This document summarizes the TypeDoc setup that has been configured for the `@knocklabs/javascript` repository.
+This document summarizes the TypeDoc setup that has been configured for the `@knocklabs/javascript` repository, **modeled after the Clerk JavaScript repository configuration**.
 
 ## What Was Set Up
 
 ### 1. Dependencies Installed
 - `typedoc` - Core TypeDoc library
-- `typedoc-plugin-markdown` - Plugin to generate Markdown output instead of HTML
+- `typedoc-plugin-markdown` - Plugin to generate Markdown output 
 - `typedoc-plugin-frontmatter` - Plugin to add frontmatter to generated files for better static site integration
 
-### 2. Configuration File
-Created `typedoc.json` with the following key settings:
-- **Output format**: MDX files (for compatibility with modern documentation sites)
-- **Entry point**: `./packages/react-core/src/index.ts` (focused on the react-core package)
-- **Output directory**: `./_typedocs` (top-level directory as requested)
-- **Plugins**: Markdown generation with frontmatter support
+### 2. Configuration Files (Clerk Style)
+Created `typedoc.config.mjs` (JavaScript configuration) with the following key settings:
+- **Entry points**: Multiple packages (client, expo, react, react-core, react-native, types)
+- **Dual output**: Both HTML and MDX formats
+- **HTML output**: `./_typedocs` directory for local viewing
+- **MDX output**: `./_typedocs-markdown` directory for documentation sites
+- **Monorepo support**: Automatically discovers and documents all packages
 - **Error handling**: Skip type checking errors to allow documentation generation even with build issues
+- **JSX highlighting**: Full support for TypeScript, JavaScript, JSX, and TSX code blocks
 
-### 3. NPM Scripts Added
-Added three new scripts to `package.json`:
-- `docs:generate` - Runs TypeDoc to generate documentation
-- `docs:clean` - Removes the previous documentation directory
-- `docs:build` - Cleans and regenerates documentation in one command
+### 3. Dual Configuration Setup
+- **`typedoc.config.mjs`** - Main configuration for HTML output (similar to Clerk's approach)
+- **`typedoc.markdown.config.mjs`** - Extended configuration for MDX output with frontmatter
 
-### 4. Convenience Script
-Created `generate-docs.sh` - A user-friendly script that:
+### 4. NPM Scripts (Clerk Style)
+Updated scripts in `package.json`:
+- `docs` - Runs TypeDoc with default (HTML) configuration
+- `docs:html` - Explicitly generates HTML documentation  
+- `docs:markdown` - Generates MDX documentation with frontmatter
+- `docs:build` - Generates both HTML and MDX documentation
+- `docs:watch` - Runs TypeDoc in watch mode for development
+
+### 5. Convenience Script
+Updated `generate-docs.sh` to support the new dual-output approach:
+- Generates both HTML and MDX documentation  
 - Provides colored output and progress indicators
-- Shows helpful information about generated files
+- Shows helpful information about both output directories
 - Includes direct file links for easy access
 
-### 5. Enhanced Documentation
+### 6. Enhanced Documentation
 Added comprehensive TypeDoc comments to key hooks:
 - **`useGuide`** - Hook for retrieving individual guides with detailed examples
 - **`useGuides`** - Hook for retrieving multiple guides with filtering examples
