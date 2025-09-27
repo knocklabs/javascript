@@ -25,6 +25,10 @@ export type KnockGuideProviderProps = {
   trackLocationFromWindow?: boolean;
   orderResolutionDuration?: number; // in milliseconds
   throttleCheckInterval?: number; // in milliseconds
+  /** Automatically manage socket connections based on tab visibility (defaults to false) */
+  autoManageSocketConnection?: boolean;
+  /** Delay in milliseconds before disconnecting socket when tab becomes inactive (defaults to 2000) */
+  autoManageSocketConnectionDelay?: number;
 };
 
 export const KnockGuideProvider: React.FC<
@@ -40,6 +44,8 @@ export const KnockGuideProvider: React.FC<
   // one render cyle first and close the group stage.
   orderResolutionDuration = 0,
   throttleCheckInterval,
+  autoManageSocketConnection,
+  autoManageSocketConnectionDelay,
   children,
 }) => {
   let knock: Knock;
@@ -57,6 +63,8 @@ export const KnockGuideProvider: React.FC<
       trackLocationFromWindow,
       orderResolutionDuration,
       throttleCheckInterval,
+      auto_manage_socket_connection: autoManageSocketConnection,
+      auto_manage_socket_connection_delay: autoManageSocketConnectionDelay,
     });
   }, [
     knock,
@@ -65,6 +73,8 @@ export const KnockGuideProvider: React.FC<
     trackLocationFromWindow,
     orderResolutionDuration,
     throttleCheckInterval,
+    autoManageSocketConnection,
+    autoManageSocketConnectionDelay,
   ]);
 
   React.useEffect(() => {
