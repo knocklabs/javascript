@@ -1,4 +1,3 @@
-import { DEBUG_QUERY_PARAMS } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Stack } from "@telegraph/layout";
@@ -6,8 +5,6 @@ import { Tag } from "@telegraph/tag";
 import { Text } from "@telegraph/typography";
 import { Minimize2, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
-
-import { checkForWindow } from "../../../core";
 
 import "./styles.css";
 
@@ -26,15 +23,7 @@ export const GuideToolbar = () => {
   }
 
   const handleExit = () => {
-    const window = checkForWindow();
-    if (!window) {
-      return;
-    }
-
-    const url = new URL(window.location.href);
-    url.searchParams.delete(DEBUG_QUERY_PARAMS.GUIDE_KEY);
-    url.searchParams.delete(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
-    window.location.href = url.toString();
+    client.exitDebugMode();
   };
 
   const handleToggleCollapse = () => {
