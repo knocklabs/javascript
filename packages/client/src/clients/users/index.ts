@@ -130,7 +130,7 @@ class UserClient {
   ) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
-      url: `${guidesApiRootPath(this.instance.userId)}/messages/${params.message_id}/${status}`,
+      url: `${guidesApiRootPath(this.instance.userId)}/messages/${status}`,
       data: params,
     });
 

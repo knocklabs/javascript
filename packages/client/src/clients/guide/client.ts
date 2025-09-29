@@ -978,7 +978,6 @@ export class KnockGuideClient {
     step: GuideStepData,
   ) {
     return {
-      message_id: step.message.id,
       channel_id: guide.channel_id,
       guide_key: guide.key,
       guide_id: guide.id,

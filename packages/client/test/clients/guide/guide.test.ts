@@ -580,7 +580,6 @@ describe("KnockGuideClient", () => {
       await client.markAsSeen(mockGuide, mockStep);
 
       expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("seen", {
-        message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
@@ -613,7 +612,6 @@ describe("KnockGuideClient", () => {
       expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
         "interacted",
         {
-          message_id: "msg_123",
           channel_id: channelId,
           guide_key: "test_guide",
           guide_id: "guide_123",
@@ -643,7 +641,6 @@ describe("KnockGuideClient", () => {
       await client.markAsArchived(mockGuide, mockStep);
 
       expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("archived", {
-        message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
@@ -699,7 +696,6 @@ describe("KnockGuideClient", () => {
       await client.markAsArchived(unthrottledGuide, freshMockStep);
 
       expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("archived", {
-        message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
@@ -2632,7 +2628,6 @@ describe("KnockGuideClient", () => {
       );
 
       expect(result).toEqual({
-        message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
