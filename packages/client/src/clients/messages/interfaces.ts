@@ -14,6 +14,7 @@ export interface NotificationSource {
   key: string;
   version_id: string;
   categories: string[];
+  step_ref?: string | null;
 }
 
 export type MessageEngagementStatus =

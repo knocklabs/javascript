@@ -1,6 +1,5 @@
 import { DEBUG_QUERY_PARAMS } from "@knocklabs/client";
-import { useGuideContext } from "@knocklabs/react-core";
-import { useStore } from "@tanstack/react-store";
+import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";

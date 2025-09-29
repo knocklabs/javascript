@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.18.4
+
+### Patch Changes
+
+- c64098e: fix: handle promise rejection when identifying a user inline
+
+## 0.18.3
+
+### Patch Changes
+
+- 9f0d317: fix(KNO-9711) Add step_ref to NotificationSource
+
+  Add optional nullable field corresponding to API spec
+
+## 0.18.2
+
+### Patch Changes
+
+- 1fc802b: fix(feed): optimistically update when unarchiving an item
+
+## 0.18.1
+
+### Patch Changes
+
+- 74366b3: export useStore from react-core to include in use client directive
+
 ## 0.18.0
 
 ### Minor Changes

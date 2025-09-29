@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.8.7
+
+### Patch Changes
+
+- Updated dependencies [c64098e]
+  - @knocklabs/client@0.18.4
+  - @knocklabs/react-core@0.10.4
+
+## 0.8.6
+
+### Patch Changes
+
+- Updated dependencies [9f0d317]
+  - @knocklabs/client@0.18.3
+  - @knocklabs/react-core@0.10.3
+
+## 0.8.5
+
+### Patch Changes
+
+- Updated dependencies [1fc802b]
+  - @knocklabs/client@0.18.2
+  - @knocklabs/react-core@0.10.2
+
+## 0.8.4
+
+### Patch Changes
+
+- 74366b3: export useStore from react-core to include in use client directive
+- Updated dependencies [74366b3]
+  - @knocklabs/react-core@0.10.1
+  - @knocklabs/client@0.18.1
+
 ## 0.8.3
 
 ### Patch Changes

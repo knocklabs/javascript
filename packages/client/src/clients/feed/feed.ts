@@ -472,9 +472,46 @@ class Feed {
   }
 
   async markAsUnarchived(itemOrItems: FeedItemOrItems) {
-    this.optimisticallyPerformStatusUpdate(itemOrItems, "unarchived", {
-      archived_at: null,
-    });
+    const state = this.store.getState();
+
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+
+    const itemIds: string[] = items.map((item) => item.id);
+
+    const shouldOptimisticallyRemoveItems =
+      this.defaultOptions.archived === "only";
+
+    if (shouldOptimisticallyRemoveItems) {
+      // If any of the items are unseen or unread, then capture as we'll want to decrement
+      // the counts for these in the metadata we have
+      const unseenCount = items.filter((i) => !i.seen_at).length;
+      const unreadCount = items.filter((i) => !i.read_at).length;
+
+      // Build the new metadata
+      const updatedMetadata = {
+        ...state.metadata,
+        // Ensure that the counts don't ever go below 0 on unarchiving where the client state
+        // gets out of sync with the server state
+        total_count: Math.max(0, state.metadata.total_count - items.length),
+        unseen_count: Math.max(0, state.metadata.unseen_count - unseenCount),
+        unread_count: Math.max(0, state.metadata.unread_count - unreadCount),
+      };
+
+      // Remove the unarchived entries
+      const entriesToSet = state.items.filter(
+        (item) => !itemIds.includes(item.id),
+      );
+
+      state.setResult({
+        entries: entriesToSet,
+        meta: updatedMetadata,
+        page_info: state.pageInfo,
+      });
+    } else {
+      this.optimisticallyPerformStatusUpdate(itemOrItems, "unarchived", {
+        archived_at: null,
+      });
+    }
 
     return this.makeStatusUpdate(itemOrItems, "unarchived");
   }

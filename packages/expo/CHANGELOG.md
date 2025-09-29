@@ -1,5 +1,47 @@
 # @knocklabs/expo
 
+## 0.3.46
+
+### Patch Changes
+
+- Updated dependencies [c64098e]
+  - @knocklabs/client@0.18.4
+  - @knocklabs/react-core@0.10.4
+  - @knocklabs/react-native@0.6.44
+
+## 0.3.45
+
+### Patch Changes
+
+- Updated dependencies [9f0d317]
+  - @knocklabs/client@0.18.3
+  - @knocklabs/react-core@0.10.3
+  - @knocklabs/react-native@0.6.43
+
+## 0.3.44
+
+### Patch Changes
+
+- Updated dependencies [1fc802b]
+  - @knocklabs/client@0.18.2
+  - @knocklabs/react-core@0.10.2
+  - @knocklabs/react-native@0.6.42
+
+## 0.3.43
+
+### Patch Changes
+
+- 02ba8e7: chore: update expo to ~53.0.22
+
+## 0.3.42
+
+### Patch Changes
+
+- Updated dependencies [74366b3]
+  - @knocklabs/react-core@0.10.1
+  - @knocklabs/client@0.18.1
+  - @knocklabs/react-native@0.6.41
+
 ## 0.3.41
 
 ### Patch Changes
