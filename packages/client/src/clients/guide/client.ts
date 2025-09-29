@@ -66,6 +66,8 @@ export const DEBUG_QUERY_PARAMS = {
   PREVIEW_SESSION_ID: "knock_preview_session_id",
 };
 
+const DEBUG_STORAGE_KEY = "knock_guide_debug";
+
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
   if (typeof window !== "undefined") {
@@ -76,7 +78,7 @@ const checkForWindow = () => {
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
-// Detect debug params like "knock_guide_key" from URL.
+// Detect debug params from URL or local storage
 const detectDebugParams = (): DebugState => {
   const win = checkForWindow();
   if (!win) {
@@ -84,10 +86,66 @@ const detectDebugParams = (): DebugState => {
   }
 
   const urlParams = new URLSearchParams(win.location.search);
-  const forcedGuideKey = urlParams.get(DEBUG_QUERY_PARAMS.GUIDE_KEY);
-  const previewSessionId = urlParams.get(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
+  const urlGuideKey = urlParams.get(DEBUG_QUERY_PARAMS.GUIDE_KEY);
+  const urlPreviewSessionId = urlParams.get(
+    DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID,
+  );
 
-  return { forcedGuideKey, previewSessionId };
+  // If URL params exist, persist them to localStorage and return them
+  if (urlGuideKey || urlPreviewSessionId) {
+    if (win.localStorage) {
+      try {
+        const debugState = {
+          forcedGuideKey: urlGuideKey,
+          previewSessionId: urlPreviewSessionId,
+        };
+        win.localStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(debugState));
+      } catch {
+        // Silently fail in privacy mode
+      }
+    }
+    return {
+      forcedGuideKey: urlGuideKey,
+      previewSessionId: urlPreviewSessionId,
+    };
+  }
+
+  // Check local storage if no URL params
+  let storedGuideKey = null;
+  let storedPreviewSessionId = null;
+
+  if (win.localStorage) {
+    try {
+      const storedDebugState = win.localStorage.getItem(DEBUG_STORAGE_KEY);
+      if (storedDebugState) {
+        const parsedDebugState = safeJsonParseDebugParams(storedDebugState);
+        storedGuideKey = parsedDebugState.forcedGuideKey;
+        storedPreviewSessionId = parsedDebugState.previewSessionId;
+      }
+    } catch {
+      // Silently fail in privacy mode
+    }
+  }
+
+  return {
+    forcedGuideKey: storedGuideKey,
+    previewSessionId: storedPreviewSessionId,
+  };
+};
+
+const safeJsonParseDebugParams = (value: string): DebugState => {
+  try {
+    const parsed = JSON.parse(value);
+    return {
+      forcedGuideKey: parsed?.forcedGuideKey ?? null,
+      previewSessionId: parsed?.previewSessionId ?? null,
+    };
+  } catch {
+    return {
+      forcedGuideKey: null,
+      previewSessionId: null,
+    };
+  }
 };
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
@@ -468,6 +526,41 @@ export class KnockGuideClient {
         location: href,
       };
     });
+  }
+
+  exitDebugMode() {
+    this.knock.log("[Guide] Exiting debug mode");
+
+    // Clear localStorage debug params
+    const win = checkForWindow();
+    if (win?.localStorage) {
+      try {
+        win.localStorage.removeItem(DEBUG_STORAGE_KEY);
+      } catch {
+        // Silently fail in privacy mode
+      }
+    }
+
+    // Clear debug state from store
+    this.store.setState((state) => ({
+      ...state,
+      debug: { forcedGuideKey: null, previewSessionId: null },
+      previewGuides: {}, // Clear preview guides when exiting debug mode
+    }));
+
+    // Remove URL query params if present
+    // Only update the URL if params need to be cleared to avoid unnecessary navigations
+    if (win) {
+      const url = new URL(win.location.href);
+      if (
+        url.searchParams.has(DEBUG_QUERY_PARAMS.GUIDE_KEY) ||
+        url.searchParams.has(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID)
+      ) {
+        url.searchParams.delete(DEBUG_QUERY_PARAMS.GUIDE_KEY);
+        url.searchParams.delete(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
+        win.location.href = url.toString();
+      }
+    }
   }
 
   //
