@@ -733,7 +733,6 @@ describe("User Client", () => {
 
         const client = new UserClient(knock);
         const params = {
-          message_id: "message_123",
           channel_id: "channel_123",
           guide_key: "welcome_guide",
           guide_id: "guide_123",
@@ -743,7 +742,7 @@ describe("User Client", () => {
 
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
-          url: "/v1/users/user_123/guides/messages/message_123/seen",
+          url: "/v1/users/user_123/guides/messages/seen",
           data: params,
         });
         expect(result).toEqual(mockResponse);
@@ -766,7 +765,6 @@ describe("User Client", () => {
 
         const client = new UserClient(knock);
         const params = {
-          message_id: "message_456",
           channel_id: "channel_456",
           guide_key: "tutorial_guide",
           guide_id: "guide_456",
@@ -777,7 +775,7 @@ describe("User Client", () => {
 
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
-          url: "/v1/users/user_123/guides/messages/message_456/interacted",
+          url: "/v1/users/user_123/guides/messages/interacted",
           data: params,
         });
         expect(result).toEqual(mockResponse);
@@ -800,7 +798,6 @@ describe("User Client", () => {
 
         const client = new UserClient(knock);
         const params = {
-          message_id: "message_789",
           channel_id: "channel_789",
           guide_key: "advanced_guide",
           guide_id: "guide_789",
@@ -810,7 +807,7 @@ describe("User Client", () => {
 
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
-          url: "/v1/users/user_123/guides/messages/message_789/archived",
+          url: "/v1/users/user_123/guides/messages/archived",
           data: params,
         });
         expect(result).toEqual(mockResponse);
@@ -846,7 +843,6 @@ describe("User Client", () => {
 
           await expect(
             client.markGuideStepAs(scenario.status, {
-              message_id: "test_message",
               channel_id: "test_channel",
               guide_key: "test_guide",
               guide_id: "test_guide_id",
@@ -925,7 +921,6 @@ describe("User Client", () => {
 
       await expect(
         knock.user.markGuideStepAs("seen", {
-          message_id: "guide_123",
           guide_key: "onboarding_guide",
           guide_id: "guide_456",
           guide_step_ref: "step_1",

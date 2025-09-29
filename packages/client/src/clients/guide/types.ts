@@ -8,7 +8,6 @@ import { GenericData } from "@knocklabs/types";
 export type Any = any;
 
 export interface StepMessageState {
-  id: string;
   seen_at: string | null;
   read_at: string | null;
   interacted_at: string | null;
@@ -83,7 +82,6 @@ export type GetGuidesResponse = {
 
 export type GuideEngagementEventBaseParams = {
   // Base params required for all engagement update events
-  message_id: string;
   channel_id: string;
   guide_key: string;
   guide_id: string;
