@@ -40,7 +40,7 @@
     "@testing-library/dom": "^10.4.0",
     "@vitejs/plugin-react": "^4.5.1",
     "@vitejs/plugin-react-swc": "^3.10.2",
-    "jsdom": "^26.1.0",
+    "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
     "vite": "^5.4.19",
     "vitest": "^3.1.1"
