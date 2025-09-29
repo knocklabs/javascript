@@ -2576,12 +2576,11 @@ describe("KnockGuideClient", () => {
 
       // Should persist debug parameters to localStorage when detected in URL
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        "knock_debug_guide_key",
-        "test_guide",
-      );
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        "knock_debug_preview_session_id",
-        "",
+        "knock_guide_debug",
+        JSON.stringify({
+          forcedGuideKey: "test_guide",
+          previewSessionId: null,
+        }),
       );
     });
 
@@ -2589,8 +2588,12 @@ describe("KnockGuideClient", () => {
       const mockLocalStorage = {
         getItem: vi.fn().mockImplementation((key: string) => {
           // Simulate localStorage having stored debug values from previous session
-          if (key === "knock_debug_guide_key") return "stored_guide";
-          if (key === "knock_debug_preview_session_id") return "stored_session";
+          if (key === "knock_guide_debug") {
+            return JSON.stringify({
+              forcedGuideKey: "stored_guide",
+              previewSessionId: "stored_session",
+            });
+          }
           return null;
         }),
         setItem: vi.fn(),
@@ -2626,10 +2629,7 @@ describe("KnockGuideClient", () => {
 
       // Should read from localStorage when no URL parameters are present
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith(
-        "knock_debug_guide_key",
-      );
-      expect(mockLocalStorage.getItem).toHaveBeenCalledWith(
-        "knock_debug_preview_session_id",
+        "knock_guide_debug",
       );
     });
   });

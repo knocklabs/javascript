@@ -66,11 +66,7 @@ export const DEBUG_QUERY_PARAMS = {
   PREVIEW_SESSION_ID: "knock_preview_session_id",
 };
 
-// Debug localStorage keys
-const DEBUG_STORAGE_KEYS = {
-  GUIDE_KEY: "knock_debug_guide_key",
-  PREVIEW_SESSION_ID: "knock_debug_preview_session_id",
-};
+const DEBUG_STORAGE_KEY = "knock_guide_debug";
 
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
@@ -99,14 +95,11 @@ const detectDebugParams = (): DebugState => {
   if (urlGuideKey || urlPreviewSessionId) {
     if (win.localStorage) {
       try {
-        win.localStorage.setItem(
-          DEBUG_STORAGE_KEYS.GUIDE_KEY,
-          urlGuideKey || "",
-        );
-        win.localStorage.setItem(
-          DEBUG_STORAGE_KEYS.PREVIEW_SESSION_ID,
-          urlPreviewSessionId || "",
-        );
+        const debugState = {
+          forcedGuideKey: urlGuideKey,
+          previewSessionId: urlPreviewSessionId,
+        };
+        win.localStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(debugState));
       } catch {
         // Silently fail in privacy mode
       }
@@ -123,10 +116,12 @@ const detectDebugParams = (): DebugState => {
 
   if (win.localStorage) {
     try {
-      storedGuideKey = win.localStorage.getItem(DEBUG_STORAGE_KEYS.GUIDE_KEY);
-      storedPreviewSessionId = win.localStorage.getItem(
-        DEBUG_STORAGE_KEYS.PREVIEW_SESSION_ID,
-      );
+      const storedDebugState = win.localStorage.getItem(DEBUG_STORAGE_KEY);
+      if (storedDebugState) {
+        const parsedDebugState = safeJsonParseDebugParams(storedDebugState);
+        storedGuideKey = parsedDebugState.forcedGuideKey;
+        storedPreviewSessionId = parsedDebugState.previewSessionId;
+      }
     } catch {
       // Silently fail in privacy mode
     }
@@ -136,6 +131,21 @@ const detectDebugParams = (): DebugState => {
     forcedGuideKey: storedGuideKey,
     previewSessionId: storedPreviewSessionId,
   };
+};
+
+const safeJsonParseDebugParams = (value: string): DebugState => {
+  try {
+    const parsed = JSON.parse(value);
+    return {
+      forcedGuideKey: parsed?.forcedGuideKey ?? null,
+      previewSessionId: parsed?.previewSessionId ?? null,
+    };
+  } catch {
+    return {
+      forcedGuideKey: null,
+      previewSessionId: null,
+    };
+  }
 };
 
 const select = (state: StoreState, filters: SelectFilterParams = {}) => {
@@ -525,8 +535,7 @@ export class KnockGuideClient {
     const win = checkForWindow();
     if (win?.localStorage) {
       try {
-        win.localStorage.removeItem(DEBUG_STORAGE_KEYS.GUIDE_KEY);
-        win.localStorage.removeItem(DEBUG_STORAGE_KEYS.PREVIEW_SESSION_ID);
+        win.localStorage.removeItem(DEBUG_STORAGE_KEY);
       } catch {
         // Silently fail in privacy mode
       }
