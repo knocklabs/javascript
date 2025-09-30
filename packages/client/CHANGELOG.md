@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.5
+
+### Patch Changes
+
+- bf7677a: feat: persist guide debug state in local storage
+- 9eba682: chore: use the new guide engagement update endpoints w/o message_id param
+
 ## 0.18.4
 
 ### Patch Changes
