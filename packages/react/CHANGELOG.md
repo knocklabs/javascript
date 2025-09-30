@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.8
+
+### Patch Changes
+
+- bf7677a: feat: persist guide debug state in local storage
+- Updated dependencies [bf7677a]
+- Updated dependencies [9eba682]
+  - @knocklabs/client@0.18.5
+  - @knocklabs/react-core@0.10.5
+
 ## 0.8.7
 
 ### Patch Changes
