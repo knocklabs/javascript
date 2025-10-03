@@ -1,7 +1,7 @@
 {
   "name": "@knocklabs/expo-example",
   "main": "expo-router/entry",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
