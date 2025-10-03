@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.6
+
+### Patch Changes
+
+- Updated dependencies [49df373]
+  - @knocklabs/client@0.18.6
+
 ## 0.10.5
 
 ### Patch Changes
