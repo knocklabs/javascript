@@ -646,6 +646,41 @@ describe("KnockGuideClient", () => {
       );
     });
 
+    test("marks guide step as interacted and returns new guide object", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      // Store the original guide reference
+      const originalGuideRef = mockStore.state.guides[mockGuide.key];
+
+      await client.markAsInteracted(mockGuide, mockStep, { action: "clicked" });
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+
+      // Verify that the guide object is a new reference (not the same object)
+      // This ensures useStore triggers a re-render
+      expect(newState.guides[mockGuide.key]).not.toBe(originalGuideRef);
+    });
+
     test("marks guide step as archived", async () => {
       const client = new KnockGuideClient(mockKnock, channelId);
 
@@ -2648,6 +2683,110 @@ describe("KnockGuideClient", () => {
         tenant: "test_tenant",
         type: "tooltip",
       });
+    });
+
+    test("setStepMessageAttrs returns guide as new object when step is updated", () => {
+      const mockGuide = {
+        key: "test_guide",
+        steps: [
+          {
+            ref: "step_1",
+            message: { id: "msg_123", seen_at: null },
+          },
+        ],
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Store the original guide reference
+      const originalGuideRef = mockStore.state.guides[mockGuide.key];
+
+      // Update the step message attributes
+      client["setStepMessageAttrs"]("test_guide", "step_1", {
+        seen_at: "2023-01-01T00:00:00Z",
+      });
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+
+      // Verify that the guide object is a new reference (not the same object)
+      expect(newState.guides["test_guide"]).not.toBe(originalGuideRef);
+
+      // Verify that the step message was updated
+      expect(newState.guides["test_guide"]!.steps[0]!.message.seen_at).toBe(
+        "2023-01-01T00:00:00Z",
+      );
+    });
+
+    test("setStepMessageAttrs returns same guide object when step is not found", () => {
+      const mockGuide = {
+        key: "test_guide",
+        steps: [
+          {
+            ref: "step_1",
+            message: { id: "msg_123", seen_at: null },
+          },
+        ],
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Store the original guide reference
+      const originalGuideRef = mockStore.state.guides[mockGuide.key];
+
+      // Try to update a non-existent step
+      client["setStepMessageAttrs"]("test_guide", "non_existent_step", {
+        seen_at: "2023-01-01T00:00:00Z",
+      });
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+
+      // Verify that the guide object is the same reference (no update occurred)
+      expect(newState.guides["test_guide"]).toBe(originalGuideRef);
+
+      // Verify that the step message was NOT updated
+      expect(newState.guides["test_guide"]!.steps[0]!.message.seen_at).toBe(
+        null,
+      );
     });
 
     test("buildQueryParams handles missing data and tenant", () => {

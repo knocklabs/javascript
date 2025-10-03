@@ -685,7 +685,7 @@ export class KnockGuideClient {
 
     switch (this.stage.status) {
       case "open": {
-        this.knock.log(`[Guide] Addng to the group stage: ${guide.key}`);
+        this.knock.log(`[Guide] Adding to the group stage: ${guide.key}`);
         this.stage.ordered[index] = guide.key;
         return undefined;
       }
@@ -1033,7 +1033,7 @@ export class KnockGuideClient {
     }
 
     this.store.setState((state) => {
-      const guide = state.guides[guideKey];
+      let guide = state.guides[guideKey];
       if (!guide) return state;
 
       const steps = guide.steps.map((step) => {
@@ -1046,8 +1046,9 @@ export class KnockGuideClient {
 
         return step;
       });
-      // Mutate in place and maintain the same obj ref.
-      guide.steps = steps;
+      // If updated, return the guide as a new object so useStore can trigger.
+      guide = updatedStep ? { ...guide, steps } : guide;
+
       const guides = { ...state.guides, [guide.key]: guide };
 
       // If the guide is subject to throttled settings and we are marking as
