@@ -59,6 +59,7 @@
     "@telegraph/layout": "^0.2.1",
     "@telegraph/tokens": "^0.1.1",
     "@telegraph/typography": "^0.1.23",
+    "@telegraph/tooltip": "0.0.55",
     "clsx": "^2.1.1",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.541.0"
