@@ -10,7 +10,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@expo/vector-icons": "^14.1.0",
+    "@expo/vector-icons": "^15.0.2",
     "@knocklabs/expo": "workspace:^",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.6.3",

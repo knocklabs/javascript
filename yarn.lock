@@ -3367,7 +3367,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/vector-icons@npm:^14.0.0, @expo/vector-icons@npm:^14.1.0":
+"@expo/vector-icons@npm:^14.0.0":
   version: 14.1.0
   resolution: "@expo/vector-icons@npm:14.1.0"
   peerDependencies:
@@ -3375,6 +3375,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/f1dcea2c43c0808f48d1953395c6f8025ae5e811648e86b79158492c9ef8af7a40781e42844dfb1434242a08fcf6ab14886825eb2c79bad2a792aebd1eb5077c
+  languageName: node
+  linkType: hard
+
+"@expo/vector-icons@npm:^15.0.2":
+  version: 15.0.2
+  resolution: "@expo/vector-icons@npm:15.0.2"
+  peerDependencies:
+    expo-font: ">=14.0.4"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/3a029c722cb3b2d7502ca984f238e5cc8fdd025860d98b3e13c15aafe9d961869f67831a28c84712438413f4922755c27c1ce35e361191fdc3880ef7728c86dc
   languageName: node
   linkType: hard
 
@@ -3993,7 +4004,7 @@ __metadata:
   resolution: "@knocklabs/expo-example@workspace:examples/expo-example"
   dependencies:
     "@babel/core": "npm:^7.28.0"
-    "@expo/vector-icons": "npm:^14.1.0"
+    "@expo/vector-icons": "npm:^15.0.2"
     "@knocklabs/expo": "workspace:^"
     "@react-navigation/bottom-tabs": "npm:^7.3.10"
     "@react-navigation/elements": "npm:^2.6.3"
