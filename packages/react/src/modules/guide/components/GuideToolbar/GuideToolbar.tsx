@@ -1,8 +1,8 @@
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
-import { Tooltip } from "@telegraph/tooltip";
 import { Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
+import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 import { Minimize2, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
