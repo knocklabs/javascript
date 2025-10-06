@@ -3962,7 +3962,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     jwt-decode: "npm:^4.0.0"
     nanoid: "npm:^3.3.11"
-    phoenix: "npm:1.7.21"
+    phoenix: "npm:1.8.1"
     prettier: "npm:^3.5.3"
     rimraf: "npm:^6.0.1"
     rollup: "npm:^4.46.2"
@@ -16155,10 +16155,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"phoenix@npm:1.7.21":
-  version: 1.7.21
-  resolution: "phoenix@npm:1.7.21"
-  checksum: 10c0/f0872451603ba460d6ef81c43282353b044ef0f1091f81a83a111c207b5c9ad2988159ef272cdcc455b2d0edf91152649ad75e2ce49f0cced61dcb2fe903737e
+"phoenix@npm:1.8.1":
+  version: 1.8.1
+  resolution: "phoenix@npm:1.8.1"
+  checksum: 10c0/82c4036aa0201eb8063e89874c87dac08dce455dd7c31521839932dce99868e319cf3efa6e4f41a88979f31132cac537a6b689eacd3e8fa8cb2e02a4b949423a
   languageName: node
   linkType: hard
 
