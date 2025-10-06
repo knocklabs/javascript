@@ -2,6 +2,7 @@ import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
+import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 import { Minimize2, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
@@ -95,23 +96,25 @@ export const GuideToolbar = () => {
           variant="soft"
           icon={{ icon: Wrench, "aria-hidden": true }}
         >
-          Debug
+          Preview
         </Tag>
 
-        <Text
-          as="div"
-          size="1"
-          weight="medium"
-          w="full"
-          maxWidth="40"
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {debugState.forcedGuideKey}
-        </Text>
+        <Tooltip label={debugState.forcedGuideKey}>
+          <Text
+            as="div"
+            size="1"
+            weight="medium"
+            w="full"
+            maxWidth="40"
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {debugState.forcedGuideKey}
+          </Text>
+        </Tooltip>
 
         <Button
           onClick={handleExit}

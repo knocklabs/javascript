@@ -4206,6 +4206,7 @@ __metadata:
     "@telegraph/icon": "npm:^0.2.4"
     "@telegraph/layout": "npm:^0.2.1"
     "@telegraph/tokens": "npm:^0.1.1"
+    "@telegraph/tooltip": "npm:0.0.55"
     "@telegraph/typography": "npm:^0.1.23"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
@@ -6799,7 +6800,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/tooltip@npm:^0.0.55":
+"@telegraph/tooltip@npm:0.0.55, @telegraph/tooltip@npm:^0.0.55":
   version: 0.0.55
   resolution: "@telegraph/tooltip@npm:0.0.55"
   dependencies:
