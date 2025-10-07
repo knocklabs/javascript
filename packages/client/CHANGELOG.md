@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.7
+
+### Patch Changes
+
+- 56ab8c0: fix: ensure that user.id can be undefined
+
 ## 0.18.6
 
 ### Patch Changes
