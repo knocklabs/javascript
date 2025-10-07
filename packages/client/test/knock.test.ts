@@ -186,12 +186,14 @@ describe("Knock Client", () => {
       expect(identify).toHaveBeenCalledWith({ name: "John Doe" });
     });
 
-    test("throws error when user object does not contain an `id` property", () => {
+    test("does not identify user when user object does not contain an `id` property", () => {
       const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
       // @ts-expect-error - we want to test the error case
-      expect(() => knock.authenticate({ name: "John Doe" })).toThrowError(
-        "`user` object must contain an `id` property",
-      );
+      knock.authenticate({ name: "John Doe" });
+
+      expect(identify).not.toHaveBeenCalled();
     });
   });
 
