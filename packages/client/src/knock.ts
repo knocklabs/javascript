@@ -239,7 +239,7 @@ class Knock {
       return userIdOrUserWithProperties.id;
     }
 
-    throw new Error("`user` object must contain an `id` property");
+    return undefined;
   }
 }
 
