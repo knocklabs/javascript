@@ -1,6 +1,6 @@
 {
   "name": "ms-teams-connect-example",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,7 +11,7 @@
     "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
   },
   "dependencies": {
-    "@knocklabs/react": "0.8.10",
+    "@knocklabs/react": "0.8.11",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.3",
     "react": "^19.0.0",
