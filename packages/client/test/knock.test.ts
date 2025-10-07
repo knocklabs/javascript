@@ -185,6 +185,16 @@ describe("Knock Client", () => {
 
       expect(identify).toHaveBeenCalledWith({ name: "John Doe" });
     });
+
+    test("does not identify user when user object does not contain an `id` property", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      // @ts-expect-error - we want to test the error case
+      knock.authenticate({ name: "John Doe" });
+
+      expect(identify).not.toHaveBeenCalled();
+    });
   });
 
   describe("Inline identification strategy", () => {
