@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.6
+
+### Patch Changes
+
+- 49df373: update guide as a new object ref when updating its step
+
 ## 0.18.5
 
 ### Patch Changes
