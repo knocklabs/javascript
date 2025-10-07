@@ -54,14 +54,13 @@
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.14",
-    "@telegraph/combobox": "^0.1.9",
-    "@telegraph/icon": "^0.2.4",
+    "@telegraph/combobox": "^0.1.10",
+    "@telegraph/icon": "^0.2.5",
     "@telegraph/layout": "^0.2.1",
     "@telegraph/tokens": "^0.1.1",
     "@telegraph/typography": "^0.1.23",
     "clsx": "^2.1.1",
-    "lodash.debounce": "^4.0.8",
-    "lucide-react": "^0.541.0"
+    "lodash.debounce": "^4.0.8"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
