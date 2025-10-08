@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.11
+
+### Patch Changes
+
+- 3d8df10: fix: utilize telegraph lucide-react instance so versions are synced
+
 ## 0.8.10
 
 ### Patch Changes
