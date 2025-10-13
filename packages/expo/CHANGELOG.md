@@ -1,5 +1,11 @@
 # @knocklabs/expo
 
+## 0.3.50
+
+### Patch Changes
+
+- d48e3b6: fix: update KnockExpoPushNotificationProvider to use updated unsubscribe method
+
 ## 0.3.49
 
 ### Patch Changes
