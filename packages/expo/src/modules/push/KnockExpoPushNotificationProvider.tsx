@@ -238,12 +238,8 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       });
 
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationReceivedSubscription,
-      );
-      Notifications.removeNotificationSubscription(
-        notificationResponseSubscription,
-      );
+      notificationReceivedSubscription.remove();
+      notificationResponseSubscription.remove();
     };
 
     // TODO: Remove when possible and ensure dependency array is correct
