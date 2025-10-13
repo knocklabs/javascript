@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
@@ -49,6 +50,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+    },
+    test: {
+      global: true,
+      environment: "jsdom",
+      setupFiles: "./setupTest.ts",
     },
   };
 });

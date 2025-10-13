@@ -31,7 +31,9 @@
     "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
     "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check",
     "type:check": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -58,6 +60,8 @@
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "^19.1.8",
     "@types/react-native-htmlview": "^0.16.6",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
@@ -70,12 +74,14 @@
     "expo-constants": "~17.1.7",
     "expo-device": "^7.1.4",
     "expo-notifications": "^0.31.4",
+    "jsdom": "^26.0.0",
     "react": "^19.0.0",
     "react-native": "^0.79.2",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
     "vite-plugin-dts": "^4.5.0",
-    "vite-plugin-no-bundle": "^4.0.0"
+    "vite-plugin-no-bundle": "^4.0.0",
+    "vitest": "^3.1.1"
   }
 }
