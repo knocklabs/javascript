@@ -63,12 +63,11 @@ export const KnockPushNotificationProvider: React.FC<
 
           if (existingDeviceIndex === -1) {
             devices.push(newDevice);
-            return registerNewDeviceDataOnServer(devices, channelId);
           } else {
             devices[existingDeviceIndex] = newDevice;
-            return registerNewDeviceDataOnServer(devices, channelId);
           }
           knockClient.log("[Knock] registerPushTokenToChannel success");
+          return registerNewDeviceDataOnServer(devices, channelId);
         })
         .catch((_) => {
           // No data registered on that channel for that user, we'll create a new record
