@@ -63,7 +63,7 @@ const defaultRenderHeader = (props: NotificationFeedHeaderProps) => (
   <NotificationFeedHeader {...props} />
 );
 
-const defaultRenderLoading = ({ colorMode }: { colorMode: ColorMode }) => (
+const defaultRenderLoading = ({ colorMode }: RenderLoadingProps) => (
   <div className="rnf-notification-feed__spinner-container">
     <Spinner
       thickness={3}
