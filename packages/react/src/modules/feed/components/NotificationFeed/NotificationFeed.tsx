@@ -134,9 +134,8 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         })}
 
       <div className="rnf-notification-feed__container" ref={containerRef}>
-        {networkStatus === NetworkStatus.loading && (
-          renderLoading({ colorMode })
-        )}
+        {networkStatus === NetworkStatus.loading &&
+          renderLoading({ colorMode })}
 
         <div className="rnf-notification-feed__feed-items-container">
           {networkStatus !== NetworkStatus.loading &&
@@ -149,9 +148,8 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
             )}
         </div>
 
-        {networkStatus === NetworkStatus.fetchMore && (
-          renderLoading({ colorMode })
-        )}
+        {networkStatus === NetworkStatus.fetchMore &&
+          renderLoading({ colorMode })}
 
         {!requestInFlight && noItems && EmptyComponent}
       </div>
