@@ -94,6 +94,7 @@ describe("usePreferences", () => {
         },
       },
       channel_types: {},
+      channels: {},
     };
 
     mockGetPreferences.mockResolvedValue(DEFAULT_PREFERENCES);
@@ -131,6 +132,7 @@ describe("usePreferences", () => {
         sms: { channel_types: { sms: true } },
       },
       channel_types: {},
+      channels: {},
     };
 
     await act(async () => {
