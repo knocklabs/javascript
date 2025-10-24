@@ -22,7 +22,7 @@ export const NextPagesRouter = () => {
     return () => {
       router.events.off("routeChangeComplete", handleRouteChangeComplete);
     };
-  }, [client, router]);
+  }, [client, router.events]);
 
   return null;
 };
