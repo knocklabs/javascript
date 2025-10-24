@@ -1,7 +1,2 @@
-import { NextAppRouter } from "./NextAppRouter";
-import { NextPagesRouter } from "./NextPagesRouter";
-
-export const GuideLocationSensor = {
-  NextAppRouter,
-  NextPagesRouter,
-};
+export { LocationSensorNextAppRouter } from "./NextAppRouter";
+export { LocationSensorNextPagesRouter } from "./NextPagesRouter";

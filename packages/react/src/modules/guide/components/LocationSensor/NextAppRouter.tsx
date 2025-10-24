@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 import { setLocation } from "./helpers";
 
-export const NextAppRouter = () => {
+export const LocationSensorNextAppRouter = () => {
   const pathname = usePathname();
   const { client } = useGuideContext();
 

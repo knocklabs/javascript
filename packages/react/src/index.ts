@@ -44,7 +44,8 @@ export {
   CardView,
   KnockGuideProvider,
   GuideToolbar as KnockGuideToolbar,
-  GuideLocationSensor as KnockGuideLocationSensor,
+  LocationSensorNextPagesRouter as KnockGuideLocationSensorNextPagesRouter,
+  LocationSensorNextAppRouter as KnockGuideLocationSensorNextAppRouter,
   Modal,
   ModalView,
 } from "./modules/guide";
