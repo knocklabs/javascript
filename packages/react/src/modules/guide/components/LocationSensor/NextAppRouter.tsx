@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { useGuideContext } from "@knocklabs/react-core";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 import { setLocation } from "./helpers";
 
@@ -15,8 +15,8 @@ export const NextAppRouter = () => {
   }, [client]);
 
   useEffect(() => {
-    setLocation(client, pathname)
+    setLocation(client, pathname);
   }, [client, pathname]);
 
   return null;
-}
+};

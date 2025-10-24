@@ -6,6 +6,6 @@ export {
   Modal,
   ModalView,
   GuideToolbar,
-  GuideLocationSensor
+  GuideLocationSensor,
 } from "./components";
 export { KnockGuideProvider } from "./providers";
