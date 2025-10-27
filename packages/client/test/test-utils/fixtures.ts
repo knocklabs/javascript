@@ -432,6 +432,9 @@ export function createMockUserPreferences(
       sms: false,
       push: true,
     },
+    channels: {
+      [faker.string.uuid()]: true ,
+    },
     ...overrides,
   };
 }

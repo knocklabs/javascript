@@ -60,6 +60,10 @@ describe("Preferences Client", () => {
           email: true,
           in_app_feed: false,
         },
+        channels: {
+          "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+          "ce475f4f-261c-43de-8016-143ecc900ea9": false,
+        },
         workflows: {},
         categories: {
           marketing: {
@@ -107,6 +111,7 @@ describe("Preferences Client", () => {
           channel_types: {},
           workflows: {},
           categories: {},
+          channels: {},
         }),
       ).rejects.toThrow("Invalid preferences");
     });
@@ -202,6 +207,7 @@ describe("Preferences Client", () => {
         channel_types: { email: false },
         workflows: {},
         categories: {},
+        channels: { "f46af07b-fb3b-4d8e-9139-7768725ba27f": true },
       };
 
       mockApiClient.makeRequest.mockResolvedValue({
