@@ -34,6 +34,12 @@ export type RenderItemProps<T = GenericData> = {
 
 export type RenderItem = (props: RenderItemProps) => ReactNode;
 
+export type RenderLoadingProps = {
+  colorMode: ColorMode;
+};
+
+export type RenderLoading = (props: RenderLoadingProps) => ReactNode;
+
 export interface NotificationFeedProps {
   EmptyComponent?: ReactNode;
   /**
@@ -46,6 +52,7 @@ export interface NotificationFeedProps {
   onNotificationButtonClick?: NotificationCellProps["onButtonClick"];
   onMarkAllAsReadClick?: (e: React.MouseEvent, unreadItems: FeedItem[]) => void;
   initialFilterStatus?: FilterStatus;
+  renderLoading?: RenderLoading;
 }
 
 const defaultRenderItem = (props: RenderItemProps) => (
@@ -56,7 +63,7 @@ const defaultRenderHeader = (props: NotificationFeedHeaderProps) => (
   <NotificationFeedHeader {...props} />
 );
 
-const LoadingSpinner = ({ colorMode }: { colorMode: ColorMode }) => (
+const defaultRenderLoading = ({ colorMode }: RenderLoadingProps) => (
   <div className="rnf-notification-feed__spinner-container">
     <Spinner
       thickness={3}
@@ -78,6 +85,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   initialFilterStatus = FilterStatus.All,
   header,
   renderHeader = defaultRenderHeader,
+  renderLoading = defaultRenderLoading,
 }) => {
   const [status, setStatus] = useState(initialFilterStatus);
   const { feedClient, useFeedStore, colorMode } = useKnockFeed();
@@ -126,9 +134,8 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         })}
 
       <div className="rnf-notification-feed__container" ref={containerRef}>
-        {networkStatus === NetworkStatus.loading && (
-          <LoadingSpinner colorMode={colorMode} />
-        )}
+        {networkStatus === NetworkStatus.loading &&
+          renderLoading({ colorMode })}
 
         <div className="rnf-notification-feed__feed-items-container">
           {networkStatus !== NetworkStatus.loading &&
@@ -141,9 +148,8 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
             )}
         </div>
 
-        {networkStatus === NetworkStatus.fetchMore && (
-          <LoadingSpinner colorMode={colorMode} />
-        )}
+        {networkStatus === NetworkStatus.fetchMore &&
+          renderLoading({ colorMode })}
 
         {!requestInFlight && noItems && EmptyComponent}
       </div>
