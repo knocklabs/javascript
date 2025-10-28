@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.0
+
+### Minor Changes
+
+- be65601: - **Added channel-level notification preferences** to client interfaces, types, tests, and the Next.js example.
+  - Update your code to handle the new channels property in `PreferenceSet`, `SetPreferencesProperties`, and `WorkflowPreferenceSetting` if using `@knock/client`.
+
+### Patch Changes
+
+- Updated dependencies [be65601]
+- Updated dependencies [4b888c4]
+  - @knocklabs/client@0.19.0
+
 ## 0.10.7
 
 ### Patch Changes
