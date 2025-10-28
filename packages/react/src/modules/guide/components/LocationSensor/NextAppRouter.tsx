@@ -1,13 +1,16 @@
 "use client";
 
 import { useGuideContext } from "@knocklabs/react-core";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-import { setLocation } from "./helpers";
+import { checkForWindow } from "../../../core/utils";
 
 export const LocationSensorNextAppRouter = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryStr = searchParams.toString();
+
   const { client } = useGuideContext();
 
   useEffect(() => {
@@ -15,8 +18,11 @@ export const LocationSensorNextAppRouter = () => {
   }, [client]);
 
   useEffect(() => {
-    setLocation(client, pathname);
-  }, [client, pathname]);
+    const win = checkForWindow();
+    if (!win) return;
+
+    client.setLocation(win.location.href);
+  }, [client, pathname, queryStr]);
 
   return null;
 };

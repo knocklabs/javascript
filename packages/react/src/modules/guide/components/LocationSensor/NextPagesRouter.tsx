@@ -2,25 +2,30 @@ import { useGuideContext } from "@knocklabs/react-core";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import { setLocation } from "./helpers";
+import { checkForWindow } from "../../../core/utils";
 
 export const LocationSensorNextPagesRouter = () => {
   const router = useRouter();
   const { client } = useGuideContext();
 
   useEffect(() => {
+    const win = checkForWindow();
+    if (!win) return;
+
     // Set the initial location if not yet set.
     if (!client.store.state.location) {
-      setLocation(client, router.pathname);
+      client.setLocation(win.location.href);
     }
 
     // Remove any location chagne event listeners on the window object in case
     // they are attached.
     client.removeLocationChangeEventListeners();
 
-    // Attach a location change event listener from nextjs router.
-    const handleRouteChangeComplete = (pathname: string) => {
-      setLocation(client, pathname);
+    // Attach a route change event listener to the nextjs router. Note, here url
+    // is the pathname and any query parameters of the new route but does not
+    // include the domain or origin.
+    const handleRouteChangeComplete = (url: string) => {
+      client.setLocation(win.location.origin + url);
     };
     router.events.on("routeChangeComplete", handleRouteChangeComplete);
 
