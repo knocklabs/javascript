@@ -60,7 +60,7 @@
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.15",
-    "@telegraph/combobox": "^0.1.15",
+    "@telegraph/combobox": "^0.1.16",
     "@telegraph/icon": "^0.2.7",
     "@telegraph/layout": "^0.2.3",
     "@telegraph/tokens": "^0.1.2",
