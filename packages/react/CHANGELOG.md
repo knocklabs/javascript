@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.0
+
+### Minor Changes
+
+- 40d8e8a: Added renderLoading prop to NotificationFeed, allowing for custom loading components
+
+### Patch Changes
+
+- 4b888c4: [guides] add dedicated nextjs helper components for detecting location changes
+- Updated dependencies [be65601]
+- Updated dependencies [4b888c4]
+  - @knocklabs/react-core@0.11.0
+  - @knocklabs/client@0.19.0
+
 ## 0.8.11
 
 ### Patch Changes
