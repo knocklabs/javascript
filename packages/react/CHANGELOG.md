@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.1
+
+### Patch Changes
+
+- c4e67da: revert 4b888c4 to remove nextjs helper components and fix module resolution error
+- Updated dependencies [c4e67da]
+  - @knocklabs/client@0.19.1
+  - @knocklabs/react-core@0.11.1
+
 ## 0.9.0
 
 ### Minor Changes
