@@ -21,8 +21,10 @@ const PagesRouter: React.FC = () => {
       client.setLocation(win.location.href);
     }
 
-    // Remove any location change event listeners on the window object in case
-    // they are attached.
+    // If you are using this helper module, then that means we are detecting
+    // route changes from next's router rather than from the global history
+    // object which the guide client does by default, so ensure we don't have
+    // any event listeners hanging around unnecessarily.
     client.removeLocationChangeEventListeners();
 
     // Attach a route change event listener to the nextjs router. Note, here url
@@ -52,6 +54,8 @@ const AppRouter: React.FC = () => {
   const { client } = useGuideContext();
 
   React.useEffect(() => {
+    // Same here, remove any location change event listeners on the window
+    // object in case they are attached.
     client.removeLocationChangeEventListeners();
   }, [client]);
 
