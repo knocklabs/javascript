@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.2
+
+### Patch Changes
+
+- 1e538b9: [guide] add a secondary entry point for nextjs specific helpers for guide location detection
+
 ## 0.19.1
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.2
+
+### Patch Changes
+
+- 1e538b9: [guide] add a secondary entry point for nextjs specific helpers for guide location detection
+- Updated dependencies [1e538b9]
+  - @knocklabs/client@0.19.2
+  - @knocklabs/react-core@0.11.2
+
 ## 0.9.1
 
 ### Patch Changes
