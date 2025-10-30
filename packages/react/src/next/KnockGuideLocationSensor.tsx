@@ -21,7 +21,7 @@ const PagesRouter: React.FC = () => {
       client.setLocation(win.location.href);
     }
 
-    // Remove any location chagne event listeners on the window object in case
+    // Remove any location change event listeners on the window object in case
     // they are attached.
     client.removeLocationChangeEventListeners();
 
