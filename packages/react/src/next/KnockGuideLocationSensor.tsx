@@ -1,14 +1,18 @@
+"use client";
+
 import { useGuideContext } from "@knocklabs/react-core";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+// Note the .js suffix for Next 15 ESM friendliness:
+import { usePathname, useSearchParams } from "next/navigation.js";
+import { useRouter } from "next/router.js";
+import React from "react";
 
-import { checkForWindow } from "../../../core/utils";
+import { checkForWindow } from "../modules/core/utils";
 
-export const LocationSensorNextPagesRouter = () => {
+const PagesRouter: React.FC = () => {
   const router = useRouter();
   const { client } = useGuideContext();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const win = checkForWindow();
     if (!win) return;
 
@@ -38,4 +42,30 @@ export const LocationSensorNextPagesRouter = () => {
   }, [client]);
 
   return null;
+};
+
+const AppRouter: React.FC = () => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryStr = searchParams.toString();
+
+  const { client } = useGuideContext();
+
+  React.useEffect(() => {
+    client.removeLocationChangeEventListeners();
+  }, [client]);
+
+  React.useEffect(() => {
+    const win = checkForWindow();
+    if (!win) return;
+
+    client.setLocation(win.location.href);
+  }, [client, pathname, queryStr]);
+
+  return null;
+};
+
+export const KnockGuideLocationSensor = {
+  PagesRouter,
+  AppRouter,
 };

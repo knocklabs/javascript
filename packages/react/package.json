@@ -16,6 +16,12 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.mjs",
       "default": "./dist/cjs/index.js"
+    },
+    "./next": {
+      "require": "./dist/cjs/next.js",
+      "types": "./dist/types/next/index.d.ts",
+      "import": "./dist/esm/next.mjs",
+      "default": "./dist/cjs/next.js"
     }
   },
   "files": [

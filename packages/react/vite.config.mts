@@ -38,14 +38,17 @@ export default defineConfig(({ mode }) => {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
-        entry: path.resolve(__dirname, "src"),
+        entry: {
+          index: path.resolve(__dirname, "src"),
+          next: path.resolve(__dirname, "src/next/index.ts"),
+        },
         fileName: "[name]",
         formats,
         name: "react",
       },
       rollupOptions: {
-        // External packages that should not be bundled
-        external: ["react", "react-dom"],
+        // External peer dependency packages that should not be bundled
+        external: [ "react", "react-dom", "next", /^next\/.*/ ],
         output: {
           interop: "compat",
           globals: {
