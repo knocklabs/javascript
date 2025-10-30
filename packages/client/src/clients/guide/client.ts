@@ -1144,6 +1144,7 @@ export class KnockGuideClient {
 
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
+    this.knock.log(`[Guide] .handleLocationChange`);
     const win = checkForWindow();
     if (!win?.location) return;
 
