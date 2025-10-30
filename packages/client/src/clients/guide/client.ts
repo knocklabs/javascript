@@ -341,7 +341,7 @@ export class KnockGuideClient {
 
   cleanup() {
     this.unsubscribe();
-    this.removeEventListeners();
+    this.removeLocationChangeEventListeners();
     this.clearGroupStage();
     this.clearCounterInterval();
   }
@@ -1223,7 +1223,7 @@ export class KnockGuideClient {
     }
   }
 
-  private removeEventListeners() {
+  removeLocationChangeEventListeners() {
     const win = checkForWindow();
     if (!win?.history) return;
 
