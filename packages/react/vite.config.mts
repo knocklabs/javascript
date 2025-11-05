@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
         entry: {
           index: path.resolve(__dirname, "src"),
           next: path.resolve(__dirname, "src/next/index.ts"),
+          tanstack: path.resolve(__dirname, "src/tanstack/index.ts"),
         },
         fileName: "[name]",
         formats,
@@ -48,7 +49,7 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         // External peer dependency packages that should not be bundled
-        external: [ "react", "react-dom", "next", /^next\/.*/ ],
+        external: [ "react", "react-dom", "next", /^next\/.*/, "@tanstack/react-router" ],
         output: {
           interop: "compat",
           globals: {
