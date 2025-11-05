@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.3
+
+### Patch Changes
+
+- 79d7608: [guide] add KnockGuideLocationSensor helper component for Tanstack Router
+
 ## 0.9.2
 
 ### Patch Changes
