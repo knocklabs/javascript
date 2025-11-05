@@ -16,6 +16,8 @@ export const KnockGuideLocationSensor: React.FC = () => {
     const win = checkForWindow();
     if (!win) return;
 
+    // href here is the full path of the location, including pathname, search,
+    // and hash but does not include the origin.
     client.setLocation(win.location.origin + href);
   }, [client, href]);
 
