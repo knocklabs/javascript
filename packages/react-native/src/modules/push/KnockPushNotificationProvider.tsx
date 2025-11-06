@@ -45,33 +45,22 @@ export const KnockPushNotificationProvider: React.FC<
   // Acts like an upsert. Inserts or updates
   const registerPushTokenToChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
-      const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
       const newDevice: Device = {
         token,
-        locale,
-        timezone,
+        locale: Intl.DateTimeFormat().resolvedOptions().locale,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
 
       return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
-          let devices: Device[] = result.data["devices"] || [];
-
-          if (!result.data["devices"] && result.data["tokens"]) {
-            const oldTokens: string[] = result.data["tokens"];
-            devices = oldTokens.map((t) => ({
-              token: t,
-              locale: undefined,
-              timezone: undefined,
-            }));
-          }
+          const devices: Device[] = result.data["devices"] || [];
 
           const existingDeviceIndex = devices.findIndex(
             (device) => device.token === token,
           );
 
+          // add device to devices array
           if (existingDeviceIndex === -1) {
             devices.push(newDevice);
           }
@@ -95,16 +84,7 @@ export const KnockPushNotificationProvider: React.FC<
       return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
-          let devices: Device[] = result.data["devices"] || [];
-
-          if (!result.data["devices"] && result.data["tokens"]) {
-            const oldTokens: string[] = result.data["tokens"];
-            devices = oldTokens.map((t) => ({
-              token: t,
-              locale: undefined,
-              timezone: undefined,
-            }));
-          }
+          const devices: Device[] = result.data["devices"] || [];
 
           const updatedDevices = devices.filter(
             (device) => device.token !== token,
