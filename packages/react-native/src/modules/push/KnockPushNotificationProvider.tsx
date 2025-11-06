@@ -9,11 +9,11 @@ export interface Device {
 }
 
 export interface KnockPushNotificationContextType {
-  registerPushTokenToChannel(
+  upsertDeviceToChannel(
     token: string,
     channelId: string,
   ): Promise<ChannelData | void>;
-  unregisterPushTokenFromChannel(
+  deregisterDeviceFromChannel(
     token: string,
     channelId: string,
   ): Promise<ChannelData | void>;
@@ -32,7 +32,7 @@ export const KnockPushNotificationProvider: React.FC<
 > = ({ children }) => {
   const knockClient = useKnockClient();
 
-  const registerNewDeviceDataOnServer = useCallback(
+  const setChannelData = useCallback(
     async (devices: Device[], channelId: string): Promise<ChannelData> => {
       return knockClient.user.setChannelData({
         channelId: channelId,
@@ -42,7 +42,8 @@ export const KnockPushNotificationProvider: React.FC<
     [knockClient],
   );
 
-  const registerPushTokenToChannel = useCallback(
+  // Acts like an upsert. Inserts or updates
+  const upsertDeviceToChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
       const locale = Intl.DateTimeFormat().resolvedOptions().locale;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -56,6 +57,7 @@ export const KnockPushNotificationProvider: React.FC<
       return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
+          // existing devices case
           const devices: Device[] = result.data["devices"] || [];
           const existingDeviceIndex = devices.findIndex(
             (device) => device.token === token,
@@ -63,21 +65,23 @@ export const KnockPushNotificationProvider: React.FC<
 
           if (existingDeviceIndex === -1) {
             devices.push(newDevice);
-          } else {
+          }
+          // update device case
+          else {
             devices[existingDeviceIndex] = newDevice;
           }
-          knockClient.log("[Knock] registerPushTokenToChannel success");
-          return registerNewDeviceDataOnServer(devices, channelId);
+          knockClient.log("[Knock] upsertDeviceToChannel success");
+          return setChannelData(devices, channelId);
         })
         .catch((_) => {
-          // No data registered on that channel for that user, we'll create a new record
-          return registerNewDeviceDataOnServer([newDevice], channelId);
+          // no existing devices case
+          return setChannelData([newDevice], channelId);
         });
     },
-    [knockClient, registerNewDeviceDataOnServer],
+    [knockClient, setChannelData],
   );
 
-  const unregisterPushTokenFromChannel = useCallback(
+  const deregisterDeviceFromChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
       return knockClient.user
         .getChannelData({ channelId: channelId })
@@ -86,22 +90,22 @@ export const KnockPushNotificationProvider: React.FC<
           const updatedDevices = devices.filter(
             (device) => device.token !== token,
           );
-          knockClient.log("unregisterPushTokenFromChannel success");
-          return registerNewDeviceDataOnServer(updatedDevices, channelId);
+          knockClient.log("deregisterDeviceFromChannel success");
+          return setChannelData(updatedDevices, channelId);
         })
         .catch((error) => {
           console.error(
-            `[Knock] Error unregistering push token from channel:`,
+            `[Knock] Error deregistering device from channel:`,
             error,
           );
         });
     },
-    [knockClient, registerNewDeviceDataOnServer],
+    [knockClient, setChannelData],
   );
 
   return (
     <KnockPushNotificationContext.Provider
-      value={{ registerPushTokenToChannel, unregisterPushTokenFromChannel }}
+      value={{ upsertDeviceToChannel, deregisterDeviceFromChannel }}
     >
       {children}
     </KnockPushNotificationContext.Provider>

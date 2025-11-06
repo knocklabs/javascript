@@ -1,7 +1,7 @@
 import { Message, MessageEngagementStatus } from "@knocklabs/client";
 import { useKnockClient } from "@knocklabs/react-core";
 import {
-  type KnockPushNotificationContextType,
+  KnockPushNotificationContextType,
   KnockPushNotificationProvider,
   usePushNotifications,
 } from "@knocklabs/react-native";
@@ -123,7 +123,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
   children,
   autoRegister = true,
 }) => {
-  const { registerPushTokenToChannel, unregisterPushTokenFromChannel } =
+  const { upsertDeviceToChannel, deregisterDeviceFromChannel } =
     usePushNotifications();
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const knockClient = useKnockClient();
@@ -198,7 +198,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       registerForPushNotifications()
         .then(() => {
           if (expoPushToken) {
-            registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
+            upsertDeviceToChannel(expoPushToken, knockExpoChannelId)
               .then((_result) => {
                 knockClient.log("[Knock] setChannelData success");
               })
@@ -260,8 +260,8 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       value={{
         expoPushToken,
         registerForPushNotifications,
-        registerPushTokenToChannel,
-        unregisterPushTokenFromChannel,
+        upsertDeviceToChannel,
+        deregisterDeviceFromChannel,
         onNotificationReceived: handleNotificationReceived,
         onNotificationTapped: handleNotificationTapped,
       }}
