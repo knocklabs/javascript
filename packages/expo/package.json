@@ -1,6 +1,6 @@
 {
   "name": "@knocklabs/expo",
-  "version": "0.3.50",
+  "version": "0.3.53",
   "author": "@knocklabs",
   "license": "MIT",
   "main": "dist/cjs/index.js",
@@ -74,7 +74,7 @@
     "expo-constants": "~17.1.7",
     "expo-device": "^7.1.4",
     "expo-notifications": "^0.31.4",
-    "jsdom": "^27.0.0",
+    "jsdom": "^27.1.0",
     "react": "^19.0.0",
     "react-native": "^0.79.2",
     "rimraf": "^6.0.1",

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.19.2
+
+### Patch Changes
+
+- 1e538b9: [guide] add a secondary entry point for nextjs specific helpers for guide location detection
+
+## 0.19.1
+
+### Patch Changes
+
+- c4e67da: revert 4b888c4 to remove nextjs helper components and fix module resolution error
+
+## 0.19.0
+
+### Minor Changes
+
+- be65601: - **Added channel-level notification preferences** to client interfaces, types, tests, and the Next.js example.
+  - Update your code to handle the new channels property in `PreferenceSet`, `SetPreferencesProperties`, and `WorkflowPreferenceSetting` if using `@knock/client`.
+
+### Patch Changes
+
+- 4b888c4: [guides] add dedicated nextjs helper components for detecting location changes
+
 ## 0.18.7
 
 ### Patch Changes

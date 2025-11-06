@@ -2,7 +2,7 @@
   "name": "@knocklabs/react",
   "description": "A set of React components to build notification experiences powered by Knock",
   "author": "@knocklabs",
-  "version": "0.8.11",
+  "version": "0.9.3",
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
@@ -16,6 +16,18 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.mjs",
       "default": "./dist/cjs/index.js"
+    },
+    "./next": {
+      "require": "./dist/cjs/next.js",
+      "types": "./dist/types/next/index.d.ts",
+      "import": "./dist/esm/next.mjs",
+      "default": "./dist/cjs/next.js"
+    },
+    "./tanstack": {
+      "require": "./dist/cjs/tanstack.js",
+      "types": "./dist/types/tanstack/index.d.ts",
+      "import": "./dist/esm/tanstack.mjs",
+      "default": "./dist/cjs/tanstack.js"
     }
   },
   "files": [
@@ -46,25 +58,36 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
+    "@tanstack/react-router": "^1.0.0",
+    "next": "^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0",
     "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-router": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
     "@popperjs/core": "^2.11.8",
-    "@radix-ui/react-dialog": "^1.1.14",
-    "@telegraph/combobox": "^0.1.11",
-    "@telegraph/icon": "^0.2.6",
-    "@telegraph/layout": "^0.2.2",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@telegraph/combobox": "^0.1.16",
+    "@telegraph/icon": "^0.2.7",
+    "@telegraph/layout": "^0.2.3",
     "@telegraph/tokens": "^0.1.2",
-    "@telegraph/typography": "^0.1.24",
+    "@telegraph/typography": "^0.1.25",
     "clsx": "^2.1.1",
     "lodash.debounce": "^4.0.8"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
-    "@testing-library/dom": "^10.4.0",
+    "@tanstack/react-router": "1.134.12",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
     "@types/eslint-plugin-jsx-a11y": "^6",
     "@types/lodash.debounce": "^4.0.9",
@@ -78,7 +101,8 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.14",
-    "jsdom": "^27.0.0",
+    "jsdom": "^27.1.0",
+    "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rimraf": "^6.0.1",

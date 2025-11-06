@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.9.3
+
+### Patch Changes
+
+- 79d7608: [guide] add KnockGuideLocationSensor helper component for Tanstack Router
+
+## 0.9.2
+
+### Patch Changes
+
+- 1e538b9: [guide] add a secondary entry point for nextjs specific helpers for guide location detection
+- Updated dependencies [1e538b9]
+  - @knocklabs/client@0.19.2
+  - @knocklabs/react-core@0.11.2
+
+## 0.9.1
+
+### Patch Changes
+
+- c4e67da: revert 4b888c4 to remove nextjs helper components and fix module resolution error
+- Updated dependencies [c4e67da]
+  - @knocklabs/client@0.19.1
+  - @knocklabs/react-core@0.11.1
+
+## 0.9.0
+
+### Minor Changes
+
+- 40d8e8a: Added renderLoading prop to NotificationFeed, allowing for custom loading components
+
+### Patch Changes
+
+- 4b888c4: [guides] add dedicated nextjs helper components for detecting location changes
+- Updated dependencies [be65601]
+- Updated dependencies [4b888c4]
+  - @knocklabs/react-core@0.11.0
+  - @knocklabs/client@0.19.0
+
 ## 0.8.11
 
 ### Patch Changes

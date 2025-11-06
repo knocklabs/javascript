@@ -33,9 +33,50 @@ const WorkflowPreferences = ({
                 },
                 categories: {},
                 channel_types: {},
+                channels: {},
               });
             }}
           />
+        </Stack>
+      );
+    }
+
+    if (typeof value === "object" && "channels" in value) {
+      return (
+        <Stack key={key} direction="column" gap="2">
+          <Text as="span">{key}</Text>
+          {Object.entries(value.channels).map(([channelId, channelValue]) => {
+            if (typeof channelValue !== "boolean") return;
+
+            return (
+              <Stack key={channelId} direction="row" gap="2" ml="8">
+                <Text as="span">{channelId}</Text>
+                <input
+                  type="checkbox"
+                  checked={channelValue}
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+
+                    onPreferencesChange({
+                      workflows: {
+                        ...preferences,
+                        [key]: {
+                          ...value,
+                          channels: {
+                            ...value.channels,
+                            [channelId]: checked,
+                          },
+                        },
+                      },
+                      categories: {},
+                      channel_types: {},
+                      channels: {},
+                    });
+                  }}
+                />
+              </Stack>
+            );
+          })}
         </Stack>
       );
     }
@@ -70,6 +111,7 @@ const WorkflowPreferences = ({
                         },
                         categories: {},
                         channel_types: {},
+                        channels: {},
                       });
                     }}
                   />

@@ -341,7 +341,7 @@ export class KnockGuideClient {
 
   cleanup() {
     this.unsubscribe();
-    this.removeEventListeners();
+    this.removeLocationChangeEventListeners();
     this.clearGroupStage();
     this.clearCounterInterval();
   }
@@ -1144,6 +1144,7 @@ export class KnockGuideClient {
 
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
+    this.knock.log(`[Guide] .handleLocationChange`);
     const win = checkForWindow();
     if (!win?.location) return;
 
@@ -1223,7 +1224,7 @@ export class KnockGuideClient {
     }
   }
 
-  private removeEventListeners() {
+  removeLocationChangeEventListeners() {
     const win = checkForWindow();
     if (!win?.history) return;
 

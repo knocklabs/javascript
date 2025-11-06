@@ -1,5 +1,39 @@
 # nextjs-example
 
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [79d7608]
+  - @knocklabs/react@0.9.3
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [1e538b9]
+  - @knocklabs/react@0.9.2
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [c4e67da]
+  - @knocklabs/react@0.9.1
+
+## 1.2.0
+
+### Minor Changes
+
+- be65601: - **Added channel-level notification preferences** to client interfaces, types, tests, and the Next.js example.
+  - Update your code to handle the new channels property in `PreferenceSet`, `SetPreferencesProperties`, and `WorkflowPreferenceSetting` if using `@knock/client`.
+
+### Patch Changes
+
+- Updated dependencies [4b888c4]
+- Updated dependencies [40d8e8a]
+  - @knocklabs/react@0.9.0
+
 ## 1.1.49
 
 ### Patch Changes
