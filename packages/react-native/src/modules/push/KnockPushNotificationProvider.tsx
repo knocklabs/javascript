@@ -9,11 +9,11 @@ export interface Device {
 }
 
 export interface KnockPushNotificationContextType {
-  upsertDeviceToChannel(
+  registerPushTokenToChannel(
     token: string,
     channelId: string,
   ): Promise<ChannelData | void>;
-  deregisterDeviceFromChannel(
+  unregisterPushTokenFromChannel(
     token: string,
     channelId: string,
   ): Promise<ChannelData | void>;
@@ -43,7 +43,7 @@ export const KnockPushNotificationProvider: React.FC<
   );
 
   // Acts like an upsert. Inserts or updates
-  const upsertDeviceToChannel = useCallback(
+  const registerPushTokenToChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
       const locale = Intl.DateTimeFormat().resolvedOptions().locale;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -70,7 +70,7 @@ export const KnockPushNotificationProvider: React.FC<
           else {
             devices[existingDeviceIndex] = newDevice;
           }
-          knockClient.log("[Knock] upsertDeviceToChannel success");
+          knockClient.log("[Knock] registerPushTokenToChannel success");
           return setChannelData(devices, channelId);
         })
         .catch((_) => {
@@ -81,7 +81,7 @@ export const KnockPushNotificationProvider: React.FC<
     [knockClient, setChannelData],
   );
 
-  const deregisterDeviceFromChannel = useCallback(
+  const unregisterPushTokenFromChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
       return knockClient.user
         .getChannelData({ channelId: channelId })
@@ -90,7 +90,7 @@ export const KnockPushNotificationProvider: React.FC<
           const updatedDevices = devices.filter(
             (device) => device.token !== token,
           );
-          knockClient.log("deregisterDeviceFromChannel success");
+          knockClient.log("unregisterPushTokenFromChannel success");
           return setChannelData(updatedDevices, channelId);
         })
         .catch((error) => {
@@ -105,7 +105,7 @@ export const KnockPushNotificationProvider: React.FC<
 
   return (
     <KnockPushNotificationContext.Provider
-      value={{ upsertDeviceToChannel, deregisterDeviceFromChannel }}
+      value={{ registerPushTokenToChannel, unregisterPushTokenFromChannel }}
     >
       {children}
     </KnockPushNotificationContext.Provider>
