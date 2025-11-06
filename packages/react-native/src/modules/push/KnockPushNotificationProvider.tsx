@@ -57,8 +57,17 @@ export const KnockPushNotificationProvider: React.FC<
       return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
-          // existing devices case
-          const devices: Device[] = result.data["devices"] || [];
+          let devices: Device[] = result.data["devices"] || [];
+
+          if (!result.data["devices"] && result.data["tokens"]) {
+            const oldTokens: string[] = result.data["tokens"];
+            devices = oldTokens.map((t) => ({
+              token: t,
+              locale: undefined,
+              timezone: undefined,
+            }));
+          }
+
           const existingDeviceIndex = devices.findIndex(
             (device) => device.token === token,
           );
@@ -86,7 +95,17 @@ export const KnockPushNotificationProvider: React.FC<
       return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {
-          const devices: Device[] = result.data["devices"] || [];
+          let devices: Device[] = result.data["devices"] || [];
+
+          if (!result.data["devices"] && result.data["tokens"]) {
+            const oldTokens: string[] = result.data["tokens"];
+            devices = oldTokens.map((t) => ({
+              token: t,
+              locale: undefined,
+              timezone: undefined,
+            }));
+          }
+
           const updatedDevices = devices.filter(
             (device) => device.token !== token,
           );
