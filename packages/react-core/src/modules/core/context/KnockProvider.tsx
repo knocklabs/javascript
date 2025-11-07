@@ -25,6 +25,7 @@ export type KnockProviderProps = {
   // i18n translations
   i18n?: I18nContent;
   logLevel?: LogLevel;
+  branch?: string;
 } & (
   | {
       /**
@@ -64,6 +65,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   children,
   i18n,
   identificationStrategy,
+  branch,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -76,6 +78,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       timeBeforeExpirationInMs,
       logLevel,
       identificationStrategy,
+      branch,
     }),
     [
       host,
@@ -83,6 +86,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       timeBeforeExpirationInMs,
       logLevel,
       identificationStrategy,
+      branch,
     ],
   );
 

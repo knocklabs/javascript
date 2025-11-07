@@ -5,6 +5,8 @@ import ApiClient from "../src/api";
 
 import { createAxiosMock, mockAxios } from "./test-utils/mocks";
 
+const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
+
 // Type for accessing global properties
 type GlobalWithWindow = Record<string, unknown>;
 
@@ -74,6 +76,7 @@ describe("API Client", () => {
         host: "https://api.knock.app",
         apiKey: "pk_test_12345",
         userToken: undefined,
+        branch: TEST_BRANCH_SLUG,
       });
 
       expect(apiClient).toBeInstanceOf(ApiClient);
@@ -512,6 +515,22 @@ describe("API Client", () => {
 
       expect(axiosClient.defaults.headers["X-Knock-Client"]).toBe(
         `Knock/ClientJS ${packageJson.version}`,
+      );
+    });
+
+    test("sets correct x-knock-branch header", () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        branch: TEST_BRANCH_SLUG,
+      });
+
+      const axiosClient = (apiClient as unknown as Record<string, unknown>)
+        .axiosClient as { defaults: { headers: Record<string, string> } };
+
+      expect(axiosClient.defaults.headers["X-Knock-Branch"]).toBe(
+        TEST_BRANCH_SLUG,
       );
     });
 
