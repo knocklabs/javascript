@@ -1,5 +1,14 @@
 # ms-teams-connect-example
 
+## 0.0.39
+
+### Patch Changes
+
+- f278892: Add `NEXT_PUBLIC_KNOCK_BRANCH` env var for specifying branch
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+  - @knocklabs/react@0.9.4
+
 ## 0.0.38
 
 ### Patch Changes

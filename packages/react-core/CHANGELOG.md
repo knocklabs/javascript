@@ -1,5 +1,68 @@
 # Changelog
 
+## 0.11.3
+
+### Patch Changes
+
+- 571abb1: Add `branch` option to `useAuthenticatedKnockClient` hook
+
+  The `useAuthenticatedKnockClient` hook now accepts a `branch` option. To use
+  `useAuthenticatedKnockClient` with a branch, set the `apiKey` param to your
+  development environment's API key and set the `branch` option to the slug of an
+  existing branch.
+
+  ```tsx
+  import { useAuthenticatedKnockClient } from "@knocklabs/react-core";
+
+  const knock = useAuthenticatedKnockClient(
+    process.env.KNOCK_PUBLIC_API_KEY,
+    { id: user.id },
+    undefined, // userToken when needed
+    { branch: "my-branch-slug" },
+  );
+  ```
+
+- f4529cc: Enable use of SlackKit with branches
+
+  The `useSlackAuth` hook exported by `@knocklabs/react-core` has been updated so
+  that it works with branches. You can now use either this hook or the
+  `<SlackAuthButton>` component exported by `@knocklabs/react` to test connecting
+  Slack workspaces to Knock tenants while working on a branch.
+
+- f278892: Enable use of TeamsKit with branches
+
+  The `useMsTeamsAuth` hook exported by `@knocklabs/react-core` has been updated
+  so that it works with branches. You can now use either this hook or the
+  `<MsTeamsAuthButton>` component exported by `@knocklabs/react` to test
+  connecting Microsoft Teams organizations to Knock tenants while working on a
+  branch.
+
+- 571abb1: Add `branch` prop to `<KnockProvider>`
+
+  The `<KnockProvider>` context provider now accepts an optional `branch` prop.
+  To use `<KnockProvider>` with a branch, set the `apiKey` prop to your
+  development environment's API key and set `branch` to the slug of an existing
+  branch.
+
+  ```tsx
+  import { KnockProvider } from "@knocklabs/react";
+
+  const YourAppLayout = () => {
+    return (
+      <KnockProvider
+        apiKey={process.env.KNOCK_PUBLIC_API_KEY}
+        user={{ id: user.id }}
+        branch="my-branch-slug"
+      >
+        {/** the rest of your app */}
+      </KnockProvider>
+    );
+  };
+  ```
+
+- Updated dependencies [571abb1]
+  - @knocklabs/client@0.19.3
+
 ## 0.11.2
 
 ### Patch Changes
