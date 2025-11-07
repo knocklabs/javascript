@@ -848,7 +848,6 @@ export class KnockGuideClient {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
       content: updatedStep.content,
       data: this.targetParams.data,
-      tenant: this.targetParams.tenant,
     };
 
     this.knock.user.markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>(
@@ -1076,6 +1075,8 @@ export class KnockGuideClient {
       guide_key: guide.key,
       guide_id: guide.id,
       guide_step_ref: step.ref,
+      // Can be used for scoping guide messages.
+      tenant: this.targetParams.tenant,
     };
   }
 
