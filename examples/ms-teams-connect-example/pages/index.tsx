@@ -49,6 +49,7 @@ export default function Home() {
       user={{ id: user.id }}
       host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
       userToken={localStorage.getItem("knock-user-token")!}
+      branch={process.env.NEXT_PUBLIC_KNOCK_BRANCH}
     >
       <KnockMsTeamsProvider
         knockMsTeamsChannelId={

@@ -4,6 +4,8 @@ import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import type UseMsTeamsAuth from "../../src/modules/ms-teams/hooks/useMsTeamsAuth";
 import { mockMsTeamsContext, mockTranslations } from "../test-utils/mocks";
 
+const TEST_BRANCH_SLUG = "lorem-ipsum-branch";
+
 // -----------------------------------------------------------------------------
 // Stubs & Mocks
 // -----------------------------------------------------------------------------
@@ -29,6 +31,7 @@ vi.mock("../../src/modules/core", () => ({
     apiKey: "test_api_key",
     userToken: "test_user_token",
     host: "https://example.com",
+    branch: TEST_BRANCH_SLUG,
   }),
 }));
 
@@ -75,6 +78,7 @@ describe("useMsTeamsAuth", () => {
       channel_id: "test_channel_id",
       public_key: "test_api_key",
       user_token: "test_user_token",
+      branch_slug: TEST_BRANCH_SLUG,
     });
   });
 
