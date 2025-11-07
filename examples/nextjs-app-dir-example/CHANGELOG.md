@@ -1,5 +1,13 @@
 # nextjs-app-dir-example
 
+## 0.0.38
+
+### Patch Changes
+
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+  - @knocklabs/react@0.9.4
+
 ## 0.0.37
 
 ### Patch Changes

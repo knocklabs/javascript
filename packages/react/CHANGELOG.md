@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.9.4
+
+### Patch Changes
+
+- f4529cc: Enable use of SlackKit with branches
+
+  The `useSlackAuth` hook exported by `@knocklabs/react-core` has been updated so
+  that it works with branches. You can now use either this hook or the
+  `<SlackAuthButton>` component exported by `@knocklabs/react` to test connecting
+  Slack workspaces to Knock tenants while working on a branch.
+
+- f278892: Enable use of TeamsKit with branches
+
+  The `useMsTeamsAuth` hook exported by `@knocklabs/react-core` has been updated
+  so that it works with branches. You can now use either this hook or the
+  `<MsTeamsAuthButton>` component exported by `@knocklabs/react` to test
+  connecting Microsoft Teams organizations to Knock tenants while working on a
+  branch.
+
+- Updated dependencies [571abb1]
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+- Updated dependencies [571abb1]
+- Updated dependencies [571abb1]
+  - @knocklabs/react-core@0.11.3
+  - @knocklabs/client@0.19.3
+
 ## 0.9.3
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- bac8ced: Migrate push notifications from tokens array to devices array with locale and timezone
+
+### Patch Changes
+
+- Updated dependencies [571abb1]
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+- Updated dependencies [571abb1]
+- Updated dependencies [571abb1]
+  - @knocklabs/react-core@0.11.3
+  - @knocklabs/client@0.19.3
+
 ## 0.6.50
 
 ### Patch Changes
