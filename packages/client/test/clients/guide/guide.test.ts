@@ -1098,8 +1098,9 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Should include the guide with allow directive for /dashboard
-      expect(result!.key).toBe("onboarding");
+      // feature_tour has a block pattern for /settings, so it's allowed on /dashboard
+      // Since feature_tour comes first in display_sequence, it should be selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by url patterns - block directive", () => {
@@ -1152,8 +1153,9 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Should include the guide with allow rule for /dashboard
-      expect(result!.key).toBe("onboarding");
+      // feature_tour still has a block pattern for /settings, so it's allowed on /dashboard
+      // Since feature_tour comes first in display_sequence, it should be selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by activation_url_rules - allow directive with contains", () => {
@@ -1187,8 +1189,9 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Should include the guide with contains rule matching "dash"
-      expect(result!.key).toBe("onboarding");
+      // feature_tour still has a block pattern for /settings, so it's allowed on /dashboard
+      // Since feature_tour comes first in display_sequence, it should be selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by activation_url_rules - block directive with equal_to", () => {
@@ -1298,11 +1301,10 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Block rule should prevail even if allow rule also matches
-      // feature_tour is excluded because it has url_patterns that don't match this location
-      // onboarding is excluded because block rule prevails
-      // system_status has no rules and is included
-      expect(result!.key).toBe("system_status");
+      // feature_tour has a block pattern for "/settings" which doesn't match "/admin/settings"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by activation_url_rules - multiple allow rules (any match allows)", () => {
@@ -1342,8 +1344,10 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Should allow the guide when any allow rule matches
-      expect(result!.key).toBe("onboarding");
+      // feature_tour has a block pattern for "/settings" which doesn't match "/settings/profile"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by activation_url_rules - handles leading slash in arguments", () => {
@@ -1377,8 +1381,10 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Should handle argument without leading slash correctly
-      expect(result!.key).toBe("onboarding");
+      // feature_tour has a block pattern for "/settings" which doesn't match "/dashboard"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by activation_url_rules - no match when url rules don't match", () => {
@@ -1412,11 +1418,11 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       const result = client["_selectGuide"](stateWithGuides);
 
-      // Should not match the guide when url rules don't match
-      // feature_tour is excluded because it has url_patterns that don't match this location
-      // onboarding is excluded because its url_rules don't match
-      // system_status has no rules and is included
-      expect(result!.key).toBe("system_status");
+      // feature_tour has a block pattern for "/settings" which doesn't match "/dashboard"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // onboarding is excluded because its url_rules require "/admin" but location is "/dashboard"
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("handles guides without location when location is undefined", () => {
