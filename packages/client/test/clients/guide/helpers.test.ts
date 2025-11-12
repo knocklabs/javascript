@@ -1,7 +1,15 @@
 import { describe, expect, test } from "vitest";
+import { URLPattern } from "urlpattern-polyfill";
 
-import { evaluateUrlRule } from "../../../src/clients/guide/helpers";
-import type { GuideActivationUrlRuleData } from "../../../src/clients/guide/types";
+import {
+  evaluateUrlRule,
+  predicateUrlRules,
+  predicateUrlPatterns,
+} from "../../../src/clients/guide/helpers";
+import type {
+  GuideActivationUrlRuleData,
+  KnockGuideActivationUrlPattern,
+} from "../../../src/clients/guide/types";
 
 describe("evaluateUrlRule", () => {
   describe("pathname variable with equal_to operator", () => {
@@ -228,6 +236,308 @@ describe("evaluateUrlRule", () => {
       const url = new URL("https://example.com/dashboard/");
 
       expect(evaluateUrlRule(url, rule)).toBe(false);
+    });
+  });
+});
+
+describe("predicateUrlRules", () => {
+  describe("with only block rules", () => {
+    test("defaults to true when all rules are block directives", () => {
+      const blockRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "block",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/admin",
+        },
+        {
+          directive: "block",
+          variable: "pathname",
+          operator: "contains",
+          argument: "private",
+        },
+      ];
+
+      // URL that doesn't match any block rules - should default to true
+      const url = new URL("https://example.com/public/page");
+      expect(predicateUrlRules(url, blockRules)).toBe(true);
+    });
+
+    test("returns false when URL matches a block rule", () => {
+      const blockRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "block",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/admin",
+        },
+      ];
+
+      const url = new URL("https://example.com/admin");
+      expect(predicateUrlRules(url, blockRules)).toBe(false);
+    });
+
+    test("returns true for empty array of rules", () => {
+      const emptyRules: GuideActivationUrlRuleData[] = [];
+      const url = new URL("https://example.com/any/path");
+
+      // Empty array: every() returns true for empty arrays, so hasBlockRulesOnly is true, defaulting to true
+      expect(predicateUrlRules(url, emptyRules)).toBe(true);
+    });
+  });
+
+  describe("with mixed allow and block rules", () => {
+    test("defaults to undefined when rules contain both allow and block directives", () => {
+      const mixedRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "allow",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/dashboard",
+        },
+        {
+          directive: "block",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/admin",
+        },
+      ];
+
+      // URL that doesn't match any rules - should default to undefined
+      const url = new URL("https://example.com/other");
+      expect(predicateUrlRules(url, mixedRules)).toBe(undefined);
+    });
+
+    test("returns true when URL matches an allow rule", () => {
+      const mixedRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "allow",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/dashboard",
+        },
+        {
+          directive: "block",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/admin",
+        },
+      ];
+
+      const url = new URL("https://example.com/dashboard");
+      expect(predicateUrlRules(url, mixedRules)).toBe(true);
+    });
+
+    test("returns false when URL matches a block rule even with allow rules present", () => {
+      const mixedRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "allow",
+          variable: "pathname",
+          operator: "contains",
+          argument: "/admin",
+        },
+        {
+          directive: "block",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/admin/users",
+        },
+      ];
+
+      const url = new URL("https://example.com/admin/users");
+      expect(predicateUrlRules(url, mixedRules)).toBe(false);
+    });
+  });
+
+  describe("with only allow rules", () => {
+    test("defaults to undefined when all rules are allow directives", () => {
+      const allowRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "allow",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/dashboard",
+        },
+        {
+          directive: "allow",
+          variable: "pathname",
+          operator: "contains",
+          argument: "public",
+        },
+      ];
+
+      // URL that doesn't match any allow rules - should default to undefined
+      const url = new URL("https://example.com/other");
+      expect(predicateUrlRules(url, allowRules)).toBe(undefined);
+    });
+
+    test("returns true when URL matches an allow rule", () => {
+      const allowRules: GuideActivationUrlRuleData[] = [
+        {
+          directive: "allow",
+          variable: "pathname",
+          operator: "equal_to",
+          argument: "/dashboard",
+        },
+      ];
+
+      const url = new URL("https://example.com/dashboard");
+      expect(predicateUrlRules(url, allowRules)).toBe(true);
+    });
+  });
+});
+
+describe("predicateUrlPatterns", () => {
+  describe("with only block patterns", () => {
+    test("defaults to true when all patterns are block directives", () => {
+      const blockPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/admin/*" }),
+        },
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/private/*" }),
+        },
+      ];
+
+      // URL that doesn't match any block patterns - should default to true
+      const url = new URL("https://example.com/public/page");
+      expect(predicateUrlPatterns(url, blockPatterns)).toBe(true);
+    });
+
+    test("returns false when URL matches a block pattern", () => {
+      const blockPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/admin/*" }),
+        },
+      ];
+
+      const url = new URL("https://example.com/admin/settings");
+      expect(predicateUrlPatterns(url, blockPatterns)).toBe(false);
+    });
+
+    test("returns true for empty array of patterns", () => {
+      const emptyPatterns: KnockGuideActivationUrlPattern[] = [];
+      const url = new URL("https://example.com/any/path");
+
+      // Empty array: every() returns true for empty arrays, so hasBlockPatternsOnly is true, defaulting to true
+      expect(predicateUrlPatterns(url, emptyPatterns)).toBe(true);
+    });
+  });
+
+  describe("with mixed allow and block patterns", () => {
+    test("defaults to undefined when patterns contain both allow and block directives", () => {
+      const mixedPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/dashboard/*" }),
+        },
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/admin/*" }),
+        },
+      ];
+
+      // URL that doesn't match any patterns - should default to undefined
+      const url = new URL("https://example.com/other");
+      expect(predicateUrlPatterns(url, mixedPatterns)).toBe(undefined);
+    });
+
+    test("returns true when URL matches an allow pattern", () => {
+      const mixedPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/dashboard/*" }),
+        },
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/admin/*" }),
+        },
+      ];
+
+      const url = new URL("https://example.com/dashboard/overview");
+      expect(predicateUrlPatterns(url, mixedPatterns)).toBe(true);
+    });
+
+    test("returns false when URL matches a block pattern even with allow patterns present", () => {
+      const mixedPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/admin/*" }),
+        },
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/admin/users" }),
+        },
+      ];
+
+      const url = new URL("https://example.com/admin/users");
+      expect(predicateUrlPatterns(url, mixedPatterns)).toBe(false);
+    });
+  });
+
+  describe("with only allow patterns", () => {
+    test("defaults to undefined when all patterns are allow directives", () => {
+      const allowPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/dashboard/*" }),
+        },
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/public/*" }),
+        },
+      ];
+
+      // URL that doesn't match any allow patterns - should default to undefined
+      const url = new URL("https://example.com/other");
+      expect(predicateUrlPatterns(url, allowPatterns)).toBe(undefined);
+    });
+
+    test("returns true when URL matches an allow pattern", () => {
+      const allowPatterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/dashboard/*" }),
+        },
+      ];
+
+      const url = new URL("https://example.com/dashboard/stats");
+      expect(predicateUrlPatterns(url, allowPatterns)).toBe(true);
+    });
+  });
+
+  describe("edge cases", () => {
+    test("handles patterns with wildcards correctly", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/*/admin" }),
+        },
+      ];
+
+      const matchingUrl = new URL("https://example.com/users/admin");
+      const nonMatchingUrl = new URL("https://example.com/public/page");
+
+      expect(predicateUrlPatterns(matchingUrl, patterns)).toBe(false);
+      expect(predicateUrlPatterns(nonMatchingUrl, patterns)).toBe(true);
+    });
+
+    test("handles exact URL patterns", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/specific-page" }),
+        },
+      ];
+
+      const exactUrl = new URL("https://example.com/specific-page");
+      const differentUrl = new URL("https://example.com/other-page");
+
+      expect(predicateUrlPatterns(exactUrl, patterns)).toBe(false);
+      expect(predicateUrlPatterns(differentUrl, patterns)).toBe(true);
     });
   });
 });
