@@ -12,6 +12,7 @@ export interface KnockPushNotificationContextType {
   registerPushTokenToChannel(
     token: string,
     channelId: string,
+    locale?: string,
   ): Promise<ChannelData | void>;
   unregisterPushTokenFromChannel(
     token: string,
@@ -44,10 +45,14 @@ export const KnockPushNotificationProvider: React.FC<
 
   // Acts like an upsert. Inserts or updates
   const registerPushTokenToChannel = useCallback(
-    async (token: string, channelId: string): Promise<ChannelData | void> => {
+    async (
+      token: string,
+      channelId: string,
+      locale: string = Intl.DateTimeFormat().resolvedOptions().locale,
+    ): Promise<ChannelData | void> => {
       const newDevice: Device = {
         token,
-        locale: Intl.DateTimeFormat().resolvedOptions().locale,
+        locale,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
 
