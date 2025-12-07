@@ -7,6 +7,7 @@ import {
 } from "@knocklabs/react-native";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
+import * as Network from "expo-network";
 import * as Notifications from "expo-notifications";
 import React, {
   createContext,
@@ -127,6 +128,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     usePushNotifications();
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const knockClient = useKnockClient();
+  const { isInternetReachable } = Network.useNetworkState();
 
   const [notificationReceivedHandler, setNotificationReceivedHandler] =
     useState<(notification: Notifications.Notification) => void>(
@@ -187,6 +189,31 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     },
     [knockClient],
   );
+
+  useEffect(() => {
+    if (expoPushToken) {
+      return;
+    }
+
+    const fetchExpoTokenIfNeeded = async () => {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      if (
+        existingStatus === "granted" &&
+        Device.isDevice &&
+        isInternetReachable
+      ) {
+        try {
+          const token = await getExpoPushToken();
+          setExpoPushToken(token ? token.data : null);
+        } catch (error) {
+          console.error(`[Knock] Error getting expo push token:`, error);
+        }
+      }
+    };
+
+    fetchExpoTokenIfNeeded();
+  }, [isInternetReachable, expoPushToken]);
 
   useEffect(() => {
     Notifications.setNotificationHandler({
