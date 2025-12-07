@@ -227,6 +227,16 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
         notificationReceivedHandler(notification);
       });
 
+    const response = Notifications.getLastNotificationResponse();
+    if (response?.notification) {
+      knockClient.log("[Knock] Expo Push Notification was interacted with");
+      updateKnockMessageStatusFromNotification(
+        response.notification,
+        "interacted",
+      );
+      notificationTappedHandler(response);
+    }
+
     const notificationResponseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
         knockClient.log("[Knock] Expo Push Notification was interacted with");
