@@ -221,6 +221,25 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
         customNotificationHandler ?? defaultNotificationHandler,
     });
 
+    const response = Notifications.getLastNotificationResponse();
+    if (response?.notification) {
+      knockClient.log(
+        "[Knock] Expo Push Notification was interacted with (initial)",
+      );
+      updateKnockMessageStatusFromNotification(
+        response.notification,
+        "interacted",
+      );
+      notificationTappedHandler(response);
+    }
+  }, [
+    customNotificationHandler,
+    knockClient,
+    notificationTappedHandler,
+    updateKnockMessageStatusFromNotification,
+  ]);
+
+  useEffect(() => {
     if (autoRegister) {
       registerForPushNotifications()
         .then(() => {
@@ -254,16 +273,6 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
         notificationReceivedHandler(notification);
       });
 
-    const response = Notifications.getLastNotificationResponse();
-    if (response?.notification) {
-      knockClient.log("[Knock] Expo Push Notification was interacted with");
-      updateKnockMessageStatusFromNotification(
-        response.notification,
-        "interacted",
-      );
-      notificationTappedHandler(response);
-    }
-
     const notificationResponseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
         knockClient.log("[Knock] Expo Push Notification was interacted with");
@@ -278,18 +287,16 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       notificationReceivedSubscription.remove();
       notificationResponseSubscription.remove();
     };
-
-    // TODO: Remove when possible and ensure dependency array is correct
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     registerForPushNotifications,
     notificationReceivedHandler,
     notificationTappedHandler,
-    customNotificationHandler,
     autoRegister,
     expoPushToken,
     knockExpoChannelId,
     knockClient,
+    registerPushTokenToChannel,
+    updateKnockMessageStatusFromNotification,
   ]);
 
   return (
