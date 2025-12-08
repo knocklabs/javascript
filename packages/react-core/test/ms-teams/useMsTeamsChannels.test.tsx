@@ -1,21 +1,21 @@
 import { renderHook } from "@testing-library/react";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type UseMsTeamsChannels from "../../src/modules/ms-teams/hooks/useMsTeamsChannels";
-import { mockMsTeamsContext, mockTranslations } from "../test-utils/mocks";
+import useMsTeamsChannels from "../../src/modules/ms-teams/hooks/useMsTeamsChannels";
 
-// Apply shared mocks **before** loading the hook
-mockMsTeamsContext();
-mockTranslations();
+// ----------------------------------------------------------------------------------
+// Mock state that can be modified between renders
+// ----------------------------------------------------------------------------------
 
-// Dynamically load the hook after mocks are set up
-let useMsTeamsChannels: typeof UseMsTeamsChannels;
+let mockMsTeamsClientState = {
+  knockMsTeamsChannelId: "knock_chan",
+  tenantId: "tenant_1",
+  connectionStatus: "connected" as string,
+};
 
-beforeAll(async () => {
-  ({ default: useMsTeamsChannels } = await import(
-    "../../src/modules/ms-teams/hooks/useMsTeamsChannels?m" as string
-  ));
-});
+vi.mock("../../src/modules/ms-teams/context", () => ({
+  useKnockMsTeamsClient: () => mockMsTeamsClientState,
+}));
 
 // Mock Knock client with msTeams.getChannels implementation
 const mockGetChannels = vi.fn();
@@ -28,30 +28,49 @@ vi.mock("../../src/modules/core", () => ({
   }),
 }));
 
-// Mock swr for deterministic data
+// ----------------------------------------------------------------------------------
+// Mock `swr` so we can fully control the hook behaviour and track calls
+// ----------------------------------------------------------------------------------
+
+const mockMutate = vi.fn();
+let capturedSwrKey: unknown = null;
+
 vi.mock("swr", () => {
   return {
     __esModule: true,
-    default: () => ({
-      data: {
-        ms_teams_channels: [
-          { id: "10", displayName: "General" },
-          { id: "20", displayName: "Dev" },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: vi.fn(),
-    }),
+    default: (key: unknown, _fetcher: unknown, _options: unknown) => {
+      // Capture the key so we can test what keys are generated
+      capturedSwrKey = key;
+      return {
+        data: {
+          ms_teams_channels: [
+            { id: "10", displayName: "General" },
+            { id: "20", displayName: "Dev" },
+          ],
+        },
+        error: undefined,
+        isLoading: false,
+        isValidating: false,
+        mutate: mockMutate,
+      };
+    },
   };
 });
 
+// ----------------------------------------------------------------------------------
+// Tests
 // ----------------------------------------------------------------------------------
 
 describe("useMsTeamsChannels", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset mock state to defaults
+    mockMsTeamsClientState = {
+      knockMsTeamsChannelId: "knock_chan",
+      tenantId: "tenant_1",
+      connectionStatus: "connected",
+    };
+    capturedSwrKey = null;
   });
 
   it("returns channel list and loading flag", () => {
@@ -64,5 +83,148 @@ describe("useMsTeamsChannels", () => {
       { id: "20", displayName: "Dev" },
     ]);
     expect(result.current.isLoading).toBe(false);
+  });
+
+  describe("cache key includes tenantId and channelId", () => {
+    it("generates cache key with tenantId, knockMsTeamsChannelId, and teamId", () => {
+      renderHook(() => useMsTeamsChannels({ teamId: "team_42" }));
+
+      expect(capturedSwrKey).toEqual([
+        "MS_TEAMS_CHANNELS",
+        "tenant_1",
+        "knock_chan",
+        "team_42",
+      ]);
+    });
+
+    it("returns null key when teamId is not provided", () => {
+      renderHook(() => useMsTeamsChannels({}));
+
+      expect(capturedSwrKey).toBeNull();
+    });
+
+    it("returns null key when not connected", () => {
+      mockMsTeamsClientState.connectionStatus = "disconnected";
+
+      renderHook(() => useMsTeamsChannels({ teamId: "team_42" }));
+
+      expect(capturedSwrKey).toBeNull();
+    });
+
+    it("generates key with different tenant", () => {
+      mockMsTeamsClientState.tenantId = "tenant_xyz";
+
+      renderHook(() => useMsTeamsChannels({ teamId: "team_42" }));
+
+      expect(capturedSwrKey).toEqual([
+        "MS_TEAMS_CHANNELS",
+        "tenant_xyz",
+        "knock_chan",
+        "team_42",
+      ]);
+    });
+  });
+
+  describe("cache clearing behavior", () => {
+    it("clears cache when tenantId changes", () => {
+      const { rerender } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Initial render should not clear cache
+      expect(mockMutate).not.toHaveBeenCalled();
+
+      // Change tenant
+      mockMsTeamsClientState.tenantId = "tenant_2";
+      rerender();
+
+      // Cache should be cleared
+      expect(mockMutate).toHaveBeenCalledWith(undefined, { revalidate: false });
+    });
+
+    it("clears cache when knockMsTeamsChannelId changes", () => {
+      const { rerender } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Initial render should not clear cache
+      expect(mockMutate).not.toHaveBeenCalled();
+
+      // Change channel
+      mockMsTeamsClientState.knockMsTeamsChannelId = "knock_chan_2";
+      rerender();
+
+      // Cache should be cleared
+      expect(mockMutate).toHaveBeenCalledWith(undefined, { revalidate: false });
+    });
+
+    it("clears cache when connection is re-established", () => {
+      // Start disconnected
+      mockMsTeamsClientState.connectionStatus = "disconnected";
+
+      const { rerender } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Initial render should not clear cache
+      expect(mockMutate).not.toHaveBeenCalled();
+
+      // Reconnect
+      mockMsTeamsClientState.connectionStatus = "connected";
+      rerender();
+
+      // Cache should be cleared when re-establishing connection
+      expect(mockMutate).toHaveBeenCalledWith(undefined, { revalidate: false });
+    });
+
+    it("does not clear cache when already connected and connection status stays connected", () => {
+      const { rerender } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Initial render should not clear cache
+      expect(mockMutate).not.toHaveBeenCalled();
+
+      // Rerender with same connection status
+      rerender();
+
+      // Cache should not be cleared
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
+
+    it("does not clear cache when transitioning from connected to disconnected", () => {
+      const { rerender } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Initial render should not clear cache
+      expect(mockMutate).not.toHaveBeenCalled();
+
+      // Disconnect
+      mockMsTeamsClientState.connectionStatus = "disconnected";
+      rerender();
+
+      // Cache should not be cleared on disconnect (only on reconnect)
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
+
+    it("clears cache when transitioning from error to connected", () => {
+      // Start with error
+      mockMsTeamsClientState.connectionStatus = "error";
+
+      const { rerender } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Initial render should not clear cache
+      expect(mockMutate).not.toHaveBeenCalled();
+
+      // Reconnect after error
+      mockMsTeamsClientState.connectionStatus = "connected";
+      rerender();
+
+      // Cache should be cleared
+      expect(mockMutate).toHaveBeenCalledWith(undefined, { revalidate: false });
+    });
   });
 });
