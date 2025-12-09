@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- 96cfa22: Update Next.js from 15.3.3 to 15.3.6
+
+## 0.0.38
+
+### Patch Changes
+
 - Updated dependencies [f4529cc]
 - Updated dependencies [f278892]
   - @knocklabs/react@0.9.4

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.5
+
+### Patch Changes
+
+- 96cfa22: Update Next.js devDependency from 15.3.3 to 15.3.6
+
 ## 0.9.4
 
 ### Patch Changes

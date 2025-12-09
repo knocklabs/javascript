@@ -1,5 +1,11 @@
 # slack-connect-example
 
+## 0.3.39
+
+### Patch Changes
+
+- 96cfa22: Update Next.js from 15.3.3 to 15.3.6
+
 ## 0.3.38
 
 ### Patch Changes

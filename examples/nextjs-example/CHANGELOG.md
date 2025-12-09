@@ -1,5 +1,11 @@
 # nextjs-example
 
+## 1.2.5
+
+### Patch Changes
+
+- 96cfa22: Update Next.js from 15.3.3 to 15.3.6
+
 ## 1.2.4
 
 ### Patch Changes
