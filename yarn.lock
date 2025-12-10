@@ -4071,6 +4071,7 @@ __metadata:
     expo: "npm:~53.0.22"
     expo-constants: "npm:~17.1.7"
     expo-device: "npm:^7.1.4"
+    expo-network: "npm:^8.0.0"
     expo-notifications: "npm:^0.31.4"
     jsdom: "npm:^27.1.0"
     react: "npm:^19.0.0"
@@ -12058,6 +12059,16 @@ __metadata:
   dependencies:
     invariant: "npm:^2.2.4"
   checksum: 10c0/9586d80644278fa4c15cc1e85f403934a07936574c050623b26a0dec8d8cbc8776ed68e988510621495d1227f52a127938a2aad2c997d05a449d0f1fd009da86
+  languageName: node
+  linkType: hard
+
+"expo-network@npm:^8.0.0":
+  version: 8.0.8
+  resolution: "expo-network@npm:8.0.8"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+  checksum: 10c0/e12e4d136dae02e22ceaf0344ed7ee053e5aed126a71e69718c91bf7161c8bc97f745eec6e794f66e60cfba44d341b4462ce2987c958671a80fc5bea85dd124d
   languageName: node
   linkType: hard
 

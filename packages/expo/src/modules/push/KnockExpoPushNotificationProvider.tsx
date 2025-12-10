@@ -7,6 +7,7 @@ import {
 } from "@knocklabs/react-native";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
+import * as Network from "expo-network";
 import * as Notifications from "expo-notifications";
 import React, {
   createContext,
@@ -127,6 +128,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     usePushNotifications();
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const knockClient = useKnockClient();
+  const { isInternetReachable } = Network.useNetworkState();
 
   const [notificationReceivedHandler, setNotificationReceivedHandler] =
     useState<(notification: Notifications.Notification) => void>(
@@ -189,11 +191,55 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
   );
 
   useEffect(() => {
+    if (expoPushToken) {
+      return;
+    }
+
+    const fetchExpoTokenIfNeeded = async () => {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      if (
+        existingStatus === "granted" &&
+        Device.isDevice &&
+        isInternetReachable
+      ) {
+        try {
+          const token = await getExpoPushToken();
+          setExpoPushToken(token ? token.data : null);
+        } catch (error) {
+          console.error(`[Knock] Error getting expo push token:`, error);
+        }
+      }
+    };
+
+    fetchExpoTokenIfNeeded();
+  }, [isInternetReachable, expoPushToken]);
+
+  useEffect(() => {
     Notifications.setNotificationHandler({
       handleNotification:
         customNotificationHandler ?? defaultNotificationHandler,
     });
 
+    const response = Notifications.getLastNotificationResponse();
+    if (response?.notification) {
+      knockClient.log(
+        "[Knock] Expo Push Notification was interacted with (initial)",
+      );
+      updateKnockMessageStatusFromNotification(
+        response.notification,
+        "interacted",
+      );
+      notificationTappedHandler(response);
+    }
+  }, [
+    customNotificationHandler,
+    knockClient,
+    notificationTappedHandler,
+    updateKnockMessageStatusFromNotification,
+  ]);
+
+  useEffect(() => {
     if (autoRegister) {
       registerForPushNotifications()
         .then(() => {
@@ -241,18 +287,16 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       notificationReceivedSubscription.remove();
       notificationResponseSubscription.remove();
     };
-
-    // TODO: Remove when possible and ensure dependency array is correct
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     registerForPushNotifications,
     notificationReceivedHandler,
     notificationTappedHandler,
-    customNotificationHandler,
     autoRegister,
     expoPushToken,
     knockExpoChannelId,
     knockClient,
+    registerPushTokenToChannel,
+    updateKnockMessageStatusFromNotification,
   ]);
 
   return (
