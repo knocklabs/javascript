@@ -808,8 +808,8 @@ export class KnockGuideClient {
     }
   }
 
-  // Test helper that opens and closes the group stage to return the select
-  // result immediately.
+  // Test helpers to open and close the group stage to return the select result
+  // immediately.
   private _selectGuide(
     state: StoreState,
     filters: SelectFilterParams = {},
@@ -821,6 +821,19 @@ export class KnockGuideClient {
     this.closePendingGroupStage();
 
     return this.selectGuide(state, filters, opts);
+  }
+
+  private _selectGuides(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuidesOpts = {},
+  ) {
+    this.openGroupStage();
+
+    this.selectGuides(state, filters, opts);
+    this.closePendingGroupStage();
+
+    return this.selectGuides(state, filters, opts);
   }
 
   //
