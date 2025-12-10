@@ -1889,6 +1889,40 @@ describe("KnockGuideClient", () => {
 
       expect(result!.key).toBe("feature_tour");
     });
+
+    test("returns a guide with includeThrottled option even inside throttle window", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled, should return undefined (throttled)
+      const result1 = client["_selectGuide"](stateWithGuides, { type: "banner" });
+      expect(result1).toBeUndefined();
+
+      // Reset the group stage for the next test
+      client["clearGroupStage"]();
+
+      // With includeThrottled: true, should return the banner guide
+      const result2 = client["_selectGuide"](stateWithGuides, { type: "banner" }, { includeThrottled: true });
+      expect(result2).toBeDefined();
+      expect(result2!.type).toBe("banner");
+    });
   });
 
   describe("selectGuides", () => {
