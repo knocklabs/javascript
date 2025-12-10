@@ -1,4 +1,8 @@
-import { KnockGuide, KnockGuideFilterParams } from "@knocklabs/client";
+import {
+  KnockGuide,
+  KnockGuideFilterParams,
+  KnockSelectGuidesOpts,
+} from "@knocklabs/client";
 import { useStore } from "@tanstack/react-store";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
@@ -12,12 +16,13 @@ interface UseGuidesReturn<C = Any> extends UseGuideContextReturn {
 
 export const useGuides = <C = Any>(
   filters: Pick<KnockGuideFilterParams, "type">,
+  opts?: KnockSelectGuidesOpts,
 ): UseGuidesReturn<C> => {
   const context = useGuideContext();
   const { client, colorMode } = context;
 
   const guides = useStore(client.store, (state) =>
-    client.selectGuides<C>(state, filters),
+    client.selectGuides<C>(state, filters, opts),
   );
 
   return { client, colorMode, guides };

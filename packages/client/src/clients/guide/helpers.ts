@@ -75,11 +75,31 @@ export const findDefaultGroup = (guideGroups: GuideGroupData[]) =>
       group.key === DEFAULT_GROUP_KEY || group.key === MOCK_DEFAULT_GROUP_KEY,
   );
 
+export const checkStateIfThrottled = (state: StoreState) => {
+  const defaultGroup = findDefaultGroup(state.guideGroups);
+  const throttleWindowStartedAt =
+    state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
+
+  if (
+    defaultGroup &&
+    defaultGroup.display_interval &&
+    throttleWindowStartedAt
+  ) {
+    return checkTimeIfThrottled(
+      throttleWindowStartedAt,
+      defaultGroup.display_interval,
+    );
+  }
+
+  // Fall back to false, though this should never happen.
+  return false;
+};
+
 // Checks whether we are currently throttled (inside a "throttle window").
 // A throttle window opens when a user dismisses (archives) a guide, and lasts
 // for the configured display interval of the guide group used (currently only
 // the default global group).
-export const checkIfThrottled = (
+const checkTimeIfThrottled = (
   throttleWindowStartedAtTs: string,
   windowDurationInSeconds: number,
 ) => {

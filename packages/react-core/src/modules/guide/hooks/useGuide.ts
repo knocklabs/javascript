@@ -2,6 +2,7 @@ import {
   KnockGuide,
   KnockGuideFilterParams,
   KnockGuideStep,
+  KnockSelectGuideOpts,
 } from "@knocklabs/client";
 import { useStore } from "@tanstack/react-store";
 
@@ -17,6 +18,7 @@ interface UseGuideReturn<C = Any> extends UseGuideContextReturn {
 
 export const useGuide = <C = Any>(
   filters: KnockGuideFilterParams,
+  opts?: KnockSelectGuideOpts,
 ): UseGuideReturn<C> => {
   const context = useGuideContext();
 
@@ -29,7 +31,7 @@ export const useGuide = <C = Any>(
   const { client, colorMode } = context;
 
   const guide = useStore(client.store, (state) =>
-    client.selectGuide<C>(state, filters),
+    client.selectGuide<C>(state, filters, opts),
   );
 
   const step = guide && guide.getStep();
