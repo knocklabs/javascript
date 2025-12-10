@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.4
+
+### Patch Changes
+
+- 98a9464: Fix cache issues in `useMsTeamsChannels`, `useMsTeamsTeams`, and `useSlackChannels` hooks
+
+  The cache keys for these hooks now include `tenantId` and `knockChannelId` to ensure that different tenants and Knock channels have separate cache entries. Additionally, the hooks now clear their SWR cache when:
+  - The tenant ID changes
+  - The Knock channel ID changes
+  - The access token is revoked
+  - The connection status transitions from disconnected/error to connected
+
+  This prevents stale data from being displayed when switching between different workspaces, revoking access tokens, or reconnecting.
+
 ## 0.11.3
 
 ### Patch Changes
