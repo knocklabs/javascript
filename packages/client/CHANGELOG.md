@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.4
+
+### Patch Changes
+
+- a56bf70: [guide] include a tenant param for all engagement update requests
+
 ## 0.19.3
 
 ### Patch Changes
