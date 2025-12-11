@@ -4,4 +4,6 @@ export type {
   KnockGuideStep,
   TargetParams as KnockGuideTargetParams,
   SelectFilterParams as KnockGuideFilterParams,
+  SelectGuideOpts as KnockSelectGuideOpts,
+  SelectGuidesOpts as KnockSelectGuidesOpts,
 } from "./types";

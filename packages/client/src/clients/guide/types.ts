@@ -212,6 +212,12 @@ export type SelectFilterParams = {
   type?: string;
 };
 
+export type SelectGuideOpts = {
+  includeThrottled?: boolean;
+};
+
+export type SelectGuidesOpts = SelectGuideOpts;
+
 export type TargetParams = {
   data?: GenericData | undefined;
   tenant?: string | undefined;
