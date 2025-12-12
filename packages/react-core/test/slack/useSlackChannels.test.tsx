@@ -128,12 +128,12 @@ describe("useSlackChannels", () => {
       {
         slack_channels: [
           { id: "1", name: "general" },
-          null as any,
+          null,
           { id: "2", name: "random" },
-          undefined as any,
-          false as any,
-          0 as any,
-        ],
+          undefined,
+          false,
+          0,
+        ] as unknown as Array<{ id: string; name: string }>,
         next_cursor: null,
       },
     ];
@@ -149,7 +149,7 @@ describe("useSlackChannels", () => {
 
   it("returns empty array when data is undefined", () => {
     // Set data to undefined to test the nullish coalescing
-    mockSwrReturnValue.data = undefined as any;
+    mockSwrReturnValue.data = undefined as unknown as typeof mockSwrReturnValue.data;
 
     const { result } = renderHook(() => useSlackChannels({}));
 

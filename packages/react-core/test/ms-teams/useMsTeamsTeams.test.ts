@@ -125,12 +125,12 @@ describe("useMsTeamsTeams", () => {
       {
         ms_teams_teams: [
           { id: "1", displayName: "Team Alpha" },
-          null as any,
+          null,
           { id: "2", displayName: "Team Beta" },
-          undefined as any,
-          false as any,
-          0 as any,
-        ],
+          undefined,
+          false,
+          0,
+        ] as unknown as Array<{ id: string; displayName: string }>,
         skip_token: null,
       },
     ];
@@ -146,7 +146,7 @@ describe("useMsTeamsTeams", () => {
 
   it("returns empty array when data is undefined", () => {
     // Set data to undefined to test the nullish coalescing
-    mockSwrReturnValue.data = undefined as any;
+    mockSwrReturnValue.data = undefined as unknown as typeof mockSwrReturnValue.data;
 
     const { result } = renderHook(() => useMsTeamsTeams({}));
 
