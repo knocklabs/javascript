@@ -4,6 +4,14 @@
 
 ### Patch Changes
 
+- Updated dependencies [a56bf70]
+  - @knocklabs/client@0.19.4
+  - @knocklabs/react-core@0.11.4
+
+## 0.9.5
+
+### Patch Changes
+
 - 96cfa22: Update Next.js devDependency from 15.3.3 to 15.3.6
 
 ## 0.9.4

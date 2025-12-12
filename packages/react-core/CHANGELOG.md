@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.11.4
+## 0.11.5
 
 ### Patch Changes
 
@@ -13,6 +13,13 @@
   - The connection status transitions from disconnected/error to connected
 
   This prevents stale data from being displayed when switching between different workspaces, revoking access tokens, or reconnecting.
+
+## 0.11.4
+
+### Patch Changes
+
+- Updated dependencies [a56bf70]
+  - @knocklabs/client@0.19.4
 
 ## 0.11.3
 
