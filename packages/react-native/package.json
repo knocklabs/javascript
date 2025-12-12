@@ -14,6 +14,13 @@
       "types": "./dist/types/index.d.ts",
       "react-native": "./src/index.ts",
       "default": "./dist/esm/index.mjs"
+    },
+    "./react-navigation": {
+      "require": "./dist/cjs/react-navigation.js",
+      "types": "./dist/types/react-navigation/index.d.ts",
+      "react-native": "./src/react-navigation/index.ts",
+      "import": "./dist/esm/react-navigation.mjs",
+      "default": "./dist/esm/react-navigation.mjs"
     }
   },
   "files": [
@@ -41,8 +48,14 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
+    "@react-navigation/native": "^7.0.0",
     "react": "*",
     "react-native": "*"
+  },
+  "peerDependenciesMeta": {
+    "@react-navigation/native": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
@@ -54,6 +67,7 @@
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
+    "@react-navigation/native": "^7.1.25",
     "@types/react": "^19.1.8",
     "@types/react-native-get-random-values": "^1",
     "@types/react-native-htmlview": "^0.16.6",

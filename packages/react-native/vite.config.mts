@@ -27,13 +27,16 @@ export default defineConfig(({ mode }) => {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
       lib: {
-        entry: resolve(__dirname, "src/index.ts"),
+        entry: {
+          index: resolve(__dirname, "src"),
+          "react-navigation": resolve(__dirname, "src/react-navigation/index.ts"),
+        },
         name: "react-native",
         formats,
       },
       rollupOptions: {
         // External packages that should not be bundled into your library.
-        external: ["react", "react-native"],
+        external: ["react", "react-native", "@react-navigation/native" ],
         output: {
           interop: "compat",
           format: formats[0],
