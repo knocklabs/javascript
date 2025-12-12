@@ -18,7 +18,9 @@ vi.mock("../../src/modules/ms-teams/context", () => ({
 }));
 
 // Mock Knock client with msTeams.getChannels implementation
-const mockGetChannels = vi.fn();
+const mockGetChannels = vi.fn().mockResolvedValue({
+  ms_teams_channels: [],
+});
 
 vi.mock("../../src/modules/core", () => ({
   useKnockClient: () => ({
@@ -34,25 +36,34 @@ vi.mock("../../src/modules/core", () => ({
 
 const mockMutate = vi.fn();
 let capturedSwrKey: unknown = null;
+let mockFetcherFn: (() => unknown) | null = null;
+let mockSwrReturnValue: {
+  data: { ms_teams_channels: Array<{ id: string; displayName: string }> } | undefined;
+  error: Error | undefined;
+  isLoading: boolean;
+  isValidating: boolean;
+  mutate: typeof mockMutate;
+} = {
+  data: {
+    ms_teams_channels: [
+      { id: "10", displayName: "General" },
+      { id: "20", displayName: "Dev" },
+    ],
+  },
+  error: undefined,
+  isLoading: false,
+  isValidating: false,
+  mutate: mockMutate,
+};
 
 vi.mock("swr", () => {
   return {
     __esModule: true,
-    default: (key: unknown, _fetcher: unknown, _options: unknown) => {
-      // Capture the key so we can test what keys are generated
+    default: (key: unknown, fetcher: () => unknown, _options: unknown) => {
+      // Capture the key and fetcher so we can test them
       capturedSwrKey = key;
-      return {
-        data: {
-          ms_teams_channels: [
-            { id: "10", displayName: "General" },
-            { id: "20", displayName: "Dev" },
-          ],
-        },
-        error: undefined,
-        isLoading: false,
-        isValidating: false,
-        mutate: mockMutate,
-      };
+      mockFetcherFn = fetcher;
+      return mockSwrReturnValue;
     },
   };
 });
@@ -71,6 +82,20 @@ describe("useMsTeamsChannels", () => {
       connectionStatus: "connected",
     };
     capturedSwrKey = null;
+    mockFetcherFn = null;
+    // Reset SWR return value to defaults
+    mockSwrReturnValue = {
+      data: {
+        ms_teams_channels: [
+          { id: "10", displayName: "General" },
+          { id: "20", displayName: "Dev" },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: mockMutate,
+    };
   });
 
   it("returns channel list and loading flag", () => {
@@ -83,6 +108,17 @@ describe("useMsTeamsChannels", () => {
       { id: "20", displayName: "Dev" },
     ]);
     expect(result.current.isLoading).toBe(false);
+  });
+
+  it("returns empty array when data is undefined", () => {
+    // Set data to undefined to test the nullish coalescing
+    mockSwrReturnValue.data = undefined;
+
+    const { result } = renderHook(() =>
+      useMsTeamsChannels({ teamId: "team_42" }),
+    );
+
+    expect(result.current.data).toEqual([]);
   });
 
   describe("cache key includes tenantId and channelId", () => {
@@ -122,6 +158,52 @@ describe("useMsTeamsChannels", () => {
         "knock_chan",
         "team_42",
       ]);
+    });
+  });
+
+  describe("fetcher function", () => {
+    it("calls knock.msTeams.getChannels with correct parameters", async () => {
+      renderHook(() => useMsTeamsChannels({ 
+        teamId: "team_42",
+        queryOptions: { filter: "displayName eq 'Test'" }
+      }));
+
+      expect(mockFetcherFn).not.toBeNull();
+
+      mockGetChannels.mockClear();
+
+      await mockFetcherFn!();
+
+      expect(mockGetChannels).toHaveBeenCalledWith({
+        knockChannelId: "knock_chan",
+        tenant: "tenant_1",
+        teamId: "team_42",
+        queryOptions: {
+          $filter: "displayName eq 'Test'",
+          $select: undefined,
+        },
+      });
+    });
+
+    it("calls with select option when provided", async () => {
+      renderHook(() => useMsTeamsChannels({ 
+        teamId: "team_42",
+        queryOptions: { select: "id,displayName" }
+      }));
+
+      mockGetChannels.mockClear();
+
+      await mockFetcherFn!();
+
+      expect(mockGetChannels).toHaveBeenCalledWith({
+        knockChannelId: "knock_chan",
+        tenant: "tenant_1",
+        teamId: "team_42",
+        queryOptions: {
+          $filter: undefined,
+          $select: "id,displayName",
+        },
+      });
     });
   });
 
@@ -225,6 +307,23 @@ describe("useMsTeamsChannels", () => {
 
       // Cache should be cleared
       expect(mockMutate).toHaveBeenCalledWith(undefined, { revalidate: false });
+    });
+  });
+
+  describe("refetch function", () => {
+    it("calls mutate to refetch data", () => {
+      const { result } = renderHook(() =>
+        useMsTeamsChannels({ teamId: "team_42" }),
+      );
+
+      // Clear any previous calls
+      mockMutate.mockClear();
+
+      // Call refetch
+      result.current.refetch();
+
+      // Should call mutate without arguments to trigger revalidation
+      expect(mockMutate).toHaveBeenCalledWith();
     });
   });
 });

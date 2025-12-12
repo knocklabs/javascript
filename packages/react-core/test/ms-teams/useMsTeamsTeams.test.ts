@@ -18,7 +18,10 @@ vi.mock("../../src/modules/ms-teams/context", () => ({
 }));
 
 // Mock Knock client with msTeams.getTeams implementation
-const mockGetTeams = vi.fn();
+const mockGetTeams = vi.fn().mockResolvedValue({
+  ms_teams_teams: [],
+  skip_token: null,
+});
 
 vi.mock("../../src/modules/core", () => ({
   useKnockClient: () => ({
@@ -35,29 +38,39 @@ vi.mock("../../src/modules/core", () => ({
 const mockSetSize = vi.fn();
 const mockMutate = vi.fn();
 let mockGetKeyFn: ((pageIndex: number, previousPageData: unknown) => unknown) | null = null;
+let mockFetcherFn: ((queryKey: unknown) => unknown) | null = null;
+let mockSwrReturnValue: {
+  data: Array<{ ms_teams_teams: Array<{ id: string; displayName: string }>; skip_token: string | null }>;
+  error: Error | undefined;
+  isLoading: boolean;
+  isValidating: boolean;
+  setSize: typeof mockSetSize;
+  mutate: typeof mockMutate;
+} = {
+  data: [
+    {
+      ms_teams_teams: [
+        { id: "1", displayName: "Team Alpha" },
+        { id: "2", displayName: "Team Beta" },
+      ],
+      skip_token: null,
+    },
+  ],
+  error: undefined,
+  isLoading: false,
+  isValidating: false,
+  setSize: mockSetSize,
+  mutate: mockMutate,
+};
 
 vi.mock("swr/infinite", () => {
   return {
     __esModule: true,
-    default: (getKey: (pageIndex: number, previousPageData: unknown) => unknown, _fetcher: unknown, _options: unknown) => {
-      // Capture the getKey function so we can test what keys it generates
+    default: (getKey: (pageIndex: number, previousPageData: unknown) => unknown, fetcher: (queryKey: unknown) => unknown, _options: unknown) => {
+      // Capture both functions so we can test them
       mockGetKeyFn = getKey;
-      return {
-        data: [
-          {
-            ms_teams_teams: [
-              { id: "1", displayName: "Team Alpha" },
-              { id: "2", displayName: "Team Beta" },
-            ],
-            skip_token: null,
-          },
-        ],
-        error: undefined,
-        isLoading: false,
-        isValidating: false,
-        setSize: mockSetSize,
-        mutate: mockMutate,
-      };
+      mockFetcherFn = fetcher;
+      return mockSwrReturnValue;
     },
   };
 });
@@ -76,6 +89,24 @@ describe("useMsTeamsTeams", () => {
       connectionStatus: "connected",
     };
     mockGetKeyFn = null;
+    mockFetcherFn = null;
+    // Reset SWR return value to defaults
+    mockSwrReturnValue = {
+      data: [
+        {
+          ms_teams_teams: [
+            { id: "1", displayName: "Team Alpha" },
+            { id: "2", displayName: "Team Beta" },
+          ],
+          skip_token: null,
+        },
+      ],
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      setSize: mockSetSize,
+      mutate: mockMutate,
+    };
   });
 
   it("returns flattened list of teams and loading flag", () => {
@@ -86,6 +117,40 @@ describe("useMsTeamsTeams", () => {
       { id: "2", displayName: "Team Beta" },
     ]);
     expect(result.current.isLoading).toBe(false);
+  });
+
+  it("filters out null/undefined teams from response", () => {
+    // Set mock with data containing falsy values BEFORE rendering
+    mockSwrReturnValue.data = [
+      {
+        ms_teams_teams: [
+          { id: "1", displayName: "Team Alpha" },
+          null as any,
+          { id: "2", displayName: "Team Beta" },
+          undefined as any,
+          false as any,
+          0 as any,
+        ],
+        skip_token: null,
+      },
+    ];
+
+    const { result } = renderHook(() => useMsTeamsTeams({}));
+
+    // Should only include truthy teams
+    expect(result.current.data).toEqual([
+      { id: "1", displayName: "Team Alpha" },
+      { id: "2", displayName: "Team Beta" },
+    ]);
+  });
+
+  it("returns empty array when data is undefined", () => {
+    // Set data to undefined to test the nullish coalescing
+    mockSwrReturnValue.data = undefined as any;
+
+    const { result } = renderHook(() => useMsTeamsTeams({}));
+
+    expect(result.current.data).toEqual([]);
   });
 
   describe("cache key includes tenantId and channelId", () => {
@@ -140,6 +205,78 @@ describe("useMsTeamsTeams", () => {
       // Should return null when disconnected
       const key = mockGetKeyFn!(0, null);
       expect(key).toBeNull();
+    });
+
+    it("handles pagination correctly for subsequent pages", () => {
+      renderHook(() => useMsTeamsTeams({}));
+
+      expect(mockGetKeyFn).not.toBeNull();
+
+      // Test with empty string skip_token (should return null)
+      const emptyStringKey = mockGetKeyFn!(1, { skip_token: "" });
+      expect(emptyStringKey).toBeNull();
+    });
+
+    it("handles undefined skip_token in previousPageData", () => {
+      renderHook(() => useMsTeamsTeams({}));
+
+      expect(mockGetKeyFn).not.toBeNull();
+
+      // Test with previousPageData that has no skip_token property
+      const keyWithUndefinedToken = mockGetKeyFn!(1, { ms_teams_teams: [] });
+      expect(keyWithUndefinedToken).toEqual([
+        "MS_TEAMS_TEAMS",
+        "tenant_1",
+        "knock_chan",
+        "",
+      ]);
+    });
+  });
+
+  describe("fetcher function", () => {
+    it("calls knock.msTeams.getTeams with correct parameters", async () => {
+      renderHook(() => useMsTeamsTeams({ 
+        queryOptions: { limitPerPage: 50, filter: "displayName eq 'Test'" }
+      }));
+
+      expect(mockFetcherFn).not.toBeNull();
+
+      mockGetTeams.mockClear();
+
+      // Call the fetcher with a sample query key
+      const queryKey = ["MS_TEAMS_TEAMS", "tenant_1", "knock_chan", "skip_token_123"];
+      await mockFetcherFn!(queryKey);
+
+      expect(mockGetTeams).toHaveBeenCalledWith({
+        knockChannelId: "knock_chan",
+        tenant: "tenant_1",
+        queryOptions: {
+          $skiptoken: "skip_token_123",
+          $top: 50,
+          $filter: "displayName eq 'Test'",
+          $select: undefined,
+        },
+      });
+    });
+
+    it("handles first page correctly", async () => {
+      renderHook(() => useMsTeamsTeams({}));
+
+      mockGetTeams.mockClear();
+
+      const queryKey = ["MS_TEAMS_TEAMS", "tenant_1", "knock_chan", ""];
+      await mockFetcherFn!(queryKey);
+
+      expect(mockGetTeams).toHaveBeenCalledWith({
+        knockChannelId: "knock_chan",
+        tenant: "tenant_1",
+        queryOptions: {
+          $skiptoken: "",
+          $top: undefined,
+          $filter: undefined,
+          $select: undefined,
+        },
+      });
     });
   });
 
@@ -238,6 +375,53 @@ describe("useMsTeamsTeams", () => {
       // Cache should be cleared
       expect(mockMutate).toHaveBeenCalledWith(undefined, { revalidate: false });
       expect(mockSetSize).toHaveBeenCalledWith(0);
+    });
+  });
+
+  describe("auto-pagination", () => {
+    it("automatically fetches next page when hasNextPage is true and count is below maxCount", () => {
+      // Configure SWR to indicate there's a next page
+      mockSwrReturnValue = {
+        data: [
+          {
+            ms_teams_teams: [
+              { id: "1", displayName: "Team Alpha" },
+            ],
+            skip_token: "next_token",
+          },
+        ],
+        error: undefined,
+        isLoading: false,
+        isValidating: false,
+        setSize: mockSetSize,
+        mutate: mockMutate,
+      };
+
+      renderHook(() => useMsTeamsTeams({}));
+
+      // setSize should be called to fetch next page
+      expect(mockSetSize).toHaveBeenCalled();
+    });
+
+    it("does not auto-fetch when error exists", () => {
+      mockSwrReturnValue = {
+        data: [
+          {
+            ms_teams_teams: [{ id: "1", displayName: "Team Alpha" }],
+            skip_token: "next_token",
+          },
+        ],
+        error: new Error("API error"),
+        isLoading: false,
+        isValidating: false,
+        setSize: mockSetSize,
+        mutate: mockMutate,
+      };
+
+      renderHook(() => useMsTeamsTeams({}));
+
+      // setSize should not be called when there's an error
+      expect(mockSetSize).not.toHaveBeenCalled();
     });
   });
 });
