@@ -1889,6 +1889,40 @@ describe("KnockGuideClient", () => {
 
       expect(result!.key).toBe("feature_tour");
     });
+
+    test("returns a guide with includeThrottled option even inside throttle window", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled, should return undefined (throttled)
+      const result1 = client["_selectGuide"](stateWithGuides, { type: "banner" });
+      expect(result1).toBeUndefined();
+
+      // Reset the group stage for the next test
+      client["clearGroupStage"]();
+
+      // With includeThrottled: true, should return the banner guide
+      const result2 = client["_selectGuide"](stateWithGuides, { type: "banner" }, { includeThrottled: true });
+      expect(result2).toBeDefined();
+      expect(result2!.type).toBe("banner");
+    });
   });
 
   describe("selectGuides", () => {
@@ -1990,7 +2024,7 @@ describe("KnockGuideClient", () => {
 
     test("returns all guides without filters", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithGuides);
+      const result = client["_selectGuides"](stateWithGuides);
 
       expect(result).toHaveLength(3);
       expect(result.map((g) => g.key)).toEqual([
@@ -2002,7 +2036,7 @@ describe("KnockGuideClient", () => {
 
     test("filters guides by key", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithGuides, {
+      const result = client["_selectGuides"](stateWithGuides, {
         key: "onboarding",
       });
 
@@ -2012,7 +2046,7 @@ describe("KnockGuideClient", () => {
 
     test("filters guides by type", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithGuides, { type: "card" });
+      const result = client["_selectGuides"](stateWithGuides, { type: "card" });
 
       expect(result).toHaveLength(2);
 
@@ -2025,7 +2059,7 @@ describe("KnockGuideClient", () => {
 
     test("returns empty array when no guides match filters", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithGuides, {
+      const result = client["_selectGuides"](stateWithGuides, {
         type: "nonexistent",
       });
 
@@ -2059,7 +2093,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithArchivedGuide);
+      const result = client["_selectGuides"](stateWithArchivedGuide);
 
       // Should exclude guides where all steps are archived
       expect(result).toHaveLength(2);
@@ -2084,7 +2118,7 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithOnlyPreviewGuide, {
+      const result = client["_selectGuides"](stateWithOnlyPreviewGuide, {
         key: mockGuideTwo.key,
       });
       expect(result).toHaveLength(1);
@@ -2113,11 +2147,137 @@ describe("KnockGuideClient", () => {
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.selectGuides(stateWithGuides);
+      const result = client["_selectGuides"](stateWithGuides);
 
       expect(result).toHaveLength(2);
       expect(result[0]!.key).toBe(mockGuideThree.key);
       expect(result[1]!.key).toBe(mockGuideOne.key);
+    });
+
+    test("returns empty array when inside throttle window by default", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateInsideThrottleWindow);
+
+      // All guides have bypass_global_group_limit: false, so all are throttled
+      expect(result).toEqual([]);
+    });
+
+    test("returns only guides with bypass_global_group_limit when inside throttle window", () => {
+      const mockGuideWithBypass = {
+        ...mockGuideTwo,
+        bypass_global_group_limit: true,
+      };
+
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: mockGuideWithBypass,
+        },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateInsideThrottleWindow);
+
+      // Only the guide with bypass_global_group_limit: true should be returned
+      expect(result).toHaveLength(1);
+      expect(result[0]!.key).toBe(mockGuideTwo.key);
+      expect(result[0]!.bypass_global_group_limit).toBe(true);
+    });
+
+    test("returns all guides with includeThrottled option even inside throttle window", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](
+        stateInsideThrottleWindow,
+        {},
+        { includeThrottled: true },
+      );
+
+      // With includeThrottled: true, all guides should be returned
+      expect(result).toHaveLength(3);
+      expect(result.map((g) => g.key)).toEqual([
+        "changelog",
+        "system_status",
+        "onboarding",
+      ]);
+    });
+
+    test("returns all guides when outside throttle window regardless of includeThrottled", () => {
+      // Throttle window started 10 minutes ago with a 5 minute interval
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
+      const stateOutsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: tenMinutesAgo,
+        },
+        guides: mockGuides,
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled
+      const result = client["_selectGuides"](stateOutsideThrottleWindow);
+      expect(result).toHaveLength(3);
     });
   });
 

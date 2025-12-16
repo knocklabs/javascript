@@ -9,7 +9,7 @@ import {
   DEFAULT_GROUP_KEY,
   SelectionResult,
   byKey,
-  checkIfThrottled,
+  checkStateIfThrottled,
   findDefaultGroup,
   formatFilters,
   formatGroupStage,
@@ -44,6 +44,8 @@ import {
   QueryFilterParams,
   QueryStatus,
   SelectFilterParams,
+  SelectGuideOpts,
+  SelectGuidesOpts,
   StepMessageState,
   StoreState,
   TargetParams,
@@ -570,34 +572,40 @@ export class KnockGuideClient {
   selectGuides<C = Any>(
     state: StoreState,
     filters: SelectFilterParams = {},
+    opts: SelectGuidesOpts = {},
   ): KnockGuide<C>[] {
     this.knock.log(
       `[Guide] .selectGuides (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
     );
-    if (
-      Object.keys(state.guides).length === 0 &&
-      Object.keys(state.previewGuides).length === 0
-    ) {
-      this.knock.log("[Guide] Exiting selection (no guides)");
+
+    const selectedGuide = this.selectGuide(state, filters, opts);
+    if (!selectedGuide) {
       return [];
     }
 
-    const result = select(state, filters);
+    // There should be at least one guide to return here now.
+    const guides = [...select(state, filters).values()];
 
-    if (result.size === 0) {
-      this.knock.log("[Guide] Selection returned zero result");
-      return [];
+    if (!opts.includeThrottled && checkStateIfThrottled(state)) {
+      const unthrottledGuides = guides.filter(
+        (g) => g.bypass_global_group_limit,
+      );
+      const throttledCount = guides.length - unthrottledGuides.length;
+      this.knock.log(
+        `[Guide] Throttling ${throttledCount} guides from selection, and returning ${unthrottledGuides.length} guides`,
+      );
+
+      return unthrottledGuides;
     }
 
-    // Return all selected guides, since we cannot apply the one-at-a-time limit
-    // or throttle settings, but rather defer to the caller to decide which ones
-    // to render. Note
-    return [...result.values()];
+    this.knock.log(`[Guide] Returning ${guides.length} guides from selection`);
+    return guides;
   }
 
   selectGuide<C = Any>(
     state: StoreState,
     filters: SelectFilterParams = {},
+    opts: SelectGuideOpts = {},
   ): KnockGuide<C> | undefined {
     this.knock.log(
       `[Guide] .selectGuide (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
@@ -630,24 +638,10 @@ export class KnockGuideClient {
     }
 
     // Check if inside the throttle window (i.e. throttled) and if so stop and
-    // return undefined.
-    const defaultGroup = findDefaultGroup(state.guideGroups);
-    const throttleWindowStartedAt =
-      state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
-
-    if (
-      defaultGroup &&
-      defaultGroup.display_interval &&
-      throttleWindowStartedAt
-    ) {
-      const throttled = checkIfThrottled(
-        throttleWindowStartedAt,
-        defaultGroup.display_interval,
-      );
-      if (throttled) {
-        this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
-        return undefined;
-      }
+    // return undefined unless explicitly given the option to include throttled.
+    if (!opts.includeThrottled && checkStateIfThrottled(state)) {
+      this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
+      return undefined;
     }
 
     // Starting here to the end of this method represents the core logic of how
@@ -814,15 +808,32 @@ export class KnockGuideClient {
     }
   }
 
-  // Test helper that opens and closes the group stage to return the select
-  // result immediately.
-  private _selectGuide(state: StoreState, filters: SelectFilterParams = {}) {
+  // Test helpers to open and close the group stage to return the select result
+  // immediately.
+  private _selectGuide(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuideOpts = {},
+  ) {
     this.openGroupStage();
 
-    this.selectGuide(state, filters);
+    this.selectGuide(state, filters, opts);
     this.closePendingGroupStage();
 
-    return this.selectGuide(state, filters);
+    return this.selectGuide(state, filters, opts);
+  }
+
+  private _selectGuides(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuidesOpts = {},
+  ) {
+    this.openGroupStage();
+
+    this.selectGuides(state, filters, opts);
+    this.closePendingGroupStage();
+
+    return this.selectGuides(state, filters, opts);
   }
 
   //
