@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.12.0
+
+### Minor Changes
+
+- 2d29ebf: [guides] update selectGuides and useGuides to be subject to throttling by default
+
+### Patch Changes
+
+- Updated dependencies [2d29ebf]
+  - @knocklabs/client@0.20.0
+
 ## 0.11.5
 
 ### Patch Changes
@@ -7,6 +18,7 @@
 - 98a9464: Fix cache issues in `useMsTeamsChannels`, `useMsTeamsTeams`, and `useSlackChannels` hooks
 
   The cache keys for these hooks now include `tenantId` and `knockChannelId` to ensure that different tenants and Knock channels have separate cache entries. Additionally, the hooks now clear their SWR cache when:
+
   - The tenant ID changes
   - The Knock channel ID changes
   - The access token is revoked

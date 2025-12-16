@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0
+
+### Minor Changes
+
+- f0c892f: [guides] update selectGuides and useGuides to be subject to throttling by default
+
+### Patch Changes
+
+- Updated dependencies [2d29ebf]
+  - @knocklabs/react-core@0.12.0
+  - @knocklabs/client@0.20.0
+
 ## 0.9.5
 
 ### Patch Changes

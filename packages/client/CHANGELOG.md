@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.0
+
+### Minor Changes
+
+- 2d29ebf: [guides] update selectGuides and useGuides to be subject to throttling by default
+
 ## 0.19.4
 
 ### Patch Changes
