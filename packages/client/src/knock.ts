@@ -171,15 +171,15 @@ class Knock {
   */
   resetAuthentication() {
     this.log("Resetting authentication state");
-    
+
     // Teardown any active feeds and connections
     this.feeds.teardownInstances();
     this.teardown();
-    
+
     // Clear authentication state
     this.userId = undefined;
     this.userToken = undefined;
-    
+
     // Reinitialize the API client without credentials
     this.apiClient = this.createApiClient();
   }

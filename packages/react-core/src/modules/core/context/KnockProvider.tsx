@@ -111,7 +111,8 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       if (enabled && userIdOrUserWithProperties) {
         knock.authenticate(userIdOrUserWithProperties, userToken, {
           onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
-          timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+          timeBeforeExpirationInMs:
+            authenticateOptions.timeBeforeExpirationInMs,
           identificationStrategy: authenticateOptions.identificationStrategy,
         });
       }
@@ -157,7 +158,8 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       ) {
         knockClient.authenticate(userIdOrUserWithProperties, userToken, {
           onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
-          timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+          timeBeforeExpirationInMs:
+            authenticateOptions.timeBeforeExpirationInMs,
           identificationStrategy: authenticateOptions.identificationStrategy,
         });
       }

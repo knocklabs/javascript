@@ -340,7 +340,9 @@ class Feed {
     metadata?: Record<string, string>,
   ) {
     if (!this.knock.isAuthenticated()) {
-      this.knock.log("[Feed] Skipping markAsInteracted - user not authenticated");
+      this.knock.log(
+        "[Feed] Skipping markAsInteracted - user not authenticated",
+      );
       return { entries: [] };
     }
 
@@ -444,7 +446,9 @@ class Feed {
 
   async markAllAsArchived() {
     if (!this.knock.isAuthenticated()) {
-      this.knock.log("[Feed] Skipping markAllAsArchived - user not authenticated");
+      this.knock.log(
+        "[Feed] Skipping markAllAsArchived - user not authenticated",
+      );
       return { entries: [] };
     }
 
@@ -476,7 +480,9 @@ class Feed {
 
   async markAllReadAsArchived() {
     if (!this.knock.isAuthenticated()) {
-      this.knock.log("[Feed] Skipping markAllReadAsArchived - user not authenticated");
+      this.knock.log(
+        "[Feed] Skipping markAllReadAsArchived - user not authenticated",
+      );
       return { entries: [] };
     }
 
@@ -523,7 +529,9 @@ class Feed {
 
   async markAsUnarchived(itemOrItems: FeedItemOrItems) {
     if (!this.knock.isAuthenticated()) {
-      this.knock.log("[Feed] Skipping markAsUnarchived - user not authenticated");
+      this.knock.log(
+        "[Feed] Skipping markAsUnarchived - user not authenticated",
+      );
       return { entries: [] };
     }
 
