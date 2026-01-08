@@ -1,5 +1,11 @@
 # slack-connect-example
 
+## 0.3.41
+
+### Patch Changes
+
+- @knocklabs/react@0.10.1
+
 ## 0.3.40
 
 ### Patch Changes
