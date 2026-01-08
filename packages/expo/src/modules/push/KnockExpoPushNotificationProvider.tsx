@@ -165,7 +165,9 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     [],
   );
 
-  const registerForPushNotifications = useCallback(async (): Promise<string | null> => {
+  const registerForPushNotifications = useCallback(async (): Promise<
+    string | null
+  > => {
     try {
       knockClient.log(`[Knock] Registering for push notifications`);
       const token = await requestPermissionAndGetPushToken();
