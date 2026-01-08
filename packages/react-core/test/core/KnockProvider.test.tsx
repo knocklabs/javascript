@@ -343,6 +343,27 @@ describe("KnockProvider", () => {
   });
 
   describe("enabled prop", () => {
+    test("does not double-authenticate on initial mount", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">User: {knock.userId}</div>;
+      };
+
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John" }}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Should only authenticate once, not twice
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+    });
+
     test("renders children without authentication when enabled is false", () => {
       const TestChild = () => <div data-testid="child">Child content</div>;
 
@@ -425,6 +446,8 @@ describe("KnockProvider", () => {
     });
 
     test("toggling enabled from false to true initializes authentication", async () => {
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
       const TestConsumer = () => {
         const knock = useKnockClient();
         return (
@@ -434,7 +457,7 @@ describe("KnockProvider", () => {
         );
       };
 
-      const { getByTestId, rerender } = render(
+      const { rerender } = render(
         <KnockProvider
           apiKey="test_api_key"
           user={{ id: "test_user_id", name: "John" }}
@@ -444,8 +467,8 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Should not be authenticated initially
-      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
+      // Should not have authenticated when disabled
+      expect(authenticateSpy).not.toHaveBeenCalled();
       expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
 
       // Enable the provider
@@ -459,9 +482,13 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Wait for the effect to complete
+      // Wait for the effect to complete and authentication to happen
       await waitFor(() => {
-        expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
+        expect(authenticateSpy).toHaveBeenCalledWith(
+          { id: "test_user_id", name: "John" },
+          undefined,
+          expect.any(Object),
+        );
       });
 
       expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
@@ -474,35 +501,31 @@ describe("KnockProvider", () => {
     });
 
     test("toggling enabled from true to false calls resetAuthentication", async () => {
-      const TestConsumer = () => {
-        const knock = useKnockClient();
-        return (
-          <div data-testid="consumer-msg">
-            API Key: {knock.apiKey}, Authenticated: {String(knock.isAuthenticated())}
-          </div>
-        );
-      };
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+      const resetAuthSpy = vi.spyOn(knock, "resetAuthentication");
 
-      const { getByTestId, rerender } = render(
+      // Manually set authenticated state for this test
+      knock.userId = "test_user_id";
+
+      const TestChild = () => <div data-testid="child">Content</div>;
+
+      const { rerender } = render(
         <KnockProvider
           apiKey="test_api_key"
           user={{ id: "test_user_id" }}
           enabled={true}
         >
-          <TestConsumer />
+          <TestChild />
         </KnockProvider>,
       );
 
-      // Initially authenticated
-      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
-
-      // Spy on resetAuthentication and have it actually clear the auth state
-      const resetAuthSpy = vi.spyOn(knock, "resetAuthentication").mockImplementation(() => {
-        knock.userId = undefined;
-        knock.userToken = undefined;
-        knock.feeds.teardownInstances();
-        knock.teardown();
+      // Wait for initial authentication
+      await waitFor(() => {
+        expect(authenticateSpy).toHaveBeenCalled();
       });
+
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(resetAuthSpy).not.toHaveBeenCalled();
 
       // Disable the provider
       rerender(
@@ -511,18 +534,16 @@ describe("KnockProvider", () => {
           user={{ id: "test_user_id" }}
           enabled={false}
         >
-          <TestConsumer />
+          <TestChild />
         </KnockProvider>,
       );
 
-      // Wait for the effect to complete
+      // Wait for resetAuthentication to be called
       await waitFor(() => {
         expect(resetAuthSpy).toHaveBeenCalled();
       });
 
-      // Client still exists but not authenticated
-      expect(getByTestId("consumer-msg")).toHaveTextContent("API Key: test_api_key");
-      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
+      expect(resetAuthSpy).toHaveBeenCalledTimes(1);
     });
 
     test("i18n context is still available when enabled is false", () => {

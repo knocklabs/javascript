@@ -97,34 +97,14 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
     ],
   );
 
-  // Create and manage Knock client instance
-  const [forceUpdate, setForceUpdate] = React.useState(0);
-  const knockClient = React.useMemo(
-    () => {
-      const knock = new Knock(apiKey ?? "", {
-        host: authenticateOptions.host,
-        logLevel: authenticateOptions.logLevel,
-        branch: authenticateOptions.branch,
-      });
-
-      // Authenticate synchronously on creation if enabled
-      if (enabled && userIdOrUserWithProperties) {
-        knock.authenticate(userIdOrUserWithProperties, userToken, {
-          onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
-          timeBeforeExpirationInMs:
-            authenticateOptions.timeBeforeExpirationInMs,
-          identificationStrategy: authenticateOptions.identificationStrategy,
-        });
-      }
-
-      return knock;
-    },
-    // We intentionally omit enabled, userIdOrUserWithProperties, and userToken
-    // to reuse the same instance when these change. Auth state changes are handled
-    // in the effect below via resetAuthentication()/authenticate() calls.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiKey, authenticateOptions, forceUpdate],
-  );
+  // Create Knock client instance (without authentication)
+  const knockClient = React.useMemo(() => {
+    return new Knock(apiKey ?? "", {
+      host: authenticateOptions.host,
+      logLevel: authenticateOptions.logLevel,
+      branch: authenticateOptions.branch,
+    });
+  }, [apiKey, authenticateOptions]);
 
   // Handle authentication state based on enabled prop
   React.useEffect(() => {
@@ -136,11 +116,9 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
         timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
         identificationStrategy: authenticateOptions.identificationStrategy,
       });
-      setForceUpdate((n) => n + 1);
     } else if (!enabled && knockClient.isAuthenticated()) {
       // When disabled, reset authentication if currently authenticated
       knockClient.resetAuthentication();
-      setForceUpdate((n) => n + 1);
     }
   }, [
     enabled,
