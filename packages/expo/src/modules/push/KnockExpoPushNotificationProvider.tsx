@@ -208,6 +208,13 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
         return;
       }
 
+      if (!knockClient.isAuthenticated()) {
+        knockClient.log(
+          "[Knock] Skipping status update - user not authenticated",
+        );
+        return;
+      }
+
       return knockClient.messages.updateStatus(messageId, status);
     },
     [knockClient],
@@ -219,7 +226,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
         customNotificationHandler ?? defaultNotificationHandler,
     });
 
-    if (autoRegister) {
+    if (autoRegister && knockClient.isAuthenticated()) {
       registerForPushNotifications()
         .then((token) => {
           if (token) {
@@ -241,6 +248,10 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
             _error,
           );
         });
+    } else if (autoRegister && !knockClient.isAuthenticated()) {
+      knockClient.log(
+        "[Knock] Skipping auto-register - user not authenticated",
+      );
     }
 
     const notificationReceivedSubscription =
