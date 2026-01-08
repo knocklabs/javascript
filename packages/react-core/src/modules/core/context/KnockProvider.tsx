@@ -133,8 +133,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       // Note: authenticate() handles re-auth internally if userId/userToken changed
       knockClient.authenticate(userIdOrUserWithProperties, userToken, {
         onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
-        timeBeforeExpirationInMs:
-          authenticateOptions.timeBeforeExpirationInMs,
+        timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
         identificationStrategy: authenticateOptions.identificationStrategy,
       });
       setForceUpdate((n) => n + 1);
