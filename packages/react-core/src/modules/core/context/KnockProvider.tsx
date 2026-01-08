@@ -118,15 +118,16 @@ const AuthenticatedKnockProvider: React.FC<
 export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   enabled = true,
   children,
+  i18n,
   ...props
 }) => {
-  // When disabled, skip authentication and just render children
+  // When disabled, skip authentication but still provide i18n context
   if (!enabled) {
-    return <>{children}</>;
+    return <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>;
   }
 
   return (
-    <AuthenticatedKnockProvider enabled={enabled} {...props}>
+    <AuthenticatedKnockProvider enabled={enabled} i18n={i18n} {...props}>
       {children}
     </AuthenticatedKnockProvider>
   );

@@ -3,7 +3,7 @@ import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { createMockKnock } from "../../../client/test/test-utils/mocks";
-import { KnockProvider, useKnockClient } from "../../src";
+import { KnockProvider, useKnockClient, useTranslations } from "../../src";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
@@ -490,6 +490,33 @@ describe("KnockProvider", () => {
       // Now context should not be available
       expect(getByTestId("error-msg")).toHaveTextContent(
         "No context available",
+      );
+    });
+
+    test("i18n context is still available when enabled is false", () => {
+      const TestChild = () => {
+        const { t, locale } = useTranslations();
+        return (
+          <div data-testid="i18n-test">
+            Locale: {locale}, Translation: {t("archiveNotification")}
+          </div>
+        );
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      // i18n should still work (with default locale and translations)
+      expect(getByTestId("i18n-test")).toHaveTextContent("Locale: en");
+      expect(getByTestId("i18n-test")).toHaveTextContent(
+        "Translation: Archive this notification",
       );
     });
   });
