@@ -1,5 +1,4 @@
 import { render, renderHook, waitFor } from "@testing-library/react";
-import * as Notifications from "expo-notifications";
 import React from "react";
 import { describe, expect, test, vi } from "vitest";
 
