@@ -13,6 +13,11 @@ class SlackClient {
   }
 
   async authCheck({ tenant, knockChannelId }: AuthCheckInput) {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log("[Slack] Skipping authCheck - user not authenticated");
+      return { status: "not_connected" };
+    }
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/providers/slack/${knockChannelId}/auth_check`,
@@ -31,6 +36,13 @@ class SlackClient {
   async getChannels(
     input: GetSlackChannelsInput,
   ): Promise<GetSlackChannelsResponse> {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[Slack] Skipping getChannels - user not authenticated",
+      );
+      return { slack_channels: [], next_cursor: null };
+    }
+
     const { knockChannelId, tenant } = input;
     const queryOptions = input.queryOptions || {};
 
@@ -57,6 +69,13 @@ class SlackClient {
   }
 
   async revokeAccessToken({ tenant, knockChannelId }: RevokeAccessTokenInput) {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[Slack] Skipping revokeAccessToken - user not authenticated",
+      );
+      return { status: "not_connected" };
+    }
+
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/providers/slack/${knockChannelId}/revoke_access`,

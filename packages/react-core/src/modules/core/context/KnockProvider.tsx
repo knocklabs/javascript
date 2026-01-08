@@ -7,7 +7,6 @@ import * as React from "react";
 import { PropsWithChildren } from "react";
 
 import { I18nContent, KnockI18nProvider } from "../../i18n";
-import { useAuthenticatedKnockClient } from "../hooks";
 
 export interface KnockProviderState {
   knock: Knock;
@@ -26,6 +25,13 @@ export type KnockProviderProps = {
   i18n?: I18nContent;
   logLevel?: LogLevel;
   branch?: string;
+  /**
+   * Controls whether the KnockProvider should authenticate and initialize the Knock client.
+   * When set to false, the provider will skip authentication and just render children.
+   * This is useful for preventing auth errors when user credentials are not yet available.
+   * @default true
+   */
+  enabled?: boolean;
 } & (
   | {
       /**
@@ -66,6 +72,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   i18n,
   identificationStrategy,
   branch,
+  enabled = true,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -90,15 +97,46 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
     ],
   );
 
-  const knock = useAuthenticatedKnockClient(
-    apiKey ?? "",
+  // Create Knock client instance (without authentication)
+  const knockClient = React.useMemo(() => {
+    return new Knock(apiKey ?? "", {
+      host: authenticateOptions.host,
+      logLevel: authenticateOptions.logLevel,
+      branch: authenticateOptions.branch,
+    });
+  }, [apiKey, authenticateOptions]);
+
+  // Handle authentication state based on enabled prop
+  React.useEffect(() => {
+    if (enabled && userIdOrUserWithProperties) {
+      // When enabled, authenticate (or re-authenticate if user/token changed)
+      // Note: authenticate() handles re-auth internally if userId/userToken changed
+      knockClient.authenticate(userIdOrUserWithProperties, userToken, {
+        onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
+        timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+        identificationStrategy: authenticateOptions.identificationStrategy,
+      });
+    } else if (!enabled && knockClient.isAuthenticated()) {
+      // When disabled, reset authentication if currently authenticated
+      knockClient.resetAuthentication();
+    }
+  }, [
+    enabled,
+    knockClient,
     userIdOrUserWithProperties,
     userToken,
     authenticateOptions,
-  );
+  ]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      knockClient.teardown();
+    };
+  }, [knockClient]);
 
   return (
-    <KnockContext.Provider value={{ knock }}>
+    <KnockContext.Provider value={{ knock: knockClient }}>
       <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
     </KnockContext.Provider>
   );

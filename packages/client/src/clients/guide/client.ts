@@ -350,7 +350,14 @@ export class KnockGuideClient {
 
   async fetch(opts?: { filters?: QueryFilterParams }) {
     this.knock.log("[Guide] .fetch");
-    this.knock.failIfNotAuthenticated();
+
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Skipping fetch - user not authenticated");
+      return {
+        status: "error" as const,
+        error: new Error("Not authenticated"),
+      };
+    }
 
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
@@ -400,7 +407,12 @@ export class KnockGuideClient {
 
   subscribe() {
     if (!this.socket) return;
-    this.knock.failIfNotAuthenticated();
+
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Skipping subscribe - user not authenticated");
+      return;
+    }
+
     this.knock.log("[Guide] Subscribing to real time updates");
 
     // Ensure a live socket connection if not yet connected.
@@ -846,6 +858,11 @@ export class KnockGuideClient {
   async markAsSeen(guide: GuideData, step: GuideStepData) {
     if (step.message.seen_at) return;
 
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Skipping markAsSeen - user not authenticated");
+      return;
+    }
+
     this.knock.log(
       `[Guide] Marking as seen (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -874,6 +891,13 @@ export class KnockGuideClient {
     step: GuideStepData,
     metadata?: GenericData,
   ) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Guide] Skipping markAsInteracted - user not authenticated",
+      );
+      return;
+    }
+
     this.knock.log(
       `[Guide] Marking as interacted (Guide key: ${guide.key}; Step ref:${step.ref})`,
     );
@@ -900,6 +924,13 @@ export class KnockGuideClient {
 
   async markAsArchived(guide: GuideData, step: GuideStepData) {
     if (step.message.archived_at) return;
+
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Guide] Skipping markAsArchived - user not authenticated",
+      );
+      return;
+    }
 
     this.knock.log(
       `[Guide] Marking as archived (Guide key: ${guide.key}, Step ref:${step.ref})`,

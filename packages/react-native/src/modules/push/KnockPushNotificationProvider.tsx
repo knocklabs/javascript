@@ -45,6 +45,13 @@ export const KnockPushNotificationProvider: React.FC<
   // Acts like an upsert. Inserts or updates
   const registerPushTokenToChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
+      if (!knockClient.isAuthenticated()) {
+        knockClient.log(
+          "[Knock] Skipping registerPushTokenToChannel - user not authenticated",
+        );
+        return;
+      }
+
       const newDevice: Device = {
         token,
         locale: Intl.DateTimeFormat().resolvedOptions().locale,
@@ -81,6 +88,13 @@ export const KnockPushNotificationProvider: React.FC<
 
   const unregisterPushTokenFromChannel = useCallback(
     async (token: string, channelId: string): Promise<ChannelData | void> => {
+      if (!knockClient.isAuthenticated()) {
+        knockClient.log(
+          "[Knock] Skipping unregisterPushTokenFromChannel - user not authenticated",
+        );
+        return;
+      }
+
       return knockClient.user
         .getChannelData({ channelId: channelId })
         .then((result: ChannelData) => {

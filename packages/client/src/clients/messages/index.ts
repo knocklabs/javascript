@@ -30,6 +30,13 @@ class MessageClient {
     status: MessageEngagementStatus,
     options?: UpdateMessageStatusOptions,
   ): Promise<Message> {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Messages] Skipping updateStatus - user not authenticated",
+      );
+      throw new Error("Not authenticated");
+    }
+
     // Metadata is only required for the "interacted" status
     const payload =
       status === "interacted" && options
@@ -49,6 +56,13 @@ class MessageClient {
     messageId: string,
     status: Exclude<MessageEngagementStatus, "interacted">,
   ): Promise<Message> {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Messages] Skipping removeStatus - user not authenticated",
+      );
+      throw new Error("Not authenticated");
+    }
+
     const result = await this.knock.client().makeRequest({
       method: "DELETE",
       url: `/v1/messages/${messageId}/${status}`,
@@ -62,6 +76,13 @@ class MessageClient {
     status: MessageEngagementStatus | "unseen" | "unread" | "unarchived",
     options?: UpdateMessageStatusOptions,
   ): Promise<Message[]> {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Messages] Skipping batchUpdateStatuses - user not authenticated",
+      );
+      return [];
+    }
+
     // Metadata is only required for the "interacted" status
     const additionalPayload =
       status === "interacted" && options ? { metadata: options.metadata } : {};
@@ -80,6 +101,13 @@ class MessageClient {
     status,
     options,
   }: BulkUpdateMessagesInChannelProperties): Promise<BulkOperation> {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Messages] Skipping bulkUpdateAllStatusesInChannel - user not authenticated",
+      );
+      throw new Error("Not authenticated");
+    }
+
     const result = await this.knock.client().makeRequest({
       method: "POST",
       url: `/v1/channels/${channelId}/messages/bulk/${status}`,

@@ -89,7 +89,12 @@ class UserClient {
   }
 
   async getChannelData<T = GenericData>(params: GetChannelDataInput) {
-    this.instance.failIfNotAuthenticated();
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[User] Skipping getChannelData - user not authenticated",
+      );
+      throw new Error("Not authenticated");
+    }
 
     const result = await this.instance.client().makeRequest({
       method: "GET",
@@ -103,7 +108,12 @@ class UserClient {
     channelId,
     channelData,
   }: SetChannelDataInput) {
-    this.instance.failIfNotAuthenticated();
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[User] Skipping setChannelData - user not authenticated",
+      );
+      throw new Error("Not authenticated");
+    }
 
     const result = await this.instance.client().makeRequest({
       method: "PUT",
