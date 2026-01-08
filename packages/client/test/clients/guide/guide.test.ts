@@ -271,7 +271,7 @@ describe("KnockGuideClient", () => {
 
       await client.fetch();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({
@@ -288,7 +288,7 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       await client.fetch();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockStore.setState).toHaveBeenCalledWith(expect.any(Function));
 
       // Get the last setState call and execute its function
@@ -343,7 +343,7 @@ describe("KnockGuideClient", () => {
       );
       client.subscribe();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockSocket.channel).toHaveBeenCalledWith(
         `guides:${channelId}`,
         expect.objectContaining({
@@ -3050,7 +3050,7 @@ describe("KnockGuideClient", () => {
 
       await client.fetch({ filters: { type: "tooltip" } });
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({
