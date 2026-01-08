@@ -321,4 +321,30 @@ describe("KnockExpoPushNotificationProvider", () => {
     vi.mocked(ConstantsMock.default).expoConfig = originalConfig;
   });
 
+  test("returns null when running on simulator/non-device", async () => {
+    const DeviceMock = await import("expo-device");
+    const originalIsDevice = DeviceMock.isDevice;
+    
+    // Mock as non-device (simulator)
+    vi.mocked(DeviceMock).isDevice = false;
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+
+    const token = await result.current.registerForPushNotifications();
+
+    expect(token).toBeNull();
+
+    // Restore original value
+    vi.mocked(DeviceMock).isDevice = originalIsDevice;
+  });
+
 });
