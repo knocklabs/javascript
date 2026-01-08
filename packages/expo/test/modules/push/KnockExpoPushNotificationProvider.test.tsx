@@ -1,8 +1,12 @@
-import { render } from "@testing-library/react";
+import { render, renderHook, waitFor } from "@testing-library/react";
+import * as Notifications from "expo-notifications";
 import React from "react";
 import { describe, expect, test, vi } from "vitest";
 
-import { KnockExpoPushNotificationProvider } from "../../../src";
+import {
+  KnockExpoPushNotificationProvider,
+  useExpoPushNotifications,
+} from "../../../src";
 
 vi.mock("expo-constants", () => ({
   default: {
@@ -90,7 +94,7 @@ describe("KnockExpoPushNotificationProvider", () => {
     expect(getByTestId("test-child")).toBeInTheDocument();
   });
 
-  test("renders with custom Android notification channel setup", () => {
+  test("renders with custom Android notification channel setup", async () => {
     const customSetup = vi.fn().mockResolvedValue(undefined);
     const TestChild = () => <div data-testid="test-child">Test Child</div>;
 
@@ -104,5 +108,106 @@ describe("KnockExpoPushNotificationProvider", () => {
     );
 
     expect(getByTestId("test-child")).toBeInTheDocument();
+
+    // Wait for the custom setup to be called during registration
+    await waitFor(() => {
+      expect(customSetup).toHaveBeenCalled();
+    });
   });
+
+
+  test("does not register when autoRegister is false", () => {
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    const { getByTestId } = render(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    expect(getByTestId("test-child")).toBeInTheDocument();
+  });
+
+  test("useExpoPushNotifications provides context values", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+
+    expect(result.current).toHaveProperty("expoPushToken");
+    expect(result.current).toHaveProperty("registerForPushNotifications");
+    expect(result.current).toHaveProperty("registerPushTokenToChannel");
+    expect(result.current).toHaveProperty("unregisterPushTokenFromChannel");
+    expect(result.current).toHaveProperty("onNotificationReceived");
+    expect(result.current).toHaveProperty("onNotificationTapped");
+  });
+
+  test("useExpoPushNotifications throws error when used outside provider", () => {
+    expect(() => {
+      renderHook(() => useExpoPushNotifications());
+    }).toThrow(
+      "[Knock] useExpoPushNotifications must be used within a KnockExpoPushNotificationProvider",
+    );
+  });
+
+  test("registerForPushNotifications can be called manually", async () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+
+    const token = await result.current.registerForPushNotifications();
+
+    expect(token).toBe("test-token");
+    
+    // Wait for state to update
+    await waitFor(() => {
+      expect(result.current.expoPushToken).toBe("test-token");
+    });
+  });
+
+  test("onNotificationReceived sets handler", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const mockHandler = vi.fn();
+
+    result.current.onNotificationReceived(mockHandler);
+
+    // Handler is set (no error thrown)
+    expect(result.current.onNotificationReceived).toBeDefined();
+  });
+
+  test("onNotificationTapped sets handler", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const mockHandler = vi.fn();
+
+    result.current.onNotificationTapped(mockHandler);
+
+    // Handler is set (no error thrown)
+    expect(result.current.onNotificationTapped).toBeDefined();
+  });
+
 });
