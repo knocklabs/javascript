@@ -61,6 +61,7 @@ export interface KnockExpoPushNotificationProviderProps {
   customNotificationHandler?: (
     notification: Notifications.Notification,
   ) => Promise<Notifications.NotificationBehavior>;
+  setupAndroidNotificationChannel?: () => Promise<void>;
   children?: React.ReactElement;
   autoRegister?: boolean;
 }
@@ -98,7 +99,7 @@ async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
   }
 }
 
-async function setupAndroidNotificationChannel(): Promise<void> {
+async function defaultSetupAndroidNotificationChannel(): Promise<void> {
   if (Device.osName === "Android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "Default",
@@ -109,7 +110,9 @@ async function setupAndroidNotificationChannel(): Promise<void> {
   }
 }
 
-async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPushToken | null> {
+async function requestPermissionAndGetPushToken(
+  setupAndroidChannel: () => Promise<void>,
+): Promise<Notifications.ExpoPushToken | null> {
   // Check for device support
   if (!Device.isDevice) {
     console.warn("[Knock] Must use physical device for Push Notifications");
@@ -117,7 +120,7 @@ async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPus
   }
 
   // Setup Android notification channel before requesting permissions
-  await setupAndroidNotificationChannel();
+  await setupAndroidChannel();
 
   const permissionStatus = await requestPushPermissionIfNeeded();
 
@@ -134,6 +137,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
 > = ({
   knockExpoChannelId,
   customNotificationHandler,
+  setupAndroidNotificationChannel = defaultSetupAndroidNotificationChannel,
   children,
   autoRegister = true,
 }) => {
@@ -170,7 +174,9 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
   > => {
     try {
       knockClient.log(`[Knock] Registering for push notifications`);
-      const token = await requestPermissionAndGetPushToken();
+      const token = await requestPermissionAndGetPushToken(
+        setupAndroidNotificationChannel,
+      );
       knockClient.log(`[Knock] Token received: ${token?.data}`);
       if (token?.data) {
         knockClient.log(`[Knock] Setting push token: ${token.data}`);
@@ -182,7 +188,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
       console.error(`[Knock] Error registering for push notifications:`, error);
       return null;
     }
-  }, [knockClient]);
+  }, [knockClient, setupAndroidNotificationChannel]);
 
   const updateKnockMessageStatusFromNotification = useCallback(
     async (

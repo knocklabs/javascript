@@ -89,4 +89,20 @@ describe("KnockExpoPushNotificationProvider", () => {
 
     expect(getByTestId("test-child")).toBeInTheDocument();
   });
+
+  test("renders with custom Android notification channel setup", () => {
+    const customSetup = vi.fn().mockResolvedValue(undefined);
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    const { getByTestId } = render(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        setupAndroidNotificationChannel={customSetup}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    expect(getByTestId("test-child")).toBeInTheDocument();
+  });
 });
