@@ -23,10 +23,10 @@ export type WorkflowPreferences = Partial<
 >;
 
 export interface SetPreferencesProperties {
-  workflows: WorkflowPreferences;
-  categories: WorkflowPreferences;
-  channel_types: ChannelTypePreferences;
-  channels: ChannelPreferences;
+  workflows?: WorkflowPreferences;
+  categories?: WorkflowPreferences;
+  channel_types?: ChannelTypePreferences;
+  channels?: ChannelPreferences;
 }
 
 export interface PreferenceSet {
