@@ -331,4 +331,166 @@ describe("KnockProvider", () => {
       );
     });
   });
+
+  describe("enabled prop", () => {
+    test("renders children without authentication when enabled is false", () => {
+      const TestChild = () => <div data-testid="child">Child content</div>;
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      expect(getByTestId("child")).toHaveTextContent("Child content");
+      // Verify no API calls were made (no authentication)
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+
+    test("authenticates normally when enabled is true (default)", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider apiKey="test_api_key" user={{ id: "test_user_id" }}>
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      expect(getByTestId("consumer-msg")).toHaveTextContent(
+        "API Key: test_api_key",
+      );
+    });
+
+    test("authenticates normally when enabled is explicitly true", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={true}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      expect(getByTestId("consumer-msg")).toHaveTextContent(
+        "API Key: test_api_key",
+      );
+    });
+
+    test("useKnockClient throws error when enabled is false", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+      };
+
+      // Suppress console.error for this test since we expect an error
+      const originalError = console.error;
+      console.error = vi.fn();
+
+      expect(() =>
+        render(
+          <KnockProvider
+            apiKey="test_api_key"
+            user={{ id: "test_user_id" }}
+            enabled={false}
+          >
+            <TestConsumer />
+          </KnockProvider>,
+        ),
+      ).toThrow("useKnockClient must be used within a KnockProvider");
+
+      console.error = originalError;
+    });
+
+    test("toggling enabled from false to true initializes authentication", () => {
+      const TestChild = () => <div data-testid="child">Child content</div>;
+
+      const { rerender } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John" }}
+          enabled={false}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      // Verify no API calls when disabled
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+
+      // Enable the provider
+      rerender(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John" }}
+          enabled={true}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      // Verify authentication happened
+      expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "PUT",
+          url: "/v1/users/test_user_id",
+          data: { name: "John" },
+        }),
+      );
+    });
+
+    test("toggling enabled from true to false stops providing context", () => {
+      const TestConsumer = () => {
+        try {
+          const knock = useKnockClient();
+          return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+        } catch {
+          return <div data-testid="error-msg">No context available</div>;
+        }
+      };
+
+      const { getByTestId, rerender } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={true}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Initially should work
+      expect(getByTestId("consumer-msg")).toHaveTextContent(
+        "API Key: test_api_key",
+      );
+
+      // Disable the provider
+      rerender(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Now context should not be available
+      expect(getByTestId("error-msg")).toHaveTextContent(
+        "No context available",
+      );
+    });
+  });
 });

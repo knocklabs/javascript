@@ -26,6 +26,13 @@ export type KnockProviderProps = {
   i18n?: I18nContent;
   logLevel?: LogLevel;
   branch?: string;
+  /**
+   * Controls whether the KnockProvider should authenticate and initialize the Knock client.
+   * When set to false, the provider will skip authentication and just render children.
+   * This is useful for preventing auth errors when user credentials are not yet available.
+   * @default true
+   */
+  enabled?: boolean;
 } & (
   | {
       /**
@@ -55,7 +62,11 @@ export type KnockProviderProps = {
     }
 );
 
-export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
+const AuthenticatedKnockProvider: React.FC<
+  PropsWithChildren<
+    Omit<KnockProviderProps, "enabled"> & { enabled: true | undefined }
+  >
+> = ({
   apiKey,
   host,
   logLevel,
@@ -101,6 +112,23 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
     <KnockContext.Provider value={{ knock }}>
       <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
     </KnockContext.Provider>
+  );
+};
+
+export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
+  enabled = true,
+  children,
+  ...props
+}) => {
+  // When disabled, skip authentication and just render children
+  if (!enabled) {
+    return <>{children}</>;
+  }
+
+  return (
+    <AuthenticatedKnockProvider enabled={enabled} {...props}>
+      {children}
+    </AuthenticatedKnockProvider>
   );
 };
 
