@@ -113,7 +113,7 @@ class MsTeamsClient {
       this.instance.log(
         "[MS Teams] Skipping revokeAccessToken - user not authenticated",
       );
-      return { status: "success" };
+      return { status: "not_connected" };
     }
 
     const result = await this.instance.client().makeRequest({

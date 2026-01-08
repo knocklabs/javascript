@@ -288,6 +288,7 @@ const InternalKnockExpoPushNotificationProvider: React.FC<
     autoRegister,
     knockExpoChannelId,
     knockClient,
+    knockClient.userId, // Track userId to detect authentication state changes
   ]);
 
   return (

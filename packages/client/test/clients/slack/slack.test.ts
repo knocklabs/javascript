@@ -577,7 +577,7 @@ describe("Slack Client", () => {
         expect(logSpy).toHaveBeenCalledWith(
           "[Slack] Skipping revokeAccessToken - user not authenticated",
         );
-        expect(result).toEqual({ status: "success" });
+        expect(result).toEqual({ status: "not_connected" });
         expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
       } finally {
         cleanup();

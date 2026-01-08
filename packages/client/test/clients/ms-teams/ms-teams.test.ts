@@ -720,7 +720,7 @@ describe("Microsoft Teams Client", () => {
         expect(logSpy).toHaveBeenCalledWith(
           "[MS Teams] Skipping revokeAccessToken - user not authenticated",
         );
-        expect(result).toEqual({ status: "success" });
+        expect(result).toEqual({ status: "not_connected" });
         expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
       } finally {
         cleanup();

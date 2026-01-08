@@ -73,7 +73,7 @@ class SlackClient {
       this.instance.log(
         "[Slack] Skipping revokeAccessToken - user not authenticated",
       );
-      return { status: "success" };
+      return { status: "not_connected" };
     }
 
     const result = await this.instance.client().makeRequest({
