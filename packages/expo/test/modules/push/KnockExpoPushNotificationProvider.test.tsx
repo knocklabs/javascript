@@ -18,6 +18,7 @@ vi.mock("expo-constants", () => ({
 
 vi.mock("expo-device", () => ({
   isDevice: true,
+  osName: "iOS",
 }));
 
 vi.mock("expo-notifications", () => ({
@@ -25,10 +26,14 @@ vi.mock("expo-notifications", () => ({
   getPermissionsAsync: vi.fn().mockResolvedValue({ status: "granted" }),
   requestPermissionsAsync: vi.fn().mockResolvedValue({ status: "granted" }),
   getExpoPushTokenAsync: vi.fn().mockResolvedValue({ data: "test-token" }),
+  setNotificationChannelAsync: vi.fn().mockResolvedValue(undefined),
   addNotificationReceivedListener: vi.fn().mockReturnValue({ remove: vi.fn() }),
   addNotificationResponseReceivedListener: vi
     .fn()
     .mockReturnValue({ remove: vi.fn() }),
+  AndroidImportance: {
+    MAX: 5,
+  },
 }));
 
 // Mock the react-native providers
@@ -39,8 +44,8 @@ vi.mock("@knocklabs/react-native", () => ({
     children: React.ReactNode;
   }) => <div data-testid="mock-react-native-provider">{children}</div>,
   usePushNotifications: () => ({
-    registerPushTokenToChannel: vi.fn(),
-    unregisterPushTokenFromChannel: vi.fn(),
+    registerPushTokenToChannel: vi.fn().mockResolvedValue(undefined),
+    unregisterPushTokenFromChannel: vi.fn().mockResolvedValue(undefined),
   }),
 }));
 
