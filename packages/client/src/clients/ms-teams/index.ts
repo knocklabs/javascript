@@ -18,6 +18,13 @@ class MsTeamsClient {
   }
 
   async authCheck({ tenant: tenantId, knockChannelId }: AuthCheckInput) {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MS Teams] Skipping authCheck - user not authenticated",
+      );
+      return { status: "not_connected" };
+    }
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/providers/ms-teams/${knockChannelId}/auth_check`,
@@ -36,6 +43,13 @@ class MsTeamsClient {
   async getTeams(
     input: GetMsTeamsTeamsInput,
   ): Promise<GetMsTeamsTeamsResponse> {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MS Teams] Skipping getTeams - user not authenticated",
+      );
+      return { ms_teams_teams: [], skip_token: null };
+    }
+
     const { knockChannelId, tenant: tenantId } = input;
     const queryOptions = input.queryOptions || {};
 
@@ -62,6 +76,13 @@ class MsTeamsClient {
   async getChannels(
     input: GetMsTeamsChannelsInput,
   ): Promise<GetMsTeamsChannelsResponse> {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MS Teams] Skipping getChannels - user not authenticated",
+      );
+      return { ms_teams_channels: [] };
+    }
+
     const { knockChannelId, teamId, tenant: tenantId } = input;
     const queryOptions = input.queryOptions || {};
 
@@ -88,6 +109,13 @@ class MsTeamsClient {
     tenant: tenantId,
     knockChannelId,
   }: RevokeAccessTokenInput) {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MS Teams] Skipping revokeAccessToken - user not authenticated",
+      );
+      return { status: "success" };
+    }
+
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/providers/ms-teams/${knockChannelId}/revoke_access`,
