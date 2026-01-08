@@ -747,4 +747,98 @@ describe("MessageClient", () => {
       );
     });
   });
+
+  describe("Authentication Guards", () => {
+    const getUnauthenticatedSetup = () => {
+      const { knock, mockApiClient } = createMockKnock();
+      // Don't authenticate
+      return { knock, mockApiClient, cleanup: () => vi.clearAllMocks() };
+    };
+
+    test("updateStatus skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new MessageClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        await expect(client.updateStatus("msg_123", "read")).rejects.toThrow(
+          "Not authenticated",
+        );
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Messages] Skipping updateStatus - user not authenticated",
+        );
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("removeStatus skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new MessageClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        await expect(client.removeStatus("msg_123", "seen")).rejects.toThrow(
+          "Not authenticated",
+        );
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Messages] Skipping removeStatus - user not authenticated",
+        );
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("batchUpdateStatuses skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new MessageClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await client.batchUpdateStatuses(
+          ["msg_1", "msg_2"],
+          "read",
+        );
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Messages] Skipping batchUpdateStatuses - user not authenticated",
+        );
+        expect(result).toEqual([]);
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("bulkUpdateAllStatusesInChannel skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new MessageClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        await expect(
+          client.bulkUpdateAllStatusesInChannel({
+            channelId: "channel_123",
+            status: "read",
+            options: {},
+          }),
+        ).rejects.toThrow("Not authenticated");
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Messages] Skipping bulkUpdateAllStatusesInChannel - user not authenticated",
+        );
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+  });
 });

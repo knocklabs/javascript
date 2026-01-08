@@ -510,4 +510,78 @@ describe("Slack Client", () => {
       }
     });
   });
+
+  describe("Authentication Guards", () => {
+    const getUnauthenticatedSetup = () => {
+      const { knock, mockApiClient } = createMockKnock();
+      // Don't authenticate
+      return { knock, mockApiClient, cleanup: () => vi.clearAllMocks() };
+    };
+
+    test("authCheck skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new SlackClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await client.authCheck({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Slack] Skipping authCheck - user not authenticated",
+        );
+        expect(result).toEqual({ status: "not_connected" });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("getChannels skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new SlackClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await client.getChannels({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Slack] Skipping getChannels - user not authenticated",
+        );
+        expect(result).toEqual({ slack_channels: [], next_cursor: null });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("revokeAccessToken skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedSetup();
+
+      try {
+        const client = new SlackClient(knock);
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await client.revokeAccessToken({
+          tenant: "tenant_123",
+          knockChannelId: "channel_123",
+        });
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Slack] Skipping revokeAccessToken - user not authenticated",
+        );
+        expect(result).toEqual({ status: "success" });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+  });
 });

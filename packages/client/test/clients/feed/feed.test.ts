@@ -21,6 +21,16 @@ describe("Feed", () => {
     };
   };
 
+  const getUnauthenticatedTestSetup = () => {
+    const { knock, mockApiClient } = createMockKnock();
+    // Don't authenticate - leave knock unauthenticated
+    return {
+      knock,
+      mockApiClient,
+      cleanup: () => vi.clearAllMocks(),
+    };
+  };
+
   describe("Basic Feed Tests", () => {
     test("can create a feed client", () => {
       const { knock, cleanup } = getTestSetup();
@@ -1577,6 +1587,232 @@ describe("Feed", () => {
         const result = await feed.markAsSeen(feedItem);
 
         expect(result).toEqual([updatedItem]);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Authentication Guards", () => {
+    test("fetch skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        const logSpy = vi.spyOn(knock, "log");
+
+        await feed.fetch();
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping fetch - user not authenticated",
+        );
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAsSeen skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const feedItem = createUnreadFeedItem();
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAsSeen(feedItem);
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAsSeen - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAllAsSeen skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAllAsSeen();
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAllAsSeen - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAsRead skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const feedItem = createUnreadFeedItem();
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAsRead(feedItem);
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAsRead - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAllAsRead skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAllAsRead();
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAllAsRead - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAsArchived skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const feedItem = createUnreadFeedItem();
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAsArchived(feedItem);
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAsArchived - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAllAsArchived skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAllAsArchived();
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAllAsArchived - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("markAsInteracted skips API call when not authenticated", async () => {
+      const { knock, mockApiClient, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+        const feedItem = createUnreadFeedItem();
+        const logSpy = vi.spyOn(knock, "log");
+
+        const result = await feed.markAsInteracted(feedItem);
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] Skipping markAsInteracted - user not authenticated",
+        );
+        expect(result).toEqual({ entries: [] });
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("listenForUpdates skips websocket connection when not authenticated", () => {
+      const { knock, cleanup } = getUnauthenticatedTestSetup();
+
+      try {
+        const mockSocketManager = {
+          join: vi.fn(),
+        } as unknown as FeedSocketManager;
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          mockSocketManager,
+        );
+
+        const logSpy = vi.spyOn(knock, "log");
+
+        feed.listenForUpdates();
+
+        expect(logSpy).toHaveBeenCalledWith(
+          "[Feed] User is not authenticated, skipping listening for updates",
+        );
+        expect(mockSocketManager.join).not.toHaveBeenCalled();
       } finally {
         cleanup();
       }

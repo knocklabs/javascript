@@ -3059,4 +3059,142 @@ describe("KnockGuideClient", () => {
       );
     });
   });
+
+  describe("Authentication Guards", () => {
+    test("fetch skips API call when not authenticated", async () => {
+      const unauthKnock = {
+        ...mockKnock,
+        isAuthenticated: vi.fn(() => false),
+      };
+
+      const client = new KnockGuideClient(unauthKnock, channelId);
+      const logSpy = vi.spyOn(unauthKnock, "log");
+
+      const result = await client.fetch();
+
+      expect(logSpy).toHaveBeenCalledWith(
+        "[Guide] Skipping fetch - user not authenticated",
+      );
+      expect(result).toEqual({
+        status: "error",
+        error: new Error("Not authenticated"),
+      });
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+    });
+
+    test("subscribe skips websocket when not authenticated", () => {
+      const testSocket = {
+        channel: vi.fn(),
+        connect: vi.fn(),
+        isConnected: vi.fn(() => false),
+      };
+
+      const unauthKnock = {
+        ...mockKnock,
+        isAuthenticated: vi.fn(() => false),
+        client: () => ({ socket: testSocket }),
+      };
+
+      const logSpy = vi.spyOn(unauthKnock, "log");
+      const client = new KnockGuideClient(unauthKnock, channelId);
+
+      client.subscribe();
+
+      // Check that the skip message was logged
+      expect(logSpy).toHaveBeenCalledWith(
+        "[Guide] Skipping subscribe - user not authenticated",
+      );
+      expect(testSocket.channel).not.toHaveBeenCalled();
+    });
+
+    test("markAsSeen skips API call when not authenticated", async () => {
+      const unauthKnock = {
+        ...mockKnock,
+        isAuthenticated: vi.fn(() => false),
+      };
+
+      const mockGuide = {
+        key: "test-guide",
+        steps: [
+          {
+            ref: "step-1",
+            message: { id: "msg_1", seen_at: null },
+            content: {},
+          },
+        ],
+      };
+
+      const client = new KnockGuideClient(unauthKnock, channelId);
+      const logSpy = vi.spyOn(unauthKnock, "log");
+
+      const result = await client.markAsSeen(mockGuide, mockGuide.steps[0]);
+
+      expect(logSpy).toHaveBeenCalledWith(
+        "[Guide] Skipping markAsSeen - user not authenticated",
+      );
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsInteracted skips API call when not authenticated", async () => {
+      const unauthKnock = {
+        ...mockKnock,
+        isAuthenticated: vi.fn(() => false),
+      };
+
+      const mockGuide = {
+        key: "test-guide",
+        steps: [
+          {
+            ref: "step-1",
+            message: { id: "msg_1", interacted_at: null },
+            content: {},
+          },
+        ],
+      };
+
+      const client = new KnockGuideClient(unauthKnock, channelId);
+      const logSpy = vi.spyOn(unauthKnock, "log");
+
+      const result = await client.markAsInteracted(
+        mockGuide,
+        mockGuide.steps[0],
+      );
+
+      expect(logSpy).toHaveBeenCalledWith(
+        "[Guide] Skipping markAsInteracted - user not authenticated",
+      );
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsArchived skips API call when not authenticated", async () => {
+      const unauthKnock = {
+        ...mockKnock,
+        isAuthenticated: vi.fn(() => false),
+      };
+
+      const mockGuide = {
+        key: "test-guide",
+        steps: [
+          {
+            ref: "step-1",
+            message: { id: "msg_1", archived_at: null },
+            content: {},
+          },
+        ],
+      };
+
+      const client = new KnockGuideClient(unauthKnock, channelId);
+      const logSpy = vi.spyOn(unauthKnock, "log");
+
+      const result = await client.markAsArchived(mockGuide, mockGuide.steps[0]);
+
+      expect(logSpy).toHaveBeenCalledWith(
+        "[Guide] Skipping markAsArchived - user not authenticated",
+      );
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+  });
 });
