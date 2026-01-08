@@ -126,46 +126,23 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
     [apiKey, authenticateOptions, forceUpdate],
   );
 
-  // Track previous enabled state to detect transitions
-  const prevEnabledRef = React.useRef(enabled);
-
+  // Handle authentication state based on enabled prop
   React.useEffect(() => {
-    const wasEnabled = prevEnabledRef.current;
-    const isEnabled = enabled;
-
-    if (wasEnabled && !isEnabled && knockClient.isAuthenticated()) {
-      // Transitioning from enabled→disabled: reset auth and force update
-      knockClient.resetAuthentication();
-      setForceUpdate((n) => n + 1);
-    } else if (!wasEnabled && isEnabled && userIdOrUserWithProperties) {
-      // Transitioning from disabled→enabled: authenticate
+    if (enabled && userIdOrUserWithProperties) {
+      // When enabled, authenticate (or re-authenticate if user/token changed)
+      // Note: authenticate() handles re-auth internally if userId/userToken changed
       knockClient.authenticate(userIdOrUserWithProperties, userToken, {
         onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
-        timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+        timeBeforeExpirationInMs:
+          authenticateOptions.timeBeforeExpirationInMs,
         identificationStrategy: authenticateOptions.identificationStrategy,
       });
       setForceUpdate((n) => n + 1);
-    } else if (isEnabled && userIdOrUserWithProperties) {
-      // If enabled and user/token changed, reauthenticate
-      const userId =
-        typeof userIdOrUserWithProperties === "string"
-          ? userIdOrUserWithProperties
-          : userIdOrUserWithProperties?.id;
-
-      if (
-        knockClient.userId !== userId ||
-        knockClient.userToken !== userToken
-      ) {
-        knockClient.authenticate(userIdOrUserWithProperties, userToken, {
-          onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
-          timeBeforeExpirationInMs:
-            authenticateOptions.timeBeforeExpirationInMs,
-          identificationStrategy: authenticateOptions.identificationStrategy,
-        });
-      }
+    } else if (!enabled && knockClient.isAuthenticated()) {
+      // When disabled, reset authentication if currently authenticated
+      knockClient.resetAuthentication();
+      setForceUpdate((n) => n + 1);
     }
-
-    prevEnabledRef.current = enabled;
   }, [
     enabled,
     knockClient,
