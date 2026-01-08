@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { createMockKnock } from "../../../client/test/test-utils/mocks";
@@ -290,7 +290,7 @@ describe("KnockProvider", () => {
       );
     });
 
-    test("changing identification strategy from skip to inline enables identification", () => {
+    test("changing identification strategy from skip to inline enables identification", async () => {
       const TestConsumer = () => {
         const knock = useKnockClient();
         return <div data-testid="consumer-msg">User Id: {knock.userId}</div>;
@@ -329,14 +329,16 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Verify identify is now called
-      expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: "PUT",
-          url: "/v1/users/test_user_id",
-          data: { name: "John Doe", email: "john@example.com" },
-        }),
-      );
+      // Wait for the effect to complete
+      await waitFor(() => {
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: "PUT",
+            url: "/v1/users/test_user_id",
+            data: { name: "John Doe", email: "john@example.com" },
+          }),
+        );
+      });
     });
   });
 
@@ -422,7 +424,7 @@ describe("KnockProvider", () => {
       expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
     });
 
-    test("toggling enabled from false to true initializes authentication", () => {
+    test("toggling enabled from false to true initializes authentication", async () => {
       const TestConsumer = () => {
         const knock = useKnockClient();
         return (
@@ -457,8 +459,11 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Should now be authenticated
-      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
+      // Wait for the effect to complete
+      await waitFor(() => {
+        expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
+      });
+
       expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: "PUT",
@@ -468,7 +473,7 @@ describe("KnockProvider", () => {
       );
     });
 
-    test("toggling enabled from true to false creates new unauthenticated client", () => {
+    test("toggling enabled from true to false calls resetAuthentication", async () => {
       const TestConsumer = () => {
         const knock = useKnockClient();
         return (
@@ -491,9 +496,13 @@ describe("KnockProvider", () => {
       // Initially authenticated
       expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
 
-      // Clear the authenticated state for the mock (simulating a new instance)
-      knock.userId = undefined;
-      knock.userToken = undefined;
+      // Spy on resetAuthentication and have it actually clear the auth state
+      const resetAuthSpy = vi.spyOn(knock, "resetAuthentication").mockImplementation(() => {
+        knock.userId = undefined;
+        knock.userToken = undefined;
+        knock.feeds.teardownInstances();
+        knock.teardown();
+      });
 
       // Disable the provider
       rerender(
@@ -506,7 +515,12 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Client still exists but not authenticated (because we created a new instance)
+      // Wait for the effect to complete
+      await waitFor(() => {
+        expect(resetAuthSpy).toHaveBeenCalled();
+      });
+
+      // Client still exists but not authenticated
       expect(getByTestId("consumer-msg")).toHaveTextContent("API Key: test_api_key");
       expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
     });

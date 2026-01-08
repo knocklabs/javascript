@@ -772,4 +772,58 @@ describe("Knock Client", () => {
       expect(knock.isAuthenticated(true)).toBe(true);
     });
   });
+
+  describe("resetAuthentication", () => {
+    test("clears userId and userToken", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate("user_123", "token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+      expect(knock.userId).toBe("user_123");
+      expect(knock.userToken).toBe("token_456");
+
+      knock.resetAuthentication();
+
+      expect(knock.isAuthenticated()).toBe(false);
+      expect(knock.userId).toBeUndefined();
+      expect(knock.userToken).toBeUndefined();
+    });
+
+    test("tears down feed instances", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const teardownSpy = vi.spyOn(knock.feeds, "teardownInstances");
+
+      knock.resetAuthentication();
+
+      expect(teardownSpy).toHaveBeenCalled();
+    });
+
+    test("calls teardown to clean up connections", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const teardownSpy = vi.spyOn(knock, "teardown");
+
+      knock.resetAuthentication();
+
+      expect(teardownSpy).toHaveBeenCalled();
+    });
+
+    test("can re-authenticate after reset", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate("user_123", "token_456");
+      expect(knock.userId).toBe("user_123");
+
+      knock.resetAuthentication();
+      expect(knock.isAuthenticated()).toBe(false);
+
+      knock.authenticate("user_456", "token_789");
+      expect(knock.isAuthenticated()).toBe(true);
+      expect(knock.userId).toBe("user_456");
+      expect(knock.userToken).toBe("token_789");
+    });
+  });
 });

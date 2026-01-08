@@ -165,6 +165,25 @@ class Knock {
     return checkUserToken ? !!(this.userId && this.userToken) : !!this.userId;
   }
 
+  /*
+    Resets the authentication state and tears down any active connections.
+    This is useful when you want to clear the current user session without destroying the Knock instance.
+  */
+  resetAuthentication() {
+    this.log("Resetting authentication state");
+    
+    // Teardown any active feeds and connections
+    this.feeds.teardownInstances();
+    this.teardown();
+    
+    // Clear authentication state
+    this.userId = undefined;
+    this.userToken = undefined;
+    
+    // Reinitialize the API client without credentials
+    this.apiClient = this.createApiClient();
+  }
+
   // Used to teardown any connected instances
   teardown() {
     if (this.tokenExpirationTimer) {

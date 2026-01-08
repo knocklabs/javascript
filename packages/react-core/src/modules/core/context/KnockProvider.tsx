@@ -97,25 +97,80 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
     ],
   );
 
-  // Create a Knock client instance - always instantiate, but conditionally authenticate
-  const knockClient = React.useMemo(() => {
-    const knock = new Knock(apiKey ?? "", {
-      host: authenticateOptions.host,
-      logLevel: authenticateOptions.logLevel,
-      branch: authenticateOptions.branch,
-    });
+  // Create and manage Knock client instance
+  const [forceUpdate, setForceUpdate] = React.useState(0);
+  const knockClient = React.useMemo(
+    () => {
+      const knock = new Knock(apiKey ?? "", {
+        host: authenticateOptions.host,
+        logLevel: authenticateOptions.logLevel,
+        branch: authenticateOptions.branch,
+      });
 
-    // Only authenticate if enabled
-    if (enabled && userIdOrUserWithProperties) {
-      knock.authenticate(userIdOrUserWithProperties, userToken, {
+      // Authenticate synchronously on creation if enabled
+      if (enabled && userIdOrUserWithProperties) {
+        knock.authenticate(userIdOrUserWithProperties, userToken, {
+          onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
+          timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+          identificationStrategy: authenticateOptions.identificationStrategy,
+        });
+      }
+
+      return knock;
+    },
+    // We intentionally omit enabled, userIdOrUserWithProperties, and userToken
+    // to reuse the same instance when these change. Auth state changes are handled
+    // in the effect below via resetAuthentication()/authenticate() calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [apiKey, authenticateOptions, forceUpdate],
+  );
+
+  // Track previous enabled state to detect transitions
+  const prevEnabledRef = React.useRef(enabled);
+
+  React.useEffect(() => {
+    const wasEnabled = prevEnabledRef.current;
+    const isEnabled = enabled;
+
+    if (wasEnabled && !isEnabled && knockClient.isAuthenticated()) {
+      // Transitioning from enabled→disabled: reset auth and force update
+      knockClient.resetAuthentication();
+      setForceUpdate((n) => n + 1);
+    } else if (!wasEnabled && isEnabled && userIdOrUserWithProperties) {
+      // Transitioning from disabled→enabled: authenticate
+      knockClient.authenticate(userIdOrUserWithProperties, userToken, {
         onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
         timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
         identificationStrategy: authenticateOptions.identificationStrategy,
       });
+      setForceUpdate((n) => n + 1);
+    } else if (isEnabled && userIdOrUserWithProperties) {
+      // If enabled and user/token changed, reauthenticate
+      const userId =
+        typeof userIdOrUserWithProperties === "string"
+          ? userIdOrUserWithProperties
+          : userIdOrUserWithProperties?.id;
+
+      if (
+        knockClient.userId !== userId ||
+        knockClient.userToken !== userToken
+      ) {
+        knockClient.authenticate(userIdOrUserWithProperties, userToken, {
+          onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
+          timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+          identificationStrategy: authenticateOptions.identificationStrategy,
+        });
+      }
     }
 
-    return knock;
-  }, [apiKey, authenticateOptions, enabled, userIdOrUserWithProperties, userToken]);
+    prevEnabledRef.current = enabled;
+  }, [
+    enabled,
+    knockClient,
+    userIdOrUserWithProperties,
+    userToken,
+    authenticateOptions,
+  ]);
 
   // Cleanup on unmount
   React.useEffect(() => {
