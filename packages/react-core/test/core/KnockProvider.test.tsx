@@ -3,7 +3,12 @@ import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { createMockKnock } from "../../../client/test/test-utils/mocks";
-import { KnockProvider, useKnockClient, useTranslations } from "../../src";
+import {
+  KnockFeedProvider,
+  KnockProvider,
+  useKnockClient,
+  useTranslations,
+} from "../../src";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
@@ -29,6 +34,9 @@ mockApiClient.makeRequest.mockImplementation(async ({ method, url, data }) => {
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  // Reset the knock instance state to prevent test pollution
+  knock.userId = undefined;
+  knock.userToken = undefined;
 });
 
 describe("KnockProvider", () => {
@@ -389,45 +397,53 @@ describe("KnockProvider", () => {
       );
     });
 
-    test("useKnockClient throws error when enabled is false", () => {
+    test("useKnockClient returns unauthenticated client when enabled is false", () => {
       const TestConsumer = () => {
         const knock = useKnockClient();
-        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+        return (
+          <div data-testid="consumer-msg">
+            API Key: {knock.apiKey}, Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
       };
 
-      // Suppress console.error for this test since we expect an error
-      const originalError = console.error;
-      console.error = vi.fn();
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
 
-      expect(() =>
-        render(
-          <KnockProvider
-            apiKey="test_api_key"
-            user={{ id: "test_user_id" }}
-            enabled={false}
-          >
-            <TestConsumer />
-          </KnockProvider>,
-        ),
-      ).toThrow("useKnockClient must be used within a KnockProvider");
-
-      console.error = originalError;
+      // Client should exist but not be authenticated
+      expect(getByTestId("consumer-msg")).toHaveTextContent("API Key: test_api_key");
+      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
     });
 
     test("toggling enabled from false to true initializes authentication", () => {
-      const TestChild = () => <div data-testid="child">Child content</div>;
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return (
+          <div data-testid="consumer-msg">
+            Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
+      };
 
-      const { rerender } = render(
+      const { getByTestId, rerender } = render(
         <KnockProvider
           apiKey="test_api_key"
           user={{ id: "test_user_id", name: "John" }}
           enabled={false}
         >
-          <TestChild />
+          <TestConsumer />
         </KnockProvider>,
       );
 
-      // Verify no API calls when disabled
+      // Should not be authenticated initially
+      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
       expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
 
       // Enable the provider
@@ -437,11 +453,12 @@ describe("KnockProvider", () => {
           user={{ id: "test_user_id", name: "John" }}
           enabled={true}
         >
-          <TestChild />
+          <TestConsumer />
         </KnockProvider>,
       );
 
-      // Verify authentication happened
+      // Should now be authenticated
+      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
       expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: "PUT",
@@ -451,14 +468,14 @@ describe("KnockProvider", () => {
       );
     });
 
-    test("toggling enabled from true to false stops providing context", () => {
+    test("toggling enabled from true to false creates new unauthenticated client", () => {
       const TestConsumer = () => {
-        try {
-          const knock = useKnockClient();
-          return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
-        } catch {
-          return <div data-testid="error-msg">No context available</div>;
-        }
+        const knock = useKnockClient();
+        return (
+          <div data-testid="consumer-msg">
+            API Key: {knock.apiKey}, Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
       };
 
       const { getByTestId, rerender } = render(
@@ -471,10 +488,12 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Initially should work
-      expect(getByTestId("consumer-msg")).toHaveTextContent(
-        "API Key: test_api_key",
-      );
+      // Initially authenticated
+      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: true");
+
+      // Clear the authenticated state for the mock (simulating a new instance)
+      knock.userId = undefined;
+      knock.userToken = undefined;
 
       // Disable the provider
       rerender(
@@ -487,10 +506,9 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Now context should not be available
-      expect(getByTestId("error-msg")).toHaveTextContent(
-        "No context available",
-      );
+      // Client still exists but not authenticated (because we created a new instance)
+      expect(getByTestId("consumer-msg")).toHaveTextContent("API Key: test_api_key");
+      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
     });
 
     test("i18n context is still available when enabled is false", () => {
@@ -518,6 +536,34 @@ describe("KnockProvider", () => {
       expect(getByTestId("i18n-test")).toHaveTextContent(
         "Translation: Archive this notification",
       );
+    });
+
+    test("child providers can render when enabled is false", () => {
+      const TestChild = () => {
+        const knock = useKnockClient();
+        return (
+          <div data-testid="feed-test">
+            Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <KnockFeedProvider feedId="test-feed-id">
+            <TestChild />
+          </KnockFeedProvider>
+        </KnockProvider>,
+      );
+
+      // Child provider should render successfully
+      expect(getByTestId("feed-test")).toHaveTextContent("Authenticated: false");
+      // No API requests should be made
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
     });
   });
 });

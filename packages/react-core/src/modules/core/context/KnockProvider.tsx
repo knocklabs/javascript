@@ -7,7 +7,6 @@ import * as React from "react";
 import { PropsWithChildren } from "react";
 
 import { I18nContent, KnockI18nProvider } from "../../i18n";
-import { useAuthenticatedKnockClient } from "../hooks";
 
 export interface KnockProviderState {
   knock: Knock;
@@ -62,11 +61,7 @@ export type KnockProviderProps = {
     }
 );
 
-const AuthenticatedKnockProvider: React.FC<
-  PropsWithChildren<
-    Omit<KnockProviderProps, "enabled"> & { enabled: true | undefined }
-  >
-> = ({
+export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   apiKey,
   host,
   logLevel,
@@ -77,6 +72,7 @@ const AuthenticatedKnockProvider: React.FC<
   i18n,
   identificationStrategy,
   branch,
+  enabled = true,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -101,35 +97,37 @@ const AuthenticatedKnockProvider: React.FC<
     ],
   );
 
-  const knock = useAuthenticatedKnockClient(
-    apiKey ?? "",
-    userIdOrUserWithProperties,
-    userToken,
-    authenticateOptions,
-  );
+  // Create a Knock client instance - always instantiate, but conditionally authenticate
+  const knockClient = React.useMemo(() => {
+    const knock = new Knock(apiKey ?? "", {
+      host: authenticateOptions.host,
+      logLevel: authenticateOptions.logLevel,
+      branch: authenticateOptions.branch,
+    });
+
+    // Only authenticate if enabled
+    if (enabled && userIdOrUserWithProperties) {
+      knock.authenticate(userIdOrUserWithProperties, userToken, {
+        onUserTokenExpiring: authenticateOptions.onUserTokenExpiring,
+        timeBeforeExpirationInMs: authenticateOptions.timeBeforeExpirationInMs,
+        identificationStrategy: authenticateOptions.identificationStrategy,
+      });
+    }
+
+    return knock;
+  }, [apiKey, authenticateOptions, enabled, userIdOrUserWithProperties, userToken]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      knockClient.teardown();
+    };
+  }, [knockClient]);
 
   return (
-    <KnockContext.Provider value={{ knock }}>
+    <KnockContext.Provider value={{ knock: knockClient }}>
       <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>
     </KnockContext.Provider>
-  );
-};
-
-export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
-  enabled = true,
-  children,
-  i18n,
-  ...props
-}) => {
-  // When disabled, skip authentication but still provide i18n context
-  if (!enabled) {
-    return <KnockI18nProvider i18n={i18n}>{children}</KnockI18nProvider>;
-  }
-
-  return (
-    <AuthenticatedKnockProvider enabled={enabled} i18n={i18n} {...props}>
-      {children}
-    </AuthenticatedKnockProvider>
   );
 };
 
