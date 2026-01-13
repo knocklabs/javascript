@@ -166,9 +166,11 @@ export type GuideSocketEvent =
 
 export interface KnockGuideStep<TContent = Any>
   extends GuideStepData<TContent> {
-  markAsSeen: () => void;
-  markAsInteracted: (params?: { metadata?: GenericData }) => void;
-  markAsArchived: () => void;
+  markAsSeen: () => Promise<KnockGuideStep<TContent> | undefined>;
+  markAsInteracted: (params?: {
+    metadata?: GenericData;
+  }) => Promise<KnockGuideStep<TContent> | undefined>;
+  markAsArchived: () => Promise<KnockGuideStep<TContent> | undefined>;
 }
 
 export interface KnockGuideActivationUrlPattern
