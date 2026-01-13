@@ -952,17 +952,12 @@ export class KnockGuideClient {
         ...rest,
         message: { ...message },
         markAsSeen() {
-          // Send a seen event if it has not been previously seen.
-          if (this.message.seen_at) return;
           return self.markAsSeen(localGuide, this);
         },
         markAsInteracted({ metadata }: { metadata?: GenericData } = {}) {
-          // Always send an interaction event through.
           return self.markAsInteracted(localGuide, this, metadata);
         },
         markAsArchived() {
-          // Send an archived event if it has not been previously archived.
-          if (this.message.archived_at) return;
           return self.markAsArchived(localGuide, this);
         },
       };
