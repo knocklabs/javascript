@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.2
+
+### Patch Changes
+
+- 09c11a3: [guides] fix: KnockGuideStep type definition to return a promise from async methods
+
 ## 0.20.1
 
 ### Patch Changes
