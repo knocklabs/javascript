@@ -176,6 +176,11 @@ class Feed {
   }
 
   async markAsSeen(itemOrItems: FeedItemOrItems) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAsSeen - user not authenticated");
+      return { entries: [] };
+    }
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -188,6 +193,11 @@ class Feed {
   }
 
   async markAllAsSeen() {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAllAsSeen - user not authenticated");
+      return { entries: [] };
+    }
+
     // To mark all of the messages as seen we:
     // 1. Optimistically update *everything* we have in the store
     // 2. We decrement the `unseen_count` to zero optimistically
@@ -230,6 +240,11 @@ class Feed {
   }
 
   async markAsUnseen(itemOrItems: FeedItemOrItems) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAsUnseen - user not authenticated");
+      return { entries: [] };
+    }
+
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
       "unseen",
@@ -241,6 +256,11 @@ class Feed {
   }
 
   async markAsRead(itemOrItems: FeedItemOrItems) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAsRead - user not authenticated");
+      return { entries: [] };
+    }
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -253,6 +273,11 @@ class Feed {
   }
 
   async markAllAsRead() {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAllAsRead - user not authenticated");
+      return { entries: [] };
+    }
+
     // To mark all of the messages as read we:
     // 1. Optimistically update *everything* we have in the store
     // 2. We decrement the `unread_count` to zero optimistically
@@ -295,6 +320,11 @@ class Feed {
   }
 
   async markAsUnread(itemOrItems: FeedItemOrItems) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAsUnread - user not authenticated");
+      return { entries: [] };
+    }
+
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
       "unread",
@@ -309,6 +339,13 @@ class Feed {
     itemOrItems: FeedItemOrItems,
     metadata?: Record<string, string>,
   ) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Feed] Skipping markAsInteracted - user not authenticated",
+      );
+      return { entries: [] };
+    }
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -332,6 +369,11 @@ class Feed {
   TODO: how do we handle rollbacks?
   */
   async markAsArchived(itemOrItems: FeedItemOrItems) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping markAsArchived - user not authenticated");
+      return { entries: [] };
+    }
+
     const state = this.store.getState();
 
     const shouldOptimisticallyRemoveItems =
@@ -403,6 +445,13 @@ class Feed {
   }
 
   async markAllAsArchived() {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Feed] Skipping markAllAsArchived - user not authenticated",
+      );
+      return { entries: [] };
+    }
+
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
@@ -430,6 +479,13 @@ class Feed {
   }
 
   async markAllReadAsArchived() {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Feed] Skipping markAllReadAsArchived - user not authenticated",
+      );
+      return { entries: [] };
+    }
+
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
@@ -472,6 +528,13 @@ class Feed {
   }
 
   async markAsUnarchived(itemOrItems: FeedItemOrItems) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Feed] Skipping markAsUnarchived - user not authenticated",
+      );
+      return { entries: [] };
+    }
+
     const state = this.store.getState();
 
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
@@ -518,6 +581,11 @@ class Feed {
 
   /* Fetches the feed content, appending it to the store */
   async fetch(options: FetchFeedOptions = {}) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping fetch - user not authenticated");
+      return;
+    }
+
     const { networkStatus, ...state } = this.store.getState();
 
     // If the user is not authenticated, then do nothing
@@ -608,6 +676,11 @@ class Feed {
   }
 
   async fetchNextPage(options: FetchFeedOptions = {}) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Feed] Skipping fetchNextPage - user not authenticated");
+      return;
+    }
+
     // Attempts to fetch the next page of results (if we have any)
     const { pageInfo } = this.store.getState();
 

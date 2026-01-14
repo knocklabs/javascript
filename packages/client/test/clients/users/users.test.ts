@@ -612,15 +612,11 @@ describe("User Client", () => {
 
         await expect(
           client.getChannelData({ channelId: "test" }),
-        ).rejects.toThrow(
-          "Not authenticated. Please call `authenticate` first.",
-        );
+        ).rejects.toThrow("Not authenticated");
 
         await expect(
           client.setChannelData({ channelId: "test", channelData: {} }),
-        ).rejects.toThrow(
-          "Not authenticated. Please call `authenticate` first.",
-        );
+        ).rejects.toThrow("Not authenticated");
       });
 
       test("handles channel data operation errors", async () => {

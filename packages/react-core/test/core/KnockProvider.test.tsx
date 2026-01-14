@@ -1,9 +1,14 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { createMockKnock } from "../../../client/test/test-utils/mocks";
-import { KnockProvider, useKnockClient } from "../../src";
+import {
+  KnockFeedProvider,
+  KnockProvider,
+  useKnockClient,
+  useTranslations,
+} from "../../src";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
@@ -29,6 +34,9 @@ mockApiClient.makeRequest.mockImplementation(async ({ method, url, data }) => {
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  // Reset the knock instance state to prevent test pollution
+  knock.userId = undefined;
+  knock.userToken = undefined;
 });
 
 describe("KnockProvider", () => {
@@ -282,7 +290,7 @@ describe("KnockProvider", () => {
       );
     });
 
-    test("changing identification strategy from skip to inline enables identification", () => {
+    test("changing identification strategy from skip to inline enables identification", async () => {
       const TestConsumer = () => {
         const knock = useKnockClient();
         return <div data-testid="consumer-msg">User Id: {knock.userId}</div>;
@@ -321,14 +329,276 @@ describe("KnockProvider", () => {
         </KnockProvider>,
       );
 
-      // Verify identify is now called
+      // Wait for the effect to complete
+      await waitFor(() => {
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: "PUT",
+            url: "/v1/users/test_user_id",
+            data: { name: "John Doe", email: "john@example.com" },
+          }),
+        );
+      });
+    });
+  });
+
+  describe("enabled prop", () => {
+    test("does not double-authenticate on initial mount", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">User: {knock.userId}</div>;
+      };
+
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John" }}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Should only authenticate once, not twice
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("renders children without authentication when enabled is false", () => {
+      const TestChild = () => <div data-testid="child">Child content</div>;
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      expect(getByTestId("child")).toHaveTextContent("Child content");
+      // Verify no API calls were made (no authentication)
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+
+    test("authenticates normally when enabled is true (default)", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider apiKey="test_api_key" user={{ id: "test_user_id" }}>
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      expect(getByTestId("consumer-msg")).toHaveTextContent(
+        "API Key: test_api_key",
+      );
+    });
+
+    test("authenticates normally when enabled is explicitly true", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={true}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      expect(getByTestId("consumer-msg")).toHaveTextContent(
+        "API Key: test_api_key",
+      );
+    });
+
+    test("useKnockClient returns unauthenticated client when enabled is false", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return (
+          <div data-testid="consumer-msg">
+            API Key: {knock.apiKey}, Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Client should exist but not be authenticated
+      expect(getByTestId("consumer-msg")).toHaveTextContent("API Key: test_api_key");
+      expect(getByTestId("consumer-msg")).toHaveTextContent("Authenticated: false");
+    });
+
+    test("toggling enabled from false to true initializes authentication", async () => {
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return (
+          <div data-testid="consumer-msg">
+            Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
+      };
+
+      const { rerender } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John" }}
+          enabled={false}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Should not have authenticated when disabled
+      expect(authenticateSpy).not.toHaveBeenCalled();
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+
+      // Enable the provider
+      rerender(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John" }}
+          enabled={true}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Wait for the effect to complete and authentication to happen
+      await waitFor(() => {
+        expect(authenticateSpy).toHaveBeenCalledWith(
+          { id: "test_user_id", name: "John" },
+          undefined,
+          expect.any(Object),
+        );
+      });
+
       expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: "PUT",
           url: "/v1/users/test_user_id",
-          data: { name: "John Doe", email: "john@example.com" },
+          data: { name: "John" },
         }),
       );
+    });
+
+    test("toggling enabled from true to false calls resetAuthentication", async () => {
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+      const resetAuthSpy = vi.spyOn(knock, "resetAuthentication");
+
+      // Manually set authenticated state for this test
+      knock.userId = "test_user_id";
+
+      const TestChild = () => <div data-testid="child">Content</div>;
+
+      const { rerender } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={true}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      // Wait for initial authentication
+      await waitFor(() => {
+        expect(authenticateSpy).toHaveBeenCalled();
+      });
+
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(resetAuthSpy).not.toHaveBeenCalled();
+
+      // Disable the provider
+      rerender(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      // Wait for resetAuthentication to be called
+      await waitFor(() => {
+        expect(resetAuthSpy).toHaveBeenCalled();
+      });
+
+      expect(resetAuthSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("i18n context is still available when enabled is false", () => {
+      const TestChild = () => {
+        const { t, locale } = useTranslations();
+        return (
+          <div data-testid="i18n-test">
+            Locale: {locale}, Translation: {t("archiveNotification")}
+          </div>
+        );
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <TestChild />
+        </KnockProvider>,
+      );
+
+      // i18n should still work (with default locale and translations)
+      expect(getByTestId("i18n-test")).toHaveTextContent("Locale: en");
+      expect(getByTestId("i18n-test")).toHaveTextContent(
+        "Translation: Archive this notification",
+      );
+    });
+
+    test("child providers can render when enabled is false", () => {
+      const TestChild = () => {
+        const knock = useKnockClient();
+        return (
+          <div data-testid="feed-test">
+            Authenticated: {String(knock.isAuthenticated())}
+          </div>
+        );
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id" }}
+          enabled={false}
+        >
+          <KnockFeedProvider feedId="test-feed-id">
+            <TestChild />
+          </KnockFeedProvider>
+        </KnockProvider>,
+      );
+
+      // Child provider should render successfully
+      expect(getByTestId("feed-test")).toHaveTextContent("Authenticated: false");
+      // No API requests should be made
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
     });
   });
 });
