@@ -1,5 +1,11 @@
 # @knocklabs/expo
 
+## 0.4.5
+
+### Patch Changes
+
+- 73ff1e7: feat: rework the expo push provider to better support android
+
 ## 0.4.4
 
 ### Patch Changes

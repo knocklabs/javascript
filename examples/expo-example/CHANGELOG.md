@@ -1,5 +1,12 @@
 # @knocklabs/expo-example
 
+## 1.0.35
+
+### Patch Changes
+
+- Updated dependencies [73ff1e7]
+  - @knocklabs/expo@0.4.5
+
 ## 1.0.34
 
 ### Patch Changes
