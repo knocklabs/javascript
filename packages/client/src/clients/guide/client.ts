@@ -295,6 +295,7 @@ export class KnockGuideClient {
       guideGroups: [],
       guideGroupDisplayLogs: {},
       guides: {},
+      ineligibleGuides: {},
       previewGuides: {},
       queries: {},
       location,
@@ -376,7 +377,12 @@ export class KnockGuideClient {
       >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
-      const { entries, guide_groups: groups, guide_group_display_logs } = data;
+      const {
+        entries,
+        guide_groups: groups,
+        guide_group_display_logs,
+        ineligible_guides,
+      } = data;
 
       this.knock.log("[Guide] Loading fetched guides");
       this.store.setState((state) => ({
@@ -384,6 +390,7 @@ export class KnockGuideClient {
         guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
         guideGroupDisplayLogs: guide_group_display_logs || {},
         guides: byKey(entries.map((g) => this.localCopy(g))),
+        ineligibleGuides: byKey(ineligible_guides),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
     } catch (e) {
