@@ -24,6 +24,13 @@ vi.mock("expo-device", () => ({
   osName: "iOS",
 }));
 
+// Mock react-native Platform
+vi.mock("react-native", () => ({
+  Platform: {
+    OS: "ios",
+  },
+}));
+
 vi.mock("expo-notifications", () => ({
   setNotificationHandler: vi.fn(),
   getPermissionsAsync: vi.fn().mockResolvedValue({ status: "granted" }),
@@ -39,6 +46,10 @@ vi.mock("expo-notifications", () => ({
   },
 }));
 
+// Create stable mock functions for usePushNotifications
+const mockRegisterPushTokenToChannel = vi.fn().mockResolvedValue(undefined);
+const mockUnregisterPushTokenFromChannel = vi.fn().mockResolvedValue(undefined);
+
 // Mock the react-native providers
 vi.mock("@knocklabs/react-native", () => ({
   KnockPushNotificationProvider: ({
@@ -47,19 +58,22 @@ vi.mock("@knocklabs/react-native", () => ({
     children: React.ReactNode;
   }) => <div data-testid="mock-react-native-provider">{children}</div>,
   usePushNotifications: () => ({
-    registerPushTokenToChannel: vi.fn().mockResolvedValue(undefined),
-    unregisterPushTokenFromChannel: vi.fn().mockResolvedValue(undefined),
+    registerPushTokenToChannel: mockRegisterPushTokenToChannel,
+    unregisterPushTokenFromChannel: mockUnregisterPushTokenFromChannel,
   }),
 }));
 
+// Create a stable mock for knockClient
+const mockKnockClient = {
+  log: vi.fn(),
+  isAuthenticated: vi.fn().mockReturnValue(true),
+  messages: {
+    updateStatus: vi.fn(),
+  },
+};
+
 vi.mock("@knocklabs/react-core", () => ({
-  useKnockClient: () => ({
-    log: vi.fn(),
-    isAuthenticated: vi.fn().mockReturnValue(true),
-    messages: {
-      updateStatus: vi.fn(),
-    },
-  }),
+  useKnockClient: () => mockKnockClient,
 }));
 
 describe("KnockExpoPushNotificationProvider", () => {
@@ -94,6 +108,11 @@ describe("KnockExpoPushNotificationProvider", () => {
   });
 
   test("renders with custom Android notification channel setup", async () => {
+    // Set platform to Android so the custom setup function gets called
+    const ReactNativeMock = await import("react-native");
+    const originalOS = ReactNativeMock.Platform.OS;
+    vi.mocked(ReactNativeMock.Platform).OS = "android";
+
     const customSetup = vi.fn().mockResolvedValue(undefined);
     const TestChild = () => <div data-testid="test-child">Test Child</div>;
 
@@ -112,8 +131,10 @@ describe("KnockExpoPushNotificationProvider", () => {
     await waitFor(() => {
       expect(customSetup).toHaveBeenCalled();
     });
-  });
 
+    // Restore original Platform.OS
+    vi.mocked(ReactNativeMock.Platform).OS = originalOS;
+  });
 
   test("does not register when autoRegister is false", () => {
     const TestChild = () => <div data-testid="test-child">Test Child</div>;
@@ -137,7 +158,9 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
 
     expect(result.current).toHaveProperty("expoPushToken");
     expect(result.current).toHaveProperty("registerForPushNotifications");
@@ -165,12 +188,14 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
 
     const token = await result.current.registerForPushNotifications();
 
     expect(token).toBe("test-token");
-    
+
     // Wait for state to update
     await waitFor(() => {
       expect(result.current.expoPushToken).toBe("test-token");
@@ -184,7 +209,9 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
     const mockHandler = vi.fn();
 
     result.current.onNotificationReceived(mockHandler);
@@ -200,7 +227,9 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
     const mockHandler = vi.fn();
 
     result.current.onNotificationTapped(mockHandler);
@@ -210,10 +239,10 @@ describe("KnockExpoPushNotificationProvider", () => {
   });
 
   test("calls setNotificationChannelAsync on Android devices", async () => {
-    // Temporarily mock as Android
-    const DeviceMock = await import("expo-device");
-    const originalOsName = DeviceMock.osName;
-    vi.mocked(DeviceMock).osName = "Android";
+    // Temporarily mock as Android using Platform.OS
+    const ReactNativeMock = await import("react-native");
+    const originalOS = ReactNativeMock.Platform.OS;
+    vi.mocked(ReactNativeMock.Platform).OS = "android";
 
     const NotificationsMock = await import("expo-notifications");
     const setChannelSpy = vi.mocked(
@@ -239,14 +268,14 @@ describe("KnockExpoPushNotificationProvider", () => {
       });
     });
 
-    // Restore original osName
-    vi.mocked(DeviceMock).osName = originalOsName;
+    // Restore original Platform.OS
+    vi.mocked(ReactNativeMock.Platform).OS = originalOS;
   });
 
   test("does not call setNotificationChannelAsync on non-Android devices", async () => {
-    // Ensure it's set as iOS
-    const DeviceMock = await import("expo-device");
-    vi.mocked(DeviceMock).osName = "iOS";
+    // Ensure it's set as iOS using Platform.OS
+    const ReactNativeMock = await import("react-native");
+    vi.mocked(ReactNativeMock.Platform).OS = "ios";
 
     const NotificationsMock = await import("expo-notifications");
     const setChannelSpy = vi.mocked(
@@ -272,7 +301,7 @@ describe("KnockExpoPushNotificationProvider", () => {
   test("handles errors during push token registration", async () => {
     const NotificationsMock = await import("expo-notifications");
     const getTokenSpy = vi.mocked(NotificationsMock.getExpoPushTokenAsync);
-    
+
     // Mock a failure
     getTokenSpy.mockRejectedValueOnce(new Error("Token fetch failed"));
 
@@ -285,7 +314,9 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
 
     const token = await result.current.registerForPushNotifications();
 
@@ -298,7 +329,7 @@ describe("KnockExpoPushNotificationProvider", () => {
   test("handles missing Expo config gracefully", async () => {
     const ConstantsMock = await import("expo-constants");
     const originalConfig = ConstantsMock.default.expoConfig;
-    
+
     // Mock missing config
     vi.mocked(ConstantsMock.default).expoConfig = undefined;
 
@@ -311,7 +342,9 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
 
     const token = await result.current.registerForPushNotifications();
 
@@ -324,7 +357,7 @@ describe("KnockExpoPushNotificationProvider", () => {
   test("returns null when running on simulator/non-device", async () => {
     const DeviceMock = await import("expo-device");
     const originalIsDevice = DeviceMock.isDevice;
-    
+
     // Mock as non-device (simulator)
     vi.mocked(DeviceMock).isDevice = false;
 
@@ -337,7 +370,9 @@ describe("KnockExpoPushNotificationProvider", () => {
       </KnockExpoPushNotificationProvider>
     );
 
-    const { result } = renderHook(() => useExpoPushNotifications(), { wrapper });
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
 
     const token = await result.current.registerForPushNotifications();
 
@@ -347,4 +382,217 @@ describe("KnockExpoPushNotificationProvider", () => {
     vi.mocked(DeviceMock).isDevice = originalIsDevice;
   });
 
+  test("sets up notification listeners on mount", async () => {
+    const NotificationsMock = await import("expo-notifications");
+    const addReceivedListenerSpy = vi.mocked(
+      NotificationsMock.addNotificationReceivedListener,
+    );
+    const addResponseListenerSpy = vi.mocked(
+      NotificationsMock.addNotificationResponseReceivedListener,
+    );
+
+    addReceivedListenerSpy.mockClear();
+    addResponseListenerSpy.mockClear();
+
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    render(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    // Verify listeners were set up
+    expect(addReceivedListenerSpy).toHaveBeenCalledTimes(1);
+    expect(addResponseListenerSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test("cleans up notification listeners on unmount", async () => {
+    const removeReceivedListener = vi.fn();
+    const removeResponseListener = vi.fn();
+
+    const NotificationsMock = await import("expo-notifications");
+    vi.mocked(
+      NotificationsMock.addNotificationReceivedListener,
+    ).mockReturnValue({
+      remove: removeReceivedListener,
+    });
+    vi.mocked(
+      NotificationsMock.addNotificationResponseReceivedListener,
+    ).mockReturnValue({
+      remove: removeResponseListener,
+    });
+
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    const { unmount } = render(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    // Unmount the component
+    unmount();
+
+    // Verify listeners were cleaned up
+    expect(removeReceivedListener).toHaveBeenCalled();
+    expect(removeResponseListener).toHaveBeenCalled();
+  });
+
+  test("notification received listener calls user handler via ref", async () => {
+    const NotificationsMock = await import("expo-notifications");
+    let capturedReceivedCallback: ((notification: unknown) => void) | null =
+      null;
+
+    vi.mocked(
+      NotificationsMock.addNotificationReceivedListener,
+    ).mockImplementation((callback) => {
+      capturedReceivedCallback = callback;
+      return { remove: vi.fn() };
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
+
+    // Set up a handler
+    const mockHandler = vi.fn();
+    result.current.onNotificationReceived(mockHandler);
+
+    // Simulate a notification being received
+    const mockNotification = {
+      request: { content: { data: {} } },
+    };
+
+    if (capturedReceivedCallback) {
+      capturedReceivedCallback(mockNotification);
+    }
+
+    // Verify the user's handler was called
+    expect(mockHandler).toHaveBeenCalledWith(mockNotification);
+  });
+
+  test("notification tapped listener calls user handler via ref", async () => {
+    const NotificationsMock = await import("expo-notifications");
+    let capturedResponseCallback: ((response: unknown) => void) | null = null;
+
+    vi.mocked(
+      NotificationsMock.addNotificationResponseReceivedListener,
+    ).mockImplementation((callback) => {
+      capturedResponseCallback = callback;
+      return { remove: vi.fn() };
+    });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={false}
+      >
+        {children}
+      </KnockExpoPushNotificationProvider>
+    );
+
+    const { result } = renderHook(() => useExpoPushNotifications(), {
+      wrapper,
+    });
+
+    // Set up a handler
+    const mockHandler = vi.fn();
+    result.current.onNotificationTapped(mockHandler);
+
+    // Simulate a notification being tapped
+    const mockResponse = {
+      notification: { request: { content: { data: {} } } },
+    };
+
+    if (capturedResponseCallback) {
+      capturedResponseCallback(mockResponse);
+    }
+
+    // Verify the user's handler was called
+    expect(mockHandler).toHaveBeenCalledWith(mockResponse);
+  });
+
+  test("setNotificationHandler is called with custom handler", async () => {
+    const NotificationsMock = await import("expo-notifications");
+    const setHandlerSpy = vi.mocked(NotificationsMock.setNotificationHandler);
+    setHandlerSpy.mockClear();
+
+    const customHandler = vi.fn().mockResolvedValue({
+      shouldShowAlert: false,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    });
+
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    render(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        customNotificationHandler={customHandler}
+        autoRegister={false}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    // Verify setNotificationHandler was called with the custom handler
+    expect(setHandlerSpy).toHaveBeenCalledWith({
+      handleNotification: customHandler,
+    });
+  });
+
+  test("auto-registration only runs once on mount", async () => {
+    const NotificationsMock = await import("expo-notifications");
+    const getTokenSpy = vi.mocked(NotificationsMock.getExpoPushTokenAsync);
+    getTokenSpy.mockClear();
+    getTokenSpy.mockResolvedValue({ data: "test-token" });
+
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    const { rerender } = render(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={true}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    // Wait for initial registration
+    await waitFor(() => {
+      expect(getTokenSpy).toHaveBeenCalledTimes(1);
+    });
+
+    // Re-render the component (simulating a parent re-render)
+    rerender(
+      <KnockExpoPushNotificationProvider
+        knockExpoChannelId="test-channel-id"
+        autoRegister={true}
+      >
+        <TestChild />
+      </KnockExpoPushNotificationProvider>,
+    );
+
+    // Wait a bit to ensure no additional calls
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    // Should still only be called once
+    expect(getTokenSpy).toHaveBeenCalledTimes(1);
+  });
 });
