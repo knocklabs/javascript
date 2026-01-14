@@ -1,5 +1,5 @@
 import { Button } from "@telegraph/button";
-import { Stack } from "@telegraph/layout";
+import { Box, Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { Minimize2 } from "lucide-react";
 import { useState } from "react";
@@ -9,51 +9,42 @@ import { MAX_Z_INDEX } from "./helpers";
 import "./styles.css";
 
 export const V2 = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  if (isCollapsed) {
-    return <KnockButton onClick={() => setIsCollapsed(false)} />;
-  }
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
-    <Stack
-      gap="2"
-      align="center"
+    <Box
       position="fixed"
       top="4"
       right="4"
-      backgroundColor="surface-2"
-      bg="surface-2"
-      shadow="3"
-      rounded="3"
-      py="2"
-      px="3"
       data-tgph-appearance="dark"
       style={{ zIndex: MAX_Z_INDEX }}
     >
-      <Stack gap="2" align="center" direction="row">
-        <Text
-          as="div"
-          size="1"
-          weight="medium"
-          w="full"
-          maxWidth="40"
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
+      {isCollapsed ? (
+        <KnockButton onClick={() => setIsCollapsed(false)} />
+      ) : (
+        <Stack
+          backgroundColor="surface-2"
+          gap="2"
+          align="center"
+          shadow="3"
+          rounded="3"
+          py="2"
+          px="3"
         >
-          Toolbar v2 placeholder
-        </Text>
+          <Stack gap="2" align="center" direction="row">
+            <Text as="div" size="1" weight="medium" w="full" maxWidth="40">
+              Toolbar v2 placeholder
+            </Text>
 
-        <Button
-          onClick={() => setIsCollapsed(true)}
-          size="1"
-          variant="soft"
-          leadingIcon={{ icon: Minimize2, alt: "Collapse guide toolbar" }}
-        />
-      </Stack>
-    </Stack>
+            <Button
+              onClick={() => setIsCollapsed(true)}
+              size="1"
+              variant="soft"
+              leadingIcon={{ icon: Minimize2, alt: "Collapse guide toolbar" }}
+            />
+          </Stack>
+        </Stack>
+      )}
+    </Box>
   );
 };
