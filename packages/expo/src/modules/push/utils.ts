@@ -53,8 +53,7 @@ export function getProjectId(): string | null {
  * @returns The permission status string
  */
 export async function requestPushPermission(): Promise<string> {
-  const { status: existingStatus } =
-    await Notifications.getPermissionsAsync();
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
 
   if (existingStatus === "granted") {
     return existingStatus;
