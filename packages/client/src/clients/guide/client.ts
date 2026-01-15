@@ -83,7 +83,7 @@ export const guidesApiRootPath = (userId: string | undefined | null) =>
 // Detect debug params from URL or local storage
 const detectDebugParams = (): DebugState => {
   const win = checkForWindow();
-  if (!win) {
+  if (!win || !win.location) {
     return { forcedGuideKey: null, previewSessionId: null };
   }
 
@@ -287,7 +287,7 @@ export class KnockGuideClient {
     } = options;
     const win = checkForWindow();
 
-    const location = trackLocationFromWindow ? win?.location.href : undefined;
+    const location = trackLocationFromWindow ? win?.location?.href : undefined;
 
     const debug = detectDebugParams();
 
@@ -552,7 +552,7 @@ export class KnockGuideClient {
 
     // Remove URL query params if present
     // Only update the URL if params need to be cleared to avoid unnecessary navigations
-    if (win) {
+    if (win?.location) {
       const url = new URL(win.location.href);
       if (
         url.searchParams.has(DEBUG_QUERY_PARAMS.GUIDE_KEY) ||
@@ -1192,7 +1192,7 @@ export class KnockGuideClient {
 
   private listenForLocationChangesFromWindow() {
     const win = checkForWindow();
-    if (win?.history) {
+    if (win?.history && win?.addEventListener) {
       // 1. Listen for browser back/forward button clicks.
       win.addEventListener("popstate", this.handleLocationChange);
 
@@ -1233,7 +1233,7 @@ export class KnockGuideClient {
 
   removeLocationChangeEventListeners() {
     const win = checkForWindow();
-    if (!win?.history) return;
+    if (!win?.history || !win?.removeEventListener) return;
 
     win.removeEventListener("popstate", this.handleLocationChange);
     win.removeEventListener("hashchange", this.handleLocationChange);
