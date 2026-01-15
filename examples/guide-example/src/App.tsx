@@ -65,6 +65,7 @@ function App() {
         readyToTarget={true}
         listenForUpdates={true}
         colorMode={colorMode}
+        toolbar="v2"
       >
         <div style={{ padding: "1rem 2rem" }}>
           <h1>Knock In-App Guide Example</h1>

@@ -43,7 +43,6 @@ export {
   Card,
   CardView,
   KnockGuideProvider,
-  GuideToolbar as KnockGuideToolbar,
   Modal,
   ModalView,
 } from "./modules/guide";
