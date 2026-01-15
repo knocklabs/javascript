@@ -157,29 +157,11 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   const defaultGroup = findDefaultGroup(state.guideGroups);
   if (!defaultGroup) return result;
 
-  const displaySequence = [...defaultGroup.display_sequence];
+  const displaySequence = defaultGroup.display_sequence;
   const location = state.location;
 
-  // If in debug mode, put the forced guide at the beginning of the display sequence.
-  if (state.debug.forcedGuideKey) {
-    const forcedKeyIndex = displaySequence.indexOf(state.debug.forcedGuideKey);
-    if (forcedKeyIndex > -1) {
-      displaySequence.splice(forcedKeyIndex, 1);
-    }
-    displaySequence.unshift(state.debug.forcedGuideKey);
-  }
-
   for (const [index, guideKey] of displaySequence.entries()) {
-    let guide = state.guides[guideKey];
-
-    // Use preview guide if it exists and matches the forced guide key
-    if (
-      state.debug.forcedGuideKey === guideKey &&
-      state.previewGuides[guideKey]
-    ) {
-      guide = state.previewGuides[guideKey];
-    }
-
+    const guide = state.previewGuides[guideKey] || state.guides[guideKey];
     if (!guide) continue;
 
     const affirmed = predicate(guide, {
@@ -215,11 +197,11 @@ const predicate = (
     return false;
   }
 
-  // Bypass filtering if the debugged guide matches the given filters.
-  // This should always run AFTER checking the filters but BEFORE
-  // checking archived status and location rules.
-  if (debug.forcedGuideKey === guide.key) {
-    return true;
+  // If in debug mode with a forced guide key, bypass other filtering and always
+  // return true for that guide only. This should always run AFTER checking the
+  // filters but BEFORE checking archived status and location rules.
+  if (debug.forcedGuideKey) {
+    return debug.forcedGuideKey === guide.key;
   }
 
   if (!guide.active) {
@@ -743,17 +725,8 @@ export class KnockGuideClient {
     // callback to a setTimeout, but just to be safe.
     this.ensureClearTimeout();
 
-    // If in debug mode, try to resolve the forced guide, otherwise return the first non-undefined guide.
-    let resolved = undefined;
-    if (this.store.state.debug.forcedGuideKey) {
-      resolved = this.stage.ordered.find(
-        (x) => x === this.store.state.debug.forcedGuideKey,
-      );
-    }
-
-    if (!resolved) {
-      resolved = this.stage.ordered.find((x) => x !== undefined);
-    }
+    // Resolve to the first non-undefined guide in the stage.
+    const resolved = this.stage.ordered.find((x) => x !== undefined);
 
     this.knock.log(
       `[Guide] Closing the current group stage: resolved=${resolved}`,
