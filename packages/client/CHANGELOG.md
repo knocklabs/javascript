@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.3
+
+### Patch Changes
+
+- cf04e5f: [guides] check window properties in browser specific code paths for react native
+
 ## 0.20.2
 
 ### Patch Changes
