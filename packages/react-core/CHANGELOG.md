@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.12.3
+
+### Patch Changes
+
+- Updated dependencies [cf04e5f]
+  - @knocklabs/client@0.20.3
+
 ## 0.12.2
 
 ### Patch Changes
