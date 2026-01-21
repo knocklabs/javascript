@@ -13,7 +13,7 @@ const DEFAULT_SLACK_SCOPES = [
 ];
 
 type UseSlackAuthOutput = {
-  buildSlackAuthUrl: (requestId: string) => string;
+  buildSlackAuthUrl: () => string;
   disconnectFromSlack: () => void;
 };
 
@@ -82,11 +82,10 @@ function useSlackAuth(
     setActionLabel,
   ]);
 
-  const buildSlackAuthUrl = useCallback((requestId: string) => {
+  const buildSlackAuthUrl = useCallback(() => {
     const rawParams = {
       state: JSON.stringify({
         redirect_url: redirectUrl,
-        request_id: requestId,
         access_token_object: {
           object_id: tenantId,
           collection: TENANT_OBJECT_COLLECTION,
