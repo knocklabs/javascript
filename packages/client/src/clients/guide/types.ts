@@ -65,6 +65,13 @@ export interface GuideGroupData {
   updated_at: string;
 }
 
+export type GuideIneligibilityMarker = {
+  __typename: "GuideIneligibilityMarker";
+  key: KnockGuide["key"];
+  reason: string;
+  message: string;
+};
+
 export type GetGuidesQueryParams = {
   data?: string;
   tenant?: string;
@@ -76,6 +83,7 @@ export type GetGuidesResponse = {
   entries: GuideData[];
   guide_groups: GuideGroupData[];
   guide_group_display_logs: Record<GuideGroupData["key"], string>;
+  ineligible_guides: GuideIneligibilityMarker[];
 };
 
 //
@@ -202,6 +210,10 @@ export type StoreState = {
   guideGroups: GuideGroupData[];
   guideGroupDisplayLogs: Record<GuideGroupData["key"], string>;
   guides: Record<KnockGuide["key"], KnockGuide>;
+  ineligibleGuides: Record<
+    GuideIneligibilityMarker["key"],
+    GuideIneligibilityMarker
+  >;
   previewGuides: Record<KnockGuide["key"], KnockGuide>;
   queries: Record<QueryKey, QueryStatus>;
   location: string | undefined;
