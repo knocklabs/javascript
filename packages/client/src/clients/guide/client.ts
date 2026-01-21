@@ -270,13 +270,15 @@ export class KnockGuideClient {
   ) {
     const {
       trackLocationFromWindow = true,
+      // TODO: Remove this option once we ship guide toolbar v2, and offload
+      // as much debugging specific logic and responsibilities to toolbar.
+      trackDebugParams = false,
       throttleCheckInterval = DEFAULT_COUNTER_INCREMENT_INTERVAL,
     } = options;
     const win = checkForWindow();
 
     const location = trackLocationFromWindow ? win?.location?.href : undefined;
-
-    const debug = detectDebugParams();
+    const debug = trackDebugParams ? detectDebugParams() : undefined;
 
     this.store = new Store<StoreState>({
       guideGroups: [],
@@ -412,8 +414,8 @@ export class KnockGuideClient {
     const params = {
       ...this.targetParams,
       user_id: this.knock.userId,
-      force_all_guides: debugState.forcedGuideKey ? true : undefined,
-      preview_session_id: debugState.previewSessionId || undefined,
+      force_all_guides: debugState?.forcedGuideKey ? true : undefined,
+      preview_session_id: debugState?.previewSessionId || undefined,
     };
 
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
@@ -558,6 +560,39 @@ export class KnockGuideClient {
         url.searchParams.delete(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
         win.location.href = url.toString();
       }
+    }
+  }
+
+  setDebug(debugOpts?: Omit<DebugState, "debugging">) {
+    this.knock.log("[Guide] .setDebug()");
+    const shouldRefetch = !this.store.state.debug?.debugging;
+
+    this.store.setState((state) => ({
+      ...state,
+      debug: { ...debugOpts, debugging: true },
+    }));
+
+    if (shouldRefetch) {
+      this.knock.log(
+        `[Guide] Start debugging, refetching guides and resubscribing to the websocket channel`,
+      );
+      this.fetch();
+      this.subscribe();
+    }
+  }
+
+  unsetDebug() {
+    this.knock.log("[Guide] .unsetDebug()");
+    const shouldRefetch = this.store.state.debug?.debugging;
+
+    this.store.setState((state) => ({ ...state, debug: undefined }));
+
+    if (shouldRefetch) {
+      this.knock.log(
+        `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
+      );
+      this.fetch();
+      this.subscribe();
     }
   }
 
@@ -924,7 +959,7 @@ export class KnockGuideClient {
       // Get the next unarchived step.
       getStep() {
         // If debugging this guide, return the first step regardless of archive status
-        if (self.store.state.debug.forcedGuideKey === this.key) {
+        if (self.store.state.debug?.forcedGuideKey === this.key) {
           return this.steps[0];
         }
 
@@ -981,7 +1016,7 @@ export class KnockGuideClient {
 
     // Append debug params
     const debugState = this.store.state.debug;
-    if (debugState.forcedGuideKey) {
+    if (debugState?.forcedGuideKey || debugState?.debugging) {
       combinedParams.force_all_guides = true;
     }
 
@@ -1150,8 +1185,15 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Detected a location change: ${href}`);
 
+    if (!this.options.trackDebugParams) {
+      this.setLocation(href);
+      return;
+    }
+
+    // TODO: Remove below once we ship toolbar v2.
+
     // If entering debug mode, fetch all guides.
-    const currentDebugParams = this.store.state.debug;
+    const currentDebugParams = this.store.state.debug || {};
     const newDebugParams = detectDebugParams();
 
     this.setLocation(href, { debug: newDebugParams });

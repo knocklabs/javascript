@@ -202,6 +202,7 @@ export type QueryStatus = {
 };
 
 export type DebugState = {
+  debugging?: boolean;
   forcedGuideKey?: string | null;
   previewSessionId?: string | null;
 };
@@ -218,7 +219,7 @@ export type StoreState = {
   queries: Record<QueryKey, QueryStatus>;
   location: string | undefined;
   counter: number;
-  debug: DebugState;
+  debug?: DebugState;
 };
 
 export type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
@@ -241,6 +242,7 @@ export type TargetParams = {
 
 export type ConstructorOpts = {
   trackLocationFromWindow?: boolean;
+  trackDebugParams?: boolean;
   orderResolutionDuration?: number;
   throttleCheckInterval?: number;
 };

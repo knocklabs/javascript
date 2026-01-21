@@ -165,7 +165,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       });
     });
 
@@ -194,7 +194,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com",
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       });
     });
 
@@ -211,7 +211,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       });
     });
 
@@ -234,7 +234,7 @@ describe("KnockGuideClient", () => {
       });
 
       expect(() => {
-        new KnockGuideClient(mockKnock, channelId);
+        new KnockGuideClient(mockKnock, channelId, {}, { trackDebugParams: true });
       }).not.toThrow();
 
       expect(mockLocalStorageWithErrors.setItem).toHaveBeenCalled();
@@ -2959,7 +2959,7 @@ describe("KnockGuideClient", () => {
         mockKnock,
         channelId,
         {},
-        { trackLocationFromWindow: true },
+        { trackLocationFromWindow: true, trackDebugParams: true },
       );
 
       client.store.state.debug = { forcedGuideKey: null };
@@ -3016,7 +3016,7 @@ describe("KnockGuideClient", () => {
         mockKnock,
         channelId,
         {},
-        { trackLocationFromWindow: true },
+        { trackLocationFromWindow: true, trackDebugParams: true },
       );
 
       client.store.state.debug = { forcedGuideKey: "test_guide" };
