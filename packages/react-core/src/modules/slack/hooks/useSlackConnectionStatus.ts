@@ -1,14 +1,8 @@
 import Knock from "@knocklabs/client";
 import { useEffect, useState } from "react";
 
+import { type ConnectionStatus } from "../../core/types";
 import { useTranslations } from "../../i18n";
-
-export type ConnectionStatus =
-  | "connecting"
-  | "connected"
-  | "disconnected"
-  | "error"
-  | "disconnecting";
 
 type UseSlackConnectionStatusOutput = {
   connectionStatus: ConnectionStatus;

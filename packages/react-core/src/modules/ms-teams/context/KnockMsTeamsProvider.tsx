@@ -1,10 +1,9 @@
 import * as React from "react";
 import { PropsWithChildren, useRef } from "react";
 
-import { useKnockClient } from "../../core";
+import { type ConnectionStatus, useKnockClient } from "../../core";
 import { msTeamsProviderKey } from "../../core/utils";
 import { useMsTeamsConnectionStatus } from "../hooks";
-import { ConnectionStatus } from "../hooks/useMsTeamsConnectionStatus";
 
 export interface KnockMsTeamsProviderState {
   knockMsTeamsChannelId: string;

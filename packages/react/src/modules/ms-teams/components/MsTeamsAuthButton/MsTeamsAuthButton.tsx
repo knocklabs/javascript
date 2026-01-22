@@ -1,10 +1,12 @@
 import {
+  useAuthPolling,
+  useAuthPostMessageListener,
   useKnockClient,
   useKnockMsTeamsClient,
   useMsTeamsAuth,
   useTranslations,
 } from "@knocklabs/react-core";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, useCallback } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
 import "../../theme.css";
@@ -58,109 +60,24 @@ export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
     redirectUrl,
   );
 
-  useEffect(() => {
-    const receiveMessage = (event: MessageEvent) => {
-      if (event.origin !== knock.host) {
-        return;
-      }
-
-      if (event.data === "authComplete") {
-        setConnectionStatus("connected");
-        onAuthenticationComplete?.(event.data);
-        // Clear popup ref so polling stops and doesn't trigger callback again
-        if (popupWindowRef.current && !popupWindowRef.current.closed) {
-          popupWindowRef.current.close();
-        }
-        popupWindowRef.current = null;
-      } else if (event.data === "authFailed") {
-        setConnectionStatus("error");
-        popupWindowRef.current = null;
-      }
-    };
-
-    window.addEventListener("message", receiveMessage, false);
-    return () => window.removeEventListener("message", receiveMessage);
-  }, [
-    knock.host,
-    onAuthenticationComplete,
-    setConnectionStatus,
+  useAuthPostMessageListener({
+    knockHost: knock.host,
     popupWindowRef,
-  ]);
+    setConnectionStatus,
+    onAuthenticationComplete,
+  });
 
-  useEffect(
-    () => {
-      let pollCount = 0;
-      const maxPolls = 90;
-      let popupClosedAt: number | null = null;
-      let isActive = true;
-
-      const pollInterval = setInterval(async () => {
-        if (!isActive) {
-          clearInterval(pollInterval);
-          return;
-        }
-
-        const popupWindow = popupWindowRef.current;
-        if (!popupWindow) {
-          return;
-        }
-
-        pollCount++;
-
-        // Check if popup is closed
-        const isPopupClosed = popupWindow.closed;
-        if (isPopupClosed && !popupClosedAt) {
-          popupClosedAt = Date.now();
-        }
-
-        // Stop condition 1: Max timeout reached
-        if (pollCount >= maxPolls) {
-          clearInterval(pollInterval);
-          setConnectionStatus("error");
-          return;
-        }
-
-        // Stop condition 2: Popup closed + grace period expired
-        if (popupClosedAt && Date.now() - popupClosedAt > 10000) {
-          clearInterval(pollInterval);
-          popupWindowRef.current = null;
-          return;
-        }
-
-        try {
-          const authRes = await knock.msTeams.authCheck({
-            tenant: tenantId,
-            knockChannelId: knockMsTeamsChannelId,
-          });
-
-          // Stop condition 3: Success detected
-          if (authRes.connection?.ok) {
-            clearInterval(pollInterval);
-            setConnectionStatus("connected");
-            if (onAuthenticationComplete) {
-              onAuthenticationComplete("authComplete");
-            }
-            if (popupWindow && !popupWindow.closed) {
-              popupWindow.close();
-            }
-            popupWindowRef.current = null;
-          }
-        } catch (_error) {
-          // Continue polling on error
-        }
-      }, 2000);
-
-      return () => {
-        isActive = false;
-        clearInterval(pollInterval);
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      // Empty deps - run once on mount and keep polling
-      // This is intentionally simple/brute force
-    ],
-  );
+  useAuthPolling({
+    popupWindowRef,
+    setConnectionStatus,
+    onAuthenticationComplete,
+    authCheckFn: useCallback(async () => {
+      return knock.msTeams.authCheck({
+        tenant: tenantId,
+        knockChannelId: knockMsTeamsChannelId,
+      });
+    }, [knock.msTeams, tenantId, knockMsTeamsChannelId]),
+  });
 
   const disconnectLabel = t("msTeamsDisconnect") || null;
   const reconnectLabel = t("msTeamsReconnect") || null;

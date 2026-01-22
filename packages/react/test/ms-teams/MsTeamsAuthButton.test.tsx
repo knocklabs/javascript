@@ -36,6 +36,9 @@ describe("MsTeamsAuthButton", () => {
       setActionLabel: vi.fn(),
       actionLabel: null,
       errorLabel: null,
+      tenantId: "tenant_123",
+      knockMsTeamsChannelId: "channel_123",
+      popupWindowRef: { current: null },
     };
 
     const { getByText } = render(
@@ -53,6 +56,9 @@ describe("MsTeamsAuthButton", () => {
       setActionLabel: vi.fn(),
       actionLabel: null,
       errorLabel: "Error",
+      tenantId: "tenant_123",
+      knockMsTeamsChannelId: "channel_123",
+      popupWindowRef: { current: null },
     };
 
     const { getByText } = render(

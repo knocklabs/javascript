@@ -1,11 +1,12 @@
 import {
+  useAuthPolling,
+  useAuthPostMessageListener,
   useKnockClient,
   useKnockSlackClient,
   useSlackAuth,
   useTranslations,
 } from "@knocklabs/react-core";
-import { FunctionComponent, useMemo } from "react";
-import { useEffect } from "react";
+import { FunctionComponent, useCallback, useMemo } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
 import "../../theme.css";
@@ -58,110 +59,24 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     useSlackAuthOptions,
   );
 
-  useEffect(() => {
-    const receiveMessage = (event: MessageEvent) => {
-      if (event.origin !== knock.host) {
-        return;
-      }
-
-      if (event.data === "authComplete") {
-        setConnectionStatus("connected");
-        if (onAuthenticationComplete) {
-          onAuthenticationComplete(event.data);
-        }
-        // Clear popup ref so polling stops and doesn't trigger callback again
-        if (popupWindowRef.current && !popupWindowRef.current.closed) {
-          popupWindowRef.current.close();
-        }
-        popupWindowRef.current = null;
-      } else if (event.data === "authFailed") {
-        setConnectionStatus("error");
-        popupWindowRef.current = null;
-      }
-    };
-
-    window.addEventListener("message", receiveMessage, false);
-    return () => window.removeEventListener("message", receiveMessage);
-  }, [
-    knock.host,
-    onAuthenticationComplete,
-    setConnectionStatus,
+  useAuthPostMessageListener({
+    knockHost: knock.host,
     popupWindowRef,
-  ]);
+    setConnectionStatus,
+    onAuthenticationComplete,
+  });
 
-  useEffect(
-    () => {
-      let pollCount = 0;
-      const maxPolls = 90;
-      let popupClosedAt: number | null = null;
-      let isActive = true;
-
-      const pollInterval = setInterval(async () => {
-        if (!isActive) {
-          clearInterval(pollInterval);
-          return;
-        }
-
-        const popupWindow = popupWindowRef.current;
-        if (!popupWindow) {
-          return;
-        }
-
-        pollCount++;
-
-        const isPopupClosed = popupWindow.closed;
-        if (isPopupClosed && !popupClosedAt) {
-          popupClosedAt = Date.now();
-        }
-
-        // Stop condition 1: Max timeout reached
-        if (pollCount >= maxPolls) {
-          clearInterval(pollInterval);
-          setConnectionStatus("error");
-          return;
-        }
-
-        // Stop condition 2: Popup closed + grace period expired
-        if (popupClosedAt && Date.now() - popupClosedAt > 10000) {
-          clearInterval(pollInterval);
-          popupWindowRef.current = null;
-          return;
-        }
-
-        try {
-          const authRes = await knock.slack.authCheck({
-            tenant: tenantId,
-            knockChannelId: knockSlackChannelId,
-          });
-
-          // Stop condition 3: Success detected
-          if (authRes.connection?.ok) {
-            clearInterval(pollInterval);
-            setConnectionStatus("connected");
-            if (onAuthenticationComplete) {
-              onAuthenticationComplete("authComplete");
-            }
-            if (popupWindow && !popupWindow.closed) {
-              popupWindow.close();
-            }
-            popupWindowRef.current = null;
-          }
-        } catch (_error) {
-          // Continue polling on error
-        }
-      }, 2000);
-
-      return () => {
-        isActive = false;
-        clearInterval(pollInterval);
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      // Empty deps - run once on mount and keep polling
-      // This is intentionally simple/brute force
-    ],
-  );
+  useAuthPolling({
+    popupWindowRef,
+    setConnectionStatus,
+    onAuthenticationComplete,
+    authCheckFn: useCallback(async () => {
+      return knock.slack.authCheck({
+        tenant: tenantId,
+        knockChannelId: knockSlackChannelId,
+      });
+    }, [knock.slack, tenantId, knockSlackChannelId]),
+  });
 
   const disconnectLabel = t("slackDisconnect") || null;
   const reconnectLabel = t("slackReconnect") || null;

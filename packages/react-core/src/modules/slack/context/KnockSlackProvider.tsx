@@ -2,9 +2,8 @@ import { useSlackConnectionStatus } from "..";
 import * as React from "react";
 import { PropsWithChildren, useRef } from "react";
 
-import { slackProviderKey } from "../../core";
+import { type ConnectionStatus, slackProviderKey } from "../../core";
 import { useKnockClient } from "../../core";
-import { ConnectionStatus } from "../hooks/useSlackConnectionStatus";
 
 export interface KnockSlackProviderState {
   knockSlackChannelId: string;
