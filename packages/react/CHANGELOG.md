@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.4
+
+### Patch Changes
+
+- f9aca69: fix: poll to check if OAuth connection succeeded in case popup communication fails during Slack and Microsoft Teams auth flows
+- Updated dependencies [f9aca69]
+  - @knocklabs/react-core@0.12.4
+
 ## 0.10.3
 
 ### Patch Changes
