@@ -1,10 +1,9 @@
 import * as React from "react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useRef } from "react";
 
-import { useKnockClient } from "../../core";
+import { type ConnectionStatus, useKnockClient } from "../../core";
 import { msTeamsProviderKey } from "../../core/utils";
 import { useMsTeamsConnectionStatus } from "../hooks";
-import { ConnectionStatus } from "../hooks/useMsTeamsConnectionStatus";
 
 export interface KnockMsTeamsProviderState {
   knockMsTeamsChannelId: string;
@@ -15,6 +14,7 @@ export interface KnockMsTeamsProviderState {
   setErrorLabel: (label: string) => void;
   actionLabel: string | null;
   setActionLabel: (label: string | null) => void;
+  popupWindowRef: React.MutableRefObject<Window | null>;
 }
 
 const MsTeamsProviderStateContext =
@@ -29,6 +29,7 @@ export const KnockMsTeamsProvider: React.FC<
   PropsWithChildren<KnockMsTeamsProviderProps>
 > = ({ knockMsTeamsChannelId, tenantId, children }) => {
   const knock = useKnockClient();
+  const popupWindowRef = useRef<Window | null>(null);
 
   const {
     connectionStatus,
@@ -56,6 +57,7 @@ export const KnockMsTeamsProvider: React.FC<
         setActionLabel,
         knockMsTeamsChannelId,
         tenantId,
+        popupWindowRef,
       }}
     >
       {children}

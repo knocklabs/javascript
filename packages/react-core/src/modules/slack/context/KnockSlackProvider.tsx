@@ -1,10 +1,9 @@
 import { useSlackConnectionStatus } from "..";
 import * as React from "react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useRef } from "react";
 
-import { slackProviderKey } from "../../core";
+import { type ConnectionStatus, slackProviderKey } from "../../core";
 import { useKnockClient } from "../../core";
-import { ConnectionStatus } from "../hooks/useSlackConnectionStatus";
 
 export interface KnockSlackProviderState {
   knockSlackChannelId: string;
@@ -19,6 +18,7 @@ export interface KnockSlackProviderState {
   setErrorLabel: (label: string) => void;
   actionLabel: string | null;
   setActionLabel: (label: string | null) => void;
+  popupWindowRef: React.MutableRefObject<Window | null>;
 }
 
 const SlackProviderStateContext =
@@ -44,6 +44,7 @@ export const KnockSlackProvider: React.FC<
   const tenantId = "tenantId" in props ? props.tenantId : props.tenant;
 
   const knock = useKnockClient();
+  const popupWindowRef = useRef<Window | null>(null);
 
   const {
     connectionStatus,
@@ -73,6 +74,7 @@ export const KnockSlackProvider: React.FC<
         // Assign the same value to both tenant and tenantId for backwards compatibility
         tenant: tenantId,
         tenantId,
+        popupWindowRef,
       }}
     >
       {children}

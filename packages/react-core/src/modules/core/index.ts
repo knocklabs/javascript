@@ -4,7 +4,12 @@ export {
   type KnockProviderProps,
   type KnockProviderState,
 } from "./context";
-export { useAuthenticatedKnockClient, useStableOptions } from "./hooks";
+export {
+  useAuthenticatedKnockClient,
+  useStableOptions,
+  useAuthPostMessageListener,
+  useAuthPolling,
+} from "./hooks";
 export { FilterStatus, type ColorMode } from "./constants";
 export {
   formatBadgeCount,
@@ -15,3 +20,4 @@ export {
   slackProviderKey,
   msTeamsProviderKey,
 } from "./utils";
+export { type ConnectionStatus, type AuthCheckResult } from "./types";
