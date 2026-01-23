@@ -1,9 +1,15 @@
 import { Button } from "@telegraph/button";
-import { Stack } from "@telegraph/layout";
+import { Box, Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
-import { CheckCircle2, CircleDashed, Eye, UserCircle2 } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleDashed,
+  Eye,
+  LocateFixed,
+  UserCircle2,
+} from "lucide-react";
 import * as React from "react";
 
 import { GuideHoverCard } from "./GuideHoverCard";
@@ -43,6 +49,27 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
       </Stack>
 
       <Stack justify="flex-end">
+        {guide.__typename === "Guide" && (
+          <Stack gap="1">
+            <Tooltip
+              label="Current location does not match the activation conditions"
+              enabled={!guide.inspection.activatable.status}
+            >
+              <Button
+                px="1"
+                size="1"
+                variant="soft"
+                color={guide.inspection.activatable.status ? "green" : "red"}
+                leadingIcon={{ icon: LocateFixed, alt: "Target" }}
+              />
+            </Tooltip>
+          </Stack>
+        )}
+        {guide.__typename === "Guide" && (
+          <Stack px="1" align="center">
+            <Box h="3" borderLeft="px" borderColor="gray-6" />
+          </Stack>
+        )}
         <Stack gap="1">
           {!isUnknownGuide(guide) && (
             <>

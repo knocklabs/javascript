@@ -16,6 +16,7 @@ import {
 import { detectToolbarParam } from "./helpers";
 import {
   InspectionResult,
+  checkUsable,
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
 
@@ -27,10 +28,12 @@ const GuidesList = ({
   displayOption: DisplayOption;
 }) => {
   return guides.map((guide, idx) => {
+    if (displayOption === "current-page" && !checkUsable(guide)) {
+      return null;
+    }
     if (displayOption === "all-eligible" && !guide.annotation.isEligible) {
       return null;
     }
-
     return <GuideRow key={guide.key} guide={guide} orderIndex={idx} />;
   });
 };
@@ -39,7 +42,7 @@ export const V2 = () => {
   const { client } = useGuideContext();
 
   const [guidesListDisplayOption, setGuidesListDisplayOption] =
-    React.useState<DisplayOption>("all-eligible");
+    React.useState<DisplayOption>("current-page");
 
   const [isVisible, setIsVisible] = React.useState(detectToolbarParam());
   const [isCollapsed, setIsCollapsed] = React.useState(true);

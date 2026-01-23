@@ -1,4 +1,8 @@
-export { KnockGuideClient, DEBUG_QUERY_PARAMS } from "./client";
+export {
+  KnockGuideClient,
+  DEBUG_QUERY_PARAMS,
+  checkActivatable,
+} from "./client";
 export type {
   KnockGuide,
   KnockGuideStep,

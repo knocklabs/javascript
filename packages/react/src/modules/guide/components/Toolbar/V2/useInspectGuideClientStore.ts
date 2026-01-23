@@ -2,6 +2,7 @@ import {
   KnockGuide,
   KnockGuideClientStoreState,
   KnockGuideIneligibilityMarker,
+  checkActivatable,
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
@@ -28,6 +29,10 @@ type TargetableStatusFalse = {
 };
 type TargetableStatus = TargetableStatusTrue | TargetableStatusFalse;
 
+type ActivatableStatus = {
+  status: boolean;
+};
+
 // Archived: `false` status = good
 type ArchivedStatus = {
   status: boolean;
@@ -38,6 +43,7 @@ type AnnotatedStatuses = {
   active: ActiveStatus;
   targetable: TargetableStatus;
   archived: ArchivedStatus;
+  activatable: ActivatableStatus;
 };
 
 type GuideAnnotation = AnnotatedStatuses & {
@@ -52,6 +58,14 @@ export type AnnotatedGuide = KnockGuide & {
   // Legacy fields, typed only to make tsc happy when we prune these out.
   activation_location_rules?: KnockGuide["activation_url_patterns"];
   priority?: number;
+};
+
+export const checkUsable = (guide: AnnotatedGuide | MissingGuide) => {
+  if (guide.__typename === "MissingGuide") return false;
+  if (!checkEligible(guide)) return false;
+  if (!guide.annotation.activatable.status) return false;
+
+  return true;
 };
 
 // Exists and ordered in control but absent in switchboard (therefore not
@@ -118,14 +132,14 @@ const resolveIsEligible = ({
 
 type StoreStateSnapshot = Pick<
   KnockGuideClientStoreState,
-  "guides" | "guideGroups" | "ineligibleGuides" | "debug"
+  "location" | "guides" | "guideGroups" | "ineligibleGuides" | "debug"
 >;
 
 const annotateGuide = (
   guide: KnockGuide,
   snapshot: StoreStateSnapshot,
 ): AnnotatedGuide => {
-  const { ineligibleGuides } = snapshot;
+  const { ineligibleGuides, location } = snapshot;
   const marker = ineligibleGuides[guide.key];
   const ineligiblity = marker ? toIneligibilityStatus(marker) : undefined;
 
@@ -133,6 +147,7 @@ const annotateGuide = (
     active: ineligiblity?.active || { status: true },
     targetable: ineligiblity?.targetable || { status: true },
     archived: ineligiblity?.archived || { status: false },
+    activatable: { status: checkActivatable(guide, location) },
   };
 
   const annotation: GuideAnnotation = {
@@ -161,8 +176,9 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
   const { client } = useGuideContext();
 
   // Extract a snapshot of the client store state for debugging.
-  const snapshot = useStore(client.store, (state) => {
+  const snapshot: StoreStateSnapshot = useStore(client.store, (state) => {
     return {
+      location: state.location,
       guides: state.guides,
       guideGroups: state.guideGroups,
       ineligibleGuides: state.ineligibleGuides,
