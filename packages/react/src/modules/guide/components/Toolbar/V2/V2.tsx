@@ -1,35 +1,29 @@
-import { useGuideContext, useStore } from "@knocklabs/react-core";
+import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
-import { Text } from "@telegraph/typography";
 import { Minimize2, Undo2 } from "lucide-react";
 import React from "react";
 
 import { KnockButton } from "../KnockButton";
-import { TOOLBAR_Z_INDEX } from "../shared";
+// import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
+import { GuideRow } from "./GuideRow";
+import {
+  DisplayOption,
+  GuidesListDisplaySelect,
+} from "./GuidesListDisplaySelect";
 import { detectToolbarParam } from "./helpers";
-
-const useInspectGuideClientStore = () => {
-  const { client } = useGuideContext();
-
-  const snapshot = useStore(client.store, (state) => {
-    return {
-      debug: state.debug,
-    };
-  });
-
-  if (!snapshot.debug?.debugging) {
-    return;
-  }
-
-  // TODO: Transform the raw client state into more useful data for debugging.
-  return {};
-};
+import {
+  checkEligible,
+  useInspectGuideClientStore,
+} from "./useInspectGuideClientStore";
 
 export const V2 = () => {
   const { client } = useGuideContext();
+
+  const [guidesListDisplayed, setGuidesListDisplayed] =
+    React.useState<DisplayOption>("all-eligible");
 
   const [isVisible, setIsVisible] = React.useState(detectToolbarParam());
   const [isCollapsed, setIsCollapsed] = React.useState(true);
@@ -73,9 +67,10 @@ export const V2 = () => {
             style={{ boxSizing: "border-box" }}
           >
             <Box style={{ width: "220px" }}>
-              <Text as="div" size="1" weight="medium" w="full" maxWidth="40">
-                Toolbar v2 placeholder
-              </Text>
+              <GuidesListDisplaySelect
+                value={guidesListDisplayed}
+                onChange={(selected) => setGuidesListDisplayed(selected)}
+              />
             </Box>
 
             <Stack gap="2">
@@ -95,6 +90,22 @@ export const V2 = () => {
               />
             </Stack>
           </Stack>
+
+          <Box w="full">
+            {data.error && <Box>{data.error}</Box>}
+            {data.guides.map((guide, idx) => {
+              if (
+                guidesListDisplayed === "all-eligible" &&
+                !checkEligible(guide)
+              ) {
+                return null;
+              }
+
+              return (
+                <GuideRow key={guide.key} guide={guide} orderIndex={idx} />
+              );
+            })}
+          </Box>
         </Stack>
       )}
     </Box>
