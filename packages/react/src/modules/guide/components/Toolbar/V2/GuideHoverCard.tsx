@@ -25,6 +25,7 @@ export const GuideHoverCard = ({
             rounded="3"
             border="px"
             overflow="auto"
+            backgroundColor="surface-2"
             style={{
               width: "450px",
               maxHeight: "600px",
@@ -32,7 +33,7 @@ export const GuideHoverCard = ({
           >
             <pre
               style={{
-                fontSize: "12px",
+                fontSize: "11px",
               }}
             >
               {/* TODO: Prune some details */}
