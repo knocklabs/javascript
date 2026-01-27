@@ -642,6 +642,27 @@ describe("predicateUrlPatterns", () => {
       expect(predicateUrlPatterns(wrongOrderUrl, patterns)).toBe(undefined);
     });
 
+    test("handles multiple search params in pattern, to match a single search param regardless of the order", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/report", search: "*role=admin*" }),
+        },
+      ];
+
+      const url1 = new URL("https://example.com/report?role=admin");
+      const url2 = new URL("https://example.com/report?year=2022&role=admin");
+      const url3 = new URL("https://example.com/report?role=admin&year=2022");
+      const url4 = new URL("https://example.com/report?location=nyc&role=admin&year=2022");
+      const url5 = new URL("https://example.com/report?location=nyc&year=2022");
+
+      expect(predicateUrlPatterns(url1, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url2, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url3, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url4, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url5, patterns)).toBe(undefined);
+    });
+
     test("handles search pattern with wildcard for any search params", () => {
       const patterns: KnockGuideActivationUrlPattern[] = [
         {
