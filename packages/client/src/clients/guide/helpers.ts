@@ -166,6 +166,9 @@ export const predicateUrlRules = (
   url: URL,
   urlRules: GuideActivationUrlRuleData[],
 ) => {
+  const hasBlockRulesOnly = urlRules.every((r) => r.directive === "block");
+  const predicateDefault = hasBlockRulesOnly ? true : undefined;
+
   return urlRules.reduce<boolean | undefined>((acc, urlRule) => {
     // Any matched block rule prevails so no need to evaluate further
     // as soon as there is one.
@@ -191,13 +194,18 @@ export const predicateUrlRules = (
         return matched ? false : acc;
       }
     }
-  }, undefined);
+  }, predicateDefault);
 };
 
 export const predicateUrlPatterns = (
   url: URL,
   urlPatterns: KnockGuideActivationUrlPattern[],
 ) => {
+  const hasBlockPatternsOnly = urlPatterns.every(
+    (r) => r.directive === "block",
+  );
+  const predicateDefault = hasBlockPatternsOnly ? true : undefined;
+
   return urlPatterns.reduce<boolean | undefined>((acc, urlPattern) => {
     // Any matched block rule prevails so no need to evaluate further
     // as soon as there is one.
@@ -223,5 +231,5 @@ export const predicateUrlPatterns = (
         return matched ? false : acc;
       }
     }
-  }, undefined);
+  }, predicateDefault);
 };
