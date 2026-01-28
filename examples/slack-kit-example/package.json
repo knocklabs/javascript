@@ -14,7 +14,7 @@
     "@knocklabs/node": "^1.11.2",
     "@knocklabs/react": "0.10.5",
     "jsonwebtoken": "^9.0.2",
-    "next": "15.3.6",
+    "next": "16.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
