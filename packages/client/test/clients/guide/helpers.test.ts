@@ -540,4 +540,142 @@ describe("predicateUrlPatterns", () => {
       expect(predicateUrlPatterns(differentUrl, patterns)).toBe(true);
     });
   });
+
+  describe("with search patterns", () => {
+    test("returns true when URL matches an allow pattern with search params", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/dashboard", search: "tab=settings" }),
+        },
+      ];
+
+      const matchingUrl = new URL("https://example.com/dashboard?tab=settings");
+      const nonMatchingUrl = new URL("https://example.com/dashboard?tab=overview");
+
+      expect(predicateUrlPatterns(matchingUrl, patterns)).toBe(true);
+      expect(predicateUrlPatterns(nonMatchingUrl, patterns)).toBe(undefined);
+    });
+
+    test("returns false when URL matches a block pattern with search params", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/admin", search: "mode=debug" }),
+        },
+      ];
+
+      const matchingUrl = new URL("https://example.com/admin?mode=debug");
+      const nonMatchingUrl = new URL("https://example.com/admin?mode=normal");
+
+      expect(predicateUrlPatterns(matchingUrl, patterns)).toBe(false);
+      expect(predicateUrlPatterns(nonMatchingUrl, patterns)).toBe(true);
+    });
+
+    test("handles wildcard patterns in search params", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/page", search: "id=*" }),
+        },
+      ];
+
+      const matchingUrl = new URL("https://example.com/page?id=123");
+      const anotherMatchingUrl = new URL("https://example.com/page?id=abc");
+      const nonMatchingUrl = new URL("https://example.com/page?other=value");
+
+      expect(predicateUrlPatterns(matchingUrl, patterns)).toBe(true);
+      expect(predicateUrlPatterns(anotherMatchingUrl, patterns)).toBe(true);
+      expect(predicateUrlPatterns(nonMatchingUrl, patterns)).toBe(undefined);
+    });
+
+    test("matches when pathname matches but no search pattern specified", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/dashboard" }),
+        },
+      ];
+
+      // Should match regardless of search params when no search pattern specified
+      const urlWithSearch = new URL("https://example.com/dashboard?tab=settings");
+      const urlWithoutSearch = new URL("https://example.com/dashboard");
+
+      expect(predicateUrlPatterns(urlWithSearch, patterns)).toBe(true);
+      expect(predicateUrlPatterns(urlWithoutSearch, patterns)).toBe(true);
+    });
+
+    test("block pattern with search takes precedence over allow pattern without search", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/settings/*" }),
+        },
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/settings/admin", search: "dangerous=true" }),
+        },
+      ];
+
+      const blockedUrl = new URL("https://example.com/settings/admin?dangerous=true");
+      const allowedUrl = new URL("https://example.com/settings/admin?dangerous=false");
+
+      expect(predicateUrlPatterns(blockedUrl, patterns)).toBe(false);
+      expect(predicateUrlPatterns(allowedUrl, patterns)).toBe(true);
+    });
+
+    test("handles multiple search params in pattern", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/report", search: "type=sales&year=2024" }),
+        },
+      ];
+
+      const matchingUrl = new URL("https://example.com/report?type=sales&year=2024");
+      const partialMatchUrl = new URL("https://example.com/report?type=sales");
+      const wrongOrderUrl = new URL("https://example.com/report?year=2024&type=sales");
+
+      expect(predicateUrlPatterns(matchingUrl, patterns)).toBe(true);
+      expect(predicateUrlPatterns(partialMatchUrl, patterns)).toBe(undefined);
+      // URLPattern is sensitive to search param order
+      expect(predicateUrlPatterns(wrongOrderUrl, patterns)).toBe(undefined);
+    });
+
+    test("handles multiple search params in pattern, to match a single search param regardless of the order", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "allow",
+          pattern: new URLPattern({ pathname: "/report", search: "*role=admin*" }),
+        },
+      ];
+
+      const url1 = new URL("https://example.com/report?role=admin");
+      const url2 = new URL("https://example.com/report?year=2022&role=admin");
+      const url3 = new URL("https://example.com/report?role=admin&year=2022");
+      const url4 = new URL("https://example.com/report?location=nyc&role=admin&year=2022");
+      const url5 = new URL("https://example.com/report?location=nyc&year=2022");
+
+      expect(predicateUrlPatterns(url1, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url2, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url3, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url4, patterns)).toBe(true);
+      expect(predicateUrlPatterns(url5, patterns)).toBe(undefined);
+    });
+
+    test("handles search pattern with wildcard for any search params", () => {
+      const patterns: KnockGuideActivationUrlPattern[] = [
+        {
+          directive: "block",
+          pattern: new URLPattern({ pathname: "/api", search: "*" }),
+        },
+      ];
+
+      const urlWithSearch = new URL("https://example.com/api?key=value");
+      const urlWithoutSearch = new URL("https://example.com/api");
+
+      expect(predicateUrlPatterns(urlWithSearch, patterns)).toBe(false);
+      expect(predicateUrlPatterns(urlWithoutSearch, patterns)).toBe(false);
+    });
+  });
 });

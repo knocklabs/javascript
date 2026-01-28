@@ -33,7 +33,9 @@ export interface GuideActivationUrlRuleData {
 
 interface GuideActivationUrlPatternData {
   directive: "allow" | "block";
-  pathname: string;
+  // At least one part should be present.
+  pathname?: string;
+  search?: string;
 }
 
 export interface GuideData<TContent = Any> {

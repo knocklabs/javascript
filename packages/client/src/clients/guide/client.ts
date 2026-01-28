@@ -975,7 +975,10 @@ export class KnockGuideClient {
       remoteGuide.activation_url_patterns.map((rule) => {
         return {
           ...rule,
-          pattern: new URLPattern({ pathname: rule.pathname }),
+          pattern: new URLPattern({
+            pathname: rule.pathname ?? undefined,
+            search: rule.search ?? undefined,
+          }),
         };
       });
 
