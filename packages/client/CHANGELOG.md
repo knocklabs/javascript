@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.4
+
+### Patch Changes
+
+- 1c486d3: [guides] support search param in guide activation url patterns
+
 ## 0.20.3
 
 ### Patch Changes
