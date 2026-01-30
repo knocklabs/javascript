@@ -6,6 +6,7 @@ import { Text } from "@telegraph/typography";
 import {
   CheckCircle2,
   CircleDashed,
+  Code2,
   Eye,
   LocateFixed,
   UserCircle2,
@@ -52,6 +53,27 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
         {!isUnknownGuide(guide) && (
           <>
             <Stack gap="1">
+              <Tooltip
+                label=""
+                // enabled={!guide.annotation.selectable.status}
+                enabled={false}
+              >
+                <Button
+                  px="1"
+                  size="1"
+                  variant="soft"
+                  color={
+                    guide.annotation.selectable.status === "returned"
+                      ? "green"
+                      : guide.annotation.selectable.status === "queried"
+                        ? "gray"
+                        : guide.annotation.selectable.status === "throttled"
+                          ? "yellow"
+                          : "red"
+                  }
+                  leadingIcon={{ icon: Code2, alt: "Render" }}
+                />
+              </Tooltip>
               <Tooltip
                 label={
                   guide.annotation.activatable.status
