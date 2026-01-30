@@ -3,6 +3,7 @@ export {
   DEBUG_QUERY_PARAMS,
   checkActivatable,
 } from "./client";
+export { checkStateIfThrottled } from "./helpers";
 export type {
   KnockGuide,
   KnockGuideStep,
@@ -12,4 +13,6 @@ export type {
   SelectGuideOpts as KnockSelectGuideOpts,
   SelectGuidesOpts as KnockSelectGuidesOpts,
   StoreState as KnockGuideClientStoreState,
+  GroupStage as KnockGuideClientGroupStage,
+  SelectionResult as KnockGuideSelectionResult,
 } from "./types";
