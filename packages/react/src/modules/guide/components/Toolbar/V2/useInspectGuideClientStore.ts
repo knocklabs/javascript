@@ -1,8 +1,12 @@
 import {
   KnockGuide,
+  // KnockGuideClient,
+  KnockGuideClientGroupStage,
   KnockGuideClientStoreState,
   KnockGuideIneligibilityMarker,
+  KnockGuideSelectionResult,
   checkActivatable,
+  checkStateIfThrottled,
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
@@ -45,6 +49,7 @@ type AnnotatedStatuses = {
   archived: ArchivedStatus;
   // Individual qualified statuses:
   activatable: ActivatableStatus;
+  selectable: SelectableStatus;
 };
 
 type GuideAnnotation = AnnotatedStatuses & {
@@ -56,6 +61,24 @@ type GuideAnnotation = AnnotatedStatuses & {
   // informs "when" and "where" an eligible guide can be displayed to user.
   isQualified: boolean;
 };
+
+type SelectionResultByLimit = {
+  one?: KnockGuideSelectionResult;
+  all?: KnockGuideSelectionResult;
+};
+type SelectionResultByQuery = {
+  key: SelectionResultByLimit | undefined;
+  type: SelectionResultByLimit | undefined;
+};
+
+type SelectableStatusPresent = {
+  status: "returned" | "throttled" | "queried";
+  query: SelectionResultByQuery;
+};
+type SelectableStatusAbsent = {
+  status: undefined;
+};
+type SelectableStatus = SelectableStatusPresent | SelectableStatusAbsent;
 
 export type AnnotatedGuide = KnockGuide & {
   annotation: GuideAnnotation;
@@ -128,19 +151,100 @@ const resolveIsEligible = ({
   return true;
 };
 
-export const resolveIsQualified = ({ activatable }: AnnotatedStatuses) => {
+export const resolveIsQualified = ({
+  activatable,
+  selectable,
+}: AnnotatedStatuses) => {
   if (!activatable.status) return false;
+  if (!selectable.status) return false;
   return true;
 };
 
 type StoreStateSnapshot = Pick<
   KnockGuideClientStoreState,
-  "location" | "guides" | "guideGroups" | "ineligibleGuides" | "debug"
->;
+  | "location"
+  | "guides"
+  | "guideGroups"
+  | "ineligibleGuides"
+  | "debug"
+  | "counter"
+> & {
+  throttled: boolean;
+};
+
+const getSelectableStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+) => {
+  if (query.type?.all) {
+    // TODO: Placeholder, we need to look up the actual query result.
+    return "returned";
+  }
+
+  // TODO: Need to handle multiple unthrottled guides of the same type.
+
+  if (guide.bypass_global_group_limit) {
+    return "returned";
+  }
+
+  if (stage.resolved !== guide.key) {
+    return "queried";
+  }
+
+  // At this point we know this is the resolved guide.
+
+  if (
+    query.type?.one?.metadata?.opts &&
+    query.type.one.metadata.opts.includeThrottled
+  ) {
+    return "returned";
+  }
+  if (
+    query.key?.one?.metadata?.opts &&
+    query.key.one.metadata.opts.includeThrottled
+  ) {
+    return "returned";
+  }
+
+  return snapshot.throttled ? "throttled" : "returned";
+};
+
+// TODO: Rename inspectGuideIfSelectable
+const toSelectableStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage | undefined,
+): SelectableStatus => {
+  if (!stage || stage.status === "open") {
+    return { status: undefined };
+  }
+
+  const { results } = stage;
+
+  const query = {
+    key: (results.key || {})[guide.key],
+    type: (results.type || {})[guide.type],
+  };
+
+  const queried = Boolean(query.key || query.type);
+  if (!queried) {
+    return { status: undefined };
+  }
+
+  const status = getSelectableStatus(guide, snapshot, stage, query);
+
+  return {
+    status,
+    query,
+  };
+};
 
 const annotateGuide = (
   guide: KnockGuide,
   snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage | undefined,
 ): AnnotatedGuide => {
   const { ineligibleGuides, location } = snapshot;
   const marker = ineligibleGuides[guide.key];
@@ -153,6 +257,7 @@ const annotateGuide = (
     archived: ineligiblity?.archived || { status: false },
     // isQualified:
     activatable: { status: checkActivatable(guide, location) },
+    selectable: toSelectableStatus(guide, snapshot, stage),
   };
 
   const annotation: GuideAnnotation = {
@@ -184,12 +289,16 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
 
   // Extract a snapshot of the client store state for debugging.
   const snapshot: StoreStateSnapshot = useStore(client.store, (state) => {
+    const throttled = checkStateIfThrottled(state);
+
     return {
       location: state.location,
       guides: state.guides,
       guideGroups: state.guideGroups,
       ineligibleGuides: state.ineligibleGuides,
       debug: state.debug,
+      counter: state.counter,
+      throttled,
     };
   });
 
@@ -208,6 +317,8 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
     };
   }
 
+  const groupStage = client.getStage();
+
   // Annotate guides for various eligibility, activation and query statuses
   // that are useful for debugging purposes.
   const orderedGuides = defaultGroup.display_sequence.map((guideKey) => {
@@ -216,7 +327,7 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
       return newUnknownGuide(guideKey);
     }
 
-    return annotateGuide(guide, snapshot);
+    return annotateGuide(guide, snapshot, groupStage);
   });
 
   return {
