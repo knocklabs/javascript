@@ -30,6 +30,12 @@ export interface FeedClientOptions {
   workflow_categories?: string[];
   // Optionally scope to a given archived status (defaults to `exclude`)
   archived?: "include" | "exclude" | "only";
+  /**
+   * Response mode for feed items.
+   * - "rich" returns all fields.
+   * - "compact" omits `activities` and `total_activities`.
+   */
+  mode?: "rich" | "compact";
   // Optionally scope all notifications that contain this argument as part of their trigger payload
   trigger_data?: TriggerData;
   // Optionally enable cross browser feed updates for this feed
@@ -107,7 +113,11 @@ export type ContentBlock =
 export interface FeedItem<T = GenericData> {
   __cursor: string;
   id: string;
-  activities: Activity<T>[];
+  /**
+   * List of activities associated with this feed item.
+   * Only present in "rich" mode.
+   */
+  activities?: Activity<T>[];
   actors: Recipient[];
   blocks: ContentBlock[];
   inserted_at: string;
@@ -118,7 +128,11 @@ export interface FeedItem<T = GenericData> {
   interacted_at: string | null;
   link_clicked_at: string | null;
   archived_at: string | null;
-  total_activities: number;
+  /**
+   * Total number of activities related to this feed item.
+   * Only present in "rich" mode.
+   */
+  total_activities?: number;
   total_actors: number;
   data: T | null;
   source: NotificationSource;
