@@ -164,6 +164,9 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
     const guide = state.previewGuides[guideKey] || state.guides[guideKey];
     if (!guide) continue;
 
+    const ineligible = !!state.ineligibleGuides[guide.key];
+    if (ineligible) continue;
+
     const affirmed = predicate(guide, {
       location,
       filters,
