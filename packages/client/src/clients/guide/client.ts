@@ -164,12 +164,9 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
     const guide = state.previewGuides[guideKey] || state.guides[guideKey];
     if (!guide) continue;
 
-    const ineligible = !!state.ineligibleGuides[guide.key];
-    if (ineligible) continue;
-
-    const affirmed = predicate(guide, {
+    const affirmed = predicate(guide, filters, {
       location,
-      filters,
+      ineligibleGuides: state.ineligibleGuides,
       debug: state.debug,
     });
 
@@ -182,15 +179,15 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   return result;
 };
 
-type PredicateOpts = {
-  location?: string | undefined;
-  filters?: SelectFilterParams | undefined;
-  debug: DebugState;
-};
+type PredicateOpts = Pick<
+  StoreState,
+  "location" | "ineligibleGuides" | "debug"
+>;
 
 const predicate = (
   guide: KnockGuide,
-  { location, filters = {}, debug = {} }: PredicateOpts,
+  filters: SelectFilterParams,
+  { location, ineligibleGuides = {}, debug = {} }: PredicateOpts,
 ) => {
   if (filters.type && filters.type !== guide.type) {
     return false;
@@ -205,6 +202,11 @@ const predicate = (
   // filters but BEFORE checking archived status and location rules.
   if (debug.forcedGuideKey) {
     return debug.forcedGuideKey === guide.key;
+  }
+
+  const ineligible = ineligibleGuides[guide.key];
+  if (ineligible) {
+    return false;
   }
 
   if (!guide.active) {
@@ -375,7 +377,7 @@ export class KnockGuideClient {
         guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
         guideGroupDisplayLogs: guide_group_display_logs || {},
         guides: byKey(entries.map((g) => this.localCopy(g))),
-        ineligibleGuides: byKey(ineligible_guides),
+        ineligibleGuides: byKey(ineligible_guides || []),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
     } catch (e) {
@@ -476,6 +478,8 @@ export class KnockGuideClient {
   private handleSocketEvent(payload: GuideSocketEvent) {
     const { event, data } = payload;
 
+    // TODO(KNO-11489): Include an ineligible guide in the socket payload too
+    // and process it when handling socket events in real time.
     switch (event) {
       case "guide.added":
         return this.addOrReplaceGuide(payload);
