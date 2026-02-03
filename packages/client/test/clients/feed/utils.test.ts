@@ -7,6 +7,7 @@ import type {
 } from "../../../src/clients/feed/interfaces";
 import {
   deduplicateItems,
+  getFormattedExclude,
   getFormattedTriggerData,
   mergeDateRangeParams,
   sortItems,
@@ -415,6 +416,70 @@ describe("feed utils", () => {
         const result = getFormattedTriggerData(options);
         expect(result).toBeUndefined();
       });
+    });
+  });
+
+  describe("getFormattedExclude", () => {
+    test("returns undefined when no exclude option", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when exclude is undefined", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: undefined,
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when exclude is empty array", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: [],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns single field as-is", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["entries.archived_at"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at");
+    });
+
+    test("joins multiple fields with commas", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["entries.archived_at", "meta.total_count", "entries.data"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at,meta.total_count,entries.data");
+    });
+
+    test("returns undefined for empty options object", () => {
+      const options: FeedClientOptions = {};
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
     });
   });
 });
