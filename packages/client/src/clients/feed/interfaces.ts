@@ -48,6 +48,17 @@ export interface FeedClientOptions {
     // Optionally set whether to be inclusive of the start and end dates
     inclusive?: boolean;
   };
+  /**
+   * The mode to render the feed items in. When `mode` is `compact`, feed items will not have
+   * `activities` and `total_activities` fields, and the `data` field will not include nested
+   * arrays and objects.
+   */
+  mode?: "rich" | "compact";
+  /**
+   * Comma-separated list of field paths to exclude from the response. Use dot notation for nested
+   * fields (e.g., `entries.archived_at`). Limited to 3 levels deep.
+   */
+  exclude?: string;
 }
 
 export type FetchFeedOptions = {
