@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
+import type { FetchFeedOptions } from "../../../src";
 import ApiClient from "../../../src/api";
 import Feed from "../../../src/clients/feed/feed";
 import { FeedSocketManager } from "../../../src/clients/feed/socket-manager";
@@ -579,10 +580,12 @@ describe("Feed", () => {
           undefined,
         );
 
-        const options = {
+        const options: FetchFeedOptions = {
           page_size: 25,
           source: "workflow_123",
           tenant: "tenant_456",
+          exclude: "total_actors",
+          mode: "rich",
         };
 
         await feed.fetch(options);
@@ -595,6 +598,8 @@ describe("Feed", () => {
             page_size: 25,
             source: "workflow_123",
             tenant: "tenant_456",
+            exclude: "total_actors",
+            mode: "rich",
           },
         });
       } finally {
