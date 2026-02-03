@@ -119,7 +119,7 @@ export interface FeedItem<T = GenericData> {
    * List of activities associated with this feed item.
    * Only present in "rich" mode.
    */
-  activities: Activity<T>[];
+  activities?: Activity<T>[];
   actors: Recipient[];
   blocks: ContentBlock[];
   inserted_at: string;
@@ -134,7 +134,7 @@ export interface FeedItem<T = GenericData> {
    * Total number of activities related to this feed item.
    * Only present in "rich" mode.
    */
-  total_activities: number;
+  total_activities?: number;
   total_actors: number;
   data: T | null;
   source: NotificationSource;
