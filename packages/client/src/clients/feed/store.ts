@@ -73,7 +73,9 @@ const initalizeStore = () => {
         return {
           ...state,
           items,
-          metadata: meta,
+          // Preserve existing metadata if meta is not provided
+          // (e.g., when excluded via `exclude` param)
+          metadata: meta ?? state.metadata,
           pageInfo: options.shouldSetPage ? page_info : state.pageInfo,
           loading: false,
           networkStatus: NetworkStatus.ready,

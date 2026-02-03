@@ -656,7 +656,12 @@ class Feed {
     }
 
     // Fetch the items before the current head (if it exists)
-    this.fetch({ before: currentHead?.__cursor, __fetchSource: "socket" });
+    this.fetch({
+      before: currentHead?.__cursor,
+      __fetchSource: "socket",
+      // Exclude meta since we already have the badge counts from the socket
+      exclude: ["meta"],
+    });
   }
 
   private buildUserFeedId() {
