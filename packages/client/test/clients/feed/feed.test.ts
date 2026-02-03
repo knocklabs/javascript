@@ -584,7 +584,6 @@ describe("Feed", () => {
           page_size: 25,
           source: "workflow_123",
           tenant: "tenant_456",
-          exclude: "total_actors",
           mode: "rich",
         };
 
@@ -598,7 +597,6 @@ describe("Feed", () => {
             page_size: 25,
             source: "workflow_123",
             tenant: "tenant_456",
-            exclude: "total_actors",
             mode: "rich",
           },
         });
