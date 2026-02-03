@@ -115,6 +115,10 @@ export type ContentBlock =
 export interface FeedItem<T = GenericData> {
   __cursor: string;
   id: string;
+  /**
+   * List of activities associated with this feed item.
+   * Only present in "rich" mode.
+   */
   activities: Activity<T>[];
   actors: Recipient[];
   blocks: ContentBlock[];
@@ -126,6 +130,10 @@ export interface FeedItem<T = GenericData> {
   interacted_at: string | null;
   link_clicked_at: string | null;
   archived_at: string | null;
+  /**
+   * Total number of activities related to this feed item.
+   * Only present in "rich" mode.
+   */
   total_activities: number;
   total_actors: number;
   data: T | null;
