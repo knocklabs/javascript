@@ -84,6 +84,7 @@ describe("Feed", () => {
         );
 
         expect(feed.defaultOptions.archived).toBe("exclude");
+        expect(feed.defaultOptions.mode).toBe("compact");
       } finally {
         cleanup();
       }
@@ -547,7 +548,7 @@ describe("Feed", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "GET",
           url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
-          params: { archived: "exclude" },
+          params: { archived: "exclude", mode: "compact" },
         });
         expect(result).toBeDefined();
         if (result && "entries" in result) {
@@ -653,6 +654,7 @@ describe("Feed", () => {
           url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
           params: {
             archived: "exclude",
+            mode: "compact",
             after: "cursor_123",
           },
         });
