@@ -8,9 +8,9 @@
 
 Initialize feeds in `"compact"` mode by default
 
-The feed client can now be initialized with a `mode` option, set to either `"compact"` or `"rich"`. When `mode` is `"compact"`, the `activities` and `total_activities` fields will _not_ be present on feed items.
+The feed client can now be initialized with a `mode` option, set to either `"compact"` or `"rich"`. When `mode` is `"compact"`, the `activities` and `total_activities` fields will _not_ be present on feed items, and the `data` field will not include nested arrays and objects.
 
-**By default, feeds are initialized in `"compact"` mode. If you need to access `activities` and/or `total_activities`, you must initialize your feed in `"rich"` mode.**
+**By default, feeds are initialized in `"compact"` mode. If you need to access `activities`, `total_activities`, or the complete `data`, you must initialize your feed in `"rich"` mode.**
 
 If you are using the feed client via `@knocklabs/client` directly:
 
