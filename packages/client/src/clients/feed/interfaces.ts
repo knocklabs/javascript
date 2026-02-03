@@ -58,6 +58,11 @@ export interface FeedClientOptions {
    * @default "compact"
    */
   mode?: "rich" | "compact";
+  /**
+   * Field paths to exclude from the response. Use dot notation for nested fields
+   * (e.g., "entries.archived_at"). Limited to 3 levels deep.
+   */
+  exclude?: string[];
 }
 
 export type FetchFeedOptions = {
@@ -69,10 +74,12 @@ export type FetchFeedOptions = {
 // Should match types here: https://docs.knock.app/reference#get-feed
 export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
-  "trigger_data"
+  "trigger_data" | "exclude"
 > & {
   // Formatted trigger data into a string
   trigger_data?: string;
+  // Formatted exclude into a comma-separated string
+  exclude?: string;
   // Unset options that should not be sent to the API
   __loadingType: undefined;
   __fetchSource: undefined;

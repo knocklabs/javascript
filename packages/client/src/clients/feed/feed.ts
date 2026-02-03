@@ -536,19 +536,22 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
+    const mergedOptions = { ...this.defaultOptions, ...options };
+
     // trigger_data should be a JSON string for the API
     // this function will format the trigger data if it's an object
     // https://docs.knock.app/reference#get-feed
-    const formattedTriggerData = getFormattedTriggerData({
-      ...this.defaultOptions,
-      ...options,
-    });
+    const formattedTriggerData = getFormattedTriggerData(mergedOptions);
+
+    // Format exclude array to comma-separated string
+    const formattedExclude = mergedOptions.exclude?.join(",");
 
     // Always include the default params, if they have been set
     const queryParams: FetchFeedOptionsForRequest = {
       ...this.defaultOptions,
       ...mergeDateRangeParams(options),
       trigger_data: formattedTriggerData,
+      exclude: formattedExclude,
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
