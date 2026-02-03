@@ -1677,4 +1677,83 @@ describe("Feed", () => {
       }
     });
   });
+
+  describe("Exclude Option", () => {
+    test("converts exclude array to comma-separated string in query params", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockFeedResponse = {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        await feed.fetch({
+          exclude: ["entries.archived_at", "meta.total_count"],
+        });
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+            exclude: "entries.archived_at,meta.total_count",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("ignores empty exclude array", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockFeedResponse = {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        await feed.fetch({ exclude: [] });
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+  });
 });
