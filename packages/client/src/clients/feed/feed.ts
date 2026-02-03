@@ -33,7 +33,11 @@ import {
   FeedMessagesReceivedPayload,
   FeedRealTimeCallback,
 } from "./types";
-import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
+import {
+  getFormattedExclude,
+  getFormattedTriggerData,
+  mergeDateRangeParams,
+} from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived" | "mode"> = {
@@ -543,8 +547,7 @@ class Feed {
     // https://docs.knock.app/reference#get-feed
     const formattedTriggerData = getFormattedTriggerData(mergedOptions);
 
-    // Format exclude array to comma-separated string
-    const formattedExclude = mergedOptions.exclude?.join(",");
+    const formattedExclude = getFormattedExclude(mergedOptions);
 
     // Always include the default params, if they have been set
     const queryParams: FetchFeedOptionsForRequest = {

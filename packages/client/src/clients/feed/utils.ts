@@ -66,3 +66,11 @@ export function getFormattedTriggerData(options: FeedClientOptions) {
 
   return undefined;
 }
+
+export function getFormattedExclude(options: FeedClientOptions) {
+  if (!options?.exclude?.length) {
+    return undefined;
+  }
+
+  return options.exclude.join(",");
+}
