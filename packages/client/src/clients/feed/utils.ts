@@ -72,5 +72,8 @@ export function getFormattedExclude(options: FeedClientOptions) {
     return undefined;
   }
 
-  return options.exclude.join(",");
+  return options.exclude
+    .map((field) => field.trim())
+    .filter((field) => !!field)
+    .join(",");
 }

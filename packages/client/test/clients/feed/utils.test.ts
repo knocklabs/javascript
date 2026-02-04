@@ -474,6 +474,32 @@ describe("feed utils", () => {
       expect(result).toBe("entries.archived_at,meta.total_count,entries.data");
     });
 
+    test("trims whitespace before joining fields", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: [
+          " entries.archived_at    ",
+          "meta.total_count\n",
+          "\tentries.data ",
+        ],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at,meta.total_count,entries.data");
+    });
+
+    test("filters out empty fields", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["entries.archived_at", "   ", "entries.data"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at,entries.data");
+    });
+
     test("returns undefined for empty options object", () => {
       const options: FeedClientOptions = {};
 
