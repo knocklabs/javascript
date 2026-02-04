@@ -24,7 +24,7 @@ export const GuidesListDisplaySelect = ({ value, onChange }: Props) => {
     >
       {/*
         <Select.Option size="1" value="current-page">
-          Present and activated on current page
+          Displayable on current page
         </Select.Option>
       */}
       <Select.Option size="1" value="all-eligible">

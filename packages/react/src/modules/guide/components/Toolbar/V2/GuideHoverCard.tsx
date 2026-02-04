@@ -36,7 +36,7 @@ export const GuideHoverCard = ({
                 fontSize: "11px",
               }}
             >
-              {/* TODO: Prune some details */}
+              {/* XXX: Prune some details */}
               <code>{JSON.stringify(guide, null, 2)}</code>
             </pre>
           </Box>

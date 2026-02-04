@@ -38,15 +38,16 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
         </GuideHoverCard>
       </Stack>
 
-      <Stack gap="1" justify="flex-end">
+      <Stack gap="1">
         {guide.__typename === "Guide" && (
           <>
             <Tooltip
               label={
-                !guide.inspection.targetable.status &&
-                guide.inspection.targetable.message
+                guide.inspection.targetable.status
+                  ? "This user is targeted"
+                  : guide.inspection.targetable.message
               }
-              enabled={!guide.inspection.targetable.status}
+              // enabled={!guide.inspection.targetable.status}
             >
               <Button
                 px="1"
@@ -57,8 +58,11 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
               />
             </Tooltip>
             <Tooltip
-              label="User has already archived this guide"
-              enabled={guide.inspection.archived.status}
+              label={
+                guide.inspection.archived.status
+                  ? "User has already archived this guide"
+                  : "User has not dismissed this guide"
+              }
             >
               <Button
                 px="1"
@@ -74,9 +78,10 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           label={
             guide.__typename === "MissingGuide"
               ? "This guide has never been committed and published yet"
-              : "This guide is not active"
+              : !guide.active
+                ? "This guide is not active"
+                : "This guide is active"
           }
-          enabled={!guide.active}
         >
           <Button
             px="1"
