@@ -605,7 +605,8 @@ class Feed {
 
     const eventPayload = {
       items: response.entries as FeedItem[],
-      metadata: response.meta as FeedMetadata,
+      // meta will not be present on the response when __fetchSource is "socket"
+      metadata: response.meta as FeedMetadata | undefined,
       event: feedEventType,
     };
 
