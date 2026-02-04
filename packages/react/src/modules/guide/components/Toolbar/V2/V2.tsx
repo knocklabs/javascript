@@ -11,7 +11,7 @@ import "../styles.css";
 
 import { detectToolbarParam } from "./helpers";
 
-const useGuideClientViewer = () => {
+const useInspectGuideClientStore = () => {
   const { client } = useGuideContext();
 
   const snapshot = useStore(client.store, (state) => {
@@ -42,8 +42,7 @@ export const V2 = () => {
     return client.unsetDebug();
   }, [isVisible, client]);
 
-  const data = useGuideClientViewer();
-
+  const data = useInspectGuideClientStore();
   if (!data) {
     return null;
   }
@@ -53,8 +52,9 @@ export const V2 = () => {
       position="fixed"
       top="4"
       right="4"
-      data-tgph-appearance="dark"
-      style={{ zIndex: MAX_Z_INDEX }}
+      style={{
+        zIndex: MAX_Z_INDEX,
+      }}
     >
       {isCollapsed ? (
         <KnockButton onClick={() => setIsCollapsed(false)} />
@@ -62,24 +62,20 @@ export const V2 = () => {
         <Stack
           direction="column"
           backgroundColor="surface-2"
-          gap="2"
-          align="center"
-          shadow="3"
+          shadow="2"
           rounded="3"
-          py="2"
-          px="3"
-          style={{
-            width: "500px",
-          }}
+          border="px"
+          overflow="hidden"
+          style={{ width: "400px" }}
         >
           <Stack
             w="full"
-            gap="2"
-            align="center"
+            p="2"
             justify="space-between"
             direction="row"
+            style={{ boxSizing: "border-box" }}
           >
-            <Box style={{ width: "240px" }}>
+            <Box style={{ width: "220px" }}>
               <Text as="div" size="1" weight="medium" w="full" maxWidth="40">
                 Toolbar v2 placeholder
               </Text>
