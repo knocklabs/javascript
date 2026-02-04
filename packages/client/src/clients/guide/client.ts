@@ -270,8 +270,8 @@ export class KnockGuideClient {
   ) {
     const {
       trackLocationFromWindow = true,
-      // TODO: Remove this option once we ship guide toolbar v2, and offload
-      // as much debugging specific logic and responsibilities to toolbar.
+      // TODO(KNO-11523): Remove once we ship guide toolbar v2, and offload as
+      // much debugging specific logic and responsibilities to toolbar.
       trackDebugParams = false,
       throttleCheckInterval = DEFAULT_COUNTER_INCREMENT_INTERVAL,
     } = options;
@@ -1190,7 +1190,7 @@ export class KnockGuideClient {
       return;
     }
 
-    // TODO: Remove below once we ship toolbar v2.
+    // TODO(KNO-11523): Remove below once we ship toolbar v2.
 
     // If entering debug mode, fetch all guides.
     const currentDebugParams = this.store.state.debug || {};
