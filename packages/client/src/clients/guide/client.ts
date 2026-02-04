@@ -414,7 +414,8 @@ export class KnockGuideClient {
     const params = {
       ...this.targetParams,
       user_id: this.knock.userId,
-      force_all_guides: debugState?.forcedGuideKey ? true : undefined,
+      force_all_guides:
+        debugState?.forcedGuideKey || debugState?.debugging ? true : undefined,
       preview_session_id: debugState?.previewSessionId || undefined,
     };
 
