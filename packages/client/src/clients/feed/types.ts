@@ -56,7 +56,7 @@ export type BindableFeedEvent = FeedEvent | "items.received.*" | "items.*";
 export interface FeedEventPayload<T = GenericData> {
   event: Omit<FeedEvent, "messages.new">;
   items: FeedItem<T>[];
-  metadata: FeedMetadata;
+  metadata?: FeedMetadata;
 }
 
 export type FeedRealTimeCallback = (resp: FeedResponse) => void;
