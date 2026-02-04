@@ -38,63 +38,65 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
         </GuideHoverCard>
       </Stack>
 
-      <Stack gap="1">
-        {guide.__typename === "Guide" && (
-          <>
-            <Tooltip
-              label={
-                guide.inspection.targetable.status
-                  ? "This user is targeted"
-                  : guide.inspection.targetable.message
-              }
-              // enabled={!guide.inspection.targetable.status}
-            >
-              <Button
-                px="1"
-                size="1"
-                variant="soft"
-                color={guide.inspection.targetable.status ? "green" : "red"}
-                leadingIcon={{ icon: UserCircle2, alt: "Target" }}
-              />
-            </Tooltip>
-            <Tooltip
-              label={
-                guide.inspection.archived.status
-                  ? "User has already archived this guide"
-                  : "User has not dismissed this guide"
-              }
-            >
-              <Button
-                px="1"
-                size="1"
-                variant="soft"
-                color={guide.inspection.archived.status ? "red" : "green"}
-                leadingIcon={{ icon: Eye, alt: "Not archived" }}
-              />
-            </Tooltip>
-          </>
-        )}
-        <Tooltip
-          label={
-            guide.__typename === "MissingGuide"
-              ? "This guide has never been committed and published yet"
-              : !guide.active
-                ? "This guide is not active"
-                : "This guide is active"
-          }
-        >
-          <Button
-            px="1"
-            size="1"
-            variant="soft"
-            color={guide.active ? "green" : "red"}
-            leadingIcon={
-              guide.active
-                ? { icon: CheckCircle2, alt: "Active" }
-                : { icon: CircleDashed, alt: "Inactive" }
+      <Stack justify="flex-end">
+        <Stack gap="1">
+          {guide.__typename === "Guide" && (
+            <>
+              <Tooltip
+                label={
+                  guide.inspection.targetable.status
+                    ? "This user is targeted"
+                    : guide.inspection.targetable.message
+                }
+                // enabled={!guide.inspection.targetable.status}
+              >
+                <Button
+                  px="1"
+                  size="1"
+                  variant="soft"
+                  color={guide.inspection.targetable.status ? "green" : "red"}
+                  leadingIcon={{ icon: UserCircle2, alt: "Target" }}
+                />
+              </Tooltip>
+              <Tooltip
+                label={
+                  guide.inspection.archived.status
+                    ? "User has already archived this guide"
+                    : "User has not dismissed this guide"
+                }
+              >
+                <Button
+                  px="1"
+                  size="1"
+                  variant="soft"
+                  color={guide.inspection.archived.status ? "red" : "green"}
+                  leadingIcon={{ icon: Eye, alt: "Not archived" }}
+                />
+              </Tooltip>
+            </>
+          )}
+          <Tooltip
+            label={
+              guide.__typename === "MissingGuide"
+                ? "This guide has never been committed and published yet"
+                : !guide.active
+                  ? "This guide is not active"
+                  : "This guide is active"
             }
-          />
-        </Tooltip>
+          >
+            <Button
+              px="1"
+              size="1"
+              variant="soft"
+              color={guide.active ? "green" : "red"}
+              leadingIcon={
+                guide.active
+                  ? { icon: CheckCircle2, alt: "Active" }
+                  : { icon: CircleDashed, alt: "Inactive" }
+              }
+            />
+          </Tooltip>
+        </Stack>
       </Stack>
     </Row>
   );
