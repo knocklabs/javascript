@@ -1261,8 +1261,16 @@ describe("Feed", () => {
 
         await feed.handleSocketEvent(newMessagePayload);
 
-        // Should trigger a fetch to get the latest data
-        expect(mockApiClient.makeRequest).toHaveBeenCalled();
+        // Should trigger a fetch to get the latest data with exclude: "meta"
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+            exclude: "meta",
+          },
+        });
       } finally {
         cleanup();
       }
