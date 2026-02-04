@@ -35,11 +35,15 @@ export const V2 = () => {
   const [isCollapsed, setIsCollapsed] = React.useState(true);
 
   React.useEffect(() => {
-    if (isVisible) {
-      return client.setDebug();
+    if (!isVisible) {
+      return;
     }
 
-    return client.unsetDebug();
+    client.setDebug();
+
+    return () => {
+      client.unsetDebug();
+    };
   }, [isVisible, client]);
 
   const data = useInspectGuideClientStore();
