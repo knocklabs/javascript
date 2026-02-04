@@ -78,7 +78,7 @@ export type FetchFeedOptionsForRequest = Omit<
 > & {
   // Formatted trigger data into a string
   trigger_data?: string;
-  // Formatted exclude into a comma-separated string
+  /** Fields to exclude from the response, joined by commas. */
   exclude?: string;
   // Unset options that should not be sent to the API
   __loadingType: undefined;
