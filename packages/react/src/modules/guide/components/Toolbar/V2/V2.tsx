@@ -6,7 +6,7 @@ import { Minimize2, Undo2 } from "lucide-react";
 import React from "react";
 
 import { KnockButton } from "../KnockButton";
-import { MAX_Z_INDEX } from "../shared";
+import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
 import { detectToolbarParam } from "./helpers";
@@ -57,7 +57,7 @@ export const V2 = () => {
       top="4"
       right="4"
       style={{
-        zIndex: MAX_Z_INDEX,
+        zIndex: TOOLBAR_Z_INDEX,
       }}
     >
       {isCollapsed ? (

@@ -1,6 +1,6 @@
 import { Button } from "@telegraph/button";
 
-import { MAX_Z_INDEX } from "./shared";
+import { TOOLBAR_Z_INDEX } from "./shared";
 import "./styles.css";
 
 type Props = {
@@ -22,7 +22,7 @@ export const KnockButton = ({ onClick }: Props) => {
       variant="soft"
       data-tgph-appearance="dark"
       aria-label="Expand guide toolbar"
-      style={{ zIndex: MAX_Z_INDEX }}
+      style={{ zIndex: TOOLBAR_Z_INDEX }}
     >
       <svg
         width="40"

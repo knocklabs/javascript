@@ -7,7 +7,7 @@ import { Minimize2, Undo2, Wrench } from "lucide-react";
 import { useState } from "react";
 
 import { KnockButton } from "../KnockButton";
-import { MAX_Z_INDEX } from "../shared";
+import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
 export const V1 = () => {
@@ -46,7 +46,7 @@ export const V1 = () => {
       py="2"
       px="3"
       data-tgph-appearance="dark"
-      style={{ zIndex: MAX_Z_INDEX }}
+      style={{ zIndex: TOOLBAR_Z_INDEX }}
     >
       <Stack gap="2" align="center" direction="row">
         <Tag
