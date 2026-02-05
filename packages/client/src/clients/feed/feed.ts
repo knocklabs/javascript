@@ -543,7 +543,7 @@ class Feed {
 
     const mergedOptions = {
       ...this.defaultOptions,
-      ...options,
+      ...mergeDateRangeParams(options),
       exclude: mergeAndDedupeArrays(
         this.defaultOptions.exclude,
         options.exclude,
@@ -552,15 +552,14 @@ class Feed {
 
     // trigger_data should be a JSON string for the API
     // this function will format the trigger data if it's an object
-    // https://docs.knock.app/reference#get-feed
+    // https://docs.knock.app/api-reference/users/feeds/list_items
     const formattedTriggerData = getFormattedTriggerData(mergedOptions);
 
     const formattedExclude = getFormattedExclude(mergedOptions);
 
     // Always include the default params, if they have been set
     const queryParams: FetchFeedOptionsForRequest = {
-      ...this.defaultOptions,
-      ...mergeDateRangeParams(options),
+      ...mergedOptions,
       trigger_data: formattedTriggerData,
       exclude: formattedExclude,
       // Unset options that should not be sent to the API
