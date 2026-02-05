@@ -1253,7 +1253,7 @@ describe("Feed", () => {
           event: "new-message" as const,
           metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
           data: {
-            client_ref_id: {
+            [feed.referenceId]: {
               metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
             },
           },
@@ -1269,6 +1269,56 @@ describe("Feed", () => {
             archived: "exclude",
             mode: "compact",
             exclude: "meta",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles new message socket events without metadata in payload", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        // Mock the store response for the feed fetch
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: {
+            entries: [],
+            page_info: { before: null, after: null },
+            meta: { total_count: 1, unread_count: 1, unseen_count: 1 },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          mockSocketManager as unknown as FeedSocketManager,
+        );
+
+        // Payload lacking metadata for this client's referenceId.
+        // This should never happen in practice, but we should handle it gracefully.
+        const newMessagePayload = {
+          event: "new-message" as const,
+          metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
+          data: {},
+        };
+
+        await feed.handleSocketEvent(newMessagePayload);
+
+        // Should trigger a fetch WITHOUT exclude: "meta" to get badge counts from API
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
           },
         });
       } finally {

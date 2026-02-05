@@ -660,8 +660,9 @@ class Feed {
     this.fetch({
       before: currentHead?.__cursor,
       __fetchSource: "socket",
-      // Exclude meta since we already have the badge counts from the socket
-      exclude: ["meta"],
+      // The socket event payload should *always* include metadata,
+      // but to be safe, only exclude meta from the fetch when it's present
+      exclude: metadata ? ["meta"] : [],
     });
   }
 
