@@ -22,7 +22,7 @@ export const GuidesListDisplaySelect = ({ value, onChange }: Props) => {
         style: { zIndex: MAX_Z_INDEX },
       }}
     >
-      {/*
+      {/* NOTE: Commented out until we can show relevant indicators.
         <Select.Option size="1" value="current-page">
           Displayable on current page
         </Select.Option>

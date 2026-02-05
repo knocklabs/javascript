@@ -5,7 +5,7 @@ import { Minimize2, Undo2 } from "lucide-react";
 import React from "react";
 
 import { KnockButton } from "../KnockButton";
-// import { TOOLBAR_Z_INDEX } from "../shared";
+import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
 import { GuideRow } from "./GuideRow";
