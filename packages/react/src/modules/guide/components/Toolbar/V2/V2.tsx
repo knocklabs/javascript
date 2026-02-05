@@ -46,8 +46,8 @@ export const V2 = () => {
     };
   }, [isVisible, client]);
 
-  const data = useInspectGuideClientStore();
-  if (!data) {
+  const result = useInspectGuideClientStore();
+  if (!result) {
     return null;
   }
 
