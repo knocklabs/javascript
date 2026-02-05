@@ -9,7 +9,7 @@ const resolveIsEligible = ({
   active,
   targetable,
   archived,
-}: Pick<GuideAnnotation, "active" | "targetable" | "archived">) => {
+}: AnnotatedStatuses) => {
   if (!active.status) return false;
   if (!targetable.status) return false;
   if (archived.status) return false;
