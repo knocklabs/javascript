@@ -507,5 +507,16 @@ describe("feed utils", () => {
 
       expect(result).toBeUndefined();
     });
+
+    test("returns undefined when all fields are whitespace-only", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["   ", "  ", "\t", "\n"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
   });
 });
