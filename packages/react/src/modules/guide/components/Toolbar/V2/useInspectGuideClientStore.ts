@@ -23,8 +23,8 @@ type ArchivedStatus = {
   status: boolean;
 };
 
-export type InspectedGuide = KnockGuide & {
-  inspection: {
+export type AnnotatedGuide = KnockGuide & {
+  annotation: {
     // true status = good
     active: ActiveStatus;
     targetable: TargetableStatus;
@@ -34,11 +34,11 @@ export type InspectedGuide = KnockGuide & {
   };
 };
 
-export const checkEligible = (guide: InspectedGuide | MissingGuide) => {
+export const checkEligible = (guide: AnnotatedGuide | MissingGuide) => {
   if (guide.__typename === "MissingGuide") return false;
-  if (!guide.inspection.active.status) return false;
-  if (!guide.inspection.targetable.status) return false;
-  if (guide.inspection.archived.status) return false;
+  if (!guide.annotation.active.status) return false;
+  if (!guide.annotation.targetable.status) return false;
+  if (guide.annotation.archived.status) return false;
 
   return true;
 };
@@ -54,7 +54,7 @@ export type MissingGuide = {
 };
 
 export type InspectionResult = {
-  guides: (InspectedGuide | MissingGuide)[];
+  guides: (AnnotatedGuide | MissingGuide)[];
   error?: "no_guide_group";
 };
 
@@ -88,10 +88,10 @@ const toArchivedStatus = (
 const inspectGuide = (
   guide: KnockGuide,
   ineligibleGuides: KnockGuideClientStoreState["ineligibleGuides"],
-): InspectedGuide => {
+): AnnotatedGuide => {
   const marker = ineligibleGuides[guide.key];
 
-  const inspection: InspectedGuide["inspection"] = {
+  const annotation: AnnotatedGuide["annotation"] = {
     active: { status: guide.active },
     targetable: marker ? toTargetableStatus(marker) : { status: true },
     archived: marker ? toArchivedStatus(marker) : { status: false },
@@ -99,7 +99,7 @@ const inspectGuide = (
 
   return {
     ...guide,
-    inspection,
+    annotation,
   };
 };
 

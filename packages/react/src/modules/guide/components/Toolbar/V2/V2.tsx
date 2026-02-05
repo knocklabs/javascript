@@ -109,9 +109,9 @@ export const V2 = () => {
           </Stack>
 
           <Box w="full">
-            {data.error && <Box>{data.error}</Box>}
+            {result.error && <Box>{result.error}</Box>}
             <GuidesList
-              guides={data.guides}
+              guides={result.guides}
               displayOption={guidesListDisplayed}
             />
           </Box>
