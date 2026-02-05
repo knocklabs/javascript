@@ -10,6 +10,7 @@ import {
   getFormattedExclude,
   getFormattedTriggerData,
   mergeDateRangeParams,
+  mergeExcludeArrays,
   sortItems,
 } from "../../../src/clients/feed/utils";
 
@@ -517,6 +518,80 @@ describe("feed utils", () => {
       const result = getFormattedExclude(options);
 
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe("mergeExcludeArrays", () => {
+    test("returns undefined when both arrays are undefined", () => {
+      const result = mergeExcludeArrays(undefined, undefined);
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when both arrays are empty", () => {
+      const result = mergeExcludeArrays([], []);
+      expect(result).toBeUndefined();
+    });
+
+    test("returns default exclude when options exclude is undefined", () => {
+      const result = mergeExcludeArrays(["entries.archived_at"], undefined);
+      expect(result).toEqual(["entries.archived_at"]);
+    });
+
+    test("returns default exclude when options exclude is empty", () => {
+      const result = mergeExcludeArrays(["entries.archived_at"], []);
+      expect(result).toEqual(["entries.archived_at"]);
+    });
+
+    test("returns options exclude when default exclude is undefined", () => {
+      const result = mergeExcludeArrays(undefined, ["meta"]);
+      expect(result).toEqual(["meta"]);
+    });
+
+    test("returns options exclude when default exclude is empty", () => {
+      const result = mergeExcludeArrays([], ["meta"]);
+      expect(result).toEqual(["meta"]);
+    });
+
+    test("merges both exclude arrays", () => {
+      const result = mergeExcludeArrays(["entries.archived_at"], ["meta"]);
+      expect(result).toEqual(["entries.archived_at", "meta"]);
+    });
+
+    test("merges multiple fields from both arrays", () => {
+      const result = mergeExcludeArrays(
+        ["entries.archived_at", "entries.data"],
+        ["meta", "entries.blocks"],
+      );
+      expect(result).toEqual([
+        "entries.archived_at",
+        "entries.data",
+        "meta",
+        "entries.blocks",
+      ]);
+    });
+
+    test("deduplicates merged arrays", () => {
+      const result = mergeExcludeArrays(
+        ["entries.archived_at", "meta"],
+        ["meta", "entries.data"],
+      );
+      expect(result).toEqual(["entries.archived_at", "meta", "entries.data"]);
+    });
+
+    test("handles duplicate values in default exclude", () => {
+      const result = mergeExcludeArrays(
+        ["entries.archived_at", "entries.archived_at"],
+        ["meta"],
+      );
+      expect(result).toEqual(["entries.archived_at", "meta"]);
+    });
+
+    test("handles duplicate values in options exclude", () => {
+      const result = mergeExcludeArrays(
+        ["entries.archived_at"],
+        ["meta", "meta"],
+      );
+      expect(result).toEqual(["entries.archived_at", "meta"]);
     });
   });
 });

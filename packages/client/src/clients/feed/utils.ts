@@ -78,3 +78,15 @@ export function getFormattedExclude(options: FeedClientOptions) {
 
   return fields.length ? fields.join(",") : undefined;
 }
+
+/**
+ * Merges two exclude arrays, deduplicating values.
+ * Returns undefined if the merged result is empty.
+ */
+export function mergeExcludeArrays(
+  exclude1: string[] | undefined,
+  exclude2: string[] | undefined,
+): string[] | undefined {
+  const merged = [...(exclude1 ?? []), ...(exclude2 ?? [])];
+  return merged.length ? [...new Set(merged)] : undefined;
+}

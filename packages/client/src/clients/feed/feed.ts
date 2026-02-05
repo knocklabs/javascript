@@ -37,6 +37,7 @@ import {
   getFormattedExclude,
   getFormattedTriggerData,
   mergeDateRangeParams,
+  mergeExcludeArrays,
 } from "./utils";
 
 // Default options to apply
@@ -540,7 +541,11 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
-    const mergedOptions = { ...this.defaultOptions, ...options };
+    const mergedOptions = {
+      ...this.defaultOptions,
+      ...options,
+      exclude: mergeExcludeArrays(this.defaultOptions.exclude, options.exclude),
+    };
 
     // trigger_data should be a JSON string for the API
     // this function will format the trigger data if it's an object
