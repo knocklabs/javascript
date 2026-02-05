@@ -28,7 +28,6 @@ export type AnnotatedGuide = KnockGuide & {
     // true status = good
     active: ActiveStatus;
     targetable: TargetableStatus;
-
     // false status = good
     archived: ArchivedStatus;
   };
@@ -85,9 +84,14 @@ const toArchivedStatus = (
   };
 };
 
-const inspectGuide = (
+type StoreStateSnapshot = Pick<
+  KnockGuideClientStoreState,
+  "guides" | "guideGroups" | "ineligibleGuides" | "debug"
+>;
+
+const annotateGuide = (
   guide: KnockGuide,
-  ineligibleGuides: KnockGuideClientStoreState["ineligibleGuides"],
+  { ineligibleGuides }: StoreStateSnapshot,
 ): AnnotatedGuide => {
   const marker = ineligibleGuides[guide.key];
 
@@ -129,7 +133,7 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
     return undefined;
   }
 
-  // Just for completeness, as there should always be a default group so this
+  // Only for completeness, as there should always be a default group so this
   // should never happen.
   const defaultGroup = snapshot.guideGroups[0];
   if (!defaultGroup) {
@@ -139,14 +143,15 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
     };
   }
 
-  // Transform the raw snapshot into something more useful for debugging.
+  // Annotate guides for various eligibility, activation and query statuses
+  // that are useful for debugging purposes.
   const orderedGuides = defaultGroup.display_sequence.map((guideKey) => {
     const guide = snapshot.guides[guideKey];
     if (!guide) {
       return newMissingGuide(guideKey);
     }
 
-    return inspectGuide(guide, snapshot.ineligibleGuides);
+    return annotateGuide(guide, snapshot);
   });
 
   return {
