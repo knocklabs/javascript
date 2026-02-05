@@ -5,19 +5,23 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
-export const checkEligible = (guide: AnnotatedGuide | MissingGuide) => {
-  if (guide.__typename === "MissingGuide") return false;
-  if (!guide.annotation.active.status) return false;
-  if (!guide.annotation.targetable.status) return false;
-  if (guide.annotation.archived.status) return false;
-
+const resolveIsEligible = ({
+  active,
+  targetable,
+  archived,
+}: Pick<GuideAnnotation, "active" | "targetable" | "archived">) => {
+  if (!active.status) return false;
+  if (!targetable.status) return false;
+  if (archived.status) return false;
   return true;
 };
 
+// Active: `true` status = good
 type ActiveStatus = {
   status: boolean;
 };
 
+// Targetable: `true` status = good
 type TargetableStatusTrue = {
   status: true;
 };
@@ -28,18 +32,26 @@ type TargetableStatusFalse = {
 };
 type TargetableStatus = TargetableStatusTrue | TargetableStatusFalse;
 
+// Archived: `false` status = good
 type ArchivedStatus = {
   status: boolean;
 };
 
+type AnnotatedStatuses = {
+  // Individual eligibility statuses:
+  active: ActiveStatus;
+  targetable: TargetableStatus;
+  archived: ArchivedStatus;
+};
+
+export type GuideAnnotation = AnnotatedStatuses & {
+  // Resolved eligibility based on active, targetable and archived statuses,
+  // which are backend driven evaluation results that are exposed for debugging.
+  isEligible: boolean;
+};
+
 export type AnnotatedGuide = KnockGuide & {
-  annotation: {
-    // true status = good
-    active: ActiveStatus;
-    targetable: TargetableStatus;
-    // false status = good
-    archived: ArchivedStatus;
-  };
+  annotation: GuideAnnotation;
 };
 
 // Exists and ordered in control but absent in switchboard (therefore not
@@ -50,6 +62,9 @@ export type MissingGuide = {
   key: KnockGuide["key"];
   active: false;
   bypass_global_group_limit: false;
+  annotation: {
+    isEligible: false;
+  };
 };
 
 export type InspectionResult = {
@@ -96,10 +111,15 @@ const annotateGuide = (
   const { ineligibleGuides } = snapshot;
   const marker = ineligibleGuides[guide.key];
 
-  const annotation: AnnotatedGuide["annotation"] = {
+  const statuses: AnnotatedStatuses = {
     active: { status: guide.active },
     targetable: marker ? toTargetableStatus(marker) : { status: true },
     archived: marker ? toArchivedStatus(marker) : { status: false },
+  };
+
+  const annotation: GuideAnnotation = {
+    ...statuses,
+    isEligible: resolveIsEligible(statuses),
   };
 
   return {
@@ -114,6 +134,9 @@ const newMissingGuide = (key: KnockGuide["key"]) =>
     key,
     active: false,
     bypass_global_group_limit: false,
+    annotation: {
+      isEligible: false,
+    },
   }) as MissingGuide;
 
 export const useInspectGuideClientStore = (): InspectionResult | undefined => {

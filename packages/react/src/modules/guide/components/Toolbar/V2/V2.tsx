@@ -16,7 +16,6 @@ import {
 import { detectToolbarParam } from "./helpers";
 import {
   InspectionResult,
-  checkEligible,
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
 
@@ -28,7 +27,7 @@ const GuidesList = ({
   displayOption: DisplayOption;
 }) => {
   return guides.map((guide, idx) => {
-    if (displayOption === "all-eligible" && !checkEligible(guide)) {
+    if (displayOption === "all-eligible" && !guide.annotation.isEligible) {
       return null;
     }
 
