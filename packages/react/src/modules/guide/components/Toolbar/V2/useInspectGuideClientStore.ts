@@ -5,17 +5,6 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
-const resolveIsEligible = ({
-  active,
-  targetable,
-  archived,
-}: AnnotatedStatuses) => {
-  if (!active.status) return false;
-  if (!targetable.status) return false;
-  if (archived.status) return false;
-  return true;
-};
-
 // Active: `true` status = good
 type ActiveStatus = {
   status: boolean;
@@ -44,7 +33,7 @@ type AnnotatedStatuses = {
   archived: ArchivedStatus;
 };
 
-export type GuideAnnotation = AnnotatedStatuses & {
+type GuideAnnotation = AnnotatedStatuses & {
   // Resolved eligibility based on active, targetable and archived statuses,
   // which are backend driven evaluation results that are exposed for debugging.
   isEligible: boolean;
@@ -97,6 +86,17 @@ const toArchivedStatus = (
   return {
     status: marker.reason === "marked_as_archived",
   };
+};
+
+const resolveIsEligible = ({
+  active,
+  targetable,
+  archived,
+}: AnnotatedStatuses) => {
+  if (!active.status) return false;
+  if (!targetable.status) return false;
+  if (archived.status) return false;
+  return true;
 };
 
 type StoreStateSnapshot = Pick<
