@@ -9,8 +9,8 @@ import {
   deduplicateItems,
   getFormattedExclude,
   getFormattedTriggerData,
+  mergeAndDedupeArrays,
   mergeDateRangeParams,
-  mergeExcludeArrays,
   sortItems,
 } from "../../../src/clients/feed/utils";
 
@@ -521,77 +521,45 @@ describe("feed utils", () => {
     });
   });
 
-  describe("mergeExcludeArrays", () => {
+  describe("mergeAndDedupeArrays", () => {
     test("returns undefined when both arrays are undefined", () => {
-      const result = mergeExcludeArrays(undefined, undefined);
+      const result = mergeAndDedupeArrays(undefined, undefined);
       expect(result).toBeUndefined();
     });
 
     test("returns undefined when both arrays are empty", () => {
-      const result = mergeExcludeArrays([], []);
+      const result = mergeAndDedupeArrays([], []);
       expect(result).toBeUndefined();
     });
 
-    test("returns default exclude when options exclude is undefined", () => {
-      const result = mergeExcludeArrays(["entries.archived_at"], undefined);
-      expect(result).toEqual(["entries.archived_at"]);
+    test("returns first array when second is undefined", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], undefined);
+      expect(result).toEqual(["a", "b"]);
     });
 
-    test("returns default exclude when options exclude is empty", () => {
-      const result = mergeExcludeArrays(["entries.archived_at"], []);
-      expect(result).toEqual(["entries.archived_at"]);
+    test("returns first array when second is empty", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], []);
+      expect(result).toEqual(["a", "b"]);
     });
 
-    test("returns options exclude when default exclude is undefined", () => {
-      const result = mergeExcludeArrays(undefined, ["meta"]);
-      expect(result).toEqual(["meta"]);
+    test("returns second array when first is undefined", () => {
+      const result = mergeAndDedupeArrays(undefined, ["c", "d"]);
+      expect(result).toEqual(["c", "d"]);
     });
 
-    test("returns options exclude when default exclude is empty", () => {
-      const result = mergeExcludeArrays([], ["meta"]);
-      expect(result).toEqual(["meta"]);
+    test("returns second array when first is empty", () => {
+      const result = mergeAndDedupeArrays([], ["c", "d"]);
+      expect(result).toEqual(["c", "d"]);
     });
 
-    test("merges both exclude arrays", () => {
-      const result = mergeExcludeArrays(["entries.archived_at"], ["meta"]);
-      expect(result).toEqual(["entries.archived_at", "meta"]);
-    });
-
-    test("merges multiple fields from both arrays", () => {
-      const result = mergeExcludeArrays(
-        ["entries.archived_at", "entries.data"],
-        ["meta", "entries.blocks"],
-      );
-      expect(result).toEqual([
-        "entries.archived_at",
-        "entries.data",
-        "meta",
-        "entries.blocks",
-      ]);
+    test("merges both arrays", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], ["c", "d"]);
+      expect(result).toEqual(["a", "b", "c", "d"]);
     });
 
     test("deduplicates merged arrays", () => {
-      const result = mergeExcludeArrays(
-        ["entries.archived_at", "meta"],
-        ["meta", "entries.data"],
-      );
-      expect(result).toEqual(["entries.archived_at", "meta", "entries.data"]);
-    });
-
-    test("handles duplicate values in default exclude", () => {
-      const result = mergeExcludeArrays(
-        ["entries.archived_at", "entries.archived_at"],
-        ["meta"],
-      );
-      expect(result).toEqual(["entries.archived_at", "meta"]);
-    });
-
-    test("handles duplicate values in options exclude", () => {
-      const result = mergeExcludeArrays(
-        ["entries.archived_at"],
-        ["meta", "meta"],
-      );
-      expect(result).toEqual(["entries.archived_at", "meta"]);
+      const result = mergeAndDedupeArrays(["a", "b"], ["b", "c"]);
+      expect(result).toEqual(["a", "b", "c"]);
     });
   });
 });

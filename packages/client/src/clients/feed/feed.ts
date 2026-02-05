@@ -36,8 +36,8 @@ import {
 import {
   getFormattedExclude,
   getFormattedTriggerData,
+  mergeAndDedupeArrays,
   mergeDateRangeParams,
-  mergeExcludeArrays,
 } from "./utils";
 
 // Default options to apply
@@ -544,7 +544,10 @@ class Feed {
     const mergedOptions = {
       ...this.defaultOptions,
       ...options,
-      exclude: mergeExcludeArrays(this.defaultOptions.exclude, options.exclude),
+      exclude: mergeAndDedupeArrays(
+        this.defaultOptions.exclude,
+        options.exclude,
+      ),
     };
 
     // trigger_data should be a JSON string for the API

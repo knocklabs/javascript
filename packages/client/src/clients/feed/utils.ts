@@ -80,13 +80,13 @@ export function getFormattedExclude(options: FeedClientOptions) {
 }
 
 /**
- * Merges two exclude arrays, deduplicating values.
+ * Merges two arrays, deduplicating values.
  * Returns undefined if the merged result is empty.
  */
-export function mergeExcludeArrays(
-  exclude1: string[] | undefined,
-  exclude2: string[] | undefined,
-): string[] | undefined {
-  const merged = [...(exclude1 ?? []), ...(exclude2 ?? [])];
+export function mergeAndDedupeArrays<T>(
+  array1: T[] | undefined,
+  array2: T[] | undefined,
+): T[] | undefined {
+  const merged = [...(array1 ?? []), ...(array2 ?? [])];
   return merged.length ? [...new Set(merged)] : undefined;
 }
