@@ -15,9 +15,26 @@ import {
 } from "./GuidesListDisplaySelect";
 import { detectToolbarParam } from "./helpers";
 import {
+  InspectionResult,
   checkEligible,
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
+
+const GuidesList = ({
+  guides,
+  displayOption,
+}: {
+  guides: InspectionResult["guides"];
+  displayOption: DisplayOption;
+}) => {
+  return guides.map((guide, idx) => {
+    if (displayOption === "all-eligible" && !checkEligible(guide)) {
+      return null;
+    }
+
+    return <GuideRow key={guide.key} guide={guide} orderIndex={idx} />;
+  });
+};
 
 export const V2 = () => {
   const { client } = useGuideContext();
@@ -93,18 +110,10 @@ export const V2 = () => {
 
           <Box w="full">
             {data.error && <Box>{data.error}</Box>}
-            {data.guides.map((guide, idx) => {
-              if (
-                guidesListDisplayed === "all-eligible" &&
-                !checkEligible(guide)
-              ) {
-                return null;
-              }
-
-              return (
-                <GuideRow key={guide.key} guide={guide} orderIndex={idx} />
-              );
-            })}
+            <GuidesList
+              guides={data.guides}
+              displayOption={guidesListDisplayed}
+            />
           </Box>
         </Stack>
       )}
