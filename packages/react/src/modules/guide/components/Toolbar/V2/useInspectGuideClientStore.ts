@@ -5,6 +5,15 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
+export const checkEligible = (guide: AnnotatedGuide | MissingGuide) => {
+  if (guide.__typename === "MissingGuide") return false;
+  if (!guide.annotation.active.status) return false;
+  if (!guide.annotation.targetable.status) return false;
+  if (guide.annotation.archived.status) return false;
+
+  return true;
+};
+
 type ActiveStatus = {
   status: boolean;
 };
@@ -31,15 +40,6 @@ export type AnnotatedGuide = KnockGuide & {
     // false status = good
     archived: ArchivedStatus;
   };
-};
-
-export const checkEligible = (guide: AnnotatedGuide | MissingGuide) => {
-  if (guide.__typename === "MissingGuide") return false;
-  if (!guide.annotation.active.status) return false;
-  if (!guide.annotation.targetable.status) return false;
-  if (guide.annotation.archived.status) return false;
-
-  return true;
 };
 
 // Exists and ordered in control but absent in switchboard (therefore not
@@ -91,8 +91,9 @@ type StoreStateSnapshot = Pick<
 
 const annotateGuide = (
   guide: KnockGuide,
-  { ineligibleGuides }: StoreStateSnapshot,
+  snapshot: StoreStateSnapshot,
 ): AnnotatedGuide => {
+  const { ineligibleGuides } = snapshot;
   const marker = ineligibleGuides[guide.key];
 
   const annotation: AnnotatedGuide["annotation"] = {
