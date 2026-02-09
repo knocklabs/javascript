@@ -4191,7 +4191,7 @@ __metadata:
     react-dom: "npm:^19.0.0"
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
-    swr: "npm:^2.3.3"
+    swr: "npm:^2.4.0"
     typescript: "npm:^5.8.3"
     vite: "npm:^5.4.19"
     vite-plugin-dts: "npm:^4.5.0"
@@ -15687,7 +15687,7 @@ __metadata:
     react-dom: "npm:^19.0.0"
     react-icons: "npm:^5.4.0"
     sonner: "npm:^2.0.6"
-    swr: "npm:^2.3.3"
+    swr: "npm:^2.4.0"
     typescript: "npm:^5.8.3"
     uuid: "npm:^11.1.0"
   languageName: unknown
@@ -15727,7 +15727,7 @@ __metadata:
     react-dom: "npm:^19.0.0"
     react-icons: "npm:^5.4.0"
     sonner: "npm:^2.0.6"
-    swr: "npm:^2.3.3"
+    swr: "npm:^2.4.0"
     typescript: "npm:^5.8.3"
     uuid: "npm:^11.1.0"
   languageName: unknown
@@ -18804,15 +18804,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swr@npm:^2.3.3":
-  version: 2.3.3
-  resolution: "swr@npm:2.3.3"
+"swr@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "swr@npm:2.4.0"
   dependencies:
     dequal: "npm:^2.0.3"
-    use-sync-external-store: "npm:^1.4.0"
+    use-sync-external-store: "npm:^1.6.0"
   peerDependencies:
     react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/882fc8291912860e0c50eae3470ebf0cd58b0144cb12adcc4b14c5cef913ea06479043830508d8b0b3d4061d99ad8dd52485c9c879fbd4e9b893484e6d8da9e3
+  checksum: 10c0/176097e737ac79c94ab9ff73f18f3eed104a07cb32ec2f92f8e6deaa7ce2c8227dda8391eed116a7e29b7c379460ccd2f16605bd64ea538df1c610ba54bc52e7
   languageName: node
   linkType: hard
 
@@ -19819,7 +19819,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0":
+"use-sync-external-store@npm:^1.5.0":
   version: 1.5.0
   resolution: "use-sync-external-store@npm:1.5.0"
   peerDependencies:
