@@ -49,9 +49,11 @@ export interface FeedClientOptions {
     inclusive?: boolean;
   };
   /**
-   * The mode to render the feed items in. When `mode` is `compact`, feed items will not have
-   * `activities` and `total_activities` fields, and the `data` field will not include nested
-   * arrays and objects.
+   * The mode to render the feed items in. When `mode` is `compact`:
+   *
+   * - The `activities` and `total_activities` fields will _not_ be present on feed items
+   * - The `data` field will _not_ include nested arrays and objects
+   * - The `actors` field will only have up to one actor
    *
    * @default "compact"
    */
