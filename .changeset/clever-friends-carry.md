@@ -21,7 +21,7 @@ If you are using the feed client via `@knocklabs/client` directly:
 ```js
 const knockFeed = knockClient.feeds.initialize(
   process.env.KNOCK_FEED_CHANNEL_ID,
-  { mode: "full" },
+  { mode: "rich" },
 );
 ```
 
@@ -30,7 +30,7 @@ If you are using `<KnockFeedProvider>` via `@knocklabs/react`, `@knocklabs/react
 ```tsx
 <KnockFeedProvider
   feedId={process.env.KNOCK_FEED_CHANNEL_ID}
-  defaultFeedOptions={{ mode: "full" }}
+  defaultFeedOptions={{ mode: "rich" }}
 />
 ```
 
@@ -40,6 +40,6 @@ If you are using the `useNotifications` hook via `@knocklabs/react-core`:
 const feedClient = useNotifications(
   knockClient,
   process.env.KNOCK_FEED_CHANNEL_ID,
-  { mode: "full" },
+  { mode: "rich" },
 );
 ```
