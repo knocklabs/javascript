@@ -10,7 +10,7 @@ Initialize feeds in `"compact"` mode by default
 
 The feed client can now be initialized with a `mode` option, set to either `"compact"` or `"rich"`. When `mode` is `"compact"`, the following restrictions will apply when the feed is fetched:
 
-- `activities` and `total_activities` fields will _not_ be present on feed items
+- The `activities` and `total_activities` fields will _not_ be present on feed items
 - The `data` field will _not_ include nested arrays and objects
 - The `actors` field will only have up to one actor
 
