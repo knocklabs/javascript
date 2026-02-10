@@ -58,6 +58,11 @@ export interface FeedClientOptions {
    * @default "compact"
    */
   mode?: "rich" | "compact";
+  /**
+   * Field paths to exclude from the response. Use dot notation for nested fields
+   * (e.g., "entries.archived_at"). Limited to 3 levels deep.
+   */
+  exclude?: string[];
 }
 
 export type FetchFeedOptions = {
@@ -65,14 +70,23 @@ export type FetchFeedOptions = {
   __fetchSource?: "socket" | "http";
 } & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
 
-// The final data shape that is sent to the API
-// Should match types here: https://docs.knock.app/reference#get-feed
+/**
+ * The final data shape that is sent to the the list feed items endpoint of the Knock API.
+ *
+ * @see https://docs.knock.app/api-reference/users/feeds/list_items
+ */
 export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
-  "trigger_data"
+  "trigger_data" | "exclude"
 > & {
   // Formatted trigger data into a string
   trigger_data?: string;
+  /** Fields to exclude from the response, joined by commas. */
+  exclude?: string;
+  "inserted_at.gte"?: string;
+  "inserted_at.lte"?: string;
+  "inserted_at.gt"?: string;
+  "inserted_at.lt"?: string;
   // Unset options that should not be sent to the API
   __loadingType: undefined;
   __fetchSource: undefined;

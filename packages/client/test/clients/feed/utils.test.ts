@@ -7,7 +7,9 @@ import type {
 } from "../../../src/clients/feed/interfaces";
 import {
   deduplicateItems,
+  getFormattedExclude,
   getFormattedTriggerData,
+  mergeAndDedupeArrays,
   mergeDateRangeParams,
   sortItems,
 } from "../../../src/clients/feed/utils";
@@ -415,6 +417,149 @@ describe("feed utils", () => {
         const result = getFormattedTriggerData(options);
         expect(result).toBeUndefined();
       });
+    });
+  });
+
+  describe("getFormattedExclude", () => {
+    test("returns undefined when no exclude option", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when exclude is undefined", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: undefined,
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when exclude is empty array", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: [],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns single field as-is", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["entries.archived_at"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at");
+    });
+
+    test("joins multiple fields with commas", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["entries.archived_at", "meta.total_count", "entries.data"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at,meta.total_count,entries.data");
+    });
+
+    test("trims whitespace before joining fields", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: [
+          " entries.archived_at    ",
+          "meta.total_count\n",
+          "\tentries.data ",
+        ],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at,meta.total_count,entries.data");
+    });
+
+    test("filters out empty fields", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["entries.archived_at", "   ", "entries.data"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBe("entries.archived_at,entries.data");
+    });
+
+    test("returns undefined for empty options object", () => {
+      const options: FeedClientOptions = {};
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when all fields are whitespace-only", () => {
+      const options: FeedClientOptions = {
+        archived: "exclude",
+        exclude: ["   ", "  ", "\t", "\n"],
+      };
+
+      const result = getFormattedExclude(options);
+
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("mergeAndDedupeArrays", () => {
+    test("returns undefined when both arrays are undefined", () => {
+      const result = mergeAndDedupeArrays(undefined, undefined);
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined when both arrays are empty", () => {
+      const result = mergeAndDedupeArrays([], []);
+      expect(result).toBeUndefined();
+    });
+
+    test("returns first array when second is undefined", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], undefined);
+      expect(result).toEqual(["a", "b"]);
+    });
+
+    test("returns first array when second is empty", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], []);
+      expect(result).toEqual(["a", "b"]);
+    });
+
+    test("returns second array when first is undefined", () => {
+      const result = mergeAndDedupeArrays(undefined, ["c", "d"]);
+      expect(result).toEqual(["c", "d"]);
+    });
+
+    test("returns second array when first is empty", () => {
+      const result = mergeAndDedupeArrays([], ["c", "d"]);
+      expect(result).toEqual(["c", "d"]);
+    });
+
+    test("merges both arrays", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], ["c", "d"]);
+      expect(result).toEqual(["a", "b", "c", "d"]);
+    });
+
+    test("deduplicates merged arrays", () => {
+      const result = mergeAndDedupeArrays(["a", "b"], ["b", "c"]);
+      expect(result).toEqual(["a", "b", "c"]);
     });
   });
 });

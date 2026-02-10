@@ -66,3 +66,27 @@ export function getFormattedTriggerData(options: FeedClientOptions) {
 
   return undefined;
 }
+
+export function getFormattedExclude(options: FeedClientOptions) {
+  if (!options?.exclude?.length) {
+    return undefined;
+  }
+
+  const fields = options.exclude
+    .map((field) => field.trim())
+    .filter((field) => !!field);
+
+  return fields.length ? fields.join(",") : undefined;
+}
+
+/**
+ * Merges two arrays, deduplicating values.
+ * Returns undefined if the merged result is empty.
+ */
+export function mergeAndDedupeArrays<T>(
+  array1: T[] | undefined,
+  array2: T[] | undefined,
+): T[] | undefined {
+  const merged = [...(array1 ?? []), ...(array2 ?? [])];
+  return merged.length ? [...new Set(merged)] : undefined;
+}

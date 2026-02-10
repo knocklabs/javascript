@@ -1253,7 +1253,7 @@ describe("Feed", () => {
           event: "new-message" as const,
           metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
           data: {
-            client_ref_id: {
+            [feed.referenceId]: {
               metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
             },
           },
@@ -1261,8 +1261,66 @@ describe("Feed", () => {
 
         await feed.handleSocketEvent(newMessagePayload);
 
-        // Should trigger a fetch to get the latest data
-        expect(mockApiClient.makeRequest).toHaveBeenCalled();
+        // Should trigger a fetch to get the latest data with exclude: "meta"
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+            exclude: "meta",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles new message socket events without metadata in payload", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockSocketManager = {
+          join: vi.fn().mockReturnValue(vi.fn()),
+          leave: vi.fn(),
+        };
+
+        // Mock the store response for the feed fetch
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: {
+            entries: [],
+            page_info: { before: null, after: null },
+            meta: { total_count: 1, unread_count: 1, unseen_count: 1 },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          mockSocketManager as unknown as FeedSocketManager,
+        );
+
+        // Payload lacking metadata for this client's referenceId.
+        // This should never happen in practice, but we should handle it gracefully.
+        const newMessagePayload = {
+          event: "new-message" as const,
+          metadata: { total_count: 2, unread_count: 2, unseen_count: 2 },
+          data: {},
+        };
+
+        await feed.handleSocketEvent(newMessagePayload);
+
+        // Should trigger a fetch WITHOUT exclude: "meta" to get badge counts from API
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+          },
+        });
       } finally {
         cleanup();
       }
@@ -1672,6 +1730,85 @@ describe("Feed", () => {
 
         expect(result).toBeDefined();
         expect(result!.data).toEqual(mockFeedResponse);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Exclude Option", () => {
+    test("converts exclude array to comma-separated string in query params", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockFeedResponse = {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        await feed.fetch({
+          exclude: ["entries.archived_at", "meta.total_count"],
+        });
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+            exclude: "entries.archived_at,meta.total_count",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("ignores empty exclude array", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockFeedResponse = {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {},
+          undefined,
+        );
+
+        await feed.fetch({ exclude: [] });
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "compact",
+          },
+        });
       } finally {
         cleanup();
       }
