@@ -48,6 +48,16 @@ export interface FeedClientOptions {
     // Optionally set whether to be inclusive of the start and end dates
     inclusive?: boolean;
   };
+  /**
+   * The mode to render the feed items in. When `mode` is `compact`:
+   *
+   * - The `activities` and `total_activities` fields will _not_ be present on feed items
+   * - The `data` field will _not_ include nested arrays and objects
+   * - The `actors` field will only have up to one actor
+   *
+   * @default "compact"
+   */
+  mode?: "rich" | "compact";
 }
 
 export type FetchFeedOptions = {
@@ -107,7 +117,11 @@ export type ContentBlock =
 export interface FeedItem<T = GenericData> {
   __cursor: string;
   id: string;
-  activities: Activity<T>[];
+  /**
+   * List of activities associated with this feed item.
+   * Only present in "rich" mode.
+   */
+  activities?: Activity<T>[];
   actors: Recipient[];
   blocks: ContentBlock[];
   inserted_at: string;
@@ -118,7 +132,11 @@ export interface FeedItem<T = GenericData> {
   interacted_at: string | null;
   link_clicked_at: string | null;
   archived_at: string | null;
-  total_activities: number;
+  /**
+   * Total number of activities related to this feed item.
+   * Only present in "rich" mode.
+   */
+  total_activities?: number;
   total_actors: number;
   data: T | null;
   source: NotificationSource;

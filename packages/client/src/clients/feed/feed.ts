@@ -36,8 +36,9 @@ import {
 import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
 // Default options to apply
-const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
+const feedClientDefaults: Pick<FeedClientOptions, "archived" | "mode"> = {
   archived: "exclude",
+  mode: "compact",
 };
 
 const DEFAULT_DISCONNECT_DELAY = 2000;

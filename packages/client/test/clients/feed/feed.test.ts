@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
+import type { FetchFeedOptions } from "../../../src";
 import ApiClient from "../../../src/api";
 import Feed from "../../../src/clients/feed/feed";
 import { FeedSocketManager } from "../../../src/clients/feed/socket-manager";
@@ -83,6 +84,7 @@ describe("Feed", () => {
         );
 
         expect(feed.defaultOptions.archived).toBe("exclude");
+        expect(feed.defaultOptions.mode).toBe("compact");
       } finally {
         cleanup();
       }
@@ -546,7 +548,7 @@ describe("Feed", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "GET",
           url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
-          params: { archived: "exclude" },
+          params: { archived: "exclude", mode: "compact" },
         });
         expect(result).toBeDefined();
         if (result && "entries" in result) {
@@ -579,10 +581,11 @@ describe("Feed", () => {
           undefined,
         );
 
-        const options = {
+        const options: FetchFeedOptions = {
           page_size: 25,
           source: "workflow_123",
           tenant: "tenant_456",
+          mode: "rich",
         };
 
         await feed.fetch(options);
@@ -595,6 +598,7 @@ describe("Feed", () => {
             page_size: 25,
             source: "workflow_123",
             tenant: "tenant_456",
+            mode: "rich",
           },
         });
       } finally {
@@ -650,6 +654,7 @@ describe("Feed", () => {
           url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
           params: {
             archived: "exclude",
+            mode: "compact",
             after: "cursor_123",
           },
         });
@@ -1577,6 +1582,96 @@ describe("Feed", () => {
         const result = await feed.markAsSeen(feedItem);
 
         expect(result).toEqual([updatedItem]);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Feed Mode", () => {
+    test("sets mode query param to rich when initialized in rich mode", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockFeedResponse = {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { mode: "rich" },
+          undefined,
+        );
+
+        await feed.fetch();
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "rich",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles lack of activities and total_activities in compact mode", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        // Create a compact mode feed item (no activities or total_activities)
+        const compactFeedItem = {
+          __cursor: "cursor_123",
+          id: "msg_123",
+          actors: [],
+          blocks: [],
+          archived_at: null,
+          inserted_at: new Date().toISOString(),
+          read_at: null,
+          seen_at: null,
+          clicked_at: null,
+          interacted_at: null,
+          link_clicked_at: null,
+          source: { key: "workflow", version_id: "v1", categories: [] },
+          tenant: null,
+          total_actors: 1,
+          updated_at: new Date().toISOString(),
+          data: { message: "Hello" },
+        };
+
+        const mockFeedResponse = {
+          entries: [compactFeedItem],
+          meta: { total_count: 1, unread_count: 1, unseen_count: 1 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { mode: "compact" },
+          undefined,
+        );
+
+        const result = await feed.fetch();
+
+        expect(result).toBeDefined();
+        expect(result!.data).toEqual(mockFeedResponse);
       } finally {
         cleanup();
       }

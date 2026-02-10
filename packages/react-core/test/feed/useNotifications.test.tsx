@@ -20,6 +20,7 @@ describe("useNotifications", () => {
       archived: "include",
       page_size: 10,
       status: "all",
+      mode: "rich",
     };
 
     const { result } = renderHook(
@@ -127,6 +128,7 @@ describe("useNotifications", () => {
       archived: "include",
       page_size: 10,
       status: "all",
+      mode: "rich",
     };
 
     const { result, rerender } = renderHook(
@@ -162,12 +164,14 @@ describe("useNotifications", () => {
       archived: "include",
       page_size: 10,
       status: "all",
+      mode: "compact",
     };
 
     const options2: FeedClientOptions = {
       archived: "exclude",
       page_size: 10,
       status: "read",
+      mode: "rich",
     };
 
     const { result, rerender } = renderHook(
