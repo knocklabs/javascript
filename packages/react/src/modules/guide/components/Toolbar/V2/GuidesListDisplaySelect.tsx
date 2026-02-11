@@ -1,6 +1,6 @@
 import { Select } from "@telegraph/select";
 
-import { MAX_Z_INDEX } from "../shared";
+import { TOOLBAR_Z_INDEX } from "../shared";
 
 export type DisplayOption = "current-page" | "all-eligible" | "all-guides";
 
@@ -19,10 +19,10 @@ export const GuidesListDisplaySelect = ({ value, onChange }: Props) => {
         onChange(value as DisplayOption);
       }}
       contentProps={{
-        style: { zIndex: MAX_Z_INDEX },
+        style: { zIndex: TOOLBAR_Z_INDEX },
       }}
     >
-      {/* NOTE: Commented out until we can show relevant indicators.
+      {/* NOTE: Commented out until we can show relevant indicators for this opt
         <Select.Option size="1" value="current-page">
           Displayable on current page
         </Select.Option>
