@@ -16,7 +16,6 @@ import {
 import { detectToolbarParam } from "./helpers";
 import {
   InspectionResult,
-  checkUsable,
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
 
@@ -28,7 +27,11 @@ const GuidesList = ({
   displayOption: DisplayOption;
 }) => {
   return guides.map((guide, idx) => {
-    if (displayOption === "current-page" && !checkUsable(guide)) {
+    if (
+      displayOption === "current-page" &&
+      !guide.annotation.isEligible &&
+      !guide.annotation.isQualified
+    ) {
       return null;
     }
     if (displayOption === "all-eligible" && !guide.annotation.isEligible) {
