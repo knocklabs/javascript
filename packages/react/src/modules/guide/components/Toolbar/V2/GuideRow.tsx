@@ -7,7 +7,7 @@ import { CheckCircle2, CircleDashed, Eye, UserCircle2 } from "lucide-react";
 import * as React from "react";
 
 import { GuideHoverCard } from "./GuideHoverCard";
-import { InspectedGuide, MissingGuide } from "./useInspectGuideClientStore";
+import { AnnotatedGuide, MissingGuide } from "./useInspectGuideClientStore";
 
 const Row = ({ children }: React.PropsWithChildren) => (
   <Stack h="7" px="2" borderTop="px" justify="space-between" align="center">
@@ -16,7 +16,7 @@ const Row = ({ children }: React.PropsWithChildren) => (
 );
 
 type Props = {
-  guide: MissingGuide | InspectedGuide;
+  guide: MissingGuide | AnnotatedGuide;
   orderIndex: number;
 };
 
@@ -44,23 +44,23 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
             <>
               <Tooltip
                 label={
-                  guide.inspection.targetable.status
+                  guide.annotation.targetable.status
                     ? "This user is targeted"
-                    : guide.inspection.targetable.message
+                    : guide.annotation.targetable.message
                 }
-                // enabled={!guide.inspection.targetable.status}
+                // enabled={!guide.annotation.targetable.status}
               >
                 <Button
                   px="1"
                   size="1"
                   variant="soft"
-                  color={guide.inspection.targetable.status ? "green" : "red"}
+                  color={guide.annotation.targetable.status ? "green" : "red"}
                   leadingIcon={{ icon: UserCircle2, alt: "Target" }}
                 />
               </Tooltip>
               <Tooltip
                 label={
-                  guide.inspection.archived.status
+                  guide.annotation.archived.status
                     ? "User has already archived this guide"
                     : "User has not dismissed this guide"
                 }
@@ -69,7 +69,7 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
                   px="1"
                   size="1"
                   variant="soft"
-                  color={guide.inspection.archived.status ? "red" : "green"}
+                  color={guide.annotation.archived.status ? "red" : "green"}
                   leadingIcon={{ icon: Eye, alt: "Not archived" }}
                 />
               </Tooltip>

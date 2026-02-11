@@ -2,16 +2,18 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 import { Box, Stack } from "@telegraph/layout";
 import * as React from "react";
 
-import { InspectedGuide, MissingGuide } from "./useInspectGuideClientStore";
+import { AnnotatedGuide, MissingGuide } from "./useInspectGuideClientStore";
 
 type Props = {
-  guide: InspectedGuide | MissingGuide;
+  guide: AnnotatedGuide | MissingGuide;
 };
 
 export const GuideHoverCard = ({
   children,
   guide,
 }: React.PropsWithChildren<Props>) => {
+  console.log(guide);
+
   return (
     <HoverCard.Root>
       <HoverCard.Trigger>
