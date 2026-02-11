@@ -52,14 +52,7 @@ export const V2 = () => {
   }
 
   return (
-    <Box
-      position="fixed"
-      top="4"
-      right="4"
-      style={{
-        zIndex: TOOLBAR_Z_INDEX,
-      }}
-    >
+    <Box position="fixed" top="4" right="4" style={{ zIndex: TOOLBAR_Z_INDEX }}>
       {isCollapsed ? (
         <KnockButton onClick={() => setIsCollapsed(false)} />
       ) : (
