@@ -38,7 +38,7 @@ const GuidesList = ({
 export const V2 = () => {
   const { client } = useGuideContext();
 
-  const [guidesListDisplayed, setGuidesListDisplayed] =
+  const [guidesListDisplayOption, setGuidesListDisplayOption] =
     React.useState<DisplayOption>("all-eligible");
 
   const [isVisible, setIsVisible] = React.useState(detectToolbarParam());
@@ -84,8 +84,8 @@ export const V2 = () => {
           >
             <Box style={{ width: "220px" }}>
               <GuidesListDisplaySelect
-                value={guidesListDisplayed}
-                onChange={(selected) => setGuidesListDisplayed(selected)}
+                value={guidesListDisplayOption}
+                onChange={(opt) => setGuidesListDisplayOption(opt)}
               />
             </Box>
 
@@ -111,7 +111,7 @@ export const V2 = () => {
             {result.error && <Box>{result.error}</Box>}
             <GuidesList
               guides={result.guides}
-              displayOption={guidesListDisplayed}
+              displayOption={guidesListDisplayOption}
             />
           </Box>
         </Stack>
