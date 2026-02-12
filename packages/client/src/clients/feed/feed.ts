@@ -33,12 +33,7 @@ import {
   FeedMessagesReceivedPayload,
   FeedRealTimeCallback,
 } from "./types";
-import {
-  getFormattedExclude,
-  getFormattedTriggerData,
-  mergeAndDedupeArrays,
-  mergeDateRangeParams,
-} from "./utils";
+import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
 // Default options to apply
 const feedClientDefaults: Pick<FeedClientOptions, "archived" | "mode"> = {
@@ -541,27 +536,19 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
-    const mergedOptions = {
-      ...this.defaultOptions,
-      ...mergeDateRangeParams(options),
-      exclude: mergeAndDedupeArrays(
-        this.defaultOptions.exclude,
-        options.exclude,
-      ),
-    };
-
     // trigger_data should be a JSON string for the API
     // this function will format the trigger data if it's an object
-    // https://docs.knock.app/api-reference/users/feeds/list_items
-    const formattedTriggerData = getFormattedTriggerData(mergedOptions);
-
-    const formattedExclude = getFormattedExclude(mergedOptions);
+    // https://docs.knock.app/reference#get-feed
+    const formattedTriggerData = getFormattedTriggerData({
+      ...this.defaultOptions,
+      ...options,
+    });
 
     // Always include the default params, if they have been set
     const queryParams: FetchFeedOptionsForRequest = {
-      ...mergedOptions,
+      ...this.defaultOptions,
+      ...mergeDateRangeParams(options),
       trigger_data: formattedTriggerData,
-      exclude: formattedExclude,
       // Unset options that should not be sent to the API
       __loadingType: undefined,
       __fetchSource: undefined,
@@ -612,8 +599,7 @@ class Feed {
 
     const eventPayload = {
       items: response.entries as FeedItem[],
-      // meta will not be present on the response when __fetchSource is "socket"
-      metadata: response.meta as FeedMetadata | undefined,
+      metadata: response.meta as FeedMetadata,
       event: feedEventType,
     };
 
@@ -664,13 +650,7 @@ class Feed {
     }
 
     // Fetch the items before the current head (if it exists)
-    this.fetch({
-      before: currentHead?.__cursor,
-      __fetchSource: "socket",
-      // The socket event payload should *always* include metadata,
-      // but to be safe, only exclude meta from the fetch when it's present
-      exclude: metadata ? ["meta"] : [],
-    });
+    this.fetch({ before: currentHead?.__cursor, __fetchSource: "socket" });
   }
 
   private buildUserFeedId() {

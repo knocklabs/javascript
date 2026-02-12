@@ -232,32 +232,6 @@ describe("feed store", () => {
       const state = store.getState();
       expect(state.items).toHaveLength(2); // Should deduplicate
     });
-
-    test("preserves existing metadata when meta is undefined", () => {
-      const store = createStore();
-
-      // Set initial result with metadata
-      store.getState().setResult({
-        entries: mockItems,
-        meta: mockMetadata,
-        page_info: mockPageInfo,
-      });
-
-      // Verify initial metadata is set
-      expect(store.getState().metadata).toEqual(mockMetadata);
-
-      // Set new result without meta (simulating exclude param)
-      store.getState().setResult({
-        entries: [mockItems[0]!],
-        meta: undefined,
-        page_info: mockPageInfo,
-      });
-
-      // Metadata should be preserved
-      const state = store.getState();
-      expect(state.metadata).toEqual(mockMetadata);
-      expect(state.items).toHaveLength(1);
-    });
   });
 
   describe("setMetadata", () => {
