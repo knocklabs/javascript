@@ -65,14 +65,25 @@ export type FetchFeedOptions = {
   __fetchSource?: "socket" | "http";
 } & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
 
-// The final data shape that is sent to the API
-// Should match types here: https://docs.knock.app/reference#get-feed
+/**
+ * The final data shape that is sent to the the list feed items endpoint of the Knock API.
+ *
+ * @see https://docs.knock.app/api-reference/users/feeds/list_items
+ */
 export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
   "trigger_data"
 > & {
-  // Formatted trigger data into a string
+  /** The trigger data of the feed items (as a JSON string). */
   trigger_data?: string;
+  /** Limits the results to items inserted after or on the given date. */
+  "inserted_at.gte"?: string;
+  /** Limits the results to items inserted before or on the given date. */
+  "inserted_at.lte"?: string;
+  /** Limits the results to items inserted after the given date. */
+  "inserted_at.gt"?: string;
+  /** Limits the results to items inserted before the given date. */
+  "inserted_at.lt"?: string;
   // Unset options that should not be sent to the API
   __loadingType: undefined;
   __fetchSource: undefined;
