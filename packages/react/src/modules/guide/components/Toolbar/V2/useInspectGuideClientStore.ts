@@ -72,31 +72,37 @@ export type InspectionResult = {
   error?: "no_guide_group";
 };
 
-const toTargetableStatus = (
+const toIneligibilityStatus = (
   marker: KnockGuideIneligibilityMarker,
-): TargetableStatus => {
+): Partial<AnnotatedStatuses> | undefined => {
   switch (marker.reason) {
-    case "target_conditions_not_met":
     case "not_in_target_audience":
+    case "target_conditions_not_met":
       return {
-        status: false,
-        reason: marker.reason,
-        message: marker.message,
+        targetable: {
+          status: false,
+          reason: marker.reason,
+          message: marker.message,
+        },
+      };
+
+    case "marked_as_archived":
+      return {
+        archived: {
+          status: true,
+        },
+      };
+
+    case "guide_not_active":
+      return {
+        active: {
+          status: false,
+        },
       };
 
     default:
-      return {
-        status: true,
-      };
+      return undefined;
   }
-};
-
-const toArchivedStatus = (
-  marker: KnockGuideIneligibilityMarker,
-): ArchivedStatus => {
-  return {
-    status: marker.reason === "marked_as_archived",
-  };
 };
 
 const resolveIsEligible = ({
@@ -121,11 +127,12 @@ const annotateGuide = (
 ): AnnotatedGuide => {
   const { ineligibleGuides } = snapshot;
   const marker = ineligibleGuides[guide.key];
+  const ineligiblity = marker ? toIneligibilityStatus(marker) : undefined;
 
   const statuses: AnnotatedStatuses = {
-    active: { status: guide.active },
-    targetable: marker ? toTargetableStatus(marker) : { status: true },
-    archived: marker ? toArchivedStatus(marker) : { status: false },
+    active: ineligiblity?.active || { status: true },
+    targetable: ineligiblity?.targetable || { status: true },
+    archived: ineligiblity?.archived || { status: false },
   };
 
   const annotation: GuideAnnotation = {
