@@ -20,6 +20,8 @@ export const GuideHoverCard = ({
     return <Stack align="center">{children}</Stack>;
   }
 
+  const { annotation: _, ...rest } = guide;
+
   return (
     <HoverCard.Root>
       <HoverCard.Trigger>
@@ -44,8 +46,7 @@ export const GuideHoverCard = ({
                 fontSize: "11px",
               }}
             >
-              {/* XXX: Prune some details */}
-              <code>{JSON.stringify(guide, null, 2)}</code>
+              <code>{JSON.stringify(rest, null, 2)}</code>
             </pre>
           </Box>
           <HoverCard.Arrow />
