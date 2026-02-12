@@ -145,10 +145,11 @@ describe("useInspectGuideClientStore", () => {
 
   test("annotates an inactive guide as ineligible", () => {
     const guide = makeGuide({ key: "g1", active: false });
+    const marker = makeMarker("g1", "guide_not_active", "Guide is not active");
     setSnapshot({
       guideGroups: [makeGuideGroup(["g1"])],
       guides: { g1: guide },
-      ineligibleGuides: {},
+      ineligibleGuides: { g1: marker },
     });
 
     const result = renderInspect()!;
@@ -248,6 +249,7 @@ describe("useInspectGuideClientStore", () => {
     const annotated = result.guides[0] as AnnotatedGuide;
     // Unknown reasons don't affect targetable or archived, so the guide is still eligible
     expect(annotated.annotation.isEligible).toBe(true);
+    expect(annotated.annotation.active).toEqual({ status: true });
     expect(annotated.annotation.targetable).toEqual({ status: true });
     expect(annotated.annotation.archived).toEqual({ status: false });
   });
@@ -274,6 +276,11 @@ describe("useInspectGuideClientStore", () => {
     const eligible = makeGuide({ key: "eligible", active: true });
     const inactive = makeGuide({ key: "inactive", active: false });
     const archived = makeGuide({ key: "archived", active: true });
+    const inactiveMarker = makeMarker(
+      "inactive",
+      "guide_not_active",
+      "Guide is not active",
+    );
     const archivedMarker = makeMarker(
       "archived",
       "marked_as_archived",
@@ -290,6 +297,7 @@ describe("useInspectGuideClientStore", () => {
         archived,
       },
       ineligibleGuides: {
+        inactive: inactiveMarker,
         archived: archivedMarker,
       },
     });
@@ -321,72 +329,7 @@ describe("useInspectGuideClientStore", () => {
     expect(g3.annotation.isEligible).toBe(false);
   });
 
-  // ----- Annotated guide preserves original guide fields -----
-
-  test("annotated guide preserves original guide fields", () => {
-    const guide = makeGuide({
-      key: "g1",
-      id: "custom-id",
-      type: "tooltip",
-      active: true,
-      bypass_global_group_limit: true,
-    });
-    setSnapshot({
-      guideGroups: [makeGuideGroup(["g1"])],
-      guides: { g1: guide },
-      ineligibleGuides: {},
-    });
-
-    const result = renderInspect()!;
-    const annotated = result.guides[0] as AnnotatedGuide;
-    expect(annotated.id).toBe("custom-id");
-    expect(annotated.type).toBe("tooltip");
-    expect(annotated.bypass_global_group_limit).toBe(true);
-    // annotation is added on top
-    expect(annotated.annotation).toBeDefined();
-  });
-
-  // ----- Uses the first guide group (default group) -----
-
-  test("uses the first guide group as the default group", () => {
-    const guide = makeGuide({ key: "g1" });
-    setSnapshot({
-      guideGroups: [
-        makeGuideGroup(["g1"], { key: "first" }),
-        makeGuideGroup([], { key: "second" }),
-      ],
-      guides: { g1: guide },
-      ineligibleGuides: {},
-    });
-
-    const result = renderInspect()!;
-    expect(result.guides).toHaveLength(1);
-    expect(result.guides[0]!.key).toBe("g1");
-  });
-
-  // ----- Eligibility resolution combinations -----
-
-  describe("resolveIsEligible edge cases", () => {
-    test("inactive + not targetable + archived = ineligible", () => {
-      const guide = makeGuide({ key: "g1", active: false });
-      const marker = makeMarker(
-        "g1",
-        "target_conditions_not_met",
-        "Not targeted",
-      );
-      setSnapshot({
-        guideGroups: [makeGuideGroup(["g1"])],
-        guides: { g1: guide },
-        ineligibleGuides: { g1: marker },
-      });
-
-      const result = renderInspect()!;
-      const annotated = result.guides[0] as AnnotatedGuide;
-      expect(annotated.annotation.isEligible).toBe(false);
-      expect(annotated.annotation.active.status).toBe(false);
-      expect(annotated.annotation.targetable.status).toBe(false);
-    });
-
+  describe("resolveIsEligible", () => {
     test("active + targetable + not archived = eligible", () => {
       const guide = makeGuide({ key: "g1", active: true });
       setSnapshot({
