@@ -29,8 +29,7 @@ const GuidesList = ({
   return guides.map((guide, idx) => {
     if (
       displayOption === "current-page" &&
-      !guide.annotation.isEligible &&
-      !guide.annotation.isQualified
+      (!guide.annotation.isEligible || !guide.annotation.isQualified)
     ) {
       return null;
     }

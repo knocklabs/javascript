@@ -49,23 +49,23 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
       </Stack>
 
       <Stack justify="flex-end">
-        {guide.__typename === "Guide" && (
+        {!isUnknownGuide(guide) && (
           <Stack gap="1">
             <Tooltip
               label="Current location does not match the activation conditions"
-              enabled={!guide.inspection.activatable.status}
+              enabled={!guide.annotation.activatable.status}
             >
               <Button
                 px="1"
                 size="1"
                 variant="soft"
-                color={guide.inspection.activatable.status ? "green" : "red"}
+                color={guide.annotation.activatable.status ? "green" : "red"}
                 leadingIcon={{ icon: LocateFixed, alt: "Target" }}
               />
             </Tooltip>
           </Stack>
         )}
-        {guide.__typename === "Guide" && (
+        {!isUnknownGuide(guide) && (
           <Stack px="1" align="center">
             <Box h="3" borderLeft="px" borderColor="gray-6" />
           </Stack>
