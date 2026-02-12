@@ -36,6 +36,7 @@ const GuidesList = ({
     if (displayOption === "all-eligible" && !guide.annotation.isEligible) {
       return null;
     }
+
     return <GuideRow key={guide.key} guide={guide} orderIndex={idx} />;
   });
 };

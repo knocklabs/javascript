@@ -52,8 +52,11 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
         {!isUnknownGuide(guide) && (
           <Stack gap="1">
             <Tooltip
-              label="Current location does not match the activation conditions"
-              enabled={!guide.annotation.activatable.status}
+              label={
+                guide.annotation.activatable.status
+                  ? "This guide can be activated in the current location"
+                  : "This guide cannot be activated in the current location"
+              }
             >
               <Button
                 px="1"

@@ -183,7 +183,7 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
   const { client } = useGuideContext();
 
   // Extract a snapshot of the client store state for debugging.
-  const snapshot: StoreStateSnapshot = useStore(client.store, (state) => {
+  const snapshot = useStore(client.store, (state) => {
     return {
       location: state.location,
       guides: state.guides,
