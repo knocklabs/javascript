@@ -41,6 +41,10 @@ type GuideAnnotation = AnnotatedStatuses & {
 
 export type AnnotatedGuide = KnockGuide & {
   annotation: GuideAnnotation;
+
+  // Legacy fields, typed only to make tsc happy when we prune these out.
+  activation_location_rules?: KnockGuide["activation_url_patterns"];
+  priority?: number;
 };
 
 // Exists and ordered in control but absent in switchboard (therefore not

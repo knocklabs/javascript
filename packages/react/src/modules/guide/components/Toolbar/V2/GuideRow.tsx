@@ -7,7 +7,11 @@ import { CheckCircle2, CircleDashed, Eye, UserCircle2 } from "lucide-react";
 import * as React from "react";
 
 import { GuideHoverCard } from "./GuideHoverCard";
-import { AnnotatedGuide, UnknownGuide } from "./useInspectGuideClientStore";
+import {
+  AnnotatedGuide,
+  UnknownGuide,
+  isUnknownGuide,
+} from "./useInspectGuideClientStore";
 
 const Row = ({ children }: React.PropsWithChildren) => (
   <Stack h="7" px="2" borderTop="px" justify="space-between" align="center">
@@ -40,15 +44,14 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
 
       <Stack justify="flex-end">
         <Stack gap="1">
-          {guide.__typename === "Guide" && (
+          {!isUnknownGuide(guide) && (
             <>
               <Tooltip
                 label={
                   guide.annotation.targetable.status
-                    ? "This user is targeted"
+                    ? "This user is being targeted"
                     : guide.annotation.targetable.message
                 }
-                // enabled={!guide.annotation.targetable.status}
               >
                 <Button
                   px="1"
@@ -61,7 +64,7 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
               <Tooltip
                 label={
                   guide.annotation.archived.status
-                    ? "User has already archived this guide"
+                    ? "User has already dismissed this guide"
                     : "User has not dismissed this guide"
                 }
               >
@@ -77,7 +80,7 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           )}
           <Tooltip
             label={
-              guide.__typename === "UnknownGuide"
+              isUnknownGuide(guide)
                 ? "This guide has never been committed and published yet"
                 : !guide.active
                   ? "This guide is not active"

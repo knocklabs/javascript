@@ -20,7 +20,13 @@ export const GuideHoverCard = ({
     return <Stack align="center">{children}</Stack>;
   }
 
-  const { annotation: _, ...rest } = guide;
+  // Prune out internal or legacy fields.
+  const {
+    annotation: _annotation,
+    activation_location_rules: _activation_location_rules,
+    priority: _priority,
+    ...rest
+  } = guide;
 
   return (
     <HoverCard.Root>
