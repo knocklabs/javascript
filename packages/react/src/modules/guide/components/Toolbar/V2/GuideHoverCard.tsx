@@ -2,17 +2,23 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 import { Box, Stack } from "@telegraph/layout";
 import * as React from "react";
 
-import { AnnotatedGuide, MissingGuide } from "./useInspectGuideClientStore";
+import {
+  AnnotatedGuide,
+  UnknownGuide,
+  isUnknownGuide,
+} from "./useInspectGuideClientStore";
 
 type Props = {
-  guide: AnnotatedGuide | MissingGuide;
+  guide: AnnotatedGuide | UnknownGuide;
 };
 
 export const GuideHoverCard = ({
   children,
   guide,
 }: React.PropsWithChildren<Props>) => {
-  console.log(guide);
+  if (isUnknownGuide(guide)) {
+    return <Stack align="center">{children}</Stack>;
+  }
 
   return (
     <HoverCard.Root>

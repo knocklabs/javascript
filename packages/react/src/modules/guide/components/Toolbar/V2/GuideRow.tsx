@@ -7,7 +7,7 @@ import { CheckCircle2, CircleDashed, Eye, UserCircle2 } from "lucide-react";
 import * as React from "react";
 
 import { GuideHoverCard } from "./GuideHoverCard";
-import { AnnotatedGuide, MissingGuide } from "./useInspectGuideClientStore";
+import { AnnotatedGuide, UnknownGuide } from "./useInspectGuideClientStore";
 
 const Row = ({ children }: React.PropsWithChildren) => (
   <Stack h="7" px="2" borderTop="px" justify="space-between" align="center">
@@ -16,7 +16,7 @@ const Row = ({ children }: React.PropsWithChildren) => (
 );
 
 type Props = {
-  guide: MissingGuide | AnnotatedGuide;
+  guide: UnknownGuide | AnnotatedGuide;
   orderIndex: number;
 };
 
@@ -77,7 +77,7 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           )}
           <Tooltip
             label={
-              guide.__typename === "MissingGuide"
+              guide.__typename === "UnknownGuide"
                 ? "This guide has never been committed and published yet"
                 : !guide.active
                   ? "This guide is not active"
