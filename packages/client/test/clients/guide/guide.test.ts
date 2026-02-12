@@ -1758,7 +1758,7 @@ describe("KnockGuideClient", () => {
       expect(result!.type).not.toBe("regular-type");
     });
 
-    test("doesn't return the preview guide when filtered by a different key", () => {
+    test("doesn't return any guide when filtered by a different key than forced guide", () => {
       const previewGuide = {
         ...mockGuideTwo,
         type: "preview-type",
@@ -1791,10 +1791,12 @@ describe("KnockGuideClient", () => {
         key: "onboarding",
       });
 
-      expect(result!.key).toBe("onboarding");
+      // When forcedGuideKey is set, only that guide is considered, so filtering
+      // by a different key returns undefined
+      expect(result).toBeUndefined();
     });
 
-    test("doesn't return the preview guide when filtered by a different type", () => {
+    test("doesn't return any guide when filtered by a different type than forced guide", () => {
       const previewGuide = {
         ...mockGuideTwo,
         type: "preview-type",
@@ -1827,7 +1829,9 @@ describe("KnockGuideClient", () => {
         type: "banner",
       });
 
-      expect(result!.key).toBe("system_status");
+      // When forcedGuideKey is set, only that guide is considered, so filtering
+      // by a different type returns undefined
+      expect(result).toBeUndefined();
     });
 
     test("does not return a guide inside a throttle window ", () => {
@@ -2131,7 +2135,7 @@ describe("KnockGuideClient", () => {
       expect(result[0]!.key).toBe(mockGuideTwo.key);
     });
 
-    test("does not return an inactive guide when forced guide key is set", () => {
+    test("returns the target guide even if inactive when forced guide key is set", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
@@ -2147,17 +2151,41 @@ describe("KnockGuideClient", () => {
         location: undefined,
         counter: 0,
         debug: {
-          forcedGuideKey: mockGuideThree.key,
+          forcedGuideKey: mockGuideTwo.key,
           previewSessionId: "test-session-id",
         },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client["_selectGuides"](stateWithGuides);
+      const result = client["_selectGuides"](stateWithGuides, {
+        key: mockGuideTwo.key
+      });
 
-      expect(result).toHaveLength(2);
-      expect(result[0]!.key).toBe(mockGuideThree.key);
-      expect(result[1]!.key).toBe(mockGuideOne.key);
+      expect(result[0]!.key).toBe(mockGuideTwo.key);
+    });
+
+    test("returns only the forced guide when forced guide key is set", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideOne.key,
+          previewSessionId: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateWithGuides, {
+        type: "card"
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.key).toBe(mockGuideOne.key);
     });
 
     test("returns empty array when inside throttle window by default", () => {
