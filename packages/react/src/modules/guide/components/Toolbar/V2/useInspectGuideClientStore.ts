@@ -5,6 +5,13 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
+/**
+ * This is the main module that will house core logic for the toolbar. It hooks
+ * into the guide client state store, extracts relevant data for debugging, and
+ * transforms it into easily consumable data for the toolbar - namely
+ * "annotating" guides for its various statuses to display.
+ */
+
 // Active: `true` status = good
 type ActiveStatus = {
   status: boolean;
