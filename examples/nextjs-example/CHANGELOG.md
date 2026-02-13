@@ -1,5 +1,11 @@
 # nextjs-example
 
+## 1.2.13
+
+### Patch Changes
+
+- @knocklabs/react@0.11.1
+
 ## 1.2.12
 
 ### Patch Changes

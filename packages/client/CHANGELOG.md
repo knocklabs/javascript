@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.1
+
+### Patch Changes
+
+- ddd7981: Improve `FetchFeedOptionsForRequest` type
+
 ## 0.21.0
 
 ### Minor Changes
