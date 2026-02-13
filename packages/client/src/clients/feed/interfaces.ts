@@ -72,7 +72,7 @@ export type FetchFeedOptions = {
  */
 export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
-  "trigger_data"
+  "trigger_data" | "inserted_at_date_range"
 > & {
   /** The trigger data of the feed items (as a JSON string). */
   trigger_data?: string;
