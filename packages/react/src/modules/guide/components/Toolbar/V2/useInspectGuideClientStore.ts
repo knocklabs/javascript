@@ -2,6 +2,7 @@ import {
   KnockGuide,
   KnockGuideClientStoreState,
   KnockGuideIneligibilityMarker,
+  checkActivatable,
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
@@ -28,6 +29,10 @@ type TargetableStatusFalse = {
 };
 type TargetableStatus = TargetableStatusTrue | TargetableStatusFalse;
 
+type ActivatableStatus = {
+  status: boolean;
+};
+
 // Archived: `false` status = good
 type ArchivedStatus = {
   status: boolean;
@@ -38,12 +43,18 @@ type AnnotatedStatuses = {
   active: ActiveStatus;
   targetable: TargetableStatus;
   archived: ArchivedStatus;
+  // Individual qualified statuses:
+  activatable: ActivatableStatus;
 };
 
 type GuideAnnotation = AnnotatedStatuses & {
   // Resolved eligibility based on active, targetable and archived statuses,
   // which are backend driven evaluation results that are exposed for debugging.
   isEligible: boolean;
+
+  // Resolved display qualification based on an activatable status, which
+  // informs "when" and "where" an eligible guide can be displayed to user.
+  isQualified: boolean;
 };
 
 export type AnnotatedGuide = KnockGuide & {
@@ -64,6 +75,7 @@ export type UnknownGuide = {
   bypass_global_group_limit: false;
   annotation: {
     isEligible: false;
+    isQualified: false;
   };
 };
 
@@ -116,28 +128,37 @@ const resolveIsEligible = ({
   return true;
 };
 
+export const resolveIsQualified = ({ activatable }: AnnotatedStatuses) => {
+  if (!activatable.status) return false;
+  return true;
+};
+
 type StoreStateSnapshot = Pick<
   KnockGuideClientStoreState,
-  "guides" | "guideGroups" | "ineligibleGuides" | "debug"
+  "location" | "guides" | "guideGroups" | "ineligibleGuides" | "debug"
 >;
 
 const annotateGuide = (
   guide: KnockGuide,
   snapshot: StoreStateSnapshot,
 ): AnnotatedGuide => {
-  const { ineligibleGuides } = snapshot;
+  const { ineligibleGuides, location } = snapshot;
   const marker = ineligibleGuides[guide.key];
   const ineligiblity = marker ? toIneligibilityStatus(marker) : undefined;
 
   const statuses: AnnotatedStatuses = {
+    // isEligible:
     active: ineligiblity?.active || { status: true },
     targetable: ineligiblity?.targetable || { status: true },
     archived: ineligiblity?.archived || { status: false },
+    // isQualified:
+    activatable: { status: checkActivatable(guide, location) },
   };
 
   const annotation: GuideAnnotation = {
     ...statuses,
     isEligible: resolveIsEligible(statuses),
+    isQualified: resolveIsQualified(statuses),
   };
 
   return {
@@ -154,6 +175,7 @@ const newUnknownGuide = (key: KnockGuide["key"]) =>
     bypass_global_group_limit: false,
     annotation: {
       isEligible: false,
+      isQualified: false,
     },
   }) as UnknownGuide;
 
@@ -161,8 +183,9 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
   const { client } = useGuideContext();
 
   // Extract a snapshot of the client store state for debugging.
-  const snapshot = useStore(client.store, (state) => {
+  const snapshot: StoreStateSnapshot = useStore(client.store, (state) => {
     return {
+      location: state.location,
       guides: state.guides,
       guideGroups: state.guideGroups,
       ineligibleGuides: state.ineligibleGuides,

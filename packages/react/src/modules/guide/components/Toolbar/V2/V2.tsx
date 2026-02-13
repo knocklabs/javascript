@@ -27,6 +27,12 @@ const GuidesList = ({
   displayOption: DisplayOption;
 }) => {
   return guides.map((guide, idx) => {
+    if (
+      displayOption === "current-page" &&
+      (!guide.annotation.isEligible || !guide.annotation.isQualified)
+    ) {
+      return null;
+    }
     if (displayOption === "all-eligible" && !guide.annotation.isEligible) {
       return null;
     }
@@ -39,7 +45,7 @@ export const V2 = () => {
   const { client } = useGuideContext();
 
   const [guidesListDisplayOption, setGuidesListDisplayOption] =
-    React.useState<DisplayOption>("all-eligible");
+    React.useState<DisplayOption>("current-page");
 
   const [isVisible, setIsVisible] = React.useState(detectToolbarParam());
   const [isCollapsed, setIsCollapsed] = React.useState(true);

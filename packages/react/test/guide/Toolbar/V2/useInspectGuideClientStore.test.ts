@@ -1,14 +1,26 @@
 import { renderHook } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   type AnnotatedGuide,
   isUnknownGuide,
+  resolveIsQualified,
   useInspectGuideClientStore,
 } from "../../../../src/modules/guide/components/Toolbar/V2/useInspectGuideClientStore";
 
 // Mutable snapshot that tests can override to simulate different store states.
 let mockStoreState: Record<string, unknown> = {};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockCheckActivatable = vi.fn((..._args: any[]) => true);
+
+vi.mock("@knocklabs/client", async () => {
+  const actual = await vi.importActual("@knocklabs/client");
+  return {
+    ...actual,
+    checkActivatable: (...args: unknown[]) => mockCheckActivatable(...args),
+  };
+});
 
 vi.mock("@knocklabs/react-core", async () => {
   const actual = await vi.importActual("@knocklabs/react-core");
@@ -67,6 +79,7 @@ const makeMarker = (
 
 const setSnapshot = (partial: Record<string, unknown>) => {
   mockStoreState = {
+    location: "https://example.com",
     guides: {},
     guideGroups: [],
     ineligibleGuides: {},
@@ -82,6 +95,11 @@ const renderInspect = () => {
 };
 
 describe("useInspectGuideClientStore", () => {
+  beforeEach(() => {
+    mockCheckActivatable.mockReset();
+    mockCheckActivatable.mockReturnValue(true);
+  });
+
   // ----- Early returns -----
 
   test("returns undefined when not in debugging mode", () => {
@@ -119,6 +137,7 @@ describe("useInspectGuideClientStore", () => {
     expect(unknown.key).toBe("missing_key");
     expect(unknown.active).toBe(false);
     expect(unknown.annotation.isEligible).toBe(false);
+    expect(unknown.annotation.isQualified).toBe(false);
   });
 
   // ----- Guide annotation: fully eligible (no marker) -----
@@ -341,6 +360,117 @@ describe("useInspectGuideClientStore", () => {
       const result = renderInspect()!;
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.isEligible).toBe(true);
+    });
+  });
+
+  // ----- activatable + isQualified -----
+
+  describe("activatable status and isQualified", () => {
+    test("marks guide as activatable and qualified when checkActivatable returns true", () => {
+      mockCheckActivatable.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.activatable).toEqual({ status: true });
+      expect(annotated.annotation.isQualified).toBe(true);
+    });
+
+    test("marks guide as not activatable and not qualified when checkActivatable returns false", () => {
+      mockCheckActivatable.mockReturnValue(false);
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.activatable).toEqual({ status: false });
+      expect(annotated.annotation.isQualified).toBe(false);
+    });
+
+    test("passes the guide and location to checkActivatable", () => {
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        location: "https://app.example.com/dashboard",
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      renderInspect();
+      expect(mockCheckActivatable).toHaveBeenCalledWith(
+        expect.objectContaining({ key: "g1" }),
+        "https://app.example.com/dashboard",
+      );
+    });
+
+    test("a guide can be eligible but not qualified", () => {
+      mockCheckActivatable.mockReturnValue(false);
+      const guide = makeGuide({ key: "g1", active: true });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.isEligible).toBe(true);
+      expect(annotated.annotation.isQualified).toBe(false);
+    });
+
+    test("a guide can be ineligible but qualified", () => {
+      mockCheckActivatable.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1", active: true });
+      const marker = makeMarker(
+        "g1",
+        "guide_not_active",
+        "Guide is not active",
+      );
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: { g1: marker },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.isEligible).toBe(false);
+      expect(annotated.annotation.isQualified).toBe(true);
+    });
+  });
+
+  // ----- resolveIsQualified (unit) -----
+
+  describe("resolveIsQualified", () => {
+    test("returns true when activatable status is true", () => {
+      expect(
+        resolveIsQualified({
+          active: { status: true },
+          targetable: { status: true },
+          archived: { status: false },
+          activatable: { status: true },
+        }),
+      ).toBe(true);
+    });
+
+    test("returns false when activatable status is false", () => {
+      expect(
+        resolveIsQualified({
+          active: { status: true },
+          targetable: { status: true },
+          archived: { status: false },
+          activatable: { status: false },
+        }),
+      ).toBe(false);
     });
   });
 });

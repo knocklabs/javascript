@@ -217,6 +217,13 @@ const predicate = (
     return false;
   }
 
+  return checkActivatable(guide, location);
+};
+
+export const checkActivatable = (
+  guide: KnockGuide,
+  location: string | undefined,
+) => {
   const url = location ? newUrl(location) : undefined;
 
   const urlRules = guide.activation_url_rules || [];
