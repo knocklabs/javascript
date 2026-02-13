@@ -53,6 +53,20 @@ class ApiClient {
           api_key: this.apiKey,
           branch_slug: this.branch,
         },
+        // Use exponential backoff with jitter to try to prevent thundering herd
+        // when many clients attempt to reconnect simultaneously after an outage or deployment.
+        reconnectAfterMs: (tries: number) => {
+          return exponentialBackoffFullJitter(tries, {
+            baseDelayMs: 1000,
+            maxDelayMs: 30_000,
+          });
+        },
+        rejoinAfterMs: (tries: number) => {
+          return exponentialBackoffFullJitter(tries, {
+            baseDelayMs: 1000,
+            maxDelayMs: 60_000,
+          });
+        },
       });
     }
 
@@ -119,6 +133,45 @@ class ApiClient {
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     return `Knock/ClientJS ${process.env.CLIENT_PACKAGE_VERSION}`;
   }
+}
+
+/**
+ * Exponential backoff with full jitter and a minimum delay floor.
+ *
+ * - Uses exponential growth capped at maxDelayMs
+ * - Applies full jitter to spread retries uniformly across the window
+ * - Enforces a minimum delay to avoid tight retry loops
+ *
+ * Example (baseDelayMs = 1000):
+ *   Try 1:   250ms – 1,000ms
+ *   Try 2:   250ms – 2,000ms
+ *   Try 3:   250ms – 4,000ms
+ *   Try 4:   250ms – 8,000ms
+ *   Try 5+:  250ms – maxDelayMs
+ */
+export function exponentialBackoffFullJitter(
+  tries: number,
+  {
+    baseDelayMs,
+    maxDelayMs,
+    minDelayMs = 250,
+  }: {
+    baseDelayMs: number;
+    maxDelayMs: number;
+    minDelayMs?: number;
+  },
+): number {
+  const exponentialDelay = Math.min(
+    maxDelayMs,
+    baseDelayMs * Math.pow(2, Math.max(0, tries - 1)),
+  );
+
+  if (exponentialDelay <= minDelayMs) {
+    return minDelayMs;
+  }
+
+  const jitterRange = exponentialDelay - minDelayMs;
+  return minDelayMs + Math.floor(Math.random() * jitterRange);
 }
 
 export default ApiClient;
