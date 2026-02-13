@@ -23,6 +23,7 @@ export type KnockGuideProviderProps = {
   colorMode?: ColorMode;
   targetParams?: KnockGuideTargetParams;
   trackLocationFromWindow?: boolean;
+  trackDebugParams?: boolean;
   orderResolutionDuration?: number; // in milliseconds
   throttleCheckInterval?: number; // in milliseconds
 };
@@ -36,6 +37,10 @@ export const KnockGuideProvider: React.FC<
   colorMode = "light",
   targetParams = {},
   trackLocationFromWindow = true,
+  // Whether the guide client should look for debug params in url/local storage
+  // to launch guide toolbar. Set to true if using toolbar v1.
+  // TODO(KNO-11523): Remove this once we ship v2.
+  trackDebugParams = false,
   // Default to 0 which works well for react apps as this "yields" to react for
   // one render cyle first and close the group stage.
   orderResolutionDuration = 0,
@@ -55,6 +60,7 @@ export const KnockGuideProvider: React.FC<
   const knockGuideClient = React.useMemo(() => {
     return new KnockGuideClient(knock, channelId, stableTargetParams, {
       trackLocationFromWindow,
+      trackDebugParams,
       orderResolutionDuration,
       throttleCheckInterval,
     });
@@ -63,6 +69,7 @@ export const KnockGuideProvider: React.FC<
     channelId,
     stableTargetParams,
     trackLocationFromWindow,
+    trackDebugParams,
     orderResolutionDuration,
     throttleCheckInterval,
   ]);

@@ -65,6 +65,19 @@ export interface GuideGroupData {
   updated_at: string;
 }
 
+type GuideIneligibilityReason =
+  | "guide_not_active"
+  | "marked_as_archived"
+  | "target_conditions_not_met"
+  | "not_in_target_audience";
+
+export type GuideIneligibilityMarker = {
+  __typename: "GuideIneligibilityMarker";
+  key: KnockGuide["key"];
+  reason: GuideIneligibilityReason;
+  message: string;
+};
+
 export type GetGuidesQueryParams = {
   data?: string;
   tenant?: string;
@@ -76,6 +89,7 @@ export type GetGuidesResponse = {
   entries: GuideData[];
   guide_groups: GuideGroupData[];
   guide_group_display_logs: Record<GuideGroupData["key"], string>;
+  ineligible_guides: GuideIneligibilityMarker[];
 };
 
 //
@@ -194,6 +208,7 @@ export type QueryStatus = {
 };
 
 export type DebugState = {
+  debugging?: boolean;
   forcedGuideKey?: string | null;
   previewSessionId?: string | null;
 };
@@ -202,11 +217,15 @@ export type StoreState = {
   guideGroups: GuideGroupData[];
   guideGroupDisplayLogs: Record<GuideGroupData["key"], string>;
   guides: Record<KnockGuide["key"], KnockGuide>;
+  ineligibleGuides: Record<
+    GuideIneligibilityMarker["key"],
+    GuideIneligibilityMarker
+  >;
   previewGuides: Record<KnockGuide["key"], KnockGuide>;
   queries: Record<QueryKey, QueryStatus>;
   location: string | undefined;
   counter: number;
-  debug: DebugState;
+  debug?: DebugState;
 };
 
 export type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
@@ -229,6 +248,7 @@ export type TargetParams = {
 
 export type ConstructorOpts = {
   trackLocationFromWindow?: boolean;
+  trackDebugParams?: boolean;
   orderResolutionDuration?: number;
   throttleCheckInterval?: number;
 };

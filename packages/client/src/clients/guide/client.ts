@@ -157,34 +157,16 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   const defaultGroup = findDefaultGroup(state.guideGroups);
   if (!defaultGroup) return result;
 
-  const displaySequence = [...defaultGroup.display_sequence];
+  const displaySequence = defaultGroup.display_sequence;
   const location = state.location;
 
-  // If in debug mode, put the forced guide at the beginning of the display sequence.
-  if (state.debug.forcedGuideKey) {
-    const forcedKeyIndex = displaySequence.indexOf(state.debug.forcedGuideKey);
-    if (forcedKeyIndex > -1) {
-      displaySequence.splice(forcedKeyIndex, 1);
-    }
-    displaySequence.unshift(state.debug.forcedGuideKey);
-  }
-
   for (const [index, guideKey] of displaySequence.entries()) {
-    let guide = state.guides[guideKey];
-
-    // Use preview guide if it exists and matches the forced guide key
-    if (
-      state.debug.forcedGuideKey === guideKey &&
-      state.previewGuides[guideKey]
-    ) {
-      guide = state.previewGuides[guideKey];
-    }
-
+    const guide = state.previewGuides[guideKey] || state.guides[guideKey];
     if (!guide) continue;
 
-    const affirmed = predicate(guide, {
+    const affirmed = predicate(guide, filters, {
       location,
-      filters,
+      ineligibleGuides: state.ineligibleGuides,
       debug: state.debug,
     });
 
@@ -197,15 +179,15 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
   return result;
 };
 
-type PredicateOpts = {
-  location?: string | undefined;
-  filters?: SelectFilterParams | undefined;
-  debug: DebugState;
-};
+type PredicateOpts = Pick<
+  StoreState,
+  "location" | "ineligibleGuides" | "debug"
+>;
 
 const predicate = (
   guide: KnockGuide,
-  { location, filters = {}, debug = {} }: PredicateOpts,
+  filters: SelectFilterParams,
+  { location, ineligibleGuides = {}, debug = {} }: PredicateOpts,
 ) => {
   if (filters.type && filters.type !== guide.type) {
     return false;
@@ -215,11 +197,16 @@ const predicate = (
     return false;
   }
 
-  // Bypass filtering if the debugged guide matches the given filters.
-  // This should always run AFTER checking the filters but BEFORE
-  // checking archived status and location rules.
-  if (debug.forcedGuideKey === guide.key) {
-    return true;
+  // If in debug mode with a forced guide key, bypass other filtering and always
+  // return true for that guide only. This should always run AFTER checking the
+  // filters but BEFORE checking archived status and location rules.
+  if (debug.forcedGuideKey) {
+    return debug.forcedGuideKey === guide.key;
+  }
+
+  const ineligible = ineligibleGuides[guide.key];
+  if (ineligible) {
+    return false;
   }
 
   if (!guide.active) {
@@ -283,18 +270,21 @@ export class KnockGuideClient {
   ) {
     const {
       trackLocationFromWindow = true,
+      // TODO(KNO-11523): Remove once we ship guide toolbar v2, and offload as
+      // much debugging specific logic and responsibilities to toolbar.
+      trackDebugParams = false,
       throttleCheckInterval = DEFAULT_COUNTER_INCREMENT_INTERVAL,
     } = options;
     const win = checkForWindow();
 
     const location = trackLocationFromWindow ? win?.location?.href : undefined;
-
-    const debug = detectDebugParams();
+    const debug = trackDebugParams ? detectDebugParams() : undefined;
 
     this.store = new Store<StoreState>({
       guideGroups: [],
       guideGroupDisplayLogs: {},
       guides: {},
+      ineligibleGuides: {},
       previewGuides: {},
       queries: {},
       location,
@@ -376,7 +366,12 @@ export class KnockGuideClient {
       >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
-      const { entries, guide_groups: groups, guide_group_display_logs } = data;
+      const {
+        entries,
+        guide_groups: groups,
+        guide_group_display_logs,
+        ineligible_guides,
+      } = data;
 
       this.knock.log("[Guide] Loading fetched guides");
       this.store.setState((state) => ({
@@ -384,6 +379,7 @@ export class KnockGuideClient {
         guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
         guideGroupDisplayLogs: guide_group_display_logs || {},
         guides: byKey(entries.map((g) => this.localCopy(g))),
+        ineligibleGuides: byKey(ineligible_guides || []),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
     } catch (e) {
@@ -418,8 +414,9 @@ export class KnockGuideClient {
     const params = {
       ...this.targetParams,
       user_id: this.knock.userId,
-      force_all_guides: debugState.forcedGuideKey ? true : undefined,
-      preview_session_id: debugState.previewSessionId || undefined,
+      force_all_guides:
+        debugState?.forcedGuideKey || debugState?.debugging ? true : undefined,
+      preview_session_id: debugState?.previewSessionId || undefined,
     };
 
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
@@ -484,6 +481,8 @@ export class KnockGuideClient {
   private handleSocketEvent(payload: GuideSocketEvent) {
     const { event, data } = payload;
 
+    // TODO(KNO-11489): Include an ineligible guide in the socket payload too
+    // and process it when handling socket events in real time.
     switch (event) {
       case "guide.added":
         return this.addOrReplaceGuide(payload);
@@ -562,6 +561,39 @@ export class KnockGuideClient {
         url.searchParams.delete(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
         win.location.href = url.toString();
       }
+    }
+  }
+
+  setDebug(debugOpts?: Omit<DebugState, "debugging">) {
+    this.knock.log("[Guide] .setDebug()");
+    const shouldRefetch = !this.store.state.debug?.debugging;
+
+    this.store.setState((state) => ({
+      ...state,
+      debug: { ...debugOpts, debugging: true },
+    }));
+
+    if (shouldRefetch) {
+      this.knock.log(
+        `[Guide] Start debugging, refetching guides and resubscribing to the websocket channel`,
+      );
+      this.fetch();
+      this.subscribe();
+    }
+  }
+
+  unsetDebug() {
+    this.knock.log("[Guide] .unsetDebug()");
+    const shouldRefetch = this.store.state.debug?.debugging;
+
+    this.store.setState((state) => ({ ...state, debug: undefined }));
+
+    if (shouldRefetch) {
+      this.knock.log(
+        `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
+      );
+      this.fetch();
+      this.subscribe();
     }
   }
 
@@ -736,17 +768,8 @@ export class KnockGuideClient {
     // callback to a setTimeout, but just to be safe.
     this.ensureClearTimeout();
 
-    // If in debug mode, try to resolve the forced guide, otherwise return the first non-undefined guide.
-    let resolved = undefined;
-    if (this.store.state.debug.forcedGuideKey) {
-      resolved = this.stage.ordered.find(
-        (x) => x === this.store.state.debug.forcedGuideKey,
-      );
-    }
-
-    if (!resolved) {
-      resolved = this.stage.ordered.find((x) => x !== undefined);
-    }
+    // Resolve to the first non-undefined guide in the stage.
+    const resolved = this.stage.ordered.find((x) => x !== undefined);
 
     this.knock.log(
       `[Guide] Closing the current group stage: resolved=${resolved}`,
@@ -937,7 +960,7 @@ export class KnockGuideClient {
       // Get the next unarchived step.
       getStep() {
         // If debugging this guide, return the first step regardless of archive status
-        if (self.store.state.debug.forcedGuideKey === this.key) {
+        if (self.store.state.debug?.forcedGuideKey === this.key) {
           return this.steps[0];
         }
 
@@ -994,7 +1017,7 @@ export class KnockGuideClient {
 
     // Append debug params
     const debugState = this.store.state.debug;
-    if (debugState.forcedGuideKey) {
+    if (debugState?.forcedGuideKey || debugState?.debugging) {
       combinedParams.force_all_guides = true;
     }
 
@@ -1163,8 +1186,15 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Detected a location change: ${href}`);
 
+    if (!this.options.trackDebugParams) {
+      this.setLocation(href);
+      return;
+    }
+
+    // TODO(KNO-11523): Remove below once we ship toolbar v2.
+
     // If entering debug mode, fetch all guides.
-    const currentDebugParams = this.store.state.debug;
+    const currentDebugParams = this.store.state.debug || {};
     const newDebugParams = detectDebugParams();
 
     this.setLocation(href, { debug: newDebugParams });
