@@ -3,22 +3,10 @@ import {
   GuideActivationUrlRuleData,
   GuideData,
   GuideGroupData,
-  KnockGuide,
   KnockGuideActivationUrlPattern,
   SelectFilterParams,
   StoreState,
 } from "./types";
-
-// Extends the map class to allow having metadata on it, which is used to record
-// the guide group context for the selection result (though currently only a
-// default global group is supported).
-export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
-  metadata: { guideGroup: GuideGroupData } | undefined;
-
-  constructor() {
-    super();
-  }
-}
 
 export const formatGroupStage = (stage: GroupStage) => {
   return `status=${stage.status}, resolved=${stage.resolved}`;

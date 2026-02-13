@@ -7,7 +7,7 @@ import Knock from "../../knock";
 
 import {
   DEFAULT_GROUP_KEY,
-  SelectionResult,
+  // SelectionResult,
   byKey,
   checkStateIfThrottled,
   findDefaultGroup,
@@ -46,6 +46,9 @@ import {
   SelectFilterParams,
   SelectGuideOpts,
   SelectGuidesOpts,
+  SelectQueryLimit,
+  SelectionResult,
+  // SelectQueryParams,
   StepMessageState,
   StoreState,
   TargetParams,
@@ -150,7 +153,16 @@ const safeJsonParseDebugParams = (value: string): DebugState => {
   }
 };
 
-const select = (state: StoreState, filters: SelectFilterParams = {}) => {
+type SelectQueryMetadata = {
+  limit: SelectQueryLimit;
+  opts: SelectGuideOpts;
+};
+
+const select = (
+  state: StoreState,
+  filters: SelectFilterParams,
+  metadata: SelectQueryMetadata,
+) => {
   // A map of selected guides as values, with its order index as keys.
   const result = new SelectionResult();
 
@@ -175,7 +187,8 @@ const select = (state: StoreState, filters: SelectFilterParams = {}) => {
     result.set(index, guide);
   }
 
-  result.metadata = { guideGroup: defaultGroup };
+  result.metadata = { guideGroup: defaultGroup, filters, ...metadata };
+
   return result;
 };
 
@@ -617,14 +630,35 @@ export class KnockGuideClient {
       `[Guide] .selectGuides (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
     );
 
-    const selectedGuide = this.selectGuide(state, filters, opts);
+    // 1. First, call selectGuide() using the same filters to ensure we have a
+    // group stage open and respect throttling. This isn't the real query, but
+    // rather it's a shortcut ahead of handling the actual query result below.
+    const selectedGuide = this.selectGuide(state, filters, {
+      ...opts,
+      // Don't record this result, not the actual query result we need.
+      recordSelectQuery: false,
+    });
+
+    // 2. Now make the actual select query with the provided filters and opts,
+    // and record the result (as needed). By default, we only record the result
+    // while in debugging.
+    const { recordSelectQuery = !!state.debug?.debugging } = opts;
+    const metadata: SelectQueryMetadata = {
+      limit: "all",
+      opts: { ...opts, recordSelectQuery },
+    };
+    const result = select(state, filters, metadata);
+    this.maybeRecordSelectResult(result);
+
+    // 3. Stop if there is not at least one guide to return.
     if (!selectedGuide) {
       return [];
     }
 
     // There should be at least one guide to return here now.
-    const guides = [...select(state, filters).values()];
+    const guides = [...result.values()];
 
+    // 4. If throttled, filter out any throttled guides.
     if (!opts.includeThrottled && checkStateIfThrottled(state)) {
       const unthrottledGuides = guides.filter(
         (g) => g.bypass_global_group_limit,
@@ -654,32 +688,6 @@ export class KnockGuideClient {
       Object.keys(state.previewGuides).length === 0
     ) {
       this.knock.log("[Guide] Exiting selection (no guides)");
-      return undefined;
-    }
-
-    const result = select(state, filters);
-
-    if (result.size === 0) {
-      this.knock.log("[Guide] Selection found zero result");
-      return undefined;
-    }
-
-    const [index, guide] = [...result][0]!;
-    this.knock.log(
-      `[Guide] Selection found: \`${guide.key}\` (total: ${result.size})`,
-    );
-
-    // If a guide ignores the group limit, then return immediately to render
-    // always.
-    if (guide.bypass_global_group_limit) {
-      this.knock.log(`[Guide] Returning the unthrottled guide: ${guide.key}`);
-      return guide;
-    }
-
-    // Check if inside the throttle window (i.e. throttled) and if so stop and
-    // return undefined unless explicitly given the option to include throttled.
-    if (!opts.includeThrottled && checkStateIfThrottled(state)) {
-      this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
       return undefined;
     }
 
@@ -716,6 +724,37 @@ export class KnockGuideClient {
       this.stage = this.openGroupStage(); // Assign here to make tsc happy
     }
 
+    // Must come AFTER we ensure a group stage exists above, so we can record
+    // select queries. By default, we only record the result while in debugging.
+    const { recordSelectQuery = !!state.debug?.debugging } = opts;
+    const metadata: SelectQueryMetadata = {
+      limit: "one",
+      opts: { ...opts, recordSelectQuery },
+    };
+    const result = select(state, filters, metadata);
+    this.maybeRecordSelectResult(result);
+
+    if (result.size === 0) {
+      this.knock.log("[Guide] Selection found zero result");
+      return undefined;
+    }
+
+    const [index, guide] = [...result][0]!;
+    this.knock.log(
+      `[Guide] Selection found: \`${guide.key}\` (total: ${result.size})`,
+    );
+
+    // If a guide ignores the group limit, then return immediately to render
+    // always.
+    if (guide.bypass_global_group_limit) {
+      this.knock.log(`[Guide] Returning the unthrottled guide: ${guide.key}`);
+      return guide;
+    }
+
+    // Check if inside the throttle window (i.e. throttled) and if so stop and
+    // return undefined unless explicitly given the option to include throttled.
+    const throttled = !opts.includeThrottled && checkStateIfThrottled(state);
+
     switch (this.stage.status) {
       case "open": {
         this.knock.log(`[Guide] Adding to the group stage: ${guide.key}`);
@@ -725,7 +764,15 @@ export class KnockGuideClient {
 
       case "patch": {
         this.knock.log(`[Guide] Patching the group stage: ${guide.key}`);
+        // Refresh the ordered queue in the group stage while continuing to
+        // render the currently resolved guide while in patch window, so that
+        // we can re-resolve when the group stage closes.
         this.stage.ordered[index] = guide.key;
+
+        if (throttled) {
+          this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
+          return undefined;
+        }
 
         const ret = this.stage.resolved === guide.key ? guide : undefined;
         this.knock.log(
@@ -735,6 +782,11 @@ export class KnockGuideClient {
       }
 
       case "closed": {
+        if (throttled) {
+          this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
+          return undefined;
+        }
+
         const ret = this.stage.resolved === guide.key ? guide : undefined;
         this.knock.log(
           `[Guide] Returning \`${ret?.key}\` (stage: ${formatGroupStage(this.stage)})`,
@@ -742,6 +794,40 @@ export class KnockGuideClient {
         return ret;
       }
     }
+  }
+
+  private maybeRecordSelectResult(result: SelectionResult) {
+    if (!result.metadata) return;
+
+    const { opts, filters, limit } = result.metadata;
+    if (!opts.recordSelectQuery) return;
+    if (!filters.key && !filters.type) return;
+    if (!this.stage || this.stage.status === "closed") return;
+
+    // Deep merge to accumulate the results.
+    const queriedByKey = this.stage.results.key || {};
+    if (filters.key) {
+      queriedByKey[filters.key] = {
+        ...(queriedByKey[filters.key] || {}),
+        ...{ [limit]: result },
+      };
+    }
+    const queriedByType = this.stage.results.type || {};
+    if (filters.type) {
+      queriedByType[filters.type] = {
+        ...(queriedByType[filters.type] || {}),
+        ...{ [limit]: result },
+      };
+    }
+
+    this.stage = {
+      ...this.stage,
+      results: { key: queriedByKey, type: queriedByType },
+    };
+  }
+
+  getStage() {
+    return this.stage;
   }
 
   private openGroupStage() {
@@ -759,6 +845,7 @@ export class KnockGuideClient {
     this.stage = {
       status: "open",
       ordered: [],
+      results: {},
       timeoutId,
     };
 
