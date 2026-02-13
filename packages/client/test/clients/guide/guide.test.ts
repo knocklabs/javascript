@@ -24,6 +24,7 @@ const mockStore = {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: {},
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -45,6 +46,7 @@ const mockStore = {
     guideGroups: [],
     guideGroupDisplayLogs: {},
     guides: {},
+    ineligibleGuides: {},
     previewGuides: {},
     queries: {},
     location: undefined,
@@ -94,6 +96,7 @@ describe("KnockGuideClient", () => {
       guideGroups: [],
       guideGroupDisplayLogs: {},
       guides: {},
+      ineligibleGuides: {},
       previewGuides: {},
       queries: {},
       location: undefined,
@@ -104,6 +107,7 @@ describe("KnockGuideClient", () => {
       guideGroups: [],
       guideGroupDisplayLogs: {},
       guides: {},
+      ineligibleGuides: {},
       previewGuides: {},
       queries: {},
       location: undefined,
@@ -156,6 +160,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: {},
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -184,6 +189,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: {},
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: "https://example.com",
@@ -200,6 +206,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: {},
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -279,6 +286,61 @@ describe("KnockGuideClient", () => {
           tenant: defaultTargetParams.tenant,
         }),
       );
+    });
+
+    test("stores ineligible_guides from fetch response into the store", async () => {
+      const mockIneligibleGuides = [
+        {
+          __typename: "GuideIneligibilityMarker" as const,
+          key: "guide_123",
+          reason: "marked_as_archived",
+          message: "User has archived this guide already",
+        },
+        {
+          __typename: "GuideIneligibilityMarker" as const,
+          key: "guide_456",
+          reason: "not_in_target_audience",
+          message: "User is not a member of the target audience",
+        },
+      ];
+
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide",
+            channel_id: channelId,
+            id: "guide_789",
+            key: "active_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        guide_groups: [],
+        guide_group_display_logs: {},
+        ineligible_guides: mockIneligibleGuides,
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      await client.fetch();
+
+      expect(client.store.state.ineligibleGuides).toEqual({
+        guide_123: mockIneligibleGuides[0],
+        guide_456: mockIneligibleGuides[1],
+      });
     });
 
     test("handles fetch errors", async () => {
@@ -593,6 +655,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -623,6 +686,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -654,6 +718,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -689,6 +754,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -744,6 +810,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [unthrottledGuide.key]: unthrottledGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -798,6 +865,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [throttledGuide.key]: throttledGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -858,6 +926,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: { [unthrottledGuide.key]: unthrottledGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -924,7 +993,7 @@ describe("KnockGuideClient", () => {
     });
   });
 
-  describe("select", () => {
+  describe("selectGuide", () => {
     const mockStep = {
       ref: "step_1",
       schema_key: "foo",
@@ -1027,6 +1096,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1048,6 +1118,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1068,6 +1139,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1088,6 +1160,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: "https://example.com/dashboard",
@@ -1108,6 +1181,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: "https://example.com/settings",
@@ -1146,8 +1220,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1182,8 +1257,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1218,8 +1294,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/settings",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1253,8 +1330,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/user/settings",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1294,8 +1372,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/admin/settings",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1337,8 +1416,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1374,8 +1454,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1411,8 +1492,9 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com/dashboard",
         counter: 0,
+        ineligibleGuides: {},
         previewGuides: {},
-        debug: { forcedGuideKey: null },
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -1451,6 +1533,7 @@ describe("KnockGuideClient", () => {
           [g2.key]: g2,
           [g3.key]: g3,
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: "https://example.com/settings",
@@ -1469,6 +1552,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1499,6 +1583,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1577,6 +1662,7 @@ describe("KnockGuideClient", () => {
           ...mockGuides,
           [mockGuideFour.key]: mockGuideFour,
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1658,6 +1744,7 @@ describe("KnockGuideClient", () => {
             ],
           },
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1694,6 +1781,7 @@ describe("KnockGuideClient", () => {
           ...mockGuides,
           [mockGuideThree.key]: archivedGuide,
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1734,6 +1822,7 @@ describe("KnockGuideClient", () => {
           ...mockGuides,
           [mockGuideTwo.key]: undefined as unknown as KnockGuide,
         },
+        ineligibleGuides: {},
         previewGuides: {
           [mockGuideTwo.key]: previewGuide,
         },
@@ -1774,6 +1863,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {
           [mockGuideTwo.key]: previewGuide,
         },
@@ -1812,6 +1902,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {
           [mockGuideTwo.key]: previewGuide,
         },
@@ -1846,6 +1937,7 @@ describe("KnockGuideClient", () => {
           default: new Date().toISOString(),
         },
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1887,6 +1979,7 @@ describe("KnockGuideClient", () => {
             bypass_global_group_limit: true,
           },
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1912,6 +2005,7 @@ describe("KnockGuideClient", () => {
           default: new Date().toISOString(), // Throttle window started now
         },
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -1932,6 +2026,73 @@ describe("KnockGuideClient", () => {
       const result2 = client["_selectGuide"](stateWithGuides, { type: "banner" }, { includeThrottled: true });
       expect(result2).toBeDefined();
       expect(result2!.type).toBe("banner");
+    });
+
+    test("skips ineligible guides during selection", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {
+          feature_tour: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "feature_tour",
+            reason: "target_conditions_not_met",
+            message: "User does not match the targeting conditions",
+          },
+        },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour is first in display_sequence but is ineligible,
+      // so it should be skipped and onboarding should be selected next
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("skips all ineligible guides and returns undefined when all are ineligible", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {
+          feature_tour: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "feature_tour",
+            reason: "marked_as_archived",
+            message: "User has archived this guide already",
+          },
+          onboarding: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "onboarding",
+            reason: "marked_as_archived",
+            message: "User has archived this guide already",
+          },
+          system_status: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "system_status",
+            reason: "marked_as_archived",
+            message: "User has archived this guide already",
+          },
+        },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // All guides are ineligible, so should return undefined
+      expect(result).toBeUndefined();
     });
   });
 
@@ -2025,6 +2186,7 @@ describe("KnockGuideClient", () => {
       guideGroups: [mockDefaultGroup],
       guideGroupDisplayLogs: {},
       guides: mockGuides,
+      ineligibleGuides: {},
       previewGuides: {},
       queries: {},
       location: undefined,
@@ -2095,6 +2257,7 @@ describe("KnockGuideClient", () => {
             ],
           },
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2115,6 +2278,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: {},
+        ineligibleGuides: {},
         previewGuides: {
           [mockGuideTwo.key]: mockGuideTwo,
         },
@@ -2146,6 +2310,7 @@ describe("KnockGuideClient", () => {
             active: false,
           },
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2169,6 +2334,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [mockDefaultGroup],
         guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2200,6 +2366,7 @@ describe("KnockGuideClient", () => {
           default: new Date().toISOString(), // Throttle window started now
         },
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2234,6 +2401,7 @@ describe("KnockGuideClient", () => {
           ...mockGuides,
           [mockGuideTwo.key]: mockGuideWithBypass,
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2262,6 +2430,7 @@ describe("KnockGuideClient", () => {
           default: new Date().toISOString(), // Throttle window started now
         },
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2300,6 +2469,7 @@ describe("KnockGuideClient", () => {
           default: tenMinutesAgo,
         },
         guides: mockGuides,
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2376,6 +2546,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: { [existingGuide.key]: existingGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2430,6 +2601,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: { [existingGuide.key]: existingGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2476,6 +2648,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: { [existingGuide.key]: existingGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2569,6 +2742,7 @@ describe("KnockGuideClient", () => {
           [mockGuideOne.key]: mockGuideOne,
           [mockGuideTwo.key]: mockGuideTwo,
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2625,6 +2799,7 @@ describe("KnockGuideClient", () => {
           [mockGuideOne.key]: mockGuideOne,
           [mockGuideTwo.key]: mockGuideTwo,
         },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2894,6 +3069,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -2946,6 +3122,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
@@ -3043,6 +3220,7 @@ describe("KnockGuideClient", () => {
         guideGroups: [],
         guideGroupDisplayLogs: {},
         guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
         previewGuides: {},
         queries: {},
         location: undefined,
