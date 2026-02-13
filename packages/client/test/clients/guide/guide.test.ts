@@ -165,7 +165,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       });
     });
 
@@ -194,7 +194,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: "https://example.com",
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       });
     });
 
@@ -211,7 +211,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       });
     });
 
@@ -234,7 +234,7 @@ describe("KnockGuideClient", () => {
       });
 
       expect(() => {
-        new KnockGuideClient(mockKnock, channelId);
+        new KnockGuideClient(mockKnock, channelId, {}, { trackDebugParams: true });
       }).not.toThrow();
 
       expect(mockLocalStorageWithErrors.setItem).toHaveBeenCalled();
@@ -2959,7 +2959,7 @@ describe("KnockGuideClient", () => {
         mockKnock,
         channelId,
         {},
-        { trackLocationFromWindow: true },
+        { trackLocationFromWindow: true, trackDebugParams: true },
       );
 
       client.store.state.debug = { forcedGuideKey: null };
@@ -3016,7 +3016,7 @@ describe("KnockGuideClient", () => {
         mockKnock,
         channelId,
         {},
-        { trackLocationFromWindow: true },
+        { trackLocationFromWindow: true, trackDebugParams: true },
       );
 
       client.store.state.debug = { forcedGuideKey: "test_guide" };
@@ -3269,6 +3269,120 @@ describe("KnockGuideClient", () => {
           type: "tooltip",
         }),
       );
+    });
+  });
+
+  describe("setDebug", () => {
+    test("sets debug state with debugging: true", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.debugging!).toBe(true);
+
+      // calls fetch and subscribe when not already debugging
+      expect(fetchSpy).toHaveBeenCalled();
+      expect(subscribeSpy).toHaveBeenCalled();
+    });
+
+    test("sets debug state with provided options", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() => Promise.resolve({ status: "ok" }));
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug({ forcedGuideKey: "test_guide" });
+
+      expect(client.store.state.debug!.debugging!).toBe(true);
+      expect(client.store.state.debug!.forcedGuideKey!).toBe("test_guide");
+    });
+
+    test("does not call fetch and subscribe when already debugging", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.debugging!).toBe(true);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("unsetDebug", () => {
+    test("sets debug state to undefined", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+
+      // calls fetch and subscribe when was debugging
+      expect(fetchSpy).toHaveBeenCalled();
+      expect(subscribeSpy).toHaveBeenCalled();
+    });
+
+    test("does not call fetch and subscribe when was not debugging", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+
+    test("does not call fetch and subscribe when debug exists but debugging is false", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: false };
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
     });
   });
 });
