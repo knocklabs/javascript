@@ -128,7 +128,7 @@ const resolveIsEligible = ({
   return true;
 };
 
-const resolveIsQualified = ({ activatable }: AnnotatedStatuses) => {
+export const resolveIsQualified = ({ activatable }: AnnotatedStatuses) => {
   if (!activatable.status) return false;
   return true;
 };
