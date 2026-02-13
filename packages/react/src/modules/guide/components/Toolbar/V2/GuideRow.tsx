@@ -50,28 +50,28 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
 
       <Stack justify="flex-end">
         {!isUnknownGuide(guide) && (
-          <Stack gap="1">
-            <Tooltip
-              label={
-                guide.annotation.activatable.status
-                  ? "This guide can be activated at the current location"
-                  : "This guide cannot be activated at the current location"
-              }
-            >
-              <Button
-                px="1"
-                size="1"
-                variant="soft"
-                color={guide.annotation.activatable.status ? "green" : "red"}
-                leadingIcon={{ icon: LocateFixed, alt: "Target" }}
-              />
-            </Tooltip>
-          </Stack>
-        )}
-        {!isUnknownGuide(guide) && (
-          <Stack px="2" align="center">
-            <Box h="3" borderLeft="px" borderColor="gray-6" />
-          </Stack>
+          <>
+            <Stack gap="1">
+              <Tooltip
+                label={
+                  guide.annotation.activatable.status
+                    ? "This guide can be activated at the current location"
+                    : "This guide cannot be activated at the current location"
+                }
+              >
+                <Button
+                  px="1"
+                  size="1"
+                  variant="soft"
+                  color={guide.annotation.activatable.status ? "green" : "red"}
+                  leadingIcon={{ icon: LocateFixed, alt: "Target" }}
+                />
+              </Tooltip>
+            </Stack>
+            <Stack px="2" align="center">
+              <Box h="3" borderLeft="px" borderColor="gray-6" />
+            </Stack>
+          </>
         )}
         <Stack gap="1">
           {!isUnknownGuide(guide) && (
