@@ -1,4 +1,8 @@
-import type { FeedClientOptions, FeedItem } from "./interfaces";
+import type {
+  FeedClientOptions,
+  FeedItem,
+  FetchFeedOptionsForRequest,
+} from "./interfaces";
 
 export function deduplicateItems(items: FeedItem[]): FeedItem[] {
   const seen: Record<string, boolean> = {};
@@ -22,6 +26,11 @@ export function sortItems(items: FeedItem[]) {
   });
 }
 
+type DateRangeParams = Pick<
+  FetchFeedOptionsForRequest,
+  "inserted_at.gte" | "inserted_at.lte" | "inserted_at.gt" | "inserted_at.lt"
+>;
+
 export function mergeDateRangeParams(options: FeedClientOptions) {
   const { inserted_at_date_range, ...rest } = options;
 
@@ -29,7 +38,7 @@ export function mergeDateRangeParams(options: FeedClientOptions) {
     return rest;
   }
 
-  const dateRangeParams: Record<string, string> = {};
+  const dateRangeParams: DateRangeParams = {};
 
   // Determine which operators to use based on the inclusive flag
   const isInclusive = inserted_at_date_range.inclusive ?? false;
