@@ -69,7 +69,7 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           </Stack>
         )}
         {!isUnknownGuide(guide) && (
-          <Stack px="1" align="center">
+          <Stack px="2" align="center">
             <Box h="3" borderLeft="px" borderColor="gray-6" />
           </Stack>
         )}
