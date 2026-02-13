@@ -65,10 +65,16 @@ export interface GuideGroupData {
   updated_at: string;
 }
 
+type GuideIneligibilityReason =
+  | "guide_not_active"
+  | "marked_as_archived"
+  | "target_conditions_not_met"
+  | "not_in_target_audience";
+
 export type GuideIneligibilityMarker = {
   __typename: "GuideIneligibilityMarker";
   key: KnockGuide["key"];
-  reason: string;
+  reason: GuideIneligibilityReason;
   message: string;
 };
 
