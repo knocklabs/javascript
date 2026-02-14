@@ -2,6 +2,8 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 
+import { exponentialBackoffFullJitter } from "./helpers";
+
 type ApiClientOptions = {
   host: string;
   apiKey: string;
@@ -52,6 +54,18 @@ class ApiClient {
           user_token: this.userToken,
           api_key: this.apiKey,
           branch_slug: this.branch,
+        },
+        reconnectAfterMs: (tries: number) => {
+          return exponentialBackoffFullJitter(tries, {
+            baseDelayMs: 1000,
+            maxDelayMs: 30_000,
+          });
+        },
+        rejoinAfterMs: (tries: number) => {
+          return exponentialBackoffFullJitter(tries, {
+            baseDelayMs: 1000,
+            maxDelayMs: 60_000,
+          });
         },
       });
     }

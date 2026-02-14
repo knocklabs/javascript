@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { Socket } from "phoenix";
 
 import packageJson from "../package.json";
 import ApiClient from "../src/api";
@@ -606,6 +607,102 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeDefined();
 
       // Restore original window value
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("configures socket with reconnectAfterMs and rejoinAfterMs", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      vi.mocked(Socket).mockClear();
+
+      new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      expect(typeof socketOpts.reconnectAfterMs).toBe("function");
+      expect(typeof socketOpts.rejoinAfterMs).toBe("function");
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("reconnectAfterMs returns values within expected bounds", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      vi.mocked(Socket).mockClear();
+
+      new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const reconnectAfterMs = socketOpts.reconnectAfterMs as (
+        tries: number,
+      ) => number;
+
+      // Call it many times to verify the range holds
+      for (let i = 0; i < 50; i++) {
+        const delay = reconnectAfterMs(1);
+        expect(delay).toBeGreaterThanOrEqual(250);
+        expect(delay).toBeLessThanOrEqual(1000);
+      }
+
+      // At high tries, should be capped at 30_000
+      for (let i = 0; i < 50; i++) {
+        const delay = reconnectAfterMs(100);
+        expect(delay).toBeGreaterThanOrEqual(250);
+        expect(delay).toBeLessThanOrEqual(30_000);
+      }
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("rejoinAfterMs returns values within expected bounds", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      vi.mocked(Socket).mockClear();
+
+      new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const rejoinAfterMs = socketOpts.rejoinAfterMs as (
+        tries: number,
+      ) => number;
+
+      // Call it many times to verify the range holds
+      for (let i = 0; i < 50; i++) {
+        const delay = rejoinAfterMs(1);
+        expect(delay).toBeGreaterThanOrEqual(250);
+        expect(delay).toBeLessThanOrEqual(1000);
+      }
+
+      // At high tries, should be capped at 60_000
+      for (let i = 0; i < 50; i++) {
+        const delay = rejoinAfterMs(100);
+        expect(delay).toBeGreaterThanOrEqual(250);
+        expect(delay).toBeLessThanOrEqual(60_000);
+      }
+
       (global as GlobalWithWindow).window = originalWindow;
     });
 
