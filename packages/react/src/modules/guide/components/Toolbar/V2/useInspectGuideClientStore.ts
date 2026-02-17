@@ -1,6 +1,5 @@
 import {
   KnockGuide,
-  // KnockGuideClient,
   KnockGuideClientGroupStage,
   KnockGuideClientStoreState,
   KnockGuideIneligibilityMarker,
@@ -42,6 +41,29 @@ type ArchivedStatus = {
   status: boolean;
 };
 
+// Selectable:
+//  - "returned": Queried and resolved to return the guide from useGuide(s).
+//  - "throttled": Queried and resolved but being throttled, so not yet returned.
+//  - "queried": Queried but not resolved, because there are other higher
+//    priority guides that are ahead of this guide in the query result.
+//  - undefined: Not reachable with any of the given queries and filters.
+type SelectionResultByLimit = {
+  one?: KnockGuideSelectionResult;
+  all?: KnockGuideSelectionResult;
+};
+type SelectionResultByQuery = {
+  key?: SelectionResultByLimit;
+  type?: SelectionResultByLimit;
+};
+type SelectableStatusPresent = {
+  status: "returned" | "throttled" | "queried";
+  query: SelectionResultByQuery;
+};
+type SelectableStatusAbsent = {
+  status: undefined;
+};
+type SelectableStatus = SelectableStatusPresent | SelectableStatusAbsent;
+
 type AnnotatedStatuses = {
   // Individual eligibility statuses:
   active: ActiveStatus;
@@ -61,24 +83,6 @@ type GuideAnnotation = AnnotatedStatuses & {
   // informs "when" and "where" an eligible guide can be displayed to user.
   isQualified: boolean;
 };
-
-type SelectionResultByLimit = {
-  one?: KnockGuideSelectionResult;
-  all?: KnockGuideSelectionResult;
-};
-type SelectionResultByQuery = {
-  key: SelectionResultByLimit | undefined;
-  type: SelectionResultByLimit | undefined;
-};
-
-type SelectableStatusPresent = {
-  status: "returned" | "throttled" | "queried";
-  query: SelectionResultByQuery;
-};
-type SelectableStatusAbsent = {
-  status: undefined;
-};
-type SelectableStatus = SelectableStatusPresent | SelectableStatusAbsent;
 
 export type AnnotatedGuide = KnockGuide & {
   annotation: GuideAnnotation;
@@ -105,6 +109,154 @@ export type UnknownGuide = {
 export type InspectionResult = {
   guides: (AnnotatedGuide | UnknownGuide)[];
   error?: "no_guide_group";
+};
+
+type StoreStateSnapshot = Pick<
+  KnockGuideClientStoreState,
+  | "location"
+  | "guides"
+  | "guideGroups"
+  | "ineligibleGuides"
+  | "debug"
+  | "counter"
+> & {
+  throttled: boolean;
+};
+
+const inferSelectByKeyReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+): SelectableStatusPresent["status"] => {
+  const includeThrottled =
+    !!query.key?.one?.metadata?.opts?.includeThrottled ||
+    !!query.key?.all?.metadata?.opts?.includeThrottled;
+
+  // If unthrottled, then it should always be returned.
+  if (guide.bypass_global_group_limit) {
+    return "returned";
+  }
+
+  // If resolved, expect this guide to be returned unless being throttled.
+  if (stage.resolved === guide.key) {
+    if (snapshot.throttled && !includeThrottled) {
+      return "throttled";
+    }
+    return "returned";
+  }
+
+  // If queried but not resolved, it means this guide is being shadowed by
+  // another guide with higher priority because throttled guides can be
+  // displayed only one at a time.
+  return "queried";
+};
+
+const inferSelectOneByTypeReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+): SelectableStatusPresent["status"] => {
+  const includeThrottled = !!query.type?.one?.metadata?.opts?.includeThrottled;
+
+  // There may be multiple unthrottled guides of the same type, being queried
+  // by type to return a single guide, for example: useGuide({ type: "card" }).
+  //
+  // So it is possible for an unthrottled guide to be shadowed by another
+  // unthrottled guide of the same type with higher priority, so we need to
+  // look at the query result to determine its return status.
+  if (guide.bypass_global_group_limit) {
+    const result = query.type!.one!;
+    if (result.size === 0) {
+      // This should never happen but for completeness.
+      return "queried";
+    }
+
+    const [_, first] = [...result][0]!;
+    if (first.key !== guide.key) {
+      // Being shadowed by another guide with higher priority.
+      return "queried";
+    }
+
+    return "returned";
+  }
+
+  // If resolved, expect this guide to be returned unless being throttled.
+  if (stage.resolved === guide.key) {
+    if (snapshot.throttled && !includeThrottled) {
+      return "throttled";
+    }
+    return "returned";
+  }
+
+  // If queried but not resolved, it means this guide is being shadowed by
+  // another guide with higher priority because throttled guides can be
+  // displayed only one at a time.
+  return "queried";
+};
+
+const inferSelectAllByTypeReturnStatus = (
+  _guide: KnockGuide,
+  _snapshot: StoreStateSnapshot,
+  _stage: KnockGuideClientGroupStage,
+  _query: SelectionResultByQuery,
+): SelectableStatusPresent["status"] => {
+  // If queried with useGuides/selectGuides (i.e. can return multiple guides),
+  // then we need to look up the actual query results to figure out how this
+  // guide may or may not be included in the result.
+
+  // TODO: Placeholder to follow up.
+  return "returned";
+};
+
+const inferSelectReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+) => {
+  // Querying by key can only return up to a max of one guide, regardless of
+  // useGuide or useGuides, and should take precedence in status designation.
+  if (query.key) {
+    return inferSelectByKeyReturnStatus(guide, snapshot, stage, query);
+  }
+
+  if (query.type?.one) {
+    return inferSelectOneByTypeReturnStatus(guide, snapshot, stage, query);
+  }
+  if (query.type?.all) {
+    return inferSelectAllByTypeReturnStatus(guide, snapshot, stage, query);
+  }
+
+  return undefined;
+};
+
+const toSelectableStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage | undefined,
+): SelectableStatus => {
+  if (!stage || stage.status === "open") {
+    return { status: undefined };
+  }
+
+  const query = {
+    key: (stage.results.key || {})[guide.key],
+    type: (stage.results.type || {})[guide.type],
+  };
+
+  const queried = Boolean(query.key || query.type);
+  if (!queried) {
+    return { status: undefined };
+  }
+
+  const status = inferSelectReturnStatus(guide, snapshot, stage, query);
+  if (!status) {
+    return { status: undefined };
+  }
+
+  return { status, query };
 };
 
 const toIneligibilityStatus = (
@@ -158,87 +310,6 @@ export const resolveIsQualified = ({
   if (!activatable.status) return false;
   if (!selectable.status) return false;
   return true;
-};
-
-type StoreStateSnapshot = Pick<
-  KnockGuideClientStoreState,
-  | "location"
-  | "guides"
-  | "guideGroups"
-  | "ineligibleGuides"
-  | "debug"
-  | "counter"
-> & {
-  throttled: boolean;
-};
-
-const getSelectableStatus = (
-  guide: KnockGuide,
-  snapshot: StoreStateSnapshot,
-  stage: KnockGuideClientGroupStage,
-  query: SelectionResultByQuery,
-) => {
-  if (query.type?.all) {
-    // TODO: Placeholder, we need to look up the actual query result.
-    return "returned";
-  }
-
-  // TODO: Need to handle multiple unthrottled guides of the same type.
-
-  if (guide.bypass_global_group_limit) {
-    return "returned";
-  }
-
-  if (stage.resolved !== guide.key) {
-    return "queried";
-  }
-
-  // At this point we know this is the resolved guide.
-
-  if (
-    query.type?.one?.metadata?.opts &&
-    query.type.one.metadata.opts.includeThrottled
-  ) {
-    return "returned";
-  }
-  if (
-    query.key?.one?.metadata?.opts &&
-    query.key.one.metadata.opts.includeThrottled
-  ) {
-    return "returned";
-  }
-
-  return snapshot.throttled ? "throttled" : "returned";
-};
-
-// TODO: Rename inspectGuideIfSelectable
-const toSelectableStatus = (
-  guide: KnockGuide,
-  snapshot: StoreStateSnapshot,
-  stage: KnockGuideClientGroupStage | undefined,
-): SelectableStatus => {
-  if (!stage || stage.status === "open") {
-    return { status: undefined };
-  }
-
-  const { results } = stage;
-
-  const query = {
-    key: (results.key || {})[guide.key],
-    type: (results.type || {})[guide.type],
-  };
-
-  const queried = Boolean(query.key || query.type);
-  if (!queried) {
-    return { status: undefined };
-  }
-
-  const status = getSelectableStatus(guide, snapshot, stage, query);
-
-  return {
-    status,
-    query,
-  };
 };
 
 const annotateGuide = (

@@ -26,12 +26,6 @@ const GuidesList = ({
   guides: InspectionResult["guides"];
   displayOption: DisplayOption;
 }) => {
-  // console.log(
-  //   guides.map(
-  //     (g) => g.__typename !== "MissingGuide" && g.annotation.selectable,
-  //   ),
-  // );
-
   return guides.map((guide, idx) => {
     if (
       displayOption === "current-page" &&
