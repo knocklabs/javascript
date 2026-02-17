@@ -2,8 +2,26 @@ import Knock, { FeedClientOptions } from "@knocklabs/client";
 import { intlFormatDistance, parseISO } from "date-fns";
 import { ReactNode } from "react";
 
+import { BadgeCountType } from "./types";
+
 export function formatBadgeCount(count: number): string | number {
   return count > 9 ? "9+" : count;
+}
+
+/**
+ * Returns a string that describes the badge count and type.
+ *
+ * `all` = "12 notifications"
+ * `unread` = "1 unread notification"
+ * `unseen` = "7 unseen notifications"
+ */
+export function getBadgeAriaLabel(
+  count: number,
+  badgeCountType: BadgeCountType,
+): string {
+  const qualifier = badgeCountType === "all" ? "" : `${badgeCountType} `;
+  const noun = count === 1 ? "notification" : "notifications";
+  return `${count} ${qualifier}${noun}`;
 }
 
 type FormatTimestampOptions = {

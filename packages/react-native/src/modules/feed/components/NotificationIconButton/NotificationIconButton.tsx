@@ -1,3 +1,4 @@
+import { type BadgeCountType } from "@knocklabs/react-core";
 import React from "react";
 import {
   StyleSheet,
@@ -9,7 +10,7 @@ import {
 
 import { BellIcon } from "../../../../assets/BellIcon";
 
-import { BadgeCountType, UnseenBadge } from "./UnseenBadge";
+import { UnseenBadge } from "./UnseenBadge";
 
 export interface NotificationIconButtonProps {
   onClick: () => void;

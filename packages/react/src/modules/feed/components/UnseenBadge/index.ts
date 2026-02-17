@@ -1,5 +1,1 @@
-export {
-  UnseenBadge,
-  type UnseenBadgeProps,
-  type BadgeCountType,
-} from "./UnseenBadge";
+export { UnseenBadge, type UnseenBadgeProps } from "./UnseenBadge";

@@ -4,6 +4,7 @@ import {
   feedProviderKey,
   formatBadgeCount,
   formatTimestamp,
+  getBadgeAriaLabel,
   msTeamsProviderKey,
   renderNodeOrFallback,
   slackProviderKey,
@@ -21,6 +22,21 @@ describe("formatBadgeCount", () => {
   test("returns 9+ when count is greater than 9", () => {
     expect(formatBadgeCount(10)).toBe("9+");
     expect(formatBadgeCount(100)).toBe("9+");
+  });
+});
+
+describe("getBadgeAriaLabel", () => {
+  test("uses singular 'notification' when count is 1", () => {
+    expect(getBadgeAriaLabel(1, "unseen")).toBe("1 unseen notification");
+    expect(getBadgeAriaLabel(1, "unread")).toBe("1 unread notification");
+    expect(getBadgeAriaLabel(1, "all")).toBe("1 notification");
+  });
+
+  test("uses plural 'notifications' when count is not 1", () => {
+    expect(getBadgeAriaLabel(0, "unseen")).toBe("0 unseen notifications");
+    expect(getBadgeAriaLabel(3, "unseen")).toBe("3 unseen notifications");
+    expect(getBadgeAriaLabel(5, "unread")).toBe("5 unread notifications");
+    expect(getBadgeAriaLabel(10, "all")).toBe("10 notifications");
   });
 });
 
