@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 
 import type { FetchFeedOptions } from "../../../src";
-import ApiClient from "../../../src/api";
+
 import Feed from "../../../src/clients/feed/feed";
 import { FeedSocketManager } from "../../../src/clients/feed/socket-manager";
 import { NetworkStatus } from "../../../src/networkStatus";
