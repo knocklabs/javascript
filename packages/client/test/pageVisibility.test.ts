@@ -89,14 +89,14 @@ describe("PageVisibilityManager", () => {
 
   test("respects a custom disconnect delay", () => {
     const socket = createMockSocket();
-    const manager = new PageVisibilityManager(socket as any, 30_000);
+    const manager = new PageVisibilityManager(socket as any, 5_000);
 
     simulateVisibilityChange(true);
 
-    vi.advanceTimersByTime(10_000);
+    vi.advanceTimersByTime(4_999);
     expect(socket.disconnect).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(20_000);
+    vi.advanceTimersByTime(1);
     expect(socket.disconnect).toHaveBeenCalledOnce();
 
     manager.teardown();
