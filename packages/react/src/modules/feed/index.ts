@@ -24,8 +24,4 @@ export {
   NotificationIconButton,
   type NotificationIconButtonProps,
 } from "./components/NotificationIconButton";
-export {
-  UnseenBadge,
-  type UnseenBadgeProps,
-  type BadgeCountType,
-} from "./components/UnseenBadge";
+export { UnseenBadge, type UnseenBadgeProps } from "./components/UnseenBadge";

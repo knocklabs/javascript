@@ -1,4 +1,9 @@
 /**
+ * Represents the badge count type for notification badges.
+ */
+export type BadgeCountType = "unseen" | "unread" | "all";
+
+/**
  * Represents the connection status for OAuth-based integrations (Slack, MS Teams, etc.)
  */
 export type ConnectionStatus =

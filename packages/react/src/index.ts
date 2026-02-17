@@ -26,7 +26,6 @@ export {
   NotificationIconButton,
   UnseenBadge,
   type AvatarProps,
-  type BadgeCountType,
   type MarkAsReadProps,
   type NotificationCellProps,
   type NotificationFeedHeaderProps,
@@ -65,10 +64,12 @@ export {
 } from "./modules/slack";
 
 export {
+  type BadgeCountType,
   FilterStatus,
   KnockProvider,
   feedProviderKey,
   formatBadgeCount,
+  getBadgeAriaLabel,
   formatTimestamp,
   msTeamsProviderKey,
   renderNodeOrFallback,

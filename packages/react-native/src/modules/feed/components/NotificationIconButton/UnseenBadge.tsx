@@ -1,11 +1,14 @@
 import { FeedMetadata } from "@knocklabs/client";
-import { formatBadgeCount, useKnockFeed } from "@knocklabs/react-core";
+import {
+  type BadgeCountType,
+  formatBadgeCount,
+  getBadgeAriaLabel,
+  useKnockFeed,
+} from "@knocklabs/react-core";
 import React from "react";
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 
 import { useTheme } from "../../../../theme/useTheme";
-
-export type BadgeCountType = "unseen" | "unread" | "all";
 
 export type UnseenBadgeProps = {
   badgeCountType?: BadgeCountType;
@@ -16,7 +19,7 @@ export type UnseenBadgeProps = {
 function selectBadgeCount(
   badgeCountType: BadgeCountType,
   metadata: FeedMetadata,
-) {
+): number {
   switch (badgeCountType) {
     case "all":
       return metadata.total_count;
@@ -42,6 +45,9 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
 
   return (
     <View
+      accessible={true}
+      accessibilityRole="text"
+      accessibilityLabel={getBadgeAriaLabel(badgeCountValue, badgeCountType)}
       style={[
         styles.badgeContainer,
         { backgroundColor: theme.colors.accent9 },
@@ -59,6 +65,7 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
           textStyle,
         ]}
         numberOfLines={1}
+        importantForAccessibility="no-hide-descendants"
       >
         {formatBadgeCount(badgeCountValue)}
       </Text>

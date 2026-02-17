@@ -13,6 +13,7 @@ export {
 export { FilterStatus, type ColorMode } from "./constants";
 export {
   formatBadgeCount,
+  getBadgeAriaLabel,
   formatTimestamp,
   toSentenceCase,
   renderNodeOrFallback,
@@ -20,4 +21,8 @@ export {
   slackProviderKey,
   msTeamsProviderKey,
 } from "./utils";
-export { type ConnectionStatus, type AuthCheckResult } from "./types";
+export {
+  type BadgeCountType,
+  type ConnectionStatus,
+  type AuthCheckResult,
+} from "./types";
