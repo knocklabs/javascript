@@ -837,7 +837,6 @@ class Feed {
     // Internal events only need `items:`
     this.broadcastOverChannel(`items:${type}`, { items });
   }
-
 }
 
 export default Feed;

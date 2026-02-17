@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
+
 import { PageVisibilityManager } from "./pageVisibility";
 
 import { exponentialBackoffFullJitter } from "./helpers";
@@ -10,6 +11,8 @@ type ApiClientOptions = {
   apiKey: string;
   userToken: string | undefined;
   branch?: string;
+  /** Automatically disconnect the socket when the page is hidden and reconnect when visible. Defaults to `true`. */
+  disconnectOnPageHidden?: boolean;
 };
 
 export interface ApiResponse {
@@ -71,7 +74,9 @@ class ApiClient {
         },
       });
 
-      this.pageVisibility = new PageVisibilityManager(this.socket);
+      if (options.disconnectOnPageHidden !== false) {
+        this.pageVisibility = new PageVisibilityManager(this.socket);
+      }
     }
 
     axiosRetry(this.axiosClient, {
