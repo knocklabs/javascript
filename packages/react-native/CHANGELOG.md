@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.1
+
+### Patch Changes
+
+- 7f8bdfe: Add accessible labels to `UnseenBadge` so screen readers announce the count with context (e.g. "3 unseen notifications") instead of just the bare number
+- Updated dependencies [ddd7981]
+- Updated dependencies [7f8bdfe]
+  - @knocklabs/client@0.21.1
+  - @knocklabs/react-core@0.13.1
+
 ## 0.8.0
 
 ### Minor Changes

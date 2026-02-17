@@ -1,5 +1,11 @@
 # @knocklabs/expo-example
 
+## 1.0.40
+
+### Patch Changes
+
+- @knocklabs/expo@0.5.1
+
 ## 1.0.39
 
 ### Patch Changes
