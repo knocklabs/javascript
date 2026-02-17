@@ -170,9 +170,7 @@ class Knock {
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
     }
-    if (this.apiClient?.socket && this.apiClient.socket.isConnected()) {
-      this.apiClient.socket.disconnect();
-    }
+    this.apiClient?.teardown();
   }
 
   log(message: string, force = false) {

@@ -34,11 +34,6 @@ export interface FeedClientOptions {
   trigger_data?: TriggerData;
   // Optionally enable cross browser feed updates for this feed
   __experimentalCrossBrowserUpdates?: boolean;
-  // Optionally automatically manage socket connections on changes to tab visibility (defaults to `false`)
-  auto_manage_socket_connection?: boolean;
-  // Optionally set the delay amount in milliseconds when automatically disconnecting sockets from inactive tabs (defaults to `2000`)
-  // Requires `auto_manage_socket_connection` to be `true`
-  auto_manage_socket_connection_delay?: number;
   // Optionally scope notifications to a given date range
   inserted_at_date_range?: {
     // Optionally set the start date with a string in ISO 8601 format
@@ -88,8 +83,6 @@ export type FetchFeedOptionsForRequest = Omit<
   __loadingType: undefined;
   __fetchSource: undefined;
   __experimentalCrossBrowserUpdates: undefined;
-  auto_manage_socket_connection: undefined;
-  auto_manage_socket_connection_delay: undefined;
 };
 
 export interface ContentBlockBase {

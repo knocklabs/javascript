@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
+import { PageVisibilityManager } from "./pageVisibility";
 
 import { exponentialBackoffFullJitter } from "./helpers";
 
@@ -28,6 +29,7 @@ class ApiClient {
   private axiosClient: AxiosInstance;
 
   public socket: Socket | undefined;
+  private pageVisibility: PageVisibilityManager | undefined;
 
   constructor(options: ApiClientOptions) {
     this.host = options.host;
@@ -68,6 +70,8 @@ class ApiClient {
           });
         },
       });
+
+      this.pageVisibility = new PageVisibilityManager(this.socket);
     }
 
     axiosRetry(this.axiosClient, {
@@ -98,6 +102,14 @@ class ApiClient {
         body: undefined,
         error: e,
       };
+    }
+  }
+
+  teardown() {
+    this.pageVisibility?.teardown();
+
+    if (this.socket?.isConnected()) {
+      this.socket.disconnect();
     }
   }
 
