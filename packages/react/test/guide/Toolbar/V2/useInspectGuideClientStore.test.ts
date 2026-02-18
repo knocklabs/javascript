@@ -14,11 +14,20 @@ let mockStoreState: Record<string, unknown> = {};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockCheckActivatable = vi.fn((..._args: any[]) => true);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockCheckStateIfThrottled = vi.fn((..._args: any[]) => false);
+
+// Mutable group stage that tests can override to simulate different stage states.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockGroupStage: Record<string, any> | undefined = undefined;
+
 vi.mock("@knocklabs/client", async () => {
   const actual = await vi.importActual("@knocklabs/client");
   return {
     ...actual,
     checkActivatable: (...args: unknown[]) => mockCheckActivatable(...args),
+    checkStateIfThrottled: (...args: unknown[]) =>
+      mockCheckStateIfThrottled(...args),
   };
 });
 
@@ -27,7 +36,10 @@ vi.mock("@knocklabs/react-core", async () => {
   return {
     ...actual,
     useGuideContext: () => ({
-      client: { store: {} },
+      client: {
+        store: {},
+        getStage: () => mockGroupStage,
+      },
     }),
     useStore: vi.fn((_store, selector) => selector(mockStoreState)),
   };
@@ -84,6 +96,7 @@ const setSnapshot = (partial: Record<string, unknown>) => {
     guideGroups: [],
     ineligibleGuides: {},
     debug: { debugging: true },
+    counter: 0,
     ...partial,
   };
 };
@@ -94,10 +107,41 @@ const renderInspect = () => {
   return result.current;
 };
 
+// Helper to build a mock selection result (Map with metadata).
+const makeSelectionResult = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  entries: [number, any][] = [],
+  opts: Record<string, unknown> = {},
+) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const map = new Map(entries) as Map<number, any> & { metadata?: unknown };
+  map.metadata = { opts };
+  return map;
+};
+
+// Helper to build a closed group stage with guides queried by key.
+const makeClosedStage = (
+  resolvedKey: string,
+  queriedKeys: string[] = [resolvedKey],
+) => ({
+  status: "closed" as const,
+  ordered: queriedKeys,
+  resolved: resolvedKey,
+  timeoutId: null,
+  results: {
+    key: Object.fromEntries(
+      queriedKeys.map((key) => [key, { one: makeSelectionResult() }]),
+    ),
+  },
+});
+
 describe("useInspectGuideClientStore", () => {
   beforeEach(() => {
     mockCheckActivatable.mockReset();
     mockCheckActivatable.mockReturnValue(true);
+    mockCheckStateIfThrottled.mockReset();
+    mockCheckStateIfThrottled.mockReturnValue(false);
+    mockGroupStage = undefined;
   });
 
   // ----- Early returns -----
@@ -366,8 +410,9 @@ describe("useInspectGuideClientStore", () => {
   // ----- activatable + isQualified -----
 
   describe("activatable status and isQualified", () => {
-    test("marks guide as activatable and qualified when checkActivatable returns true", () => {
+    test("marks guide as activatable and qualified when checkActivatable returns true and guide is selectable", () => {
       mockCheckActivatable.mockReturnValue(true);
+      mockGroupStage = makeClosedStage("g1");
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
         guideGroups: [makeGuideGroup(["g1"])],
@@ -378,6 +423,7 @@ describe("useInspectGuideClientStore", () => {
       const result = renderInspect()!;
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.activatable).toEqual({ status: true });
+      expect(annotated.annotation.selectable.status).toBe("returned");
       expect(annotated.annotation.isQualified).toBe(true);
     });
 
@@ -429,6 +475,7 @@ describe("useInspectGuideClientStore", () => {
 
     test("a guide can be ineligible but qualified", () => {
       mockCheckActivatable.mockReturnValue(true);
+      mockGroupStage = makeClosedStage("g1");
       const guide = makeGuide({ key: "g1", active: true });
       const marker = makeMarker(
         "g1",
@@ -448,16 +495,293 @@ describe("useInspectGuideClientStore", () => {
     });
   });
 
+  // ----- selectable status -----
+
+  describe("selectable status", () => {
+    test("selectable is undefined when stage is undefined", () => {
+      mockGroupStage = undefined;
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable).toEqual({ status: undefined });
+    });
+
+    test("selectable is undefined when stage is open", () => {
+      mockGroupStage = {
+        status: "open",
+        ordered: [],
+        results: {},
+        timeoutId: null,
+      };
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable).toEqual({ status: undefined });
+    });
+
+    test("selectable is 'returned' when guide is resolved and queried by key", () => {
+      mockGroupStage = makeClosedStage("g1");
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("selectable is 'throttled' when guide is resolved but throttled", () => {
+      mockGroupStage = makeClosedStage("g1");
+      mockCheckStateIfThrottled.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("throttled");
+    });
+
+    test("selectable is 'queried' when guide is queried but not resolved", () => {
+      // resolved is "other_guide", not "g1"
+      mockGroupStage = makeClosedStage("other_guide", ["g1", "other_guide"]);
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectable is 'returned' for unthrottled guide regardless of resolved key", () => {
+      // resolved is "other_guide", but guide bypasses the group limit
+      mockGroupStage = makeClosedStage("other_guide", ["g1", "other_guide"]);
+      const guide = makeGuide({
+        key: "g1",
+        bypass_global_group_limit: true,
+      });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("selectable is undefined when guide is not in stage results", () => {
+      // Stage has results only for "other_guide", not "g1"
+      mockGroupStage = makeClosedStage("other_guide");
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable).toEqual({ status: undefined });
+    });
+
+    test("selectable is 'returned' when queried by type (selectOne)", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      // Stage has type-based results instead of key-based
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([[0, { key: "g1" }]]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("selectable is 'queried' when queried by type but shadowed by higher priority", () => {
+      const guide = makeGuide({
+        key: "g1",
+        type: "banner",
+        bypass_global_group_limit: true,
+      });
+      // Stage has type-based results where a different guide is first
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([
+                [0, { key: "higher_priority_guide" }],
+              ]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectable is 'returned' when queried by type (selectAll)", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              all: makeSelectionResult([[0, { key: "g1" }]]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      // selectAll placeholder always returns "returned"
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("key-based query takes precedence over type-based query", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      // Stage has both key and type results, key should take precedence
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: {
+            g1: { one: makeSelectionResult() },
+          },
+          type: {
+            banner: {
+              one: makeSelectionResult([[0, { key: "other" }]]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      // Key query: resolved === guide.key → "returned" (not "queried" from type)
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("isQualified is false when activatable but not selectable (no stage)", () => {
+      mockGroupStage = undefined;
+      mockCheckActivatable.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.activatable).toEqual({ status: true });
+      expect(annotated.annotation.selectable).toEqual({ status: undefined });
+      expect(annotated.annotation.isQualified).toBe(false);
+    });
+
+    test("isQualified is false when selectable but not activatable", () => {
+      mockGroupStage = makeClosedStage("g1");
+      mockCheckActivatable.mockReturnValue(false);
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.activatable).toEqual({ status: false });
+      expect(annotated.annotation.selectable.status).toBe("returned");
+      expect(annotated.annotation.isQualified).toBe(false);
+    });
+
+    test("selectable is 'returned' on patch stage when guide is resolved", () => {
+      mockGroupStage = {
+        status: "patch",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: {
+            g1: { one: makeSelectionResult() },
+          },
+        },
+      };
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+  });
+
   // ----- resolveIsQualified (unit) -----
 
   describe("resolveIsQualified", () => {
-    test("returns true when activatable status is true", () => {
+    test("returns true when activatable and selectable", () => {
       expect(
         resolveIsQualified({
           active: { status: true },
           targetable: { status: true },
           archived: { status: false },
           activatable: { status: true },
+          selectable: { status: "returned", query: {} },
         }),
       ).toBe(true);
     });
@@ -469,8 +793,45 @@ describe("useInspectGuideClientStore", () => {
           targetable: { status: true },
           archived: { status: false },
           activatable: { status: false },
+          selectable: { status: "returned", query: {} },
         }),
       ).toBe(false);
+    });
+
+    test("returns false when selectable status is undefined", () => {
+      expect(
+        resolveIsQualified({
+          active: { status: true },
+          targetable: { status: true },
+          archived: { status: false },
+          activatable: { status: true },
+          selectable: { status: undefined },
+        }),
+      ).toBe(false);
+    });
+
+    test("returns true when selectable status is throttled", () => {
+      expect(
+        resolveIsQualified({
+          active: { status: true },
+          targetable: { status: true },
+          archived: { status: false },
+          activatable: { status: true },
+          selectable: { status: "throttled", query: {} },
+        }),
+      ).toBe(true);
+    });
+
+    test("returns true when selectable status is queried", () => {
+      expect(
+        resolveIsQualified({
+          active: { status: true },
+          targetable: { status: true },
+          archived: { status: false },
+          activatable: { status: true },
+          selectable: { status: "queried", query: {} },
+        }),
+      ).toBe(true);
     });
   });
 });
