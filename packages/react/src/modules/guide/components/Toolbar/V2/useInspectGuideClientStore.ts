@@ -107,6 +107,9 @@ export type UnknownGuide = {
   annotation: {
     isEligible: false;
     isQualified: false;
+    selectable: {
+      status: undefined;
+    };
   };
 };
 
@@ -383,6 +386,9 @@ const newUnknownGuide = (key: KnockGuide["key"]) =>
     annotation: {
       isEligible: false,
       isQualified: false,
+      selectable: {
+        status: undefined,
+      },
     },
   }) as UnknownGuide;
 

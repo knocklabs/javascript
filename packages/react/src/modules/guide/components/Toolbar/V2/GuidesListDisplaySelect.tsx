@@ -2,7 +2,11 @@ import { Select } from "@telegraph/select";
 
 import { TOOLBAR_Z_INDEX } from "../shared";
 
-export type DisplayOption = "current-page" | "all-eligible" | "all-guides";
+export type DisplayOption =
+  | "only-displaying"
+  | "only-displayable"
+  | "all-eligible"
+  | "all-guides";
 
 type Props = {
   value: DisplayOption;
@@ -22,7 +26,10 @@ export const GuidesListDisplaySelect = ({ value, onChange }: Props) => {
         style: { zIndex: TOOLBAR_Z_INDEX },
       }}
     >
-      <Select.Option size="1" value="current-page">
+      <Select.Option size="1" value="only-displaying">
+        Displaying on current page
+      </Select.Option>
+      <Select.Option size="1" value="only-displayable">
         Displayable on current page
       </Select.Option>
       <Select.Option size="1" value="all-eligible">
