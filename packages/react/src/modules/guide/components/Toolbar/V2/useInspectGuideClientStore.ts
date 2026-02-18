@@ -160,6 +160,11 @@ const inferSelectOneByTypeReturnStatus = (
 ): SelectableStatusPresent["status"] => {
   const includeThrottled = !!query.type?.one?.metadata?.opts?.includeThrottled;
 
+  const result = query.type!.one!;
+  if (result.size === 0) {
+    return "queried";
+  }
+
   // There may be multiple unthrottled guides of the same type, being queried
   // by type to return a single guide, for example: useGuide({ type: "card" }).
   //
@@ -167,18 +172,13 @@ const inferSelectOneByTypeReturnStatus = (
   // unthrottled guide of the same type with higher priority, so we need to
   // look at the query result to determine its return status.
   if (guide.bypass_global_group_limit) {
-    const result = query.type!.one!;
-    if (result.size === 0) {
-      // This should never happen but for completeness.
-      return "queried";
-    }
+    const guides = [...result.values()];
+    const first = guides[0]!;
 
-    const [_, first] = [...result][0]!;
     if (first.key !== guide.key) {
       // Being shadowed by another guide with higher priority.
       return "queried";
     }
-
     return "returned";
   }
 
