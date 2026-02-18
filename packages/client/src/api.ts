@@ -2,9 +2,8 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 
-import { PageVisibilityManager } from "./pageVisibility";
-
 import { exponentialBackoffFullJitter } from "./helpers";
+import { PageVisibilityManager } from "./pageVisibility";
 
 type ApiClientOptions = {
   host: string;
