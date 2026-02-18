@@ -34,7 +34,7 @@ export const GuideHoverCard = ({
         <Stack align="center">{children}</Stack>
       </HoverCard.Trigger>
       <HoverCard.Portal>
-        <HoverCard.Content sideOffset={44} side="left">
+        <HoverCard.Content sideOffset={16} side="left">
           <Box
             px="2"
             shadow="2"
