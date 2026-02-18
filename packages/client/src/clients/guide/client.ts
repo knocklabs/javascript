@@ -749,8 +749,6 @@ export class KnockGuideClient {
       return guide;
     }
 
-    // Check if inside the throttle window (i.e. throttled) and if so stop and
-    // return undefined unless explicitly given the option to include throttled.
     const throttled = !opts.includeThrottled && checkStateIfThrottled(state);
 
     switch (this.stage.status) {
@@ -794,6 +792,8 @@ export class KnockGuideClient {
     }
   }
 
+  // Record select query results by accumulating them by 1) key or type first,
+  // and then 2) "one" or "all".
   private maybeRecordSelectResult(result: SelectionResult) {
     if (!result.metadata) return;
 
