@@ -139,7 +139,7 @@ const inferSelectByKeyReturnStatus = (
   }
 
   // If resolved, expect this guide to be returned unless being throttled.
-  if (stage.resolved === guide.key) {
+  if (guide.key === stage.resolved) {
     if (snapshot.throttled && !includeThrottled) {
       return "throttled";
     }
@@ -175,7 +175,7 @@ const inferSelectOneByTypeReturnStatus = (
     const guides = [...result.values()];
     const first = guides[0]!;
 
-    if (first.key !== guide.key) {
+    if (guide.key !== first.key) {
       // Being shadowed by another guide with higher priority.
       return "queried";
     }
@@ -183,7 +183,7 @@ const inferSelectOneByTypeReturnStatus = (
   }
 
   // If resolved, expect this guide to be returned unless being throttled.
-  if (stage.resolved === guide.key) {
+  if (guide.key === stage.resolved) {
     if (snapshot.throttled && !includeThrottled) {
       return "throttled";
     }
