@@ -1,5 +1,8 @@
 import { GenericData } from "@knocklabs/types";
 
+// i.e. useGuide vs useGuides
+export type SelectQueryLimit = "one" | "all";
+
 type SelectionResultMetadata = {
   guideGroup: GuideGroupData;
   // Additional info about the underlying select query behind the result.
@@ -273,13 +276,6 @@ export type ConstructorOpts = {
   orderResolutionDuration?: number;
   throttleCheckInterval?: number;
 };
-
-// i.e. useGuide vs useGuides
-export type SelectQueryLimit = "one" | "all";
-
-// export type SelectQueryParams = SelectFilterParams & {
-//   limit: "one" | "all";
-// };
 
 type SelectionResultByLimit = {
   one?: SelectionResult;
