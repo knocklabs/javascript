@@ -197,42 +197,30 @@ const inferSelectOneByTypeReturnStatus = (
 };
 
 const inferSelectAllByTypeReturnStatus = (
-  _guide: KnockGuide,
+  guide: KnockGuide,
   snapshot: StoreStateSnapshot,
-  _stage: KnockGuideClientGroupStage,
+  stage: KnockGuideClientGroupStage,
   query: SelectionResultByQuery,
 ): SelectableStatusPresent["status"] => {
   const result = query.type!.all!;
   if (result.size === 0) {
-    // This should not happen but here for completeness.
     return "queried";
   }
 
-  // If queried with useGuides (i.e. can return multiple guides), then we need
-  // to look up the actual query results to figure out how this guide may or
-  // may not be included in the result.
+  const guides = [...result.values()];
+  const first = guides[0]!;
 
-  // If explicitly given the option to ignore throttling, then all guides
-  // selected in this query should return.
-  const includeThrottled = !!query.type?.one?.metadata?.opts?.includeThrottled;
-  if (includeThrottled) {
+  // If the first selected guide is unthrottled or resolved, then we should
+  // have at minimum one guide to return, and potentially more based on whether
+  // we are throttling currently and which other guides are unthrottled.
+  if (first.bypass_global_group_limit || first.key === stage.resolved) {
+    if (snapshot.throttled) {
+      return guide.bypass_global_group_limit ? "returned" : "throttled";
+    }
     return "returned";
   }
 
-  const guides = [...result.values()]
-  const first = guides[0]!;
-
-  // If not throttled, then all guides in the query result should be returned.
-  if (!snapshot.throttled) {
-    return "returned"
-  }
-
-  // If being throttled, then all guides in the query result should be returned.
-  // const guides = [...result.values()];
-
-
-  // TODO: Placeholder to follow up.
-  return "returned";
+  return "queried";
 };
 
 const inferSelectReturnStatus = (
