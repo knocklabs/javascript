@@ -7,7 +7,6 @@ import Knock from "../../knock";
 
 import {
   DEFAULT_GROUP_KEY,
-  // SelectionResult,
   byKey,
   checkStateIfThrottled,
   findDefaultGroup,
@@ -48,7 +47,6 @@ import {
   SelectGuidesOpts,
   SelectQueryLimit,
   SelectionResult,
-  // SelectQueryParams,
   StepMessageState,
   StoreState,
   TargetParams,
