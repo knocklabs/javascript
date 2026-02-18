@@ -229,6 +229,7 @@ const inferSelectReturnStatus = (
     return inferSelectAllByTypeReturnStatus(guide, snapshot, stage, query);
   }
 
+  // Should not happen but just for completeness.
   return undefined;
 };
 
@@ -248,6 +249,7 @@ const toSelectableStatus = (
 
   const queried = Boolean(query.key || query.type);
   if (!queried) {
+    // No present query in the current location can select this guide.
     return { status: undefined };
   }
 
