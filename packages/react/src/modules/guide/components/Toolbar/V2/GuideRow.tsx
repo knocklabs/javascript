@@ -54,9 +54,15 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           <>
             <Stack gap="1">
               <Tooltip
-                label=""
-                // enabled={!guide.annotation.selectable.status}
-                enabled={false}
+                label={
+                  guide.annotation.selectable.status === "returned"
+                    ? "This guide was queried and can display"
+                    : guide.annotation.selectable.status === "queried"
+                      ? "This guide was queried but cannot display"
+                      : guide.annotation.selectable.status === "throttled"
+                        ? "This guide was queried and can display but is throttled currently"
+                        : "No component is present in the current location to display this guide"
+                }
               >
                 <Button
                   px="1"
