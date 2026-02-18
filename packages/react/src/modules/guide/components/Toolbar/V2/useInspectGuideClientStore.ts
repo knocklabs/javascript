@@ -198,13 +198,38 @@ const inferSelectOneByTypeReturnStatus = (
 
 const inferSelectAllByTypeReturnStatus = (
   _guide: KnockGuide,
-  _snapshot: StoreStateSnapshot,
+  snapshot: StoreStateSnapshot,
   _stage: KnockGuideClientGroupStage,
-  _query: SelectionResultByQuery,
+  query: SelectionResultByQuery,
 ): SelectableStatusPresent["status"] => {
-  // If queried with useGuides/selectGuides (i.e. can return multiple guides),
-  // then we need to look up the actual query results to figure out how this
-  // guide may or may not be included in the result.
+  const result = query.type!.all!;
+  if (result.size === 0) {
+    // This should not happen but here for completeness.
+    return "queried";
+  }
+
+  // If queried with useGuides (i.e. can return multiple guides), then we need
+  // to look up the actual query results to figure out how this guide may or
+  // may not be included in the result.
+
+  // If explicitly given the option to ignore throttling, then all guides
+  // selected in this query should return.
+  const includeThrottled = !!query.type?.one?.metadata?.opts?.includeThrottled;
+  if (includeThrottled) {
+    return "returned";
+  }
+
+  const guides = [...result.values()]
+  const first = guides[0]!;
+
+  // If not throttled, then all guides in the query result should be returned.
+  if (!snapshot.throttled) {
+    return "returned"
+  }
+
+  // If being throttled, then all guides in the query result should be returned.
+  // const guides = [...result.values()];
+
 
   // TODO: Placeholder to follow up.
   return "returned";
@@ -247,6 +272,7 @@ const toSelectableStatus = (
     type: (stage.results.type || {})[guide.type],
   };
 
+  // There is no query in the current location that can select this guide.
   const queried = Boolean(query.key || query.type);
   if (!queried) {
     // No present query in the current location can select this guide.
