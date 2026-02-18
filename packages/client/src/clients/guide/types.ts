@@ -259,7 +259,6 @@ export type SelectFilterParams = {
 
 export type SelectGuideOpts = {
   includeThrottled?: boolean;
-  // XXX: record result
   recordSelectQuery?: boolean;
 };
 
