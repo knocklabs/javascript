@@ -260,7 +260,6 @@ const toSelectableStatus = (
     type: (stage.results.type || {})[guide.type],
   };
 
-  // There is no query in the current location that can select this guide.
   const queried = Boolean(query.key || query.type);
   if (!queried) {
     // No present query in the current location can select this guide.
