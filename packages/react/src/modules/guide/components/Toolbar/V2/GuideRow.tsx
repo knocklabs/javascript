@@ -43,7 +43,7 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           >
             {orderIndex + 1}
           </Tag>
-          <Text as="code" size="1" color={guide.active ? "black" : "disabled"}>
+          <Text as="code" size="1">
             {guide.key}
           </Text>
         </Stack>
