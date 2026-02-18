@@ -131,6 +131,41 @@ describe("API Client", () => {
       // Restore original window value
       (global as GlobalWithWindow).window = originalWindow;
     });
+
+    test("creates PageVisibilityManager by default in browser environment", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {} as Window;
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      expect(
+        (apiClient as unknown as Record<string, unknown>)["pageVisibility"],
+      ).toBeDefined();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("skips PageVisibilityManager when disconnectOnPageHidden is false", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {} as Window;
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      expect(
+        (apiClient as unknown as Record<string, unknown>)["pageVisibility"],
+      ).toBeUndefined();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
   });
 
   describe("Request Handling", () => {

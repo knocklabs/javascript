@@ -712,14 +712,18 @@ describe("Knock Client", () => {
     test("disconnects socket on teardown when connected", () => {
       const knock = new Knock("pk_test_12345");
 
-      // Mock the socket with correct interface
       const mockSocket = {
         isConnected: vi.fn().mockReturnValue(true),
         disconnect: vi.fn(),
       };
 
       const mockApiClient = {
-        socket: mockSocket, // Direct property, not a function
+        socket: mockSocket,
+        teardown: vi.fn(() => {
+          if (mockSocket.isConnected()) {
+            mockSocket.disconnect();
+          }
+        }),
       };
 
       knock["apiClient"] =
@@ -727,14 +731,13 @@ describe("Knock Client", () => {
 
       knock.teardown();
 
-      expect(mockSocket.isConnected).toHaveBeenCalled();
+      expect(mockApiClient.teardown).toHaveBeenCalled();
       expect(mockSocket.disconnect).toHaveBeenCalled();
     });
 
     test("handles teardown when socket is not connected", () => {
       const knock = new Knock("pk_test_12345");
 
-      // Mock the socket as not connected
       const mockSocket = {
         isConnected: vi.fn().mockReturnValue(false),
         disconnect: vi.fn(),
@@ -742,14 +745,18 @@ describe("Knock Client", () => {
 
       const mockApiClient = {
         socket: mockSocket,
+        teardown: vi.fn(() => {
+          if (mockSocket.isConnected()) {
+            mockSocket.disconnect();
+          }
+        }),
       };
 
       knock["apiClient"] =
         mockApiClient as unknown as (typeof knock)["apiClient"];
 
-      // Should not throw an error
       expect(() => knock.teardown()).not.toThrow();
-      expect(mockSocket.isConnected).toHaveBeenCalled();
+      expect(mockApiClient.teardown).toHaveBeenCalled();
       expect(mockSocket.disconnect).not.toHaveBeenCalled();
     });
   });

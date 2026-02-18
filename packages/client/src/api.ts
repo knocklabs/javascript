@@ -3,12 +3,15 @@ import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 
 import { exponentialBackoffFullJitter } from "./helpers";
+import { PageVisibilityManager } from "./pageVisibility";
 
 type ApiClientOptions = {
   host: string;
   apiKey: string;
   userToken: string | undefined;
   branch?: string;
+  /** Automatically disconnect the socket when the page is hidden and reconnect when visible. Defaults to `true`. */
+  disconnectOnPageHidden?: boolean;
 };
 
 export interface ApiResponse {
@@ -28,6 +31,7 @@ class ApiClient {
   private axiosClient: AxiosInstance;
 
   public socket: Socket | undefined;
+  private pageVisibility: PageVisibilityManager | undefined;
 
   constructor(options: ApiClientOptions) {
     this.host = options.host;
@@ -68,6 +72,10 @@ class ApiClient {
           });
         },
       });
+
+      if (options.disconnectOnPageHidden !== false) {
+        this.pageVisibility = new PageVisibilityManager(this.socket);
+      }
     }
 
     axiosRetry(this.axiosClient, {
@@ -98,6 +106,14 @@ class ApiClient {
         body: undefined,
         error: e,
       };
+    }
+  }
+
+  teardown() {
+    this.pageVisibility?.teardown();
+
+    if (this.socket?.isConnected()) {
+      this.socket.disconnect();
     }
   }
 

@@ -9,6 +9,8 @@ export interface KnockOptions {
   host?: string;
   logLevel?: LogLevel;
   branch?: string;
+  /** Automatically disconnect the socket when the page is hidden and reconnect when visible. Defaults to `true`. */
+  disconnectOnPageHidden?: boolean;
 }
 
 export interface KnockObject<T = GenericData> {

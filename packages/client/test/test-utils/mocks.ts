@@ -65,7 +65,6 @@ export const createMockFeed = (
   const { knock, mockApiClient } = createMockKnock();
 
   const defaultOptions: FeedClientOptions = {
-    auto_manage_socket_connection: false,
     ...options,
   };
 
@@ -310,14 +309,6 @@ export const createEventEmitterMock = () => ({
   off: vi.fn(),
   emit: vi.fn(),
   removeAllListeners: vi.fn(),
-});
-
-// Simple document mock for browser APIs
-export const createDocumentMock = () => ({
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  visibilityState: "visible",
-  hidden: false,
 });
 
 // Module-level mocks for common dependencies

@@ -26,6 +26,7 @@ class Knock {
   public userToken?: string;
   public logLevel?: LogLevel;
   public readonly branch?: string;
+  private readonly disconnectOnPageHidden?: boolean;
   private tokenExpirationTimer: ReturnType<typeof setTimeout> | null = null;
   readonly feeds = new FeedClient(this);
   readonly objects = new ObjectClient(this);
@@ -42,6 +43,7 @@ class Knock {
     this.host = options.host || DEFAULT_HOST;
     this.logLevel = options.logLevel;
     this.branch = options.branch || undefined;
+    this.disconnectOnPageHidden = options.disconnectOnPageHidden;
 
     this.log("Initialized Knock instance");
 
@@ -170,9 +172,7 @@ class Knock {
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
     }
-    if (this.apiClient?.socket && this.apiClient.socket.isConnected()) {
-      this.apiClient.socket.disconnect();
-    }
+    this.apiClient?.teardown();
   }
 
   log(message: string, force = false) {
@@ -190,6 +190,7 @@ class Knock {
       host: this.host,
       userToken: this.userToken,
       branch: this.branch,
+      disconnectOnPageHidden: this.disconnectOnPageHidden,
     });
   }
 
