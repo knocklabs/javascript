@@ -183,7 +183,7 @@ describe("KnockGuideClient", () => {
       // Mock window to simulate browser environment
       vi.stubGlobal("window", mockWindow);
 
-      const _client = new KnockGuideClient(mockKnock, channelId);
+      new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
         guideGroups: [],
@@ -1596,6 +1596,7 @@ describe("KnockGuideClient", () => {
       client["stage"] = {
         status: "open",
         ordered: ["feature_tour", "onboarding", "system_status"],
+        results: {},
         timeoutId: 123,
       };
 
@@ -1625,6 +1626,7 @@ describe("KnockGuideClient", () => {
         status: "closed",
         ordered: ["feature_tour", "onboarding", "system_status"],
         resolved: "feature_tour",
+        results: {},
         timeoutId: 123,
       };
 
@@ -2037,7 +2039,7 @@ describe("KnockGuideClient", () => {
           feature_tour: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "feature_tour",
-            reason: "target_conditions_not_met",
+            reason: "target_conditions_not_met" as const,
             message: "User does not match the targeting conditions",
           },
         },
@@ -2065,19 +2067,19 @@ describe("KnockGuideClient", () => {
           feature_tour: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "feature_tour",
-            reason: "marked_as_archived",
+            reason: "marked_as_archived" as const,
             message: "User has archived this guide already",
           },
           onboarding: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "onboarding",
-            reason: "marked_as_archived",
+            reason: "marked_as_archived" as const,
             message: "User has archived this guide already",
           },
           system_status: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "system_status",
-            reason: "marked_as_archived",
+            reason: "marked_as_archived" as const,
             message: "User has archived this guide already",
           },
         },
@@ -2483,6 +2485,67 @@ describe("KnockGuideClient", () => {
       const result = client["_selectGuides"](stateOutsideThrottleWindow);
       expect(result).toHaveLength(3);
     });
+
+    test("returns matched guides with includeThrottled during open stage", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Call selectGuides directly (not _selectGuides which handles the full
+      // open/close cycle). The internal selectGuide call opens a new stage and
+      // returns undefined because the stage is open. With includeThrottled,
+      // selectGuides should still return the matched guides instead of [].
+      const result = client.selectGuides(
+        stateWithGuides,
+        { type: "card" },
+        { includeThrottled: true },
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["changelog", "onboarding"]);
+    });
+
+    test("returns empty array without includeThrottled during open stage", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled, selectGuides returns [] during the open stage
+      // because the internal selectGuide call returns undefined.
+      const result = client.selectGuides(stateWithGuides, { type: "card" });
+
+      expect(result).toEqual([]);
+    });
+
+    test("returns matched guides with includeThrottled during open stage even when throttled", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Even when throttled and in the open stage, includeThrottled should
+      // return all matched guides instead of [].
+      const result = client.selectGuides(
+        stateInsideThrottleWindow,
+        { type: "card" },
+        { includeThrottled: true },
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["changelog", "onboarding"]);
+    });
   });
 
   describe("guide socket event handling", () => {
@@ -2858,7 +2921,7 @@ describe("KnockGuideClient", () => {
         },
       });
 
-      const _client = new KnockGuideClient(
+      new KnockGuideClient(
         mockKnock,
         channelId,
         {},
@@ -3269,6 +3332,492 @@ describe("KnockGuideClient", () => {
           type: "tooltip",
         }),
       );
+    });
+  });
+
+  describe("maybeRecordSelectResult and select query recording", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "changelog",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideThree = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_3",
+      key: "system_status",
+      type: "banner",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const recordingGuides = {
+      [mockGuideOne.key]: mockGuideOne,
+      [mockGuideTwo.key]: mockGuideTwo,
+      [mockGuideThree.key]: mockGuideThree,
+    };
+
+    const recordingDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["changelog", "onboarding", "system_status"],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    test("records select result by key when debugging and stage is open", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First call opens stage and records result because debugging is true
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage).toBeDefined();
+      expect(stage!.status).toBe("open");
+      expect(stage!.results.key).toBeDefined();
+      expect(stage!.results.key!["onboarding"]).toBeDefined();
+      expect(stage!.results.key!["onboarding"]!.one).toBeDefined();
+      expect(stage!.results.key!["onboarding"]!.one!.metadata).toBeDefined();
+      expect(stage!.results.key!["onboarding"]!.one!.metadata!.limit).toBe(
+        "one",
+      );
+    });
+
+    test("records select result by type when debugging and stage is open", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Call with type filter triggers recording by type
+      client.selectGuide(stateWithGuides, { type: "card" });
+
+      const stage = client.getStage();
+      expect(stage).toBeDefined();
+      expect(stage!.results.type).toBeDefined();
+      expect(stage!.results.type!["card"]).toBeDefined();
+      expect(stage!.results.type!["card"]!.one).toBeDefined();
+    });
+
+    test("does not record when not debugging", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: undefined,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage!.results).toEqual({});
+    });
+
+    test("does not record without key or type filters", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      // No filters
+      client.selectGuide(stateWithGuides);
+
+      const stage = client.getStage();
+      expect(stage!.results).toEqual({});
+    });
+
+    test("accumulates results from multiple selectGuide calls", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First call opens stage and records by key
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+      // Second call records by type (same open stage)
+      client.selectGuide(stateWithGuides, { type: "banner" });
+
+      const stage = client.getStage();
+      expect(stage!.results.key!["onboarding"].one).toBeDefined();
+      expect(stage!.results.type!["banner"].one).toBeDefined();
+    });
+
+    test("selectGuides records result with 'all' limit", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // selectGuides opens stage via internal selectGuide, then records its
+      // own select result with limit "all".
+      client.selectGuides(stateWithGuides, { type: "card" });
+
+      const stage = client.getStage();
+      expect(stage!.results.type).toBeDefined();
+      expect(stage!.results.type!["card"]).toBeDefined();
+      expect(stage!.results.type!["card"]!.all).toBeDefined();
+      expect(stage!.results.type!["card"]!.all!.metadata!.limit).toBe("all");
+
+      // selectGuides calls selectGuide internally with recordSelectQuery: false,
+      // so the "one" limit should NOT be recorded for the same type filter.
+      expect(stage!.results.type!["card"]!.one).toBeUndefined();
+    });
+
+    test("does not record when stage is closed", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage
+      client["stage"] = {
+        status: "closed",
+        ordered: ["changelog"],
+        resolved: "changelog",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Call selectGuide on the closed stage; should NOT record
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage!.results).toEqual({});
+    });
+
+    test("records during patch stage status", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage, then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["changelog"],
+        resolved: "changelog",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      // Call selectGuide on the patched stage; SHOULD record
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage!.results.key).toBeDefined();
+      expect(stage!.results.key!["onboarding"]).toBeDefined();
+    });
+  });
+
+  describe("throttle behavior in group stage", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuide = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const throttleDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["onboarding"],
+      display_interval: 24 * 60 * 60,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    test("returns undefined for throttled guide in closed stage", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: undefined,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage with the guide resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined for throttled guide in patch stage", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      expect(result).toBeUndefined();
+    });
+
+    test("returns unthrottled guide in closed stage even when throttled", () => {
+      const unthrottledGuide = {
+        ...mockGuide,
+        bypass_global_group_limit: true,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: unthrottledGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage with the guide resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Unthrottled guides bypass the throttle check entirely
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns throttled guide with includeThrottled option in patch stage", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      // With includeThrottled, should return the resolved guide
+      const result = client.selectGuide(
+        stateWithGuides,
+        { key: "onboarding" },
+        { includeThrottled: true },
+      );
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
     });
   });
 

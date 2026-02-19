@@ -1,5 +1,27 @@
 import { GenericData } from "@knocklabs/types";
 
+// i.e. useGuide vs useGuides
+export type SelectQueryLimit = "one" | "all";
+
+type SelectionResultMetadata = {
+  guideGroup: GuideGroupData;
+  // Additional info about the underlying select query behind the result.
+  filters: SelectFilterParams;
+  limit: SelectQueryLimit;
+  opts: SelectGuideOpts;
+};
+
+// Extends the map class to allow having metadata on it, which is used to record
+// the guide group context for the selection result (though currently only a
+// default global group is supported).
+export class SelectionResult<K = number, V = KnockGuide> extends Map<K, V> {
+  metadata: SelectionResultMetadata | undefined;
+
+  constructor() {
+    super();
+  }
+}
+
 //
 // Fetch guides API
 //
@@ -237,6 +259,7 @@ export type SelectFilterParams = {
 
 export type SelectGuideOpts = {
   includeThrottled?: boolean;
+  recordSelectQuery?: boolean;
 };
 
 export type SelectGuidesOpts = SelectGuideOpts;
@@ -253,9 +276,20 @@ export type ConstructorOpts = {
   throttleCheckInterval?: number;
 };
 
+type SelectionResultByLimit = {
+  one?: SelectionResult;
+  all?: SelectionResult;
+};
+
+type RecordedSelectionResults = {
+  key?: Record<KnockGuide["key"], SelectionResultByLimit>;
+  type?: Record<KnockGuide["type"], SelectionResultByLimit>;
+};
+
 export type GroupStage = {
   status: "open" | "closed" | "patch";
   ordered: Array<KnockGuide["key"]>;
   resolved?: KnockGuide["key"];
   timeoutId: ReturnType<typeof setTimeout> | null;
+  results: RecordedSelectionResults;
 };

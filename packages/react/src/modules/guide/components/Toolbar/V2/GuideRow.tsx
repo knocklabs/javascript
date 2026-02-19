@@ -6,6 +6,7 @@ import { Text } from "@telegraph/typography";
 import {
   CheckCircle2,
   CircleDashed,
+  Code2,
   Eye,
   LocateFixed,
   UserCircle2,
@@ -52,6 +53,33 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
         {!isUnknownGuide(guide) && (
           <>
             <Stack gap="1">
+              <Tooltip
+                label={
+                  guide.annotation.selectable.status === "returned"
+                    ? "This guide was queried and can display"
+                    : guide.annotation.selectable.status === "queried"
+                      ? "This guide was queried but cannot display"
+                      : guide.annotation.selectable.status === "throttled"
+                        ? "This guide was queried and can display but is throttled currently"
+                        : "No component is present in the current location to display this guide"
+                }
+              >
+                <Button
+                  px="1"
+                  size="1"
+                  variant="soft"
+                  color={
+                    guide.annotation.selectable.status === "returned"
+                      ? "green"
+                      : guide.annotation.selectable.status === "queried"
+                        ? "gray"
+                        : guide.annotation.selectable.status === "throttled"
+                          ? "yellow"
+                          : "red"
+                  }
+                  leadingIcon={{ icon: Code2, alt: "Render" }}
+                />
+              </Tooltip>
               <Tooltip
                 label={
                   guide.annotation.activatable.status
