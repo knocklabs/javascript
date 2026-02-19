@@ -9,6 +9,10 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
+const byKey = <T extends { key: string }>(items: T[]) => {
+  return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});
+};
+
 /**
  * This is the main module that will house core logic for the toolbar. It hooks
  * into the guide client state store, extracts relevant data for debugging, and
@@ -210,10 +214,22 @@ const inferSelectAllByTypeReturnStatus = (
   const guides = [...result.values()];
   const first = guides[0]!;
 
+  // Might want to consider moving this up to do once.
+  const guidesByKey: Record<KnockGuide["key"], KnockGuide> = byKey(guides);
+
+  // If includeThrottled given, then expect all selected guides to be returned.
+  const includeThrottled = !!query.type?.all?.metadata?.opts?.includeThrottled;
+  if (includeThrottled) {
+    return guidesByKey[guide.key] ? "returned" : "queried";
+  }
+
   // If the first selected guide is unthrottled or resolved, then we should
   // have at minimum one guide to return, and potentially more based on whether
   // we are throttling currently and which other guides are unthrottled.
   if (first.bypass_global_group_limit || first.key === stage.resolved) {
+    if (!guidesByKey[guide.key]) {
+      return "queried";
+    }
     if (snapshot.throttled) {
       return guide.bypass_global_group_limit ? "returned" : "throttled";
     }

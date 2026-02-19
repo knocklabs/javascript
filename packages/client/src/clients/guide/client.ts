@@ -649,7 +649,7 @@ export class KnockGuideClient {
     this.maybeRecordSelectResult(result);
 
     // 3. Stop if there is not at least one guide to return.
-    if (!selectedGuide) {
+    if (!selectedGuide && !opts.includeThrottled) {
       return [];
     }
 
