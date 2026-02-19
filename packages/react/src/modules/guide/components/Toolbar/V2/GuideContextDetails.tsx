@@ -1,0 +1,100 @@
+import { useGuideContext, useStore } from "@knocklabs/react-core";
+import { Box, Stack } from "@telegraph/layout";
+import { Text } from "@telegraph/typography";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import * as React from "react";
+
+export const GuideContextDetails = () => {
+  const { client } = useGuideContext();
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const defaultGroup = useStore(client.store, (state) => state.guideGroups[0]);
+  const displayInterval = defaultGroup?.display_interval ?? null;
+
+  return (
+    <Stack direction="column" borderTop="px">
+      <Stack
+        h="5"
+        px="2"
+        bg="gray-3"
+        align="center"
+        gap="1"
+        style={{ cursor: "pointer" }}
+        onClick={() => setIsExpanded((prev) => !prev)}
+      >
+        <Text as="span" size="0" weight="medium">
+          Details
+        </Text>
+        {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+      </Stack>
+
+      {isExpanded && (
+        <Stack direction="column">
+          <Stack direction="column" gap="0_5" py="1" px="2" borderTop="px">
+            <Text as="span" size="0" weight="medium">
+              Throttle
+            </Text>
+            <Text as="code" size="0">
+              {displayInterval === null ? "-" : `Every ${displayInterval}s`}
+            </Text>
+          </Stack>
+
+          <Stack direction="column" py="1" px="2" borderTop="px">
+            <Text as="span" size="0" weight="medium">
+              Target params
+            </Text>
+            <Stack direction="column" gap="0_5" mt="1">
+              <Text as="span" size="0" color="gray">
+                Tenant
+              </Text>
+              <Text as="code" size="0">
+                {client.targetParams.tenant ? (
+                  <Box
+                    rounded="2"
+                    overflow="auto"
+                    backgroundColor="gray-2"
+                    border="px"
+                    style={{ maxHeight: "200px" }}
+                  >
+                    <pre style={{ fontSize: "11px", margin: 0 }}>
+                      <code>{client.targetParams.tenant}</code>
+                    </pre>
+                  </Box>
+                ) : (
+                  <Text as="code" size="0">
+                    -
+                  </Text>
+                )}
+              </Text>
+            </Stack>
+
+            <Stack direction="column" gap="0_5">
+              <Text as="span" size="0" color="gray">
+                Data
+              </Text>
+              {client.targetParams.data ? (
+                <Box
+                  rounded="2"
+                  overflow="auto"
+                  backgroundColor="gray-2"
+                  border="px"
+                  style={{ maxHeight: "200px" }}
+                >
+                  <pre style={{ fontSize: "11px", margin: 0 }}>
+                    <code>
+                      {JSON.stringify(client.targetParams.data, null, 2)}
+                    </code>
+                  </pre>
+                </Box>
+              ) : (
+                <Text as="code" size="0">
+                  -
+                </Text>
+              )}
+            </Stack>
+          </Stack>
+        </Stack>
+      )}
+    </Stack>
+  );
+};

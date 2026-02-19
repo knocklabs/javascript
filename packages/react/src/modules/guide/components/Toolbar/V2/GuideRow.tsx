@@ -34,20 +34,20 @@ type Props = {
 export const GuideRow = ({ guide, orderIndex }: Props) => {
   return (
     <Row>
-      <Stack h="6" justify="flex-start" align="center" gap="2">
-        <Tag
-          size="0"
-          variant="soft"
-          color={guide.bypass_global_group_limit ? "blue" : "default"}
-        >
-          {orderIndex + 1}
-        </Tag>
-        <GuideHoverCard guide={guide}>
-          <Text as="code" size="1" color={guide.active ? "black" : "disabled"}>
+      <GuideHoverCard guide={guide}>
+        <Stack h="6" justify="flex-start" align="center" gap="2">
+          <Tag
+            size="0"
+            variant="soft"
+            color={guide.bypass_global_group_limit ? "blue" : "default"}
+          >
+            {orderIndex + 1}
+          </Tag>
+          <Text as="code" size="1">
             {guide.key}
           </Text>
-        </GuideHoverCard>
-      </Stack>
+        </Stack>
+      </GuideHoverCard>
 
       <Stack justify="flex-end">
         {!isUnknownGuide(guide) && (
