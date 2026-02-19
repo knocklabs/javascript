@@ -371,6 +371,34 @@ describe("KnockGuideClient", () => {
         });
       }
     });
+
+    test("skips fetch when query was already fetched", async () => {
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce({
+        entries: [],
+      });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      vi.mocked(mockKnock.user.getGuides).mockClear();
+      await client.fetch();
+
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+    });
+
+    test("re-fetches when force is true even if query was already fetched", async () => {
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue({
+        entries: [],
+      });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      vi.mocked(mockKnock.user.getGuides).mockClear();
+      await client.fetch({ force: true });
+
+      expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
+    });
   });
 
   describe("subscribe/unsubscribe", () => {
@@ -393,6 +421,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
@@ -415,6 +445,93 @@ describe("KnockGuideClient", () => {
         }),
       );
       expect(mockChannel.join).toHaveBeenCalled();
+    });
+
+    test("refetches guides when socket reconnects", async () => {
+      let onOpenCallback: () => void;
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn(),
+            }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+        onOpen: vi.fn((cb) => {
+          onOpenCallback = cb;
+          return "ref_1";
+        }),
+        off: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue({ entries: [] });
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      // Initial fetch to populate the query cache
+      await client.fetch();
+      vi.mocked(mockKnock.user.getGuides).mockClear();
+
+      client.subscribe();
+
+      // First onOpen is the initial connection, should not refetch
+      onOpenCallback!();
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+
+      // Second onOpen is a reconnect, should refetch
+      onOpenCallback!();
+      await vi.waitFor(() => {
+        expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
+      });
+    });
+
+    test("cleans up socket onOpen listener when unsubscribing", () => {
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn(),
+            }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+      client.unsubscribe();
+
+      expect(mockSocket.off).toHaveBeenCalledWith(["ref_1"]);
     });
 
     test("handles successful channel join", () => {
@@ -440,6 +557,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
@@ -495,6 +614,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
@@ -570,6 +691,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
