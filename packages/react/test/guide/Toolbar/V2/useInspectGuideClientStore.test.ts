@@ -1128,6 +1128,119 @@ describe("useInspectGuideClientStore", () => {
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
 
+    test("selectAll: returns 'returned' when includeThrottled is set and guide is in result", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              all: makeSelectionResult(
+                [
+                  [0, { key: "g1" }],
+                  [1, { key: "g2" }],
+                ],
+                { includeThrottled: true },
+              ),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("selectAll: returns 'queried' when includeThrottled is set but guide is not in result", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "other",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              all: makeSelectionResult(
+                [[0, { key: "other" }]],
+                { includeThrottled: true },
+              ),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectAll: returns 'queried' when first guide is unthrottled but current guide is not in result", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "other",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              all: makeSelectionResult([
+                [0, { key: "first", bypass_global_group_limit: true }],
+              ]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectAll: returns 'queried' when first guide is resolved but current guide is not in result", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "first",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              all: makeSelectionResult([
+                [0, { key: "first", bypass_global_group_limit: false }],
+              ]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
     test("selectable is undefined when type query exists but has no one or all results", () => {
       const guide = makeGuide({ key: "g1", type: "banner" });
       mockGroupStage = {

@@ -2485,6 +2485,67 @@ describe("KnockGuideClient", () => {
       const result = client["_selectGuides"](stateOutsideThrottleWindow);
       expect(result).toHaveLength(3);
     });
+
+    test("returns matched guides with includeThrottled during open stage", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Call selectGuides directly (not _selectGuides which handles the full
+      // open/close cycle). The internal selectGuide call opens a new stage and
+      // returns undefined because the stage is open. With includeThrottled,
+      // selectGuides should still return the matched guides instead of [].
+      const result = client.selectGuides(
+        stateWithGuides,
+        { type: "card" },
+        { includeThrottled: true },
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["changelog", "onboarding"]);
+    });
+
+    test("returns empty array without includeThrottled during open stage", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled, selectGuides returns [] during the open stage
+      // because the internal selectGuide call returns undefined.
+      const result = client.selectGuides(stateWithGuides, { type: "card" });
+
+      expect(result).toEqual([]);
+    });
+
+    test("returns matched guides with includeThrottled during open stage even when throttled", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Even when throttled and in the open stage, includeThrottled should
+      // return all matched guides instead of [].
+      const result = client.selectGuides(
+        stateInsideThrottleWindow,
+        { type: "card" },
+        { includeThrottled: true },
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["changelog", "onboarding"]);
+    });
   });
 
   describe("guide socket event handling", () => {
