@@ -8,6 +8,7 @@ import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
+import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
 import {
   DisplayOption,
@@ -119,6 +120,7 @@ export const V2 = () => {
 
           <Box w="full">
             {result.error && <Box>{result.error}</Box>}
+            <GuideContextDetails />
             <GuidesList
               guides={result.guides}
               displayOption={guidesListDisplayOption}
