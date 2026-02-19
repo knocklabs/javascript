@@ -251,11 +251,11 @@ const inferSelectReturnStatus = (
     return inferSelectByKeyReturnStatus(guide, snapshot, stage, query);
   }
 
-  if (query.type?.one) {
-    return inferSelectOneByTypeReturnStatus(guide, snapshot, stage, query);
-  }
   if (query.type?.all) {
     return inferSelectAllByTypeReturnStatus(guide, snapshot, stage, query);
+  }
+  if (query.type?.one) {
+    return inferSelectOneByTypeReturnStatus(guide, snapshot, stage, query);
   }
 
   // Should not happen but just for completeness.
