@@ -417,6 +417,12 @@ export class KnockGuideClient {
       this.unsubscribe();
     }
 
+    // If there's an existing open listener, then remove it.
+    if (this.socketOpenListenerId) {
+      this.socket.off([this.socketOpenListenerId]);
+      this.socketOpenListenerId = undefined;
+    }
+
     // Join the channel topic and subscribe to supported events.
     const debugState = this.store.state.debug;
     const params = {
@@ -1113,9 +1119,9 @@ export class KnockGuideClient {
       const guideGroupDisplayLogs =
         attrs.archived_at && !guide.bypass_global_group_limit
           ? {
-              ...state.guideGroupDisplayLogs,
-              [DEFAULT_GROUP_KEY]: attrs.archived_at,
-            }
+            ...state.guideGroupDisplayLogs,
+            [DEFAULT_GROUP_KEY]: attrs.archived_at,
+          }
           : state.guideGroupDisplayLogs;
 
       return { ...state, guides, guideGroupDisplayLogs };
