@@ -465,8 +465,10 @@ export class KnockGuideClient {
 
     // Refetch guides on socket reconnect to pick up any changes that
     // occurred while disconnected (e.g. tab was hidden for a long time).
-    // Skip the first onOpen since that's the initial connection, not a reconnect.
-    let isFirstOpen = true;
+    // If the socket is already connected, there's no initial open event coming,
+    // so we don't need to skip anything. If it's not yet connected, skip the
+    // first onOpen since that's the initial connection, not a reconnect.
+    let isFirstOpen = !this.socket.isConnected();
     this.socketOpenListenerId = this.socket.onOpen(() => {
       if (isFirstOpen) {
         isFirstOpen = false;

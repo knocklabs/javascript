@@ -472,9 +472,10 @@ describe("KnockGuideClient", () => {
       expect(mockChannel.join).toHaveBeenCalled();
     });
 
-    test("refetches guides on socket reconnect but not on initial connection", async () => {
+    test("refetches guides on socket reconnect but not on initial connection when socket starts disconnected", async () => {
       let onOpenCallback: () => void;
       const { mockSocket } = createSubscribableMocks({
+        isConnected: vi.fn().mockReturnValue(false),
         onOpen: vi.fn((cb) => {
           onOpenCallback = cb;
           return "listener_1";
@@ -488,9 +489,35 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       client.subscribe();
 
+      // First onOpen is the initial connection — should be skipped.
       onOpenCallback!();
       expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
 
+      // Second onOpen is a reconnect — should trigger a refetch.
+      onOpenCallback!();
+      await vi.waitFor(() => {
+        expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
+      });
+    });
+
+    test("refetches guides on first onOpen when socket is already connected at subscribe time", async () => {
+      let onOpenCallback: () => void;
+      const { mockSocket } = createSubscribableMocks({
+        isConnected: vi.fn().mockReturnValue(true),
+        onOpen: vi.fn((cb) => {
+          onOpenCallback = cb;
+          return "listener_1";
+        }),
+      });
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue({ entries: [] });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+
+      // Socket was already connected, so no initial open to skip — first onOpen is a reconnect.
       onOpenCallback!();
       await vi.waitFor(() => {
         expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
