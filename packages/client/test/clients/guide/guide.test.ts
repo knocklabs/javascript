@@ -150,6 +150,31 @@ describe("KnockGuideClient", () => {
     tenant: "tenant_123",
   };
 
+  function createSubscribableMocks(socketOverrides: Record<string, unknown> = {}) {
+    const mockChannel = {
+      join: vi.fn().mockReturnValue({
+        receive: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+        }),
+      }),
+      on: vi.fn(),
+      off: vi.fn(),
+      leave: vi.fn(),
+      state: "closed",
+    };
+
+    const mockSocket = {
+      channel: vi.fn().mockReturnValue(mockChannel),
+      isConnected: vi.fn().mockReturnValue(true),
+      connect: vi.fn(),
+      onOpen: vi.fn().mockReturnValue("listener_1"),
+      off: vi.fn(),
+      ...socketOverrides,
+    };
+
+    return { mockChannel, mockSocket };
+  }
+
   describe("constructor", () => {
     test("initializes with default options", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -447,54 +472,25 @@ describe("KnockGuideClient", () => {
       expect(mockChannel.join).toHaveBeenCalled();
     });
 
-    test("refetches guides when socket reconnects", async () => {
+    test("refetches guides on socket reconnect but not on initial connection", async () => {
       let onOpenCallback: () => void;
-      const mockChannel = {
-        join: vi.fn().mockReturnValue({
-          receive: vi.fn().mockReturnValue({
-            receive: vi.fn().mockReturnValue({
-              receive: vi.fn(),
-            }),
-          }),
-        }),
-        on: vi.fn(),
-        off: vi.fn(),
-        leave: vi.fn(),
-        state: "closed",
-      };
-
-      const mockSocket = {
-        channel: vi.fn().mockReturnValue(mockChannel),
-        isConnected: vi.fn().mockReturnValue(true),
-        connect: vi.fn(),
+      const { mockSocket } = createSubscribableMocks({
         onOpen: vi.fn((cb) => {
           onOpenCallback = cb;
-          return "ref_1";
+          return "listener_1";
         }),
-        off: vi.fn(),
-      };
+      });
 
       mockApiClient.socket = mockSocket as unknown as Socket;
       vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
       vi.mocked(mockKnock.user.getGuides).mockResolvedValue({ entries: [] });
 
-      const client = new KnockGuideClient(
-        mockKnock,
-        channelId,
-        defaultTargetParams,
-      );
-
-      // Initial fetch to populate the query cache
-      await client.fetch();
-      vi.mocked(mockKnock.user.getGuides).mockClear();
-
+      const client = new KnockGuideClient(mockKnock, channelId);
       client.subscribe();
 
-      // First onOpen is the initial connection, should not refetch
       onOpenCallback!();
       expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
 
-      // Second onOpen is a reconnect, should refetch
       onOpenCallback!();
       await vi.waitFor(() => {
         expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
@@ -502,27 +498,7 @@ describe("KnockGuideClient", () => {
     });
 
     test("cleans up socket onOpen listener when unsubscribing", () => {
-      const mockChannel = {
-        join: vi.fn().mockReturnValue({
-          receive: vi.fn().mockReturnValue({
-            receive: vi.fn().mockReturnValue({
-              receive: vi.fn(),
-            }),
-          }),
-        }),
-        on: vi.fn(),
-        off: vi.fn(),
-        leave: vi.fn(),
-        state: "closed",
-      };
-
-      const mockSocket = {
-        channel: vi.fn().mockReturnValue(mockChannel),
-        isConnected: vi.fn().mockReturnValue(true),
-        connect: vi.fn(),
-        onOpen: vi.fn().mockReturnValue("ref_1"),
-        off: vi.fn(),
-      };
+      const { mockSocket } = createSubscribableMocks();
 
       mockApiClient.socket = mockSocket as unknown as Socket;
       vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
@@ -531,7 +507,7 @@ describe("KnockGuideClient", () => {
       client.subscribe();
       client.unsubscribe();
 
-      expect(mockSocket.off).toHaveBeenCalledWith(["ref_1"]);
+      expect(mockSocket.off).toHaveBeenCalledWith(["listener_1"]);
     });
 
     test("handles successful channel join", () => {
