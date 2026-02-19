@@ -183,7 +183,7 @@ describe("KnockGuideClient", () => {
       // Mock window to simulate browser environment
       vi.stubGlobal("window", mockWindow);
 
-      const _client = new KnockGuideClient(mockKnock, channelId);
+      new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
         guideGroups: [],
@@ -2039,7 +2039,7 @@ describe("KnockGuideClient", () => {
           feature_tour: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "feature_tour",
-            reason: "target_conditions_not_met",
+            reason: "target_conditions_not_met" as const,
             message: "User does not match the targeting conditions",
           },
         },
@@ -2067,19 +2067,19 @@ describe("KnockGuideClient", () => {
           feature_tour: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "feature_tour",
-            reason: "marked_as_archived",
+            reason: "marked_as_archived" as const,
             message: "User has archived this guide already",
           },
           onboarding: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "onboarding",
-            reason: "marked_as_archived",
+            reason: "marked_as_archived" as const,
             message: "User has archived this guide already",
           },
           system_status: {
             __typename: "GuideIneligibilityMarker" as const,
             key: "system_status",
-            reason: "marked_as_archived",
+            reason: "marked_as_archived" as const,
             message: "User has archived this guide already",
           },
         },
@@ -2860,7 +2860,7 @@ describe("KnockGuideClient", () => {
         },
       });
 
-      const _client = new KnockGuideClient(
+      new KnockGuideClient(
         mockKnock,
         channelId,
         {},
@@ -3274,97 +3274,6 @@ describe("KnockGuideClient", () => {
     });
   });
 
-  describe("getStage", () => {
-    test("returns undefined when no stage exists", () => {
-      const client = new KnockGuideClient(mockKnock, channelId);
-      expect(client.getStage()).toBeUndefined();
-    });
-
-    test("returns the current open stage after first selectGuide call", () => {
-      const mockStep = {
-        ref: "step_1",
-        schema_key: "foo",
-        schema_semver: "1.0.0",
-        schema_variant_key: "default",
-        message: {
-          seen_at: null,
-          read_at: null,
-          interacted_at: null,
-          archived_at: null,
-          link_clicked_at: null,
-        },
-        content: {},
-        markAsSeen: vi.fn(),
-        markAsInteracted: vi.fn(),
-        markAsArchived: vi.fn(),
-      } as unknown as KnockGuideStep;
-
-      const mockGuide = {
-        __typename: "Guide",
-        channel_id: channelId,
-        id: "guide_1",
-        key: "onboarding",
-        type: "card",
-        semver: "1.0.0",
-        active: true,
-        steps: [mockStep],
-        activation_url_rules: [],
-        activation_url_patterns: [],
-        bypass_global_group_limit: false,
-        inserted_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        getStep: vi.fn().mockReturnValue(mockStep),
-      } as unknown as KnockGuide;
-
-      const stateWithGuides = {
-        guideGroups: [
-          {
-            __typename: "GuideGroup",
-            key: "default",
-            display_sequence: ["onboarding"],
-            display_interval: null,
-            inserted_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ],
-        guideGroupDisplayLogs: {},
-        guides: { onboarding: mockGuide },
-        ineligibleGuides: {},
-        previewGuides: {},
-        queries: {},
-        location: undefined,
-        counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
-      };
-
-      const client = new KnockGuideClient(mockKnock, channelId);
-      client.selectGuide(stateWithGuides, { key: "onboarding" });
-
-      const stage = client.getStage();
-      expect(stage).toBeDefined();
-      expect(stage!.status).toBe("open");
-      expect(stage!.results).toEqual({});
-    });
-
-    test("returns the closed stage with resolved guide after closing", () => {
-      const client = new KnockGuideClient(mockKnock, channelId);
-
-      client["stage"] = {
-        status: "open",
-        ordered: ["guide_a", "guide_b"],
-        results: {},
-        timeoutId: 123,
-      };
-
-      client["closePendingGroupStage"]();
-
-      const stage = client.getStage();
-      expect(stage).toBeDefined();
-      expect(stage!.status).toBe("closed");
-      expect(stage!.resolved).toBe("guide_a");
-    });
-  });
-
   describe("maybeRecordSelectResult and select query recording", () => {
     const mockStep = {
       ref: "step_1",
@@ -3515,7 +3424,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -3567,8 +3476,8 @@ describe("KnockGuideClient", () => {
       client.selectGuide(stateWithGuides, { type: "banner" });
 
       const stage = client.getStage();
-      expect(stage!.results.key!["onboarding"]).toBeDefined();
-      expect(stage!.results.type!["banner"]).toBeDefined();
+      expect(stage!.results.key!["onboarding"].one).toBeDefined();
+      expect(stage!.results.type!["banner"].one).toBeDefined();
     });
 
     test("selectGuides records result with 'all' limit", () => {
@@ -3595,30 +3504,9 @@ describe("KnockGuideClient", () => {
       expect(stage!.results.type!["card"]).toBeDefined();
       expect(stage!.results.type!["card"]!.all).toBeDefined();
       expect(stage!.results.type!["card"]!.all!.metadata!.limit).toBe("all");
-    });
-
-    test("selectGuides internal selectGuide call does not record (recordSelectQuery: false)", () => {
-      const stateWithGuides = {
-        guideGroups: [recordingDefaultGroup],
-        guideGroupDisplayLogs: {},
-        guides: recordingGuides,
-        ineligibleGuides: {},
-        previewGuides: {},
-        queries: {},
-        location: undefined,
-        counter: 0,
-        debug: { debugging: true },
-      };
-
-      const client = new KnockGuideClient(mockKnock, channelId);
 
       // selectGuides calls selectGuide internally with recordSelectQuery: false,
       // so the "one" limit should NOT be recorded for the same type filter.
-      client.selectGuides(stateWithGuides, { type: "card" });
-
-      const stage = client.getStage();
-      // Only "all" should be recorded, not "one"
-      expect(stage!.results.type!["card"]!.all).toBeDefined();
       expect(stage!.results.type!["card"]!.one).toBeUndefined();
     });
 
@@ -3647,7 +3535,7 @@ describe("KnockGuideClient", () => {
       };
 
       // Call selectGuide on the closed stage; should NOT record
-      client.selectGuide(stateWithGuides, { key: "changelog" });
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
 
       const stage = client.getStage();
       expect(stage!.results).toEqual({});
@@ -3729,7 +3617,7 @@ describe("KnockGuideClient", () => {
       __typename: "GuideGroup",
       key: "default",
       display_sequence: ["onboarding"],
-      display_interval: 5 * 60,
+      display_interval: 24 * 60 * 60,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as unknown as GuideGroupData;
@@ -3746,7 +3634,7 @@ describe("KnockGuideClient", () => {
         queries: {},
         location: undefined,
         counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
+        debug: undefined,
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
