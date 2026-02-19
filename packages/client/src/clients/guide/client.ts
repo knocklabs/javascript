@@ -1119,9 +1119,9 @@ export class KnockGuideClient {
       const guideGroupDisplayLogs =
         attrs.archived_at && !guide.bypass_global_group_limit
           ? {
-            ...state.guideGroupDisplayLogs,
-            [DEFAULT_GROUP_KEY]: attrs.archived_at,
-          }
+              ...state.guideGroupDisplayLogs,
+              [DEFAULT_GROUP_KEY]: attrs.archived_at,
+            }
           : state.guideGroupDisplayLogs;
 
       return { ...state, guides, guideGroupDisplayLogs };
