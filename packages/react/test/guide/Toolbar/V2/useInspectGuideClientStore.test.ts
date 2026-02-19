@@ -119,22 +119,6 @@ const makeSelectionResult = (
   return map;
 };
 
-// Helper to build a closed group stage with guides queried by key.
-const makeClosedStage = (
-  resolvedKey: string,
-  queriedKeys: string[] = [resolvedKey],
-) => ({
-  status: "closed" as const,
-  ordered: queriedKeys,
-  resolved: resolvedKey,
-  timeoutId: null,
-  results: {
-    key: Object.fromEntries(
-      queriedKeys.map((key) => [key, { one: makeSelectionResult() }]),
-    ),
-  },
-});
-
 describe("useInspectGuideClientStore", () => {
   beforeEach(() => {
     mockCheckActivatable.mockReset();
@@ -412,7 +396,15 @@ describe("useInspectGuideClientStore", () => {
   describe("activatable status and isQualified", () => {
     test("marks guide as activatable and qualified when checkActivatable returns true and guide is selectable", () => {
       mockCheckActivatable.mockReturnValue(true);
-      mockGroupStage = makeClosedStage("g1");
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
         guideGroups: [makeGuideGroup(["g1"])],
@@ -475,7 +467,15 @@ describe("useInspectGuideClientStore", () => {
 
     test("a guide can be ineligible but qualified", () => {
       mockCheckActivatable.mockReturnValue(true);
-      mockGroupStage = makeClosedStage("g1");
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
       const guide = makeGuide({ key: "g1", active: true });
       const marker = makeMarker(
         "g1",
@@ -530,7 +530,15 @@ describe("useInspectGuideClientStore", () => {
     });
 
     test("selectable is 'returned' when guide is resolved and queried by key", () => {
-      mockGroupStage = makeClosedStage("g1");
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
         guideGroups: [makeGuideGroup(["g1"])],
@@ -543,7 +551,15 @@ describe("useInspectGuideClientStore", () => {
     });
 
     test("selectable is 'throttled' when guide is resolved but throttled", () => {
-      mockGroupStage = makeClosedStage("g1");
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
       mockCheckStateIfThrottled.mockReturnValue(true);
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
@@ -584,7 +600,18 @@ describe("useInspectGuideClientStore", () => {
 
     test("selectable is 'queried' when guide is queried but not resolved", () => {
       // resolved is "other_guide", not "g1"
-      mockGroupStage = makeClosedStage("other_guide", ["g1", "other_guide"]);
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1", "other_guide"],
+        resolved: "other_guide",
+        timeoutId: null,
+        results: {
+          key: {
+            g1: { one: makeSelectionResult() },
+            other_guide: { one: makeSelectionResult() },
+          },
+        },
+      };
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
         guideGroups: [makeGuideGroup(["g1"])],
@@ -598,7 +625,18 @@ describe("useInspectGuideClientStore", () => {
 
     test("selectable is 'returned' for unthrottled guide regardless of resolved key", () => {
       // resolved is "other_guide", but guide bypasses the group limit
-      mockGroupStage = makeClosedStage("other_guide", ["g1", "other_guide"]);
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1", "other_guide"],
+        resolved: "other_guide",
+        timeoutId: null,
+        results: {
+          key: {
+            g1: { one: makeSelectionResult() },
+            other_guide: { one: makeSelectionResult() },
+          },
+        },
+      };
       const guide = makeGuide({
         key: "g1",
         bypass_global_group_limit: true,
@@ -615,7 +653,15 @@ describe("useInspectGuideClientStore", () => {
 
     test("selectable is undefined when guide is not in stage results", () => {
       // Stage has results only for "other_guide", not "g1"
-      mockGroupStage = makeClosedStage("other_guide");
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["other_guide"],
+        resolved: "other_guide",
+        timeoutId: null,
+        results: {
+          key: { other_guide: { one: makeSelectionResult() } },
+        },
+      };
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
         guideGroups: [makeGuideGroup(["g1"])],
@@ -1152,7 +1198,15 @@ describe("useInspectGuideClientStore", () => {
     });
 
     test("isQualified is false when selectable but not activatable", () => {
-      mockGroupStage = makeClosedStage("g1");
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
       mockCheckActivatable.mockReturnValue(false);
       const guide = makeGuide({ key: "g1" });
       setSnapshot({
