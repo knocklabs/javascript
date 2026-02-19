@@ -556,6 +556,32 @@ describe("useInspectGuideClientStore", () => {
       expect(annotated.annotation.selectable.status).toBe("throttled");
     });
 
+    test("selectable is 'returned' when throttled but includeThrottled option is set (key query)", () => {
+      mockCheckStateIfThrottled.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: {
+            g1: {
+              one: makeSelectionResult([], { includeThrottled: true }),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
     test("selectable is 'queried' when guide is queried but not resolved", () => {
       // resolved is "other_guide", not "g1"
       mockGroupStage = makeClosedStage("other_guide", ["g1", "other_guide"]);
@@ -645,6 +671,139 @@ describe("useInspectGuideClientStore", () => {
               one: makeSelectionResult([
                 [0, { key: "higher_priority_guide" }],
               ]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectOne by type: returns 'queried' when result is empty", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectOne by type: returns 'returned' when unthrottled guide is first in result", () => {
+      const guide = makeGuide({
+        key: "g1",
+        type: "banner",
+        bypass_global_group_limit: true,
+      });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "other",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([[0, { key: "g1" }]]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("selectOne by type: returns 'throttled' when resolved but throttled", () => {
+      mockCheckStateIfThrottled.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([[0, { key: "g1" }]]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("throttled");
+    });
+
+    test("selectOne by type: returns 'returned' when throttled but includeThrottled option is set", () => {
+      mockCheckStateIfThrottled.mockReturnValue(true);
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([[0, { key: "g1" }]], {
+                includeThrottled: true,
+              }),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
+    test("selectOne by type: returns 'queried' when not resolved and not unthrottled", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "other_guide",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              one: makeSelectionResult([[0, { key: "g1" }]]),
             },
           },
         },
@@ -862,6 +1021,39 @@ describe("useInspectGuideClientStore", () => {
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
 
+    test("selectAll: returns 'returned' when first guide is resolved, throttled, and current guide bypasses group limit", () => {
+      mockCheckStateIfThrottled.mockReturnValue(true);
+      const guide = makeGuide({
+        key: "g1",
+        type: "banner",
+        bypass_global_group_limit: true,
+      });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "first",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {
+              all: makeSelectionResult([
+                [0, { key: "first", bypass_global_group_limit: false }],
+                [1, { key: "g1", bypass_global_group_limit: true }],
+              ]),
+            },
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable.status).toBe("returned");
+    });
+
     test("selectAll: returns 'queried' when first guide is neither resolved nor unthrottled", () => {
       const guide = makeGuide({ key: "g1", type: "banner" });
       mockGroupStage = {
@@ -888,6 +1080,29 @@ describe("useInspectGuideClientStore", () => {
       const result = renderInspect()!;
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
+    });
+
+    test("selectable is undefined when type query exists but has no one or all results", () => {
+      const guide = makeGuide({ key: "g1", type: "banner" });
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          type: {
+            banner: {},
+          },
+        },
+      };
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = renderInspect()!;
+      const annotated = result.guides[0] as AnnotatedGuide;
+      expect(annotated.annotation.selectable).toEqual({ status: undefined });
     });
 
     test("key-based query takes precedence over type-based query", () => {
