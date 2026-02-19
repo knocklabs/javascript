@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.2
+
+### Patch Changes
+
+- b7b3708: [guides] add guide toolbar v2 poc
+- Updated dependencies [cb7148b]
+- Updated dependencies [04a8f16]
+- Updated dependencies [b7b3708]
+  - @knocklabs/client@0.21.2
+
 ## 0.13.1
 
 ### Patch Changes
