@@ -80,6 +80,7 @@
     "@telegraph/combobox": "^0.1.16",
     "@telegraph/icon": "^0.2.7",
     "@telegraph/layout": "^0.2.3",
+    "@telegraph/select": "^0.0.83",
     "@telegraph/tokens": "^0.1.2",
     "@telegraph/tooltip": "0.0.61",
     "@telegraph/typography": "^0.1.25",
