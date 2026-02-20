@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.21.2
+
+### Patch Changes
+
+- cb7148b: Add exponential backoff with jitter to Phoenix socket reconnection to prevent thundering herd on outages
+- 04a8f16: Disconnects socket after an initial delay when page visibility is hidden and removes the `auto_manage_socket_connection` and `auto_manage_socket_connection_delay` flags from `FeedClientOptions`.
+- b7b3708: [guides] add guide toolbar v2 poc
+
 ## 0.21.1
 
 ### Patch Changes

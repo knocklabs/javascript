@@ -1,5 +1,12 @@
 # slack-connect-example
 
+## 0.3.48
+
+### Patch Changes
+
+- Updated dependencies [b7b3708]
+  - @knocklabs/react@0.11.2
+
 ## 0.3.47
 
 ### Patch Changes
