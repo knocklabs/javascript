@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.4
+
+### Patch Changes
+
+- 4dbf94e: chore: upgrade telegraph dependencies to their latest versions
+
 ## 0.11.3
 
 ### Patch Changes

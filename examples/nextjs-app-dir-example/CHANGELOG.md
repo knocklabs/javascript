@@ -1,5 +1,13 @@
 # nextjs-app-dir-example
 
+## 0.0.50
+
+### Patch Changes
+
+- 4dbf94e: chore: upgrade telegraph dependencies to their latest versions
+- Updated dependencies [4dbf94e]
+  - @knocklabs/react@0.11.4
+
 ## 0.0.49
 
 ### Patch Changes
