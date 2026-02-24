@@ -106,7 +106,7 @@ export default function Example() {
             <Box
               marginTop="12"
               borderTopWidth="1"
-              bordertopcolor="gray"
+              borderTopColor="gray"
               paddingTop="4"
             >
               <Stack justifyContent="space-between" alignItems="center">
