@@ -1,4 +1,5 @@
 import { useGuideContext, useStore } from "@knocklabs/react-core";
+import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -8,7 +9,14 @@ export const GuideContextDetails = () => {
   const { client } = useGuideContext();
   const [isExpanded, setIsExpanded] = React.useState(false);
 
-  const defaultGroup = useStore(client.store, (state) => state.guideGroups[0]);
+  const { defaultGroup, debugSettings } = useStore(client.store, (state) => {
+    return {
+      defaultGroup: state.guideGroups[0],
+      debugSettings: {
+        skipEngagementTracking: !!state.debug?.skipEngagementTracking,
+      },
+    };
+  });
   const displayInterval = defaultGroup?.display_interval ?? null;
 
   return (
@@ -30,6 +38,30 @@ export const GuideContextDetails = () => {
 
       {isExpanded && (
         <Stack direction="column">
+          <Stack
+            align="center"
+            justify="space-between"
+            py="1"
+            px="2"
+            borderTop="px"
+          >
+            <Text as="span" size="0" weight="medium">
+              Client-only engagement
+            </Text>
+            <Button
+              size="0"
+              variant="soft"
+              color={debugSettings.skipEngagementTracking ? "green" : "gray"}
+              onClick={() =>
+                client.setDebug({
+                  skipEngagementTracking: !debugSettings.skipEngagementTracking,
+                })
+              }
+            >
+              {debugSettings.skipEngagementTracking ? "On" : "Off"}
+            </Button>
+          </Stack>
+
           <Stack direction="column" gap="0_5" py="1" px="2" borderTop="px">
             <Text as="span" size="0" weight="medium">
               Throttle
