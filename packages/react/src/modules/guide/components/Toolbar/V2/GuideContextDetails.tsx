@@ -1,8 +1,10 @@
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
+import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
+import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Info } from "lucide-react";
 import * as React from "react";
 
 export const GuideContextDetails = () => {
@@ -31,7 +33,7 @@ export const GuideContextDetails = () => {
         onClick={() => setIsExpanded((prev) => !prev)}
       >
         <Text as="span" size="0" weight="medium">
-          Details
+          More
         </Text>
         {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
       </Stack>
@@ -45,9 +47,14 @@ export const GuideContextDetails = () => {
             px="2"
             borderTop="px"
           >
-            <Text as="span" size="0" weight="medium">
-              Client-only engagement
-            </Text>
+            <Stack align="center" gap="1">
+              <Text as="span" size="0" weight="medium">
+                Client-only engagement
+              </Text>
+              <Tooltip label="Contain engagement actions to the client side only while in preview without sending engagement events to the API">
+                <Icon icon={Info} size="0" color="gray" aria-hidden />
+              </Tooltip>
+            </Stack>
             <Button
               size="0"
               variant="soft"
