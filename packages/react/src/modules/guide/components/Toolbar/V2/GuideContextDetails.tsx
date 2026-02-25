@@ -75,9 +75,9 @@ export const GuideContextDetails = () => {
             <Stack align="center" justify="space-between">
               <Stack align="center" gap="1">
                 <Text as="span" size="0" weight="medium">
-                  Suspend throttle application
+                  Suspend throttling
                 </Text>
-                <Tooltip label="Suspend throttle application during preview, and show next guide immediately">
+                <Tooltip label="Suspend throttling during preview, and show next guide immediately">
                   <Icon icon={Info} size="0" color="gray" aria-hidden />
                 </Tooltip>
               </Stack>
@@ -96,10 +96,12 @@ export const GuideContextDetails = () => {
             </Stack>
             <Stack direction="row" gap="0_5" py="1">
               <Text as="span" size="0" color="gray">
-                Throttle interval:{" "}
-                {displayInterval === null
-                  ? "(none)"
-                  : `Every ${displayInterval}s`}
+                Throttle:{" "}
+                {debugSettings.ignoreDisplayInterval
+                  ? "(ignored)"
+                  : displayInterval === null
+                    ? "(none)"
+                    : `Every ${displayInterval}s`}
               </Text>
             </Stack>
           </Stack>
