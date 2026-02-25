@@ -590,6 +590,7 @@ export class KnockGuideClient {
       ...state,
       debug: {
         skipEngagementTracking: true,
+        ignoreDisplayInterval: true,
         ...debugOpts,
         debugging: true,
       },

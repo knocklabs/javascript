@@ -16,6 +16,7 @@ export const GuideContextDetails = () => {
       defaultGroup: state.guideGroups[0],
       debugSettings: {
         skipEngagementTracking: !!state.debug?.skipEngagementTracking,
+        ignoreDisplayInterval: !!state.debug?.ignoreDisplayInterval,
       },
     };
   });
@@ -67,6 +68,30 @@ export const GuideContextDetails = () => {
               }
             >
               {debugSettings.skipEngagementTracking ? "On" : "Off"}
+            </Button>
+          </Stack>
+
+          <Stack
+            align="center"
+            justify="space-between"
+            py="1"
+            px="2"
+            borderTop="px"
+          >
+            <Text as="span" size="0" weight="medium">
+              Ignore throttle
+            </Text>
+            <Button
+              size="0"
+              variant="soft"
+              color={debugSettings.ignoreDisplayInterval ? "green" : "gray"}
+              onClick={() =>
+                client.setDebug({
+                  ignoreDisplayInterval: !debugSettings.ignoreDisplayInterval,
+                })
+              }
+            >
+              {debugSettings.ignoreDisplayInterval ? "On" : "Off"}
             </Button>
           </Stack>
 
