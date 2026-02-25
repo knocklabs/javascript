@@ -1,3 +1,4 @@
+import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
@@ -9,6 +10,7 @@ import {
   Code2,
   Eye,
   LocateFixed,
+  Pin,
   UserCircle2,
 } from "lucide-react";
 import * as React from "react";
@@ -32,6 +34,15 @@ type Props = {
 };
 
 export const GuideRow = ({ guide, orderIndex }: Props) => {
+  const { client } = useGuideContext();
+  const { debugSettings } = useStore(client.store, (state) => ({
+    debugSettings: state.debug,
+  }));
+
+  const focusedGuideKeys = debugSettings?.focusedGuideKeys || {};
+  const hasFocus = Object.keys(focusedGuideKeys).length > 0;
+  const isFocused = !!focusedGuideKeys[guide.key];
+
   return (
     <Row>
       <GuideHoverCard guide={guide}>
@@ -43,7 +54,11 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
           >
             {orderIndex + 1}
           </Tag>
-          <Text as="code" size="1">
+          <Text
+            as="code"
+            size="1"
+            color={!hasFocus ? "default" : isFocused ? "blue" : "disabled"}
+          >
             {guide.key}
           </Text>
         </Stack>
@@ -52,6 +67,34 @@ export const GuideRow = ({ guide, orderIndex }: Props) => {
       <Stack justify="flex-end">
         {!isUnknownGuide(guide) && (
           <>
+            {guide.annotation.selectable.status !== undefined &&
+              (!hasFocus || isFocused) && (
+                <>
+                  <Tooltip
+                    label={
+                      isFocused ? "Unfocus this guide" : "Focus on this guide"
+                    }
+                  >
+                    <Button
+                      size="1"
+                      variant="ghost"
+                      color={isFocused ? "blue" : "gray"}
+                      leadingIcon={{ icon: Pin, alt: "Focus" }}
+                      onClick={() =>
+                        client.setDebug({
+                          ...debugSettings,
+                          focusedGuideKeys: isFocused
+                            ? {}
+                            : { [guide.key]: true },
+                        })
+                      }
+                    />
+                  </Tooltip>
+                  <Stack px="2" align="center">
+                    <Box h="3" borderLeft="px" borderColor="gray-6" />
+                  </Stack>
+                </>
+              )}
             <Stack gap="1">
               <Tooltip
                 label={
