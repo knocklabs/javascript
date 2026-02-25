@@ -87,6 +87,7 @@ export const GuideContextDetails = () => {
                 color={debugSettings.ignoreDisplayInterval ? "green" : "gray"}
                 onClick={() =>
                   client.setDebug({
+                    ...debugSettings,
                     ignoreDisplayInterval: !debugSettings.ignoreDisplayInterval,
                   })
                 }
