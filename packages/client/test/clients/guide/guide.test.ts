@@ -2347,6 +2347,29 @@ describe("KnockGuideClient", () => {
       expect(result).toBeUndefined();
     });
 
+    test("falls through to normal filtering when focusedGuideKeys is empty object", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: {},
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Empty focusedGuideKeys should not filter — normal selection applies
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("feature_tour");
+    });
+
     test("does not return a guide inside a throttle window ", () => {
       const stateWithGuides = {
         guideGroups: [
@@ -4301,6 +4324,152 @@ describe("KnockGuideClient", () => {
         { key: "onboarding" },
         { includeThrottled: true },
       );
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in closed stage even when throttled", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage with the guide resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Focused guides bypass throttle in closed stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in patch stage even when throttled", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      // Focused guides bypass throttle in patch stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in patch stage even when not the resolved guide", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage where a DIFFERENT guide was resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "some_other_guide",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      // Focused guides bypass the resolved check in patch stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in closed stage even when not the resolved guide", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage where a DIFFERENT guide was resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "some_other_guide",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Focused guides bypass the resolved check in closed stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
       expect(result).toBeDefined();
       expect(result!.key).toBe("onboarding");
     });
