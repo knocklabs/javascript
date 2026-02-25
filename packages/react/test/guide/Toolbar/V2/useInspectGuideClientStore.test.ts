@@ -45,6 +45,25 @@ vi.mock("@knocklabs/react-core", async () => {
   };
 });
 
+const makeStep = (overrides: Record<string, unknown> = {}) => ({
+  ref: "step-1",
+  schema_key: "schema-1",
+  schema_semver: "1.0.0",
+  schema_variant_key: "variant-1",
+  message: {
+    seen_at: null,
+    read_at: null,
+    interacted_at: null,
+    archived_at: null,
+    link_clicked_at: null,
+  },
+  content: {},
+  markAsSeen: vi.fn(),
+  markAsInteracted: vi.fn(),
+  markAsArchived: vi.fn(),
+  ...overrides,
+});
+
 const makeGuide = (overrides: Record<string, unknown> = {}) => ({
   __typename: "Guide",
   id: "guide-1",
@@ -53,7 +72,7 @@ const makeGuide = (overrides: Record<string, unknown> = {}) => ({
   type: "banner",
   semver: "1.0.0",
   active: true,
-  steps: [],
+  steps: [makeStep()],
   activation_url_rules: [],
   activation_url_patterns: [],
   bypass_global_group_limit: false,
@@ -274,6 +293,108 @@ describe("useInspectGuideClientStore", () => {
     expect(annotated.annotation.isEligible).toBe(false);
     // archived reason falls through the targetable switch default, so targetable stays true
     expect(annotated.annotation.targetable).toEqual({ status: true });
+    expect(annotated.annotation.archived).toEqual({ status: true });
+  });
+
+  // ----- Guide annotation: archived via step archived_at timestamps -----
+
+  test("annotates a guide as archived when all steps have archived_at timestamps (no marker)", () => {
+    const guide = makeGuide({
+      key: "g1",
+      active: true,
+      steps: [
+        makeStep({
+          ref: "step-1",
+          message: { archived_at: "2024-06-01T00:00:00Z" },
+        }),
+        makeStep({
+          ref: "step-2",
+          message: { archived_at: "2024-06-02T00:00:00Z" },
+        }),
+      ],
+    });
+    setSnapshot({
+      guideGroups: [makeGuideGroup(["g1"])],
+      guides: { g1: guide },
+      ineligibleGuides: {},
+    });
+
+    const result = renderInspect()!;
+    const annotated = result.guides[0] as AnnotatedGuide;
+    expect(annotated.annotation.isEligible).toBe(false);
+    expect(annotated.annotation.archived).toEqual({ status: true });
+    // No marker means targetable is still true
+    expect(annotated.annotation.targetable).toEqual({ status: true });
+  });
+
+  test("does not mark guide as archived when only some steps have archived_at", () => {
+    const guide = makeGuide({
+      key: "g1",
+      active: true,
+      steps: [
+        makeStep({
+          ref: "step-1",
+          message: { archived_at: "2024-06-01T00:00:00Z" },
+        }),
+        makeStep({
+          ref: "step-2",
+          message: { archived_at: null },
+        }),
+      ],
+    });
+    setSnapshot({
+      guideGroups: [makeGuideGroup(["g1"])],
+      guides: { g1: guide },
+      ineligibleGuides: {},
+    });
+
+    const result = renderInspect()!;
+    const annotated = result.guides[0] as AnnotatedGuide;
+    expect(annotated.annotation.isEligible).toBe(true);
+    expect(annotated.annotation.archived).toEqual({ status: false });
+  });
+
+  test("annotates a guide as archived when single step has archived_at", () => {
+    const guide = makeGuide({
+      key: "g1",
+      active: true,
+      steps: [
+        makeStep({
+          ref: "step-1",
+          message: { archived_at: "2024-06-01T00:00:00Z" },
+        }),
+      ],
+    });
+    setSnapshot({
+      guideGroups: [makeGuideGroup(["g1"])],
+      guides: { g1: guide },
+      ineligibleGuides: {},
+    });
+
+    const result = renderInspect()!;
+    const annotated = result.guides[0] as AnnotatedGuide;
+    expect(annotated.annotation.isEligible).toBe(false);
+    expect(annotated.annotation.archived).toEqual({ status: true });
+  });
+
+  test("annotates a guide as archived when marker says marked_as_archived even if steps have no archived_at", () => {
+    const guide = makeGuide({
+      key: "g1",
+      active: true,
+      steps: [
+        makeStep({ ref: "step-1", message: { archived_at: null } }),
+      ],
+    });
+    const marker = makeMarker("g1", "marked_as_archived", "Already dismissed");
+    setSnapshot({
+      guideGroups: [makeGuideGroup(["g1"])],
+      guides: { g1: guide },
+      ineligibleGuides: { g1: marker },
+    });
+
+    const result = renderInspect()!;
+    const annotated = result.guides[0] as AnnotatedGuide;
+    expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.archived).toEqual({ status: true });
   });
 
