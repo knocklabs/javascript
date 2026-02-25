@@ -61,6 +61,7 @@ export const GuideContextDetails = () => {
               color={debugSettings.skipEngagementTracking ? "green" : "gray"}
               onClick={() =>
                 client.setDebug({
+                  ...debugSettings,
                   skipEngagementTracking: !debugSettings.skipEngagementTracking,
                 })
               }
