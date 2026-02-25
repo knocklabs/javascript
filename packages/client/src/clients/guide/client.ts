@@ -214,6 +214,9 @@ const predicate = (
   if (debug.forcedGuideKey) {
     return debug.forcedGuideKey === guide.key;
   }
+  if (debug.focusedGuideKeys) {
+    return !!debug.focusedGuideKeys[guide.key]
+  }
 
   const ineligible = ineligibleGuides[guide.key];
   if (ineligible) {
@@ -563,7 +566,11 @@ export class KnockGuideClient {
     // Clear debug state from store
     this.store.setState((state) => ({
       ...state,
-      debug: { forcedGuideKey: null, previewSessionId: null },
+      debug: {
+        forcedGuideKey: null,
+        previewSessionId: null,
+        focusedGuideKeys: {},
+      },
       previewGuides: {}, // Clear preview guides when exiting debug mode
     }));
 
@@ -591,6 +598,7 @@ export class KnockGuideClient {
       debug: {
         skipEngagementTracking: true,
         ignoreDisplayInterval: true,
+        focusedGuideKeys: {},
         ...debugOpts,
         debugging: true,
       },
@@ -1082,7 +1090,10 @@ export class KnockGuideClient {
       // Get the next unarchived step.
       getStep() {
         // If debugging this guide, return the first step regardless of archive status
-        if (self.store.state.debug?.forcedGuideKey === this.key) {
+        if (
+          self.store.state.debug?.forcedGuideKey === this.key ||
+          self.store.state.debug?.focusedGuideKeys?.[this.key]
+        ) {
           return this.steps[0];
         }
 
