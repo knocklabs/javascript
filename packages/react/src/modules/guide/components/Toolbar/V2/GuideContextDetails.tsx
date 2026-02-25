@@ -73,9 +73,14 @@ export const GuideContextDetails = () => {
 
           <Stack direction="column" py="1" px="2">
             <Stack align="center" justify="space-between">
-              <Text as="span" size="0" weight="medium">
-                Ignore throttle setting
-              </Text>
+              <Stack align="center" gap="1">
+                <Text as="span" size="0" weight="medium">
+                  Suspend throttle application
+                </Text>
+                <Tooltip label="Suspend throttle application during preview, and show next guide immediately">
+                  <Icon icon={Info} size="0" color="gray" aria-hidden />
+                </Tooltip>
+              </Stack>
               <Button
                 size="0"
                 variant="soft"
