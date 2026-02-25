@@ -214,8 +214,11 @@ const predicate = (
   if (debug.forcedGuideKey) {
     return debug.forcedGuideKey === guide.key;
   }
-  if (debug.focusedGuideKeys) {
-    return !!debug.focusedGuideKeys[guide.key]
+  if (
+    debug.focusedGuideKeys &&
+    Object.keys(debug.focusedGuideKeys).length > 0
+  ) {
+    return !!debug.focusedGuideKeys[guide.key];
   }
 
   const ineligible = ineligibleGuides[guide.key];
@@ -762,6 +765,10 @@ export class KnockGuideClient {
       return guide;
     }
 
+    // If focused while in debug mode, then we want to ignore the guide order
+    // and throttle settings and force render this guide.
+    const focusedInDebug = state.debug?.focusedGuideKeys?.[guide.key];
+
     const throttled = !opts.includeThrottled && checkStateIfThrottled(state);
 
     switch (this.stage.status) {
@@ -778,6 +785,13 @@ export class KnockGuideClient {
         // we can re-resolve when the group stage closes.
         this.stage.ordered[index] = guide.key;
 
+        if (focusedInDebug) {
+          this.knock.log(
+            `[Guide] Focused to return \`${guide.key}\` (stage: ${formatGroupStage(this.stage)})`,
+          );
+          return guide;
+        }
+
         if (throttled) {
           this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
           return undefined;
@@ -791,6 +805,13 @@ export class KnockGuideClient {
       }
 
       case "closed": {
+        if (focusedInDebug) {
+          this.knock.log(
+            `[Guide] Focused to return \`${guide.key}\` (stage: ${formatGroupStage(this.stage)})`,
+          );
+          return guide;
+        }
+
         if (throttled) {
           this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
           return undefined;
