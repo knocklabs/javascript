@@ -36,10 +36,10 @@ type Props = {
 export const GuideRow = ({ guide, orderIndex }: Props) => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
-    debugSettings: state.debug,
+    debugSettings: state.debug || {},
   }));
 
-  const focusedGuideKeys = debugSettings?.focusedGuideKeys || {};
+  const focusedGuideKeys = debugSettings.focusedGuideKeys || {};
   const hasFocus = Object.keys(focusedGuideKeys).length > 0;
   const isFocused = !!focusedGuideKeys[guide.key];
 
