@@ -211,14 +211,14 @@ const predicate = (
   // If in debug mode with a forced guide key, bypass other filtering and always
   // return true for that guide only. This should always run AFTER checking the
   // filters but BEFORE checking archived status and location rules.
-  if (debug.forcedGuideKey) {
-    return debug.forcedGuideKey === guide.key;
-  }
   if (
     debug.focusedGuideKeys &&
     Object.keys(debug.focusedGuideKeys).length > 0
   ) {
     return !!debug.focusedGuideKeys[guide.key];
+  }
+  if (debug.forcedGuideKey) {
+    return debug.forcedGuideKey === guide.key;
   }
 
   const ineligible = ineligibleGuides[guide.key];
