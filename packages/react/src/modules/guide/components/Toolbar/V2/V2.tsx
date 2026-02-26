@@ -9,6 +9,9 @@ import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
+import { DragHandle, DRAG_HANDLE_OVERHANG } from "./DragHandle";
+import { useDrag } from "./useDrag";
+
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
 import {
@@ -68,15 +71,31 @@ export const V2 = () => {
     };
   }, [isVisible, client]);
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const { position, isDragging, handlePointerDown } = useDrag({
+    elementRef: containerRef,
+    reclampDeps: [isCollapsed],
+    rightPadding: DRAG_HANDLE_OVERHANG,
+  });
+
   const result = useInspectGuideClientStore();
   if (!result) {
     return null;
   }
 
   return (
-    <Box position="fixed" top="4" right="4" style={{ zIndex: TOOLBAR_Z_INDEX }}>
+    <Box
+      tgphRef={containerRef}
+      position="fixed"
+      style={{
+        top: position.top + "px",
+        right: position.right + "px",
+        zIndex: TOOLBAR_Z_INDEX,
+      }}
+    >
+      <DragHandle onPointerDown={handlePointerDown} isDragging={isDragging} />
       {isCollapsed ? (
-        <KnockButton onClick={() => setIsCollapsed(false)} />
+        <KnockButton onClick={() => setIsCollapsed(false)} positioned={false} />
       ) : (
         <Stack
           direction="column"
