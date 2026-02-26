@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   clampPosition,
-  useDrag,
-} from "../../../../src/modules/guide/components/Toolbar/V2/useDrag";
+  useDraggable,
+} from "../../../../src/modules/guide/components/Toolbar/V2/useDraggable";
 
 // Mock RAF to execute callbacks synchronously
 let rafCallback: FrameRequestCallback | null = null;
@@ -106,10 +106,10 @@ describe("clampPosition", () => {
   });
 });
 
-describe("useDrag", () => {
+describe("useDraggable", () => {
   test("returns default initial position", () => {
     const elementRef = makeElementRef();
-    const { result } = renderHook(() => useDrag({ elementRef }));
+    const { result } = renderHook(() => useDraggable({ elementRef }));
 
     expect(result.current.position).toEqual({ top: 16, right: 16 });
   });
@@ -117,7 +117,7 @@ describe("useDrag", () => {
   test("returns custom initial position", () => {
     const elementRef = makeElementRef();
     const { result } = renderHook(() =>
-      useDrag({ elementRef, initialPosition: { top: 50, right: 100 } }),
+      useDraggable({ elementRef, initialPosition: { top: 50, right: 100 } }),
     );
 
     expect(result.current.position).toEqual({ top: 50, right: 100 });
@@ -125,7 +125,7 @@ describe("useDrag", () => {
 
   test("isDragging starts as false", () => {
     const elementRef = makeElementRef();
-    const { result } = renderHook(() => useDrag({ elementRef }));
+    const { result } = renderHook(() => useDraggable({ elementRef }));
 
     expect(result.current.isDragging).toBe(false);
   });
@@ -136,7 +136,7 @@ describe("useDrag", () => {
       height: 40,
     });
     const { result } = renderHook(() =>
-      useDrag({ elementRef, initialPosition: { top: 100, right: 100 } }),
+      useDraggable({ elementRef, initialPosition: { top: 100, right: 100 } }),
     );
 
     // Start drag
@@ -175,7 +175,7 @@ describe("useDrag", () => {
   test("position is clamped to viewport bounds", () => {
     const elementRef = makeElementRef({ width: 40, height: 40 });
     const { result } = renderHook(() =>
-      useDrag({ elementRef, initialPosition: { top: 10, right: 10 } }),
+      useDraggable({ elementRef, initialPosition: { top: 10, right: 10 } }),
     );
 
     // Start drag
@@ -211,7 +211,7 @@ describe("useDrag", () => {
     const elementRef = makeElementRef();
     const removeListenerSpy = vi.spyOn(document, "removeEventListener");
 
-    const { result, unmount } = renderHook(() => useDrag({ elementRef }));
+    const { result, unmount } = renderHook(() => useDraggable({ elementRef }));
 
     // Start a drag to register listeners
     act(() => {
@@ -234,7 +234,7 @@ describe("useDrag", () => {
   test("window resize re-clamps position", () => {
     const elementRef = makeElementRef({ width: 40, height: 40 });
     const { result } = renderHook(() =>
-      useDrag({ elementRef, initialPosition: { top: 700, right: 900 } }),
+      useDraggable({ elementRef, initialPosition: { top: 700, right: 900 } }),
     );
 
     // Shrink viewport
