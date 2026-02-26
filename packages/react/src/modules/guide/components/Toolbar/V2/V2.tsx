@@ -9,9 +9,7 @@ import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
-import { DragHandle, DRAG_HANDLE_OVERHANG } from "./DragHandle";
-import { useDrag } from "./useDrag";
-
+import { DRAG_HANDLE_OVERHANG, DragHandle } from "./DragHandle";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
 import {
@@ -19,6 +17,7 @@ import {
   GuidesListDisplaySelect,
 } from "./GuidesListDisplaySelect";
 import { detectToolbarParam } from "./helpers";
+import { useDraggable } from "./useDraggable";
 import {
   InspectionResult,
   useInspectGuideClientStore,
@@ -72,10 +71,11 @@ export const V2 = () => {
   }, [isVisible, client]);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const { position, isDragging, handlePointerDown } = useDrag({
+  const { position, isDragging, handlePointerDown } = useDraggable({
     elementRef: containerRef,
     reclampDeps: [isCollapsed],
     rightPadding: DRAG_HANDLE_OVERHANG,
+    initialPosition: { top: 16, right: 16 },
   });
 
   const result = useInspectGuideClientStore();

@@ -1,8 +1,11 @@
 import React from "react";
 
+// NOTE: This hook was generated entirely with Claude then lightly touched up,
+// and the behavior works correctly from testing it manually in the browser.
+
 type Position = { top: number; right: number };
 
-type UseDragOptions = {
+type UseDraggableOptions = {
   elementRef: React.RefObject<HTMLElement | null>;
   initialPosition?: Position;
   reclampDeps?: React.DependencyList;
@@ -10,7 +13,7 @@ type UseDragOptions = {
   rightPadding?: number;
 };
 
-type UseDragReturn = {
+type UseDraggableReturn = {
   position: Position;
   isDragging: boolean;
   handlePointerDown: (e: React.PointerEvent) => void;
@@ -44,12 +47,12 @@ export function clampPosition(
   return { top: clampedTop, right: clampedRight };
 }
 
-export function useDrag({
+export function useDraggable({
   elementRef,
   initialPosition = DEFAULT_POSITION,
   reclampDeps = [],
   rightPadding = 0,
-}: UseDragOptions): UseDragReturn {
+}: UseDraggableOptions): UseDraggableReturn {
   const [position, setPosition] = React.useState<Position>(initialPosition);
   const [isDragging, setIsDragging] = React.useState(false);
 
