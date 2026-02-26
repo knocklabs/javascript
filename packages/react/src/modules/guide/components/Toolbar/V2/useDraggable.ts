@@ -63,6 +63,7 @@ export function useDraggable({
   const startPositionRef = React.useRef<Position>({ top: 0, right: 0 });
   const rafIdRef = React.useRef<number | null>(null);
   const isDraggingRef = React.useRef(false);
+  const cleanupListenersRef = React.useRef<(() => void) | null>(null);
 
   const reclamp = React.useCallback(() => {
     const el = elementRef.current;
@@ -112,7 +113,7 @@ export function useDraggable({
         });
       };
 
-      const onPointerUp = () => {
+      const cleanup = () => {
         isDraggingRef.current = false;
         setIsDragging(false);
         if (rafIdRef.current !== null) {
@@ -121,10 +122,14 @@ export function useDraggable({
         }
         document.removeEventListener("pointermove", onPointerMove);
         document.removeEventListener("pointerup", onPointerUp);
+        cleanupListenersRef.current = null;
       };
+
+      const onPointerUp = () => cleanup();
 
       document.addEventListener("pointermove", onPointerMove);
       document.addEventListener("pointerup", onPointerUp);
+      cleanupListenersRef.current = cleanup;
     },
     [elementRef, rightPadding],
   );
@@ -132,10 +137,7 @@ export function useDraggable({
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
-      isDraggingRef.current = false;
+      cleanupListenersRef.current?.();
     };
   }, []);
 
