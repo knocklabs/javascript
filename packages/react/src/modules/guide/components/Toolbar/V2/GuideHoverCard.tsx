@@ -55,6 +55,7 @@ export const GuideHoverCard = ({
                 variant="soft"
                 color="default"
                 leadingIcon={{ icon: RotateCcw, alt: "Reset engagement" }}
+                // TODO(KNO-11468): Placeholder button
                 onClick={() => {}}
               >
                 Reset engagement
@@ -64,6 +65,7 @@ export const GuideHoverCard = ({
                 variant="soft"
                 color="default"
                 leadingIcon={{ icon: ExternalLink, alt: "Go to dashboard" }}
+                // TODO(KNO-11819): Placeholder button
                 onClick={() => {}}
               >
                 Go to dashboard
