@@ -5,15 +5,19 @@ import "./styles.css";
 
 type Props = {
   onClick: () => void;
+  positioned?: boolean;
 };
 
-export const KnockButton = ({ onClick }: Props) => {
+export const KnockButton = ({ onClick, positioned = true }: Props) => {
   return (
     <Button
       onClick={onClick}
-      position="fixed"
-      top="4"
-      right="4"
+      {...(positioned && {
+        position: "fixed" as const,
+        top: "4" as const,
+        right: "4" as const,
+        style: { zIndex: TOOLBAR_Z_INDEX },
+      })}
       bg="surface-2"
       shadow="3"
       rounded="3"
@@ -22,7 +26,6 @@ export const KnockButton = ({ onClick }: Props) => {
       variant="soft"
       data-tgph-appearance="dark"
       aria-label="Expand guide toolbar"
-      style={{ zIndex: TOOLBAR_Z_INDEX }}
     >
       <svg
         width="40"
