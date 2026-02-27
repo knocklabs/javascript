@@ -16,6 +16,7 @@ export const GuideContextDetails = () => {
       defaultGroup: state.guideGroups[0],
       debugSettings: {
         skipEngagementTracking: !!state.debug?.skipEngagementTracking,
+        ignoreDisplayInterval: !!state.debug?.ignoreDisplayInterval,
       },
     };
   });
@@ -70,13 +71,40 @@ export const GuideContextDetails = () => {
             </Button>
           </Stack>
 
-          <Stack direction="column" gap="0_5" py="1" px="2" borderTop="px">
-            <Text as="span" size="0" weight="medium">
-              Throttle
-            </Text>
-            <Text as="code" size="0">
-              {displayInterval === null ? "-" : `Every ${displayInterval}s`}
-            </Text>
+          <Stack direction="column" py="1" px="2">
+            <Stack align="center" justify="space-between">
+              <Stack align="center" gap="1">
+                <Text as="span" size="0" weight="medium">
+                  Suspend throttling
+                </Text>
+                <Tooltip label="Suspend throttling during preview, and show next guide immediately">
+                  <Icon icon={Info} size="0" color="gray" aria-hidden />
+                </Tooltip>
+              </Stack>
+              <Button
+                size="0"
+                variant="soft"
+                color={debugSettings.ignoreDisplayInterval ? "green" : "gray"}
+                onClick={() =>
+                  client.setDebug({
+                    ...debugSettings,
+                    ignoreDisplayInterval: !debugSettings.ignoreDisplayInterval,
+                  })
+                }
+              >
+                {debugSettings.ignoreDisplayInterval ? "On" : "Off"}
+              </Button>
+            </Stack>
+            <Stack direction="row" gap="0_5" py="1">
+              <Text as="span" size="0" color="gray">
+                Throttle:{" "}
+                {debugSettings.ignoreDisplayInterval
+                  ? "(ignored)"
+                  : displayInterval === null
+                    ? "(none)"
+                    : `Every ${displayInterval}s`}
+              </Text>
+            </Stack>
           </Stack>
 
           <Stack direction="column" py="1" px="2" borderTop="px">

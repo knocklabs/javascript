@@ -2363,6 +2363,71 @@ describe("KnockGuideClient", () => {
       expect(result2!.type).toBe("banner");
     });
 
+    test("returns a guide inside a throttle window when ignoreDisplayInterval is true", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          ignoreDisplayInterval: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Even though we are inside the configured throttle window,
+      // ignoreDisplayInterval bypasses it.
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("does not return a guide inside a throttle window when ignoreDisplayInterval is false", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          ignoreDisplayInterval: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      expect(result).toBeUndefined();
+    });
+
     test("skips ineligible guides during selection", () => {
       const stateWithGuides = {
         guideGroups: [mockDefaultGroup],
@@ -4233,6 +4298,34 @@ describe("KnockGuideClient", () => {
       client.setDebug({ skipEngagementTracking: false });
 
       expect(client.store.state.debug!.skipEngagementTracking).toBe(false);
+    });
+
+    test("defaults ignoreDisplayInterval to true", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.ignoreDisplayInterval).toBe(true);
+    });
+
+    test("allows overriding ignoreDisplayInterval to false", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug({ ignoreDisplayInterval: false });
+
+      expect(client.store.state.debug!.ignoreDisplayInterval).toBe(false);
     });
   });
 

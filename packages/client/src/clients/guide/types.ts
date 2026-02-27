@@ -234,6 +234,7 @@ export type DebugState = {
   forcedGuideKey?: string | null;
   previewSessionId?: string | null;
   skipEngagementTracking?: boolean;
+  ignoreDisplayInterval?: boolean;
 };
 
 export type StoreState = {

@@ -64,6 +64,10 @@ export const findDefaultGroup = (guideGroups: GuideGroupData[]) =>
   );
 
 export const checkStateIfThrottled = (state: StoreState) => {
+  if (state.debug?.ignoreDisplayInterval) {
+    return false;
+  }
+
   const defaultGroup = findDefaultGroup(state.guideGroups);
   const throttleWindowStartedAt =
     state.guideGroupDisplayLogs[DEFAULT_GROUP_KEY];
