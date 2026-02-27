@@ -588,7 +588,11 @@ export class KnockGuideClient {
 
     this.store.setState((state) => ({
       ...state,
-      debug: { ...debugOpts, debugging: true },
+      debug: {
+        skipEngagementTracking: true,
+        ...debugOpts,
+        debugging: true,
+      },
     }));
 
     if (shouldRefetch) {
@@ -970,6 +974,13 @@ export class KnockGuideClient {
     });
     if (!updatedStep) return;
 
+    if (this.shouldSkipEngagementApi()) {
+      this.knock.log(
+        "[Guide] Skipping engagement API call for markAsSeen (debug mode)",
+      );
+      return updatedStep;
+    }
+
     const params = {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
       content: updatedStep.content,
@@ -1000,6 +1011,13 @@ export class KnockGuideClient {
     });
     if (!updatedStep) return;
 
+    if (this.shouldSkipEngagementApi()) {
+      this.knock.log(
+        "[Guide] Skipping engagement API call for markAsInteracted (debug mode)",
+      );
+      return updatedStep;
+    }
+
     const params = {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
       metadata,
@@ -1025,6 +1043,13 @@ export class KnockGuideClient {
     });
     if (!updatedStep) return;
 
+    if (this.shouldSkipEngagementApi()) {
+      this.knock.log(
+        "[Guide] Skipping engagement API call for markAsArchived (debug mode)",
+      );
+      return updatedStep;
+    }
+
     const params = this.buildEngagementEventBaseParams(guide, updatedStep);
 
     this.knock.user.markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>(
@@ -1036,6 +1061,10 @@ export class KnockGuideClient {
     );
 
     return updatedStep;
+  }
+
+  private shouldSkipEngagementApi(): boolean {
+    return !!this.store.state.debug?.skipEngagementTracking;
   }
 
   //

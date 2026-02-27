@@ -294,36 +294,38 @@ const toSelectableStatus = (
 };
 
 const toIneligibilityStatus = (
-  marker: KnockGuideIneligibilityMarker,
-): Partial<AnnotatedStatuses> | undefined => {
-  switch (marker.reason) {
-    case "not_in_target_audience":
-    case "target_conditions_not_met":
-      return {
-        targetable: {
-          status: false,
-          reason: marker.reason,
-          message: marker.message,
-        },
-      };
+  guide: KnockGuide,
+  marker?: KnockGuideIneligibilityMarker,
+): Partial<AnnotatedStatuses> => {
+  const statuses: Partial<AnnotatedStatuses> = {};
 
-    case "marked_as_archived":
-      return {
-        archived: {
-          status: true,
-        },
-      };
-
-    case "guide_not_active":
-      return {
-        active: {
-          status: false,
-        },
-      };
-
-    default:
-      return undefined;
+  if (
+    marker?.reason === "not_in_target_audience" ||
+    marker?.reason === "target_conditions_not_met"
+  ) {
+    statuses.targetable = {
+      status: false,
+      reason: marker.reason,
+      message: marker.message,
+    };
   }
+
+  if (
+    marker?.reason === "marked_as_archived" ||
+    (guide.steps || []).every((s) => !!s.message.archived_at)
+  ) {
+    statuses.archived = {
+      status: true,
+    };
+  }
+
+  if (marker?.reason === "guide_not_active") {
+    statuses.active = {
+      status: false,
+    };
+  }
+
+  return statuses;
 };
 
 const resolveIsEligible = ({
@@ -353,7 +355,7 @@ const annotateGuide = (
 ): AnnotatedGuide => {
   const { ineligibleGuides, location } = snapshot;
   const marker = ineligibleGuides[guide.key];
-  const ineligiblity = marker ? toIneligibilityStatus(marker) : undefined;
+  const ineligiblity = toIneligibilityStatus(guide, marker);
 
   const statuses: AnnotatedStatuses = {
     // isEligible:

@@ -950,6 +950,339 @@ describe("KnockGuideClient", () => {
       const newState = stateUpdateFn(stateWithGuides);
       expect(newState.guideGroupDisplayLogs).toEqual({});
     });
+
+    test("markAsSeen skips API call when skipEngagementTracking is true", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await client.markAsSeen(freshMockGuide, freshMockStep);
+
+      expect(result).toBeDefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsSeen sends API call when skipEngagementTracking is false", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsSeen(freshMockGuide, freshMockStep);
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "seen",
+        expect.any(Object),
+      );
+    });
+
+    test("markAsInteracted skips API call when skipEngagementTracking is true", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await client.markAsInteracted(
+        freshMockGuide,
+        freshMockStep,
+        { action: "clicked" },
+      );
+
+      expect(result).toBeDefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsInteracted sends API call when skipEngagementTracking is false", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsInteracted(freshMockGuide, freshMockStep, {
+        action: "clicked",
+      });
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "interacted",
+        expect.any(Object),
+      );
+    });
+
+    test("markAsArchived skips API call when skipEngagementTracking is true", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await client.markAsArchived(
+        freshMockGuide,
+        freshMockStep,
+      );
+
+      expect(result).toBeDefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsArchived sends API call when skipEngagementTracking is false", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(freshMockGuide, freshMockStep);
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "archived",
+        expect.any(Object),
+      );
+    });
   });
 
   describe("cleanup", () => {
@@ -3872,6 +4205,34 @@ describe("KnockGuideClient", () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+
+    test("defaults skipEngagementTracking to true", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.skipEngagementTracking).toBe(true);
+    });
+
+    test("allows overriding skipEngagementTracking to false", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug({ skipEngagementTracking: false });
+
+      expect(client.store.state.debug!.skipEngagementTracking).toBe(false);
     });
   });
 
