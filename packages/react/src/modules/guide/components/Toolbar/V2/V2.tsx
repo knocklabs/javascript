@@ -1,6 +1,7 @@
 import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
+import { Text } from "@telegraph/typography";
 import { Minimize2, Undo2 } from "lucide-react";
 import React from "react";
 
@@ -119,8 +120,14 @@ export const V2 = () => {
           </Stack>
 
           <Box w="full">
-            {result.error && <Box>{result.error}</Box>}
             <GuideContextDetails />
+            {result.error && (
+              <Box px="2" pb="1">
+                <Text as="span" size="0" weight="medium" color="red">
+                  {result.error}
+                </Text>
+              </Box>
+            )}
             <GuidesList
               guides={result.guides}
               displayOption={guidesListDisplayOption}

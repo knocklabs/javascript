@@ -211,6 +211,12 @@ const predicate = (
   // If in debug mode with a forced guide key, bypass other filtering and always
   // return true for that guide only. This should always run AFTER checking the
   // filters but BEFORE checking archived status and location rules.
+  if (
+    debug.focusedGuideKeys &&
+    Object.keys(debug.focusedGuideKeys).length > 0
+  ) {
+    return !!debug.focusedGuideKeys[guide.key];
+  }
   if (debug.forcedGuideKey) {
     return debug.forcedGuideKey === guide.key;
   }
@@ -563,7 +569,11 @@ export class KnockGuideClient {
     // Clear debug state from store
     this.store.setState((state) => ({
       ...state,
-      debug: { forcedGuideKey: null, previewSessionId: null },
+      debug: {
+        forcedGuideKey: null,
+        previewSessionId: null,
+        focusedGuideKeys: {},
+      },
       previewGuides: {}, // Clear preview guides when exiting debug mode
     }));
 
@@ -591,6 +601,7 @@ export class KnockGuideClient {
       debug: {
         skipEngagementTracking: true,
         ignoreDisplayInterval: true,
+        focusedGuideKeys: {},
         ...debugOpts,
         debugging: true,
       },
@@ -754,6 +765,10 @@ export class KnockGuideClient {
       return guide;
     }
 
+    // If focused while in debug mode, then we want to ignore the guide order
+    // and throttle settings and force render this guide.
+    const focusedInDebug = state.debug?.focusedGuideKeys?.[guide.key];
+
     const throttled = !opts.includeThrottled && checkStateIfThrottled(state);
 
     switch (this.stage.status) {
@@ -770,6 +785,13 @@ export class KnockGuideClient {
         // we can re-resolve when the group stage closes.
         this.stage.ordered[index] = guide.key;
 
+        if (focusedInDebug) {
+          this.knock.log(
+            `[Guide] Focused to return \`${guide.key}\` (stage: ${formatGroupStage(this.stage)})`,
+          );
+          return guide;
+        }
+
         if (throttled) {
           this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
           return undefined;
@@ -783,6 +805,13 @@ export class KnockGuideClient {
       }
 
       case "closed": {
+        if (focusedInDebug) {
+          this.knock.log(
+            `[Guide] Focused to return \`${guide.key}\` (stage: ${formatGroupStage(this.stage)})`,
+          );
+          return guide;
+        }
+
         if (throttled) {
           this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
           return undefined;
@@ -1082,7 +1111,10 @@ export class KnockGuideClient {
       // Get the next unarchived step.
       getStep() {
         // If debugging this guide, return the first step regardless of archive status
-        if (self.store.state.debug?.forcedGuideKey === this.key) {
+        if (
+          self.store.state.debug?.forcedGuideKey === this.key ||
+          self.store.state.debug?.focusedGuideKeys?.[this.key]
+        ) {
           return this.steps[0];
         }
 

@@ -232,6 +232,7 @@ export type QueryStatus = {
 export type DebugState = {
   debugging?: boolean;
   forcedGuideKey?: string | null;
+  focusedGuideKeys?: Record<KnockGuide["key"], true>;
   previewSessionId?: string | null;
   skipEngagementTracking?: boolean;
   ignoreDisplayInterval?: boolean;

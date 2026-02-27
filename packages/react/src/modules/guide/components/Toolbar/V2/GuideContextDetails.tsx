@@ -14,10 +14,7 @@ export const GuideContextDetails = () => {
   const { defaultGroup, debugSettings } = useStore(client.store, (state) => {
     return {
       defaultGroup: state.guideGroups[0],
-      debugSettings: {
-        skipEngagementTracking: !!state.debug?.skipEngagementTracking,
-        ignoreDisplayInterval: !!state.debug?.ignoreDisplayInterval,
-      },
+      debugSettings: state.debug || {},
     };
   });
   const displayInterval = defaultGroup?.display_interval ?? null;

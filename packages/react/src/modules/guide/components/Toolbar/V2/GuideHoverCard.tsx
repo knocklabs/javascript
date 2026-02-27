@@ -1,5 +1,7 @@
 import * as HoverCard from "@radix-ui/react-hover-card";
+import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
+import { ExternalLink, RotateCcw } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -47,6 +49,28 @@ export const GuideHoverCard = ({
               maxHeight: "600px",
             }}
           >
+            <Stack justify="flex-end" gap="1" pt="2">
+              <Button
+                size="0"
+                variant="soft"
+                color="default"
+                leadingIcon={{ icon: RotateCcw, alt: "Reset engagement" }}
+                // TODO(KNO-11468): Placeholder button
+                onClick={() => {}}
+              >
+                Reset engagement
+              </Button>
+              <Button
+                size="0"
+                variant="soft"
+                color="default"
+                leadingIcon={{ icon: ExternalLink, alt: "Go to dashboard" }}
+                // TODO(KNO-11819): Placeholder button
+                onClick={() => {}}
+              >
+                Go to dashboard
+              </Button>
+            </Stack>
             <pre
               style={{
                 fontSize: "11px",
