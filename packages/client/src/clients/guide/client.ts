@@ -1,6 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import { Store } from "@tanstack/store";
-import { Channel, Socket } from "phoenix";
+import { Channel, type MessageRef, Socket } from "phoenix";
 import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
@@ -274,6 +274,7 @@ export class KnockGuideClient {
     "guide.live_preview_updated",
   ];
   private subscribeRetryCount = 0;
+  private socketOpenListenerId: MessageRef | undefined;
 
   // Original history methods to monkey patch, or restore in cleanups.
   private pushStateFn: History["pushState"] | undefined;
@@ -362,16 +363,16 @@ export class KnockGuideClient {
     this.clearCounterInterval();
   }
 
-  async fetch(opts?: { filters?: QueryFilterParams }) {
+  async fetch(opts?: { filters?: QueryFilterParams; force?: boolean }) {
     this.knock.log("[Guide] .fetch");
     this.knock.failIfNotAuthenticated();
 
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
 
-    // If already fetched before, then noop.
+    // If already fetched before, then noop (unless force refetch).
     const maybeQueryStatus = this.store.state.queries[queryKey];
-    if (maybeQueryStatus) {
+    if (maybeQueryStatus && !opts?.force) {
       return maybeQueryStatus;
     }
 
@@ -433,6 +434,12 @@ export class KnockGuideClient {
       this.unsubscribe();
     }
 
+    // If there's an existing open listener, then remove it.
+    if (this.socketOpenListenerId) {
+      this.socket.off([this.socketOpenListenerId]);
+      this.socketOpenListenerId = undefined;
+    }
+
     // Join the channel topic and subscribe to supported events.
     const debugState = this.store.state.debug;
     const params = {
@@ -472,6 +479,21 @@ export class KnockGuideClient {
 
     // Track the joined channel.
     this.socketChannel = newChannel;
+
+    // Refetch guides on socket reconnect to pick up any changes that
+    // occurred while disconnected (e.g. tab was hidden for a long time).
+    // If the socket is already connected, there's no initial open event coming,
+    // so we don't need to skip anything. If it's not yet connected, skip the
+    // first onOpen since that's the initial connection, not a reconnect.
+    let isFirstOpen = !this.socket.isConnected();
+    this.socketOpenListenerId = this.socket.onOpen(() => {
+      if (isFirstOpen) {
+        isFirstOpen = false;
+        return;
+      }
+      this.knock.log("[Guide] Socket reconnected, refetching guides");
+      this.fetch({ force: true });
+    });
   }
 
   private handleChannelJoinError() {
@@ -497,6 +519,11 @@ export class KnockGuideClient {
       this.socketChannel.off(eventType);
     }
     this.socketChannel.leave();
+
+    if (this.socketOpenListenerId && this.socket) {
+      this.socket.off([this.socketOpenListenerId]);
+      this.socketOpenListenerId = undefined;
+    }
 
     // Unset the channel.
     this.socketChannel = undefined;
