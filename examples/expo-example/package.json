@@ -25,7 +25,7 @@
     "expo-linking": "~7.1.7",
     "expo-notifications": "^0.31.4",
     "expo-router": "~5.1.6",
-    "expo-splash-screen": "~0.30.10",
+    "expo-splash-screen": "~55.0.10",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.11",
