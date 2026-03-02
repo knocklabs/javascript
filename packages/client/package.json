@@ -50,7 +50,7 @@
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.16.7",
     "@babel/plugin-transform-runtime": "^7.28.0",
-    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-env": "^7.29.0",
     "@babel/preset-typescript": "^7.27.0",
     "@codecov/vite-plugin": "^1.9.1",
     "@types/jsonwebtoken": "^9.0.10",
