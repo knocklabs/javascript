@@ -4,14 +4,15 @@ import { checkForWindow } from "../../../../../modules/core";
 // it is present and set to true.
 const TOOLBAR_QUERY_PARAM = "knock_guide_toolbar";
 
-export const detectToolbarParam = () => {
+export const getRunConfig = () => {
   const win = checkForWindow();
   if (!win || !win.location) {
-    return false;
+    return undefined;
   }
 
   const urlSearchParams = new URLSearchParams(win.location.search);
-  const hasToolbarParam = urlSearchParams.get(TOOLBAR_QUERY_PARAM) === "true";
 
-  return hasToolbarParam;
+  return {
+    isVisible: urlSearchParams.get(TOOLBAR_QUERY_PARAM) === "true",
+  };
 };
