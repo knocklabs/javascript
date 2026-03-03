@@ -16,7 +16,7 @@ import {
   DisplayOption,
   GuidesListDisplaySelect,
 } from "./GuidesListDisplaySelect";
-import { detectToolbarParam } from "./helpers";
+import { getRunConfig } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResult,
@@ -55,20 +55,19 @@ export const V2 = () => {
   const [guidesListDisplayOption, setGuidesListDisplayOption] =
     React.useState<DisplayOption>("only-displayable");
 
-  const [isVisible, setIsVisible] = React.useState(detectToolbarParam());
+  const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(true);
 
   React.useEffect(() => {
-    if (!isVisible) {
-      return;
+    const isDebugging = client.store.state.debug?.debugging;
+    if (runConfig?.isVisible && !isDebugging) {
+      client.setDebug();
     }
-
-    client.setDebug();
 
     return () => {
       client.unsetDebug();
     };
-  }, [isVisible, client]);
+  }, [runConfig, client]);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { position, isDragging, handlePointerDown } = useDraggable({
@@ -79,7 +78,7 @@ export const V2 = () => {
   });
 
   const result = useInspectGuideClientStore();
-  if (!result) {
+  if (!result || !runConfig?.isVisible) {
     return null;
   }
 
@@ -122,7 +121,10 @@ export const V2 = () => {
 
             <Stack gap="2">
               <Button
-                onClick={() => setIsVisible(false)}
+                onClick={() => {
+                  setRunConfig((curr) => ({ ...curr, isVisible: false }));
+                  client.unsetDebug();
+                }}
                 size="1"
                 variant="soft"
                 trailingIcon={{ icon: Undo2, "aria-hidden": true }}
