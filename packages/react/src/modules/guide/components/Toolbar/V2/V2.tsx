@@ -59,9 +59,9 @@ export const V2 = () => {
   const [isCollapsed, setIsCollapsed] = React.useState(true);
 
   React.useEffect(() => {
-    const isDebugging = !!client.store.state.debug?.debugging;
+    const isDebugging = client.store.state.debug?.debugging;
     if (runConfig?.isVisible && !isDebugging) {
-      return client.setDebug();
+      client.setDebug();
     }
 
     return () => {
