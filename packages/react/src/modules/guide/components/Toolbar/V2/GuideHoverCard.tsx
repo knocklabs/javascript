@@ -65,8 +65,9 @@ export const GuideHoverCard = ({
                 variant="soft"
                 color="default"
                 leadingIcon={{ icon: ExternalLink, alt: "Go to dashboard" }}
-                // TODO(KNO-11819): Placeholder button
-                onClick={() => {}}
+                onClick={() =>
+                  window.open(guide.dashboard_url, "_blank", "noopener")
+                }
               >
                 Go to dashboard
               </Button>
