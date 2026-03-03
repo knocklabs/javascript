@@ -4476,6 +4476,25 @@ describe("KnockGuideClient", () => {
   });
 
   describe("setDebug", () => {
+    test("clears group stage before updating store state", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      const clearGroupStageSpy = vi.spyOn(
+        client as any,
+        "clearGroupStage",
+      );
+
+      client.setDebug();
+
+      expect(clearGroupStageSpy).toHaveBeenCalled();
+    });
+
     test("sets debug state with debugging: true", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       client.store.state.debug = undefined;
@@ -4586,6 +4605,25 @@ describe("KnockGuideClient", () => {
   });
 
   describe("unsetDebug", () => {
+    test("clears group stage before updating store state", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      const clearGroupStageSpy = vi.spyOn(
+        client as any,
+        "clearGroupStage",
+      );
+
+      client.unsetDebug();
+
+      expect(clearGroupStageSpy).toHaveBeenCalled();
+    });
+
     test("sets debug state to undefined", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       client.store.state.debug = { debugging: true };
