@@ -59,7 +59,7 @@ export const V2 = () => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   React.useEffect(() => {
-    const { isVisible, focusedGuideKeys } = runConfig || {};
+    const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
     if (isVisible && !isDebugging) {
       client.setDebug({ focusedGuideKeys });
