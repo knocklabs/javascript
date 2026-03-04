@@ -4486,6 +4486,7 @@ describe("KnockGuideClient", () => {
       vi.spyOn(client, "subscribe").mockImplementation(() => {});
 
       const clearGroupStageSpy = vi.spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         client as any,
         "clearGroupStage",
       );
@@ -4615,6 +4616,7 @@ describe("KnockGuideClient", () => {
       vi.spyOn(client, "subscribe").mockImplementation(() => {});
 
       const clearGroupStageSpy = vi.spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         client as any,
         "clearGroupStage",
       );
