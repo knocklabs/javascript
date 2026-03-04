@@ -596,6 +596,10 @@ export class KnockGuideClient {
     this.knock.log("[Guide] .setDebug()");
     const shouldRefetch = !this.store.state.debug?.debugging;
 
+    // Clear the stage before updating the store state to let the next render
+    // cycle run with a fresh group stage.
+    this.clearGroupStage();
+
     this.store.setState((state) => ({
       ...state,
       debug: {
@@ -619,6 +623,10 @@ export class KnockGuideClient {
   unsetDebug() {
     this.knock.log("[Guide] .unsetDebug()");
     const shouldRefetch = this.store.state.debug?.debugging;
+
+    // Clear the stage before updating the store state to let the next render
+    // cycle run with a fresh group stage.
+    this.clearGroupStage();
 
     this.store.setState((state) => ({ ...state, debug: undefined }));
 

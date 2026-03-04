@@ -16,7 +16,7 @@ import {
   DisplayOption,
   GuidesListDisplaySelect,
 } from "./GuidesListDisplaySelect";
-import { getRunConfig } from "./helpers";
+import { clearRunConfigLS, getRunConfig } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResult,
@@ -123,6 +123,7 @@ export const V2 = () => {
               <Button
                 onClick={() => {
                   setRunConfig((curr) => ({ ...curr, isVisible: false }));
+                  clearRunConfigLS();
                   client.unsetDebug();
                 }}
                 size="1"
