@@ -50,8 +50,10 @@ export const getRunConfig = (): ToolbarV2RunConfig => {
 
 const writeRunConfigLS = (config: ToolbarV2RunConfig) => {
   const win = checkForWindow();
+  if (!win || !win.localStorage) return;
+
   try {
-    win?.localStorage?.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config));
+    win.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config));
   } catch {
     // localStorage may be unavailable (e.g. private browsing)
   }
@@ -59,8 +61,10 @@ const writeRunConfigLS = (config: ToolbarV2RunConfig) => {
 
 const readRunConfigLS = (): ToolbarV2RunConfig | undefined => {
   const win = checkForWindow();
+  if (!win || !win.localStorage) return undefined;
+
   try {
-    const stored = win?.localStorage?.getItem(LOCAL_STORAGE_KEY);
+    const stored = win.localStorage.getItem(LOCAL_STORAGE_KEY);
     if (stored) {
       return JSON.parse(stored);
     }
@@ -72,8 +76,10 @@ const readRunConfigLS = (): ToolbarV2RunConfig | undefined => {
 
 export const clearRunConfigLS = () => {
   const win = checkForWindow();
+  if (!win || !win.localStorage) return;
+
   try {
-    win?.localStorage?.removeItem(LOCAL_STORAGE_KEY);
+    win.localStorage.removeItem(LOCAL_STORAGE_KEY);
   } catch {
     // localStorage may be unavailable (e.g. private browsing)
   }
