@@ -53,15 +53,16 @@ export const V2 = () => {
   const { client } = useGuideContext();
 
   const [guidesListDisplayOption, setGuidesListDisplayOption] =
-    React.useState<DisplayOption>("only-displayable");
+    React.useState<DisplayOption>("all-guides");
 
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
-  const [isCollapsed, setIsCollapsed] = React.useState(true);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   React.useEffect(() => {
+    const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
-    if (runConfig?.isVisible && !isDebugging) {
-      client.setDebug();
+    if (isVisible && !isDebugging) {
+      client.setDebug({ focusedGuideKeys });
     }
 
     return () => {
@@ -77,7 +78,7 @@ export const V2 = () => {
     initialPosition: { top: 16, right: 16 },
   });
 
-  const result = useInspectGuideClientStore();
+  const result = useInspectGuideClientStore(runConfig);
   if (!result || !runConfig?.isVisible) {
     return null;
   }

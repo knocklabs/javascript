@@ -121,8 +121,11 @@ const setSnapshot = (partial: Record<string, unknown>) => {
 };
 
 // Shorthand for rendering the hook and extracting the result.
-const renderInspect = () => {
-  const { result } = renderHook(() => useInspectGuideClientStore());
+const defaultRunConfig = { isVisible: true };
+const renderInspect = (
+  runConfig: { isVisible: boolean; focusedGuideKeys?: Record<string, true> } = defaultRunConfig,
+) => {
+  const { result } = renderHook(() => useInspectGuideClientStore(runConfig));
   return result.current;
 };
 
@@ -1540,6 +1543,104 @@ describe("useInspectGuideClientStore", () => {
           selectable: { status: "queried", query: {} },
         }),
       ).toBe(true);
+    });
+  });
+
+  // ----- focused guide (no_guide_present) -----
+
+  describe("focused guide filtering", () => {
+    test("returns no_guide_present when focused guide is not selectable on closed stage", () => {
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect({
+        isVisible: true,
+        focusedGuideKeys: { other_guide: true },
+      });
+      expect(result).toEqual({ error: "no_guide_present", guides: [] });
+    });
+
+    test("returns guides normally when focused guide is selectable", () => {
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect({
+        isVisible: true,
+        focusedGuideKeys: { g1: true },
+      });
+      expect(result!.guides).toHaveLength(1);
+      expect(result!.guides[0]!.key).toBe("g1");
+      expect(result!.error).toBeUndefined();
+    });
+
+    test("skips focused guide check when focusedGuideKeys is not set", () => {
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect({ isVisible: true });
+      expect(result!.guides).toHaveLength(1);
+      expect(result!.error).toBeUndefined();
+    });
+
+    test("skips focused guide check when stage is not closed", () => {
+      mockGroupStage = {
+        status: "open",
+        ordered: [],
+        results: {},
+        timeoutId: null,
+      };
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect({
+        isVisible: true,
+        focusedGuideKeys: { missing: true },
+      });
+      expect(result!.guides).toHaveLength(1);
+      expect(result!.error).toBeUndefined();
     });
   });
 });

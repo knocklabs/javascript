@@ -118,6 +118,56 @@ describe("Toolbar V2 helpers", () => {
       expect(config).toEqual({ isVisible: false });
     });
 
+    test("includes focusedGuideKeys when focused_guide_key URL param is present", () => {
+      Object.defineProperty(window, "location", {
+        value: {
+          search: "?knock_guide_toolbar=true&focused_guide_key=my_guide",
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      const config = getRunConfig();
+
+      expect(config).toEqual({
+        isVisible: true,
+        focusedGuideKeys: { my_guide: true },
+      });
+    });
+
+    test("writes focusedGuideKeys to localStorage when focused_guide_key param is present", () => {
+      Object.defineProperty(window, "location", {
+        value: {
+          search: "?knock_guide_toolbar=true&focused_guide_key=my_guide",
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      getRunConfig();
+
+      expect(setItemSpy).toHaveBeenCalledWith(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({
+          isVisible: true,
+          focusedGuideKeys: { my_guide: true },
+        }),
+      );
+    });
+
+    test("does not include focusedGuideKeys when focused_guide_key param is absent", () => {
+      Object.defineProperty(window, "location", {
+        value: { search: "?knock_guide_toolbar=true" },
+        writable: true,
+        configurable: true,
+      });
+
+      const config = getRunConfig();
+
+      expect(config).toEqual({ isVisible: true });
+      expect(config).not.toHaveProperty("focusedGuideKeys");
+    });
+
     test("URL param takes precedence over localStorage", () => {
       Object.defineProperty(window, "location", {
         value: { search: "?knock_guide_toolbar=false" },

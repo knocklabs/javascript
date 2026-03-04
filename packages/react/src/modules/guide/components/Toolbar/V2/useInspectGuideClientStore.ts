@@ -9,6 +9,8 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
+import { ToolbarV2RunConfig } from "./helpers";
+
 const byKey = <T extends { key: string }>(items: T[]) => {
   return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});
 };
@@ -115,7 +117,7 @@ export type UnknownGuide = {
 
 export type InspectionResult = {
   guides: (AnnotatedGuide | UnknownGuide)[];
-  error?: "no_guide_group";
+  error?: "no_guide_group" | "no_guide_present";
 };
 
 type StoreStateSnapshot = Pick<
@@ -394,7 +396,9 @@ const newUnknownGuide = (key: KnockGuide["key"]) =>
     },
   }) as UnknownGuide;
 
-export const useInspectGuideClientStore = (): InspectionResult | undefined => {
+export const useInspectGuideClientStore = (
+  runConfig: ToolbarV2RunConfig,
+): InspectionResult | undefined => {
   const { client } = useGuideContext();
 
   // Extract a snapshot of the client store state for debugging.
@@ -439,6 +443,20 @@ export const useInspectGuideClientStore = (): InspectionResult | undefined => {
 
     return annotateGuide(guide, snapshot, groupStage);
   });
+
+  // Check if the focused guide actually exists and is selectable on the page.
+  if (groupStage?.status === "closed" && runConfig.focusedGuideKeys) {
+    const focusableGuide = orderedGuides.find(
+      (g) =>
+        runConfig.focusedGuideKeys![g.key] && g.annotation.selectable.status,
+    );
+    if (!focusableGuide) {
+      return {
+        error: "no_guide_present",
+        guides: [],
+      };
+    }
+  }
 
   return {
     guides: orderedGuides,
