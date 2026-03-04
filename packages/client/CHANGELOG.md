@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.4
+
+### Patch Changes
+
+- c134f53: [guides] read and write toolbar run config via local stroage
+
 ## 0.21.3
 
 ### Patch Changes

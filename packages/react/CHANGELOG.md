@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.6
+
+### Patch Changes
+
+- c134f53: [guides] read and write toolbar run config via local stroage
+- ddb24b4: [guides] add support for focused_guide_key param in toolbar run config
+- Updated dependencies [c134f53]
+  - @knocklabs/client@0.21.4
+  - @knocklabs/react-core@0.13.4
+
 ## 0.11.5
 
 ### Patch Changes
