@@ -252,7 +252,7 @@ export const V2 = () => {
                   />
                 </Tooltip>
 
-                <Tooltip label="Ignore throttle: Show next guide immdiately">
+                <Tooltip label="Ignore throttle: Show next guide immediately">
                   <Button
                     size="1"
                     variant={
@@ -292,7 +292,7 @@ export const V2 = () => {
               </Stack>
             </Stack>
 
-            {/* Right: exit + mininmize buttons */}
+            {/* Right: exit + minimize buttons */}
             <Stack
               align="center"
               gap="1_5"
