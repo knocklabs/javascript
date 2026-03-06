@@ -4538,7 +4538,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/react@npm:0.11.6, @knocklabs/react@workspace:*, @knocklabs/react@workspace:^, @knocklabs/react@workspace:packages/react":
+"@knocklabs/react@npm:0.11.7, @knocklabs/react@workspace:*, @knocklabs/react@workspace:^, @knocklabs/react@workspace:packages/react":
   version: 0.0.0-use.local
   resolution: "@knocklabs/react@workspace:packages/react"
   dependencies:
@@ -16359,7 +16359,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ms-teams-connect-example@workspace:examples/ms-teams-connect-example"
   dependencies:
-    "@knocklabs/react": "npm:0.11.6"
+    "@knocklabs/react": "npm:0.11.7"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
@@ -19260,7 +19260,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "slack-connect-example@workspace:examples/slack-connect-example"
   dependencies:
-    "@knocklabs/react": "npm:0.11.6"
+    "@knocklabs/react": "npm:0.11.7"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
@@ -19280,7 +19280,7 @@ __metadata:
   resolution: "slack-kit-example@workspace:examples/slack-kit-example"
   dependencies:
     "@knocklabs/node": "npm:^1.11.2"
-    "@knocklabs/react": "npm:0.11.6"
+    "@knocklabs/react": "npm:0.11.7"
     "@tailwindcss/postcss": "npm:^4.1.18"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
