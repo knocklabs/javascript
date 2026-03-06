@@ -1,9 +1,11 @@
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
+import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
 import { Tag } from "@telegraph/tag";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
+import { Gauge } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -254,8 +256,19 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
       >
         {/* Left section: order + key */}
         <Stack align="center" gap="1_5" style={{ minWidth: 0, flex: 1 }}>
-          <Stack w="5" justify="flex-end">
-            <Text as="span" size="1" weight="medium" style={{ flexShrink: 0 }}>
+          <Stack w="7" justify="space-between" align="center" gap="0_5">
+            <Box w="3">
+              {!guide.bypass_global_group_limit && (
+                <Icon icon={Gauge} size="0" color="gray" alt="Unthrottled" />
+              )}
+            </Box>
+            <Text
+              as="span"
+              size="1"
+              weight="medium"
+              color={guide.bypass_global_group_limit ? "blue" : "default"}
+              style={{ flexShrink: 0 }}
+            >
               {orderIndex + 1}
             </Text>
           </Stack>
@@ -276,7 +289,6 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
               }}
             >
               {guide.key}
-              {guide.bypass_global_group_limit ? " (u)" : ""}
             </Text>
           </Tooltip>
         </Stack>

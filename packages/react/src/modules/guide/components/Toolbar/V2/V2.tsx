@@ -30,7 +30,7 @@ import {
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
 
-const TOOLBAR_WIDTH = "520px";
+const TOOLBAR_WIDTH = "540px";
 
 type DisplayOption = "all-guides" | "only-eligible" | "only-displayable";
 
