@@ -70,7 +70,7 @@ type SelectableStatusAbsent = {
 };
 type SelectableStatus = SelectableStatusPresent | SelectableStatusAbsent;
 
-type AnnotatedStatuses = {
+export type AnnotatedStatuses = {
   // Individual eligibility statuses:
   active: ActiveStatus;
   targetable: TargetableStatus;
@@ -115,10 +115,16 @@ export type UnknownGuide = {
   };
 };
 
-export type InspectionResult = {
+export type InspectionResultOk = {
+  status: "ok";
   guides: (AnnotatedGuide | UnknownGuide)[];
-  error?: "no_guide_group" | "no_guide_present";
 };
+type InspectionResultError = {
+  status: "error";
+  error: "no_guides_fetched" | "no_guide_group" | "no_guide_present";
+  message: string;
+};
+type InspectionResult = InspectionResultOk | InspectionResultError;
 
 type StoreStateSnapshot = Pick<
   KnockGuideClientStoreState,
@@ -128,6 +134,7 @@ type StoreStateSnapshot = Pick<
   | "ineligibleGuides"
   | "debug"
   | "counter"
+  | "queries"
 > & {
   throttled: boolean;
 };
@@ -412,6 +419,7 @@ export const useInspectGuideClientStore = (
       ineligibleGuides: state.ineligibleGuides,
       debug: state.debug,
       counter: state.counter,
+      queries: state.queries,
       throttled,
     };
   });
@@ -421,13 +429,23 @@ export const useInspectGuideClientStore = (
     return undefined;
   }
 
-  // Only for completeness, as there should always be a default group so this
-  // should never happen.
+  // No recorded fetch requests, which implies an inflight request loading.
+  const req = Object.entries(snapshot.queries)[0];
+  if (!req || req[1].status === "loading") {
+    return {
+      status: "error",
+      error: "no_guides_fetched",
+      message: "Loading...",
+    };
+  }
+
+  // Should always be a default group so this should never happen.
   const defaultGroup = snapshot.guideGroups[0];
   if (!defaultGroup) {
     return {
+      status: "error",
       error: "no_guide_group",
-      guides: [],
+      message: "No guide group found",
     };
   }
 
@@ -445,20 +463,22 @@ export const useInspectGuideClientStore = (
   });
 
   // Check if the focused guide actually exists and is selectable on the page.
-  if (groupStage?.status === "closed" && runConfig.focusedGuideKeys) {
+  const focusedGuideKey = Object.keys(runConfig.focusedGuideKeys || {})[0];
+  if (groupStage?.status === "closed" && focusedGuideKey) {
     const focusableGuide = orderedGuides.find(
-      (g) =>
-        runConfig.focusedGuideKeys![g.key] && g.annotation.selectable.status,
+      (g) => g.key === focusedGuideKey && g.annotation.selectable.status,
     );
     if (!focusableGuide) {
       return {
+        status: "error",
         error: "no_guide_present",
-        guides: [],
+        message: `No component that can render \`${focusedGuideKey}\` was found`,
       };
     }
   }
 
   return {
+    status: "ok",
     guides: orderedGuides,
   };
 };

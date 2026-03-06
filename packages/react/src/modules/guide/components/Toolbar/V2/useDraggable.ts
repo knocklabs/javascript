@@ -17,9 +17,12 @@ type UseDraggableReturn = {
   position: Position;
   isDragging: boolean;
   handlePointerDown: (e: React.PointerEvent) => void;
+  /** True if the pointer moved beyond a small threshold during the last interaction. */
+  hasDraggedRef: React.RefObject<boolean>;
 };
 
 const DEFAULT_POSITION: Position = { top: 16, right: 16 };
+const DRAG_THRESHOLD = 5;
 
 /**
  * @param rightPadding Extra space to reserve on the right edge (e.g. for a
@@ -63,6 +66,7 @@ export function useDraggable({
   const startPositionRef = React.useRef<Position>({ top: 0, right: 0 });
   const rafIdRef = React.useRef<number | null>(null);
   const isDraggingRef = React.useRef(false);
+  const hasDraggedRef = React.useRef(false);
   const cleanupListenersRef = React.useRef<(() => void) | null>(null);
 
   const reclamp = React.useCallback(() => {
@@ -81,10 +85,17 @@ export function useDraggable({
       startPointerRef.current = { x: e.clientX, y: e.clientY };
       startPositionRef.current = { ...positionRef.current };
       isDraggingRef.current = true;
+      hasDraggedRef.current = false;
       setIsDragging(true);
 
       const onPointerMove = (moveEvent: PointerEvent) => {
         if (!isDraggingRef.current) return;
+
+        const dx = moveEvent.clientX - startPointerRef.current.x;
+        const dy = moveEvent.clientY - startPointerRef.current.y;
+        if (!hasDraggedRef.current && Math.hypot(dx, dy) >= DRAG_THRESHOLD) {
+          hasDraggedRef.current = true;
+        }
 
         if (rafIdRef.current !== null) return;
 
@@ -155,5 +166,5 @@ export function useDraggable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, reclampDeps);
 
-  return { position, isDragging, handlePointerDown };
+  return { position, isDragging, handlePointerDown, hasDraggedRef };
 }
