@@ -116,6 +116,7 @@ const setSnapshot = (partial: Record<string, unknown>) => {
     ineligibleGuides: {},
     debug: { debugging: true },
     counter: 0,
+    queries: { default: { status: "done" } },
     ...partial,
   };
 };
@@ -166,8 +167,9 @@ describe("useInspectGuideClientStore", () => {
     setSnapshot({ guideGroups: [] });
     const result = renderInspect();
     expect(result).toEqual({
+      status: "error",
       error: "no_guide_group",
-      guides: [],
+      message: "No guide group found",
     });
   });
 
@@ -1570,7 +1572,11 @@ describe("useInspectGuideClientStore", () => {
         isVisible: true,
         focusedGuideKeys: { other_guide: true },
       });
-      expect(result).toEqual({ error: "no_guide_present", guides: [] });
+      expect(result).toEqual({
+        status: "error",
+        error: "no_guide_present",
+        message: "No component that can render `other_guide` was found",
+      });
     });
 
     test("returns guides normally when focused guide is selectable", () => {
