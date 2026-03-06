@@ -259,7 +259,12 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
           <Stack w="7" justify="space-between" align="center" gap="0_5">
             <Box w="3">
               {!guide.bypass_global_group_limit && (
-                <Icon icon={Gauge} size="0" color="gray" alt="Subject to throttling" />
+                <Icon
+                  icon={Gauge}
+                  size="0"
+                  color="gray"
+                  alt="Subject to throttling"
+                />
               )}
             </Box>
             <Text
