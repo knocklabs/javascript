@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.7
+
+### Patch Changes
+
+- 838b1fd: [guides] designs update for guide toolbar v2
+
 ## 0.11.6
 
 ### Patch Changes
