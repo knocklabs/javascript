@@ -1,82 +1,117 @@
-import { useGuideContext } from "@knocklabs/react-core";
+import { useGuideContext, useStore } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
+import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
+import { SegmentedControl } from "@telegraph/segmented-control";
+import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
-import { Minimize2, Undo2 } from "lucide-react";
+import {
+  Box as BoxIcon,
+  ChevronDown,
+  ChevronRight,
+  Gauge,
+  GripVertical,
+  LogOut,
+  Minimize2,
+  SlidersHorizontal,
+} from "lucide-react";
 import React from "react";
 
 import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
-import { DRAG_HANDLE_OVERHANG, DragHandle } from "./DragHandle";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import {
-  DisplayOption,
-  GuidesListDisplaySelect,
-} from "./GuidesListDisplaySelect";
 import { clearRunConfigLS, getRunConfig } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
-  InspectionResult,
+  InspectionResultOk,
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
+
+const TOOLBAR_WIDTH = "520px";
+
+type DisplayOption = "all-guides" | "only-eligible" | "only-displayable";
 
 const GuidesList = ({
   guides,
   displayOption,
 }: {
-  guides: InspectionResult["guides"];
+  guides: InspectionResultOk["guides"];
   displayOption: DisplayOption;
 }) => {
-  return guides.map((guide, idx) => {
-    const { isEligible, isQualified, selectable } = guide.annotation;
-    const isDisplayable = isEligible && isQualified;
-    const isDisplaying = isDisplayable && selectable.status === "returned";
+  const [expandedGuideRowKey, setExpandedGuideRowKey] = React.useState<
+    string | undefined
+  >();
 
-    if (displayOption === "only-displaying" && !isDisplaying) {
-      return null;
-    }
+  React.useEffect(() => {
+    setExpandedGuideRowKey(undefined);
+  }, [displayOption]);
+
+  return guides.map((guide, idx) => {
+    const { isEligible, isQualified } = guide.annotation;
+    const isDisplayable = isEligible && isQualified;
+
     if (displayOption === "only-displayable" && !isDisplayable) {
       return null;
     }
-    if (displayOption === "all-eligible" && !isEligible) {
+    if (displayOption === "only-eligible" && !isEligible) {
       return null;
     }
-
-    return <GuideRow key={guide.key} guide={guide} orderIndex={idx} />;
+    return (
+      <GuideRow
+        key={guide.key}
+        guide={guide}
+        orderIndex={idx}
+        isExpanded={guide.key === expandedGuideRowKey}
+        onClick={() => {
+          setExpandedGuideRowKey((k) =>
+            k && k === guide.key ? undefined : guide.key,
+          );
+        }}
+      />
+    );
   });
 };
 
 export const V2 = () => {
   const { client } = useGuideContext();
 
-  const [guidesListDisplayOption, setGuidesListDisplayOption] =
-    React.useState<DisplayOption>("all-guides");
-
+  const [displayOption, setDisplayOption] =
+    React.useState<DisplayOption>("only-eligible");
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
+
+  const { debugSettings } = useStore(client.store, (state) => ({
+    debugSettings: state.debug || {},
+  }));
 
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
     if (isVisible && !isDebugging) {
       client.setDebug({ focusedGuideKeys });
+
+      // If focused, switch to all guides so you can see in the list.
+      if (Object.keys(focusedGuideKeys).length > 0) {
+        setDisplayOption("all-guides");
+      }
     }
 
     return () => {
       client.unsetDebug();
     };
-  }, [runConfig, client]);
+  }, [runConfig, client, setDisplayOption]);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const { position, isDragging, handlePointerDown } = useDraggable({
-    elementRef: containerRef,
-    reclampDeps: [isCollapsed],
-    rightPadding: DRAG_HANDLE_OVERHANG,
-    initialPosition: { top: 16, right: 16 },
-  });
+  const { position, isDragging, handlePointerDown, hasDraggedRef } =
+    useDraggable({
+      elementRef: containerRef,
+      reclampDeps: [isCollapsed],
+      initialPosition: { top: 16, right: 16 },
+    });
 
   const result = useInspectGuideClientStore(runConfig);
   if (!result || !runConfig?.isVisible) {
@@ -93,68 +128,230 @@ export const V2 = () => {
         zIndex: TOOLBAR_Z_INDEX,
       }}
     >
-      <DragHandle onPointerDown={handlePointerDown} isDragging={isDragging} />
       {isCollapsed ? (
-        <KnockButton onClick={() => setIsCollapsed(false)} positioned={false} />
+        <Stack
+          border="px"
+          rounded="4"
+          align="center"
+          justify="center"
+          w="10"
+          h="10"
+          onPointerDown={handlePointerDown}
+          backgroundColor="surface-1"
+          style={{
+            cursor: isDragging ? "grabbing" : "grab",
+            touchAction: "none",
+            userSelect: "none",
+          }}
+        >
+          <Box
+            style={{
+              transform: "scale(0.7)",
+              transformOrigin: "center center",
+            }}
+          >
+            <KnockButton
+              onClick={() => {
+                if (!hasDraggedRef.current) {
+                  setIsCollapsed(false);
+                }
+              }}
+              positioned={false}
+            />
+          </Box>
+        </Stack>
       ) : (
         <Stack
           direction="column"
-          backgroundColor="surface-2"
-          shadow="2"
-          rounded="3"
+          backgroundColor="surface-1"
+          rounded="4"
           border="px"
           overflow="hidden"
-          style={{ width: "400px" }}
+          style={{
+            width: TOOLBAR_WIDTH,
+            boxShadow: "0 8px 32px var(--tgph-gray-5)",
+          }}
         >
+          {/* Header — also acts as drag handle area */}
           <Stack
             w="full"
             p="2"
             justify="space-between"
             direction="row"
-            style={{ boxSizing: "border-box" }}
+            align="center"
+            gap="2"
+            borderBottom="px"
+            onPointerDown={handlePointerDown}
+            style={{
+              boxSizing: "border-box",
+              cursor: isDragging ? "grabbing" : "grab",
+              touchAction: "none",
+              userSelect: "none",
+            }}
           >
-            <Box style={{ width: "220px" }}>
-              <GuidesListDisplaySelect
-                value={guidesListDisplayOption}
-                onChange={(opt) => setGuidesListDisplayOption(opt)}
-              />
-            </Box>
-
-            <Stack gap="2">
-              <Button
-                onClick={() => {
-                  setRunConfig((curr) => ({ ...curr, isVisible: false }));
-                  clearRunConfigLS();
-                  client.unsetDebug();
+            {/* Left: drag icon + segmented control + settings */}
+            <Stack align="center" gap="1_5" style={{ minWidth: 0, flex: 1 }}>
+              <Stack
+                display="inline-flex"
+                align="center"
+                style={{
+                  cursor: isDragging ? "grabbing" : "grab",
+                  touchAction: "none",
+                  userSelect: "none",
                 }}
-                size="1"
-                variant="soft"
-                trailingIcon={{ icon: Undo2, "aria-hidden": true }}
+                onPointerDown={(e: React.PointerEvent) => {
+                  // Already handled by parent, prevent double-fire
+                  e.stopPropagation();
+                  handlePointerDown(e);
+                }}
               >
-                Exit
-              </Button>
-              <Button
-                onClick={() => setIsCollapsed(true)}
-                size="1"
-                variant="soft"
-                leadingIcon={{ icon: Minimize2, alt: "Collapse guide toolbar" }}
-              />
+                <Icon color="gray" size="1" icon={GripVertical} aria-hidden />
+              </Stack>
+              <Stack
+                align="center"
+                gap="1_5"
+                onPointerDown={(e: React.PointerEvent) => e.stopPropagation()}
+              >
+                <SegmentedControl.Root
+                  size="1"
+                  type="single"
+                  value={displayOption}
+                  onValueChange={(val: DisplayOption) => {
+                    if (!val) return;
+                    setDisplayOption(val);
+                  }}
+                >
+                  <SegmentedControl.Option value="all-guides">
+                    All guides
+                  </SegmentedControl.Option>
+                  <SegmentedControl.Option value="only-eligible">
+                    Eligible
+                  </SegmentedControl.Option>
+                  <SegmentedControl.Option value="only-displayable">
+                    On this page
+                  </SegmentedControl.Option>
+                </SegmentedControl.Root>
+
+                <Tooltip label="Sandbox: Contain engagement actions to client side only">
+                  <Button
+                    size="1"
+                    variant={
+                      debugSettings.skipEngagementTracking ? "outline" : "ghost"
+                    }
+                    color={
+                      debugSettings.skipEngagementTracking ? "blue" : "gray"
+                    }
+                    icon={{ icon: BoxIcon, alt: "Sandbox mode" }}
+                    onClick={() => {
+                      client.setDebug({
+                        ...debugSettings,
+                        skipEngagementTracking:
+                          !debugSettings.skipEngagementTracking,
+                      });
+                    }}
+                  />
+                </Tooltip>
+
+                <Tooltip label="Ignore throttle: Show next guide immdiately">
+                  <Button
+                    size="1"
+                    variant={
+                      debugSettings.ignoreDisplayInterval ? "outline" : "ghost"
+                    }
+                    color={
+                      debugSettings.ignoreDisplayInterval ? "blue" : "gray"
+                    }
+                    icon={{ icon: Gauge, alt: "Ignore throttle" }}
+                    onClick={() => {
+                      client.setDebug({
+                        ...debugSettings,
+                        ignoreDisplayInterval:
+                          !debugSettings.ignoreDisplayInterval,
+                      });
+                    }}
+                  />
+                </Tooltip>
+
+                <Tooltip label="Inspect target params">
+                  <Button
+                    size="1"
+                    variant={isContextPanelOpen ? "outline" : "ghost"}
+                    color={isContextPanelOpen ? "blue" : "gray"}
+                    leadingIcon={{
+                      icon: SlidersHorizontal,
+                      alt: "Inspect target params",
+                    }}
+                    trailingIcon={
+                      isContextPanelOpen
+                        ? { icon: ChevronDown, alt: "Hide context data" }
+                        : { icon: ChevronRight, alt: "Show context data" }
+                    }
+                    onClick={() => setIsContextPanelOpen((v) => !v)}
+                  />
+                </Tooltip>
+              </Stack>
+            </Stack>
+
+            {/* Right: exit + mininmize buttons */}
+            <Stack
+              align="center"
+              gap="1_5"
+              style={{ flexShrink: 0 }}
+              onPointerDown={(e: React.PointerEvent) => e.stopPropagation()}
+            >
+              <Stack align="center" gap="1_5">
+                <Button
+                  size="1"
+                  variant="outline"
+                  leadingIcon={{ icon: LogOut, alt: "Exit" }}
+                  onClick={() => {
+                    setRunConfig((curr) => ({ ...curr, isVisible: false }));
+                    clearRunConfigLS();
+                    client.unsetDebug();
+                  }}
+                >
+                  Exit
+                </Button>
+                <Tooltip label="Minimize toolbar">
+                  <Button
+                    size="1"
+                    variant="outline"
+                    leadingIcon={{ icon: Minimize2, alt: "Minimize" }}
+                    onClick={() => setIsCollapsed(true)}
+                  />
+                </Tooltip>
+              </Stack>
             </Stack>
           </Stack>
 
-          <Box w="full">
-            <GuideContextDetails />
-            {result.error && (
+          {/* Collapsible panel to show context data */}
+          {isContextPanelOpen && (
+            <Box borderBottom="px">
+              <GuideContextDetails />
+            </Box>
+          )}
+
+          {/* Guide list content area */}
+          <Box p="1" overflow="auto" style={{ maxHeight: "calc(80vh - 96px)" }}>
+            {result.status === "error" ? (
               <Box px="2" pb="1">
-                <Text as="span" size="0" weight="medium" color="red">
-                  {result.error}
+                <Text
+                  as="span"
+                  size="1"
+                  weight="medium"
+                  color={
+                    result.error === "no_guides_fetched" ? "default" : "red"
+                  }
+                >
+                  {result.message}
                 </Text>
               </Box>
+            ) : (
+              <GuidesList
+                guides={result.guides}
+                displayOption={displayOption}
+              />
             )}
-            <GuidesList
-              guides={result.guides}
-              displayOption={guidesListDisplayOption}
-            />
           </Box>
         </Stack>
       )}
