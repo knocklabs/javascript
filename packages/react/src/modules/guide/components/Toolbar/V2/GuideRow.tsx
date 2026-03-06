@@ -155,8 +155,8 @@ const getStatusDots = (
   };
 
   const archived: StatusDot = {
-    color: annotation.archived.status ? "red" : "blue",
-    tooltip: `Not archived: ${annotation.archived.status ? "Yes" : "No"}`,
+    color: !annotation.archived.status ? "blue" : "red",
+    tooltip: `Not archived: ${!annotation.archived.status ? "Yes" : "No"}`,
   };
 
   const targetable: StatusDot = {
