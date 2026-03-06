@@ -254,7 +254,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
       >
         {/* Left section: order + key */}
         <Stack align="center" gap="1_5" style={{ minWidth: 0, flex: 1 }}>
-          <Stack w="5" justify="flex-start">
+          <Stack w="5" justify="flex-end">
             <Text as="span" size="1" weight="medium" style={{ flexShrink: 0 }}>
               {orderIndex + 1}
             </Text>
