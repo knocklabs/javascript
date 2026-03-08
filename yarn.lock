@@ -4576,6 +4576,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.14"
     jsdom: "npm:^27.1.0"
     lodash.debounce: "npm:^4.0.8"
+    lucide-react: "npm:^0.544.0"
     next: "npm:15.3.6"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
