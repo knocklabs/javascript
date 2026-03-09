@@ -42,7 +42,6 @@ const SendNotificationForm = ({ userId, tenant }: Props) => {
               Message
             </Text>
             <TextArea
-              as="textarea"
               display="block"
               id="message"
               height="20"
