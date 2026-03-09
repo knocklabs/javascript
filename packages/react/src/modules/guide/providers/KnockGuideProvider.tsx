@@ -15,7 +15,7 @@ type Props = KnockGuideProviderProps & {
 // contexts (e.g. React Native).
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   children,
-  toolbar = "v1",
+  toolbar = "v2",
   ...props
 }) => {
   return (

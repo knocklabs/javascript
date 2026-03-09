@@ -88,7 +88,8 @@
     "@telegraph/tooltip": "0.1.1",
     "@telegraph/typography": "^0.2.0",
     "clsx": "^2.1.1",
-    "lodash.debounce": "^4.0.8"
+    "lodash.debounce": "^4.0.8",
+    "lucide-react": "^0.544.0"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
