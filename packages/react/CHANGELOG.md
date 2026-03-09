@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.8
+
+### Patch Changes
+
+- 9e8e3ae: [guides] default to v2 toolbar in KnockGuideProvider
+
 ## 0.11.7
 
 ### Patch Changes
