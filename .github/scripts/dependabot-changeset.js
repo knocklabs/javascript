@@ -1,9 +1,11 @@
 /**
- * Automatically creates a changeset file for Dependabot PRs that update
- * production dependencies in published @knocklabs/* packages.
+ * Creates a changeset file for Dependabot PRs that update production
+ * dependencies in published @knocklabs/* packages.
  *
- * This script is intended to be run in a GitHub Actions workflow triggered
- * by pull_request_target events from dependabot[bot].
+ * Skips devDependency-only changes since those don't require a release.
+ *
+ * This script is only run from a workflow gated to dependabot[bot],
+ * so we trust that the changes are dependency updates.
  *
  * Environment variables:
  *   PR_TITLE      - The pull request title (used as the changeset description)
@@ -41,7 +43,7 @@ if (fs.existsSync(changesetFile)) {
 
 // Find all package.json files changed in the latest commit
 const diffOutput = execSync(
-  "git diff --name-only HEAD~1 HEAD -- '**/package.json' 'package.json'",
+  "git diff --name-only HEAD~1 HEAD -- '**/package.json'",
   { encoding: "utf-8" },
 ).trim();
 
@@ -55,12 +57,15 @@ const changedFiles = diffOutput.split("\n").filter(Boolean);
 const packages = [];
 
 for (const pkgFile of changedFiles) {
-  // Skip root package.json (private monorepo root)
-  if (pkgFile === "package.json") {
+  const content = JSON.parse(fs.readFileSync(pkgFile, "utf-8"));
+  const pkgName = content.name || "";
+
+  if (content.private || !pkgName.startsWith("@knocklabs/")) {
     continue;
   }
 
-  // Get old dependencies
+  // Only include packages where production dependencies changed,
+  // not devDependency-only updates
   let oldDeps = {};
   try {
     const oldContent = execSync(`git show "HEAD~1:${pkgFile}"`, {
@@ -68,47 +73,25 @@ for (const pkgFile of changedFiles) {
     });
     oldDeps = JSON.parse(oldContent).dependencies || {};
   } catch {
-    // File may not exist in previous commit (new package)
-    oldDeps = {};
+    // File may not exist in previous commit
   }
 
-  // Get new package contents
-  const newContent = execSync(`git show "HEAD:${pkgFile}"`, {
-    encoding: "utf-8",
-  });
-  const newPkg = JSON.parse(newContent);
-  const newDeps = newPkg.dependencies || {};
-
-  // Compare dependencies using sorted keys for stable comparison
+  const newDeps = content.dependencies || {};
   const sortedOld = JSON.stringify(oldDeps, Object.keys(oldDeps).sort());
   const sortedNew = JSON.stringify(newDeps, Object.keys(newDeps).sort());
 
   if (sortedOld === sortedNew) {
-    console.log(`No production dependency changes in ${pkgFile}, skipping`);
-    continue;
-  }
-
-  const pkgName = newPkg.name || "";
-  const isPrivate = newPkg.private === true;
-
-  if (isPrivate) {
-    console.log(`Skipping private package: ${pkgName}`);
-    continue;
-  }
-
-  if (!pkgName.startsWith("@knocklabs/")) {
-    console.log(`Skipping non-@knocklabs package: ${pkgName}`);
+    console.log(`Only devDependency changes in ${pkgName}, skipping`);
     continue;
   }
 
   packages.push(pkgName);
 }
 
-// Deduplicate and sort
 const uniquePackages = [...new Set(packages)].sort();
 
 if (uniquePackages.length === 0) {
-  console.log("No production dependency changes in published packages");
+  console.log("No published @knocklabs packages were affected");
   setOutput("created", "false");
   process.exit(0);
 }
@@ -123,7 +106,6 @@ const lines = [
   "",
 ];
 
-fs.mkdirSync(path.dirname(changesetFile), { recursive: true });
 fs.writeFileSync(changesetFile, lines.join("\n"));
 
 console.log(`Created changeset: ${changesetFile}`);
