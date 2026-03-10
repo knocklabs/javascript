@@ -1,0 +1,40 @@
+name: Dependabot Changeset
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+jobs:
+  changeset:
+    name: Add changeset for dependency update
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Detect affected packages and create changeset
+        id: changeset
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node .github/scripts/dependabot-changeset.js
+
+      - name: Commit and push changeset
+        if: steps.changeset.outputs.created == 'true'
+        run: |
+          git config user.name "knock-eng-bot"
+          git config user.email "knock-eng-bot@users.noreply.github.com"
+          git add .changeset/
+          git commit -m "chore(deps): add changeset for dependency update"
+          git push
