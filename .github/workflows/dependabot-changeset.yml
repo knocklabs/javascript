@@ -53,7 +53,7 @@ jobs:
       - name: Checkout trusted script from main
         uses: actions/checkout@v4
         with:
-          ref: kyle-kno-11961-automate-changeset-for-dependabot-dependencies-2 # TODO: change back to main before merging
+          ref: main
           sparse-checkout: .github/scripts
           path: .trusted
 
