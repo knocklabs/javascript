@@ -39,21 +39,23 @@ jobs:
             echo "ref=$PR_REF_FROM_EVENT" >> "$GITHUB_OUTPUT"
           fi
 
-      # Checkout the base branch to get the trusted version of the script,
-      # then checkout the PR branch on top to get the package.json changes.
-      - name: Checkout base branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
-          path: base
-
+      # Checkout the PR branch for package.json analysis and committing.
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.pr.outputs.ref }}
           token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
           fetch-depth: 2
+
+      # Checkout the trusted script from main into a subdirectory.
+      # This ensures we never execute code from an untrusted PR branch
+      # when triggered via workflow_dispatch.
+      - name: Checkout trusted script from main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: .github/scripts
+          path: .trusted
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -65,7 +67,7 @@ jobs:
         env:
           PR_TITLE: ${{ steps.pr.outputs.title }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
-        run: node base/.github/scripts/dependabot-changeset.js
+        run: node .trusted/.github/scripts/dependabot-changeset.js
 
       - name: Commit and push changeset
         if: steps.changeset.outputs.created == 'true'
