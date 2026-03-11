@@ -4430,8 +4430,8 @@ __metadata:
     expo-symbols: "npm:~55.0.5"
     expo-system-ui: "npm:~55.0.9"
     expo-web-browser: "npm:~55.0.9"
-    react: "npm:19.2.0"
-    react-dom: "npm:19.2.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
     react-native: "npm:0.83.2"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-reanimated: "npm:4.2.1"
@@ -4466,7 +4466,7 @@ __metadata:
     expo-device: "npm:~55.0.9"
     expo-notifications: "npm:~55.0.12"
     jsdom: "npm:^27.1.0"
-    react: "npm:19.2.0"
+    react: "npm:^19.0.0"
     react-native: "npm:0.83.2"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-render-html: "npm:^6.3.4"
@@ -4579,8 +4579,8 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.14"
-    react: "npm:19.2.0"
-    react-dom: "npm:19.2.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
     react-native: "npm:0.83.2"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-get-random-values: "npm:^1.11.0"
@@ -18275,17 +18275,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:19.2.0":
-  version: 19.2.0
-  resolution: "react-dom@npm:19.2.0"
-  dependencies:
-    scheduler: "npm:^0.27.0"
-  peerDependencies:
-    react: ^19.2.0
-  checksum: 10c0/fa2cae05248d01288e91523b590ce4e7635b1e13f1344e225f850d722a8da037bf0782f63b1c1d46353334e0c696909b82e582f8cad607948fde6f7646cc18d9
-  languageName: node
-  linkType: hard
-
 "react-dom@npm:^19.0.0":
   version: 19.1.0
   resolution: "react-dom@npm:19.1.0"
@@ -18679,13 +18668,6 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/841938ff16d16a6b76895f4cb2e1fea957e5fe3b30febbf03a54892dae1c9153f2383e231dea0b3ba41192ad2f2849448fa859caccd288943bce32639e971bee
-  languageName: node
-  linkType: hard
-
-"react@npm:19.2.0":
-  version: 19.2.0
-  resolution: "react@npm:19.2.0"
-  checksum: 10c0/1b6d64eacb9324725bfe1e7860cb7a6b8a34bc89a482920765ebff5c10578eb487e6b46b2f0df263bd27a25edbdae2c45e5ea5d81ae61404301c1a7192c38330
   languageName: node
   linkType: hard
 
@@ -19439,7 +19421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:0.27.0, scheduler@npm:^0.27.0":
+"scheduler@npm:0.27.0":
   version: 0.27.0
   resolution: "scheduler@npm:0.27.0"
   checksum: 10c0/4f03048cb05a3c8fddc45813052251eca00688f413a3cee236d984a161da28db28ba71bd11e7a3dd02f7af84ab28d39fb311431d3b3772fed557945beb00c452
