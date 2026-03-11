@@ -47,7 +47,7 @@
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
-    "react-native-gesture-handler": "^2.27.1",
+    "react-native-gesture-handler": "~2.30.0",
     "react-native-get-random-values": "^1.11.0",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "^15.12.0"
@@ -63,9 +63,9 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.14",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-native": "^0.79.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.2",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
