@@ -21,18 +21,32 @@ jobs:
         id: pr
         env:
           GH_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR_NUMBER: ${{ inputs.pr-number }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER_FROM_EVENT: ${{ github.event.pull_request.number }}
+          PR_TITLE_FROM_EVENT: ${{ github.event.pull_request.title }}
+          PR_REF_FROM_EVENT: ${{ github.event.pull_request.head.ref }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            PR_NUMBER="${{ inputs.pr-number }}"
-            PR_JSON=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json title,headRefName)
-            echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            PR_JSON=$(gh pr view "$INPUT_PR_NUMBER" --repo "$REPO" --json title,headRefName)
+            echo "number=$INPUT_PR_NUMBER" >> "$GITHUB_OUTPUT"
             echo "title=$(echo "$PR_JSON" | jq -r '.title')" >> "$GITHUB_OUTPUT"
             echo "ref=$(echo "$PR_JSON" | jq -r '.headRefName')" >> "$GITHUB_OUTPUT"
           else
-            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
-            echo "title=${{ github.event.pull_request.title }}" >> "$GITHUB_OUTPUT"
-            echo "ref=${{ github.event.pull_request.head.ref }}" >> "$GITHUB_OUTPUT"
+            echo "number=$PR_NUMBER_FROM_EVENT" >> "$GITHUB_OUTPUT"
+            echo "title=$PR_TITLE_FROM_EVENT" >> "$GITHUB_OUTPUT"
+            echo "ref=$PR_REF_FROM_EVENT" >> "$GITHUB_OUTPUT"
           fi
+
+      # Checkout the base branch to get the trusted version of the script,
+      # then checkout the PR branch on top to get the package.json changes.
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+          path: base
 
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -51,7 +65,7 @@ jobs:
         env:
           PR_TITLE: ${{ steps.pr.outputs.title }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
-        run: node .github/scripts/dependabot-changeset.js
+        run: node base/.github/scripts/dependabot-changeset.js
 
       - name: Commit and push changeset
         if: steps.changeset.outputs.created == 'true'
