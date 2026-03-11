@@ -1,7 +1,7 @@
 name: Dependabot Changeset
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened]
   workflow_dispatch:
     inputs:
@@ -9,6 +9,10 @@ on:
         description: "Pull request number to add a changeset for"
         required: true
         type: string
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
   changeset:
