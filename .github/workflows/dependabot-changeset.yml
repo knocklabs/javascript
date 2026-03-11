@@ -1,0 +1,77 @@
+name: Dependabot Changeset
+
+on:
+  pull_request_target:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: "Pull request number to add a changeset for"
+        required: true
+        type: string
+
+jobs:
+  changeset:
+    name: Add changeset for dependency update
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Get PR metadata
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR_NUMBER: ${{ inputs.pr-number }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER_FROM_EVENT: ${{ github.event.pull_request.number }}
+          PR_TITLE_FROM_EVENT: ${{ github.event.pull_request.title }}
+          PR_REF_FROM_EVENT: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            PR_JSON=$(gh pr view "$INPUT_PR_NUMBER" --repo "$REPO" --json title,headRefName)
+            echo "number=$INPUT_PR_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "title=$(echo "$PR_JSON" | jq -r '.title')" >> "$GITHUB_OUTPUT"
+            echo "ref=$(echo "$PR_JSON" | jq -r '.headRefName')" >> "$GITHUB_OUTPUT"
+          else
+            echo "number=$PR_NUMBER_FROM_EVENT" >> "$GITHUB_OUTPUT"
+            echo "title=$PR_TITLE_FROM_EVENT" >> "$GITHUB_OUTPUT"
+            echo "ref=$PR_REF_FROM_EVENT" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Checkout the base branch to get the trusted version of the script,
+      # then checkout the PR branch on top to get the package.json changes.
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+          path: base
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.ref }}
+          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Detect affected packages and create changeset
+        id: changeset
+        env:
+          PR_TITLE: ${{ steps.pr.outputs.title }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: node base/.github/scripts/dependabot-changeset.js
+
+      - name: Commit and push changeset
+        if: steps.changeset.outputs.created == 'true'
+        run: |
+          git config user.name "knock-eng-bot"
+          git config user.email "knock-eng-bot@users.noreply.github.com"
+          git add .changeset/
+          git commit -m "chore(deps): add changeset for dependency update"
+          git push
