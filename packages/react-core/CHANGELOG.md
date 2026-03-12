@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.5
+
+### Patch Changes
+
+- Updated dependencies [c5babb3]
+  - @knocklabs/client@0.21.5
+
 ## 0.13.4
 
 ### Patch Changes

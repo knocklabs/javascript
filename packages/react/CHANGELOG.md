@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.9
+
+### Patch Changes
+
+- 766e5c1: chore(deps): bump the telegraph-packages group with 7 updates
+- Updated dependencies [c5babb3]
+  - @knocklabs/client@0.21.5
+  - @knocklabs/react-core@0.13.5
+
 ## 0.11.8
 
 ### Patch Changes

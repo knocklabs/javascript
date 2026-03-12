@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.5
+
+### Patch Changes
+
+- c5babb3: fix: use nanoid/non-secure to avoid unnecessary dependency on crypto
+
 ## 0.21.4
 
 ### Patch Changes
