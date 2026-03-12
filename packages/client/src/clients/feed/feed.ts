@@ -1,6 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 
 import { isValidUuid } from "../../helpers";
 import Knock from "../../knock";
