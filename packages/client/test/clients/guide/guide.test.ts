@@ -150,6 +150,31 @@ describe("KnockGuideClient", () => {
     tenant: "tenant_123",
   };
 
+  function createSubscribableMocks(socketOverrides: Record<string, unknown> = {}) {
+    const mockChannel = {
+      join: vi.fn().mockReturnValue({
+        receive: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+        }),
+      }),
+      on: vi.fn(),
+      off: vi.fn(),
+      leave: vi.fn(),
+      state: "closed",
+    };
+
+    const mockSocket = {
+      channel: vi.fn().mockReturnValue(mockChannel),
+      isConnected: vi.fn().mockReturnValue(true),
+      connect: vi.fn(),
+      onOpen: vi.fn().mockReturnValue("listener_1"),
+      off: vi.fn(),
+      ...socketOverrides,
+    };
+
+    return { mockChannel, mockSocket };
+  }
+
   describe("constructor", () => {
     test("initializes with default options", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -371,6 +396,34 @@ describe("KnockGuideClient", () => {
         });
       }
     });
+
+    test("skips fetch when query was already fetched", async () => {
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce({
+        entries: [],
+      });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      vi.mocked(mockKnock.user.getGuides).mockClear();
+      await client.fetch();
+
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+    });
+
+    test("re-fetches when force is true even if query was already fetched", async () => {
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue({
+        entries: [],
+      });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      vi.mocked(mockKnock.user.getGuides).mockClear();
+      await client.fetch({ force: true });
+
+      expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
+    });
   });
 
   describe("subscribe/unsubscribe", () => {
@@ -393,6 +446,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
@@ -415,6 +470,71 @@ describe("KnockGuideClient", () => {
         }),
       );
       expect(mockChannel.join).toHaveBeenCalled();
+    });
+
+    test("refetches guides on socket reconnect but not on initial connection when socket starts disconnected", async () => {
+      let onOpenCallback: () => void;
+      const { mockSocket } = createSubscribableMocks({
+        isConnected: vi.fn().mockReturnValue(false),
+        onOpen: vi.fn((cb) => {
+          onOpenCallback = cb;
+          return "listener_1";
+        }),
+      });
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue({ entries: [] });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+
+      // First onOpen is the initial connection — should be skipped.
+      onOpenCallback!();
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+
+      // Second onOpen is a reconnect — should trigger a refetch.
+      onOpenCallback!();
+      await vi.waitFor(() => {
+        expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
+      });
+    });
+
+    test("refetches guides on first onOpen when socket is already connected at subscribe time", async () => {
+      let onOpenCallback: () => void;
+      const { mockSocket } = createSubscribableMocks({
+        isConnected: vi.fn().mockReturnValue(true),
+        onOpen: vi.fn((cb) => {
+          onOpenCallback = cb;
+          return "listener_1";
+        }),
+      });
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue({ entries: [] });
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+
+      // Socket was already connected, so no initial open to skip — first onOpen is a reconnect.
+      onOpenCallback!();
+      await vi.waitFor(() => {
+        expect(mockKnock.user.getGuides).toHaveBeenCalledOnce();
+      });
+    });
+
+    test("cleans up socket onOpen listener when unsubscribing", () => {
+      const { mockSocket } = createSubscribableMocks();
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+      client.unsubscribe();
+
+      expect(mockSocket.off).toHaveBeenCalledWith(["listener_1"]);
     });
 
     test("handles successful channel join", () => {
@@ -440,6 +560,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
@@ -495,6 +617,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
@@ -570,6 +694,8 @@ describe("KnockGuideClient", () => {
         channel: vi.fn().mockReturnValue(mockChannel),
         isConnected: vi.fn().mockReturnValue(true),
         connect: vi.fn(),
+        onOpen: vi.fn().mockReturnValue("ref_1"),
+        off: vi.fn(),
       };
 
       mockApiClient.socket = mockSocket as unknown as Socket;
