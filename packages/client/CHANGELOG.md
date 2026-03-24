@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.6
+
+### Patch Changes
+
+- afae7ce: [guides] Export StepMessageState type definition from guide client types
+
 ## 0.21.5
 
 ### Patch Changes
