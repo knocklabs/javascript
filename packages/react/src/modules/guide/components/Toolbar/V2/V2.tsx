@@ -105,6 +105,33 @@ export const V2 = () => {
     };
   }, [runConfig, client, setDisplayOption]);
 
+  // Toggle collapsed state when Ctrl is pressed and released alone
+  // (without combining with another key), similar to Vercel's toolbar.
+  React.useEffect(() => {
+    let ctrlUsedInCombo = false;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Control") {
+        ctrlUsedInCombo = false;
+      } else if (e.ctrlKey) {
+        ctrlUsedInCombo = true;
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Control" && !ctrlUsedInCombo) {
+        setIsCollapsed((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { position, isDragging, handlePointerDown, hasDraggedRef } =
     useDraggable({
