@@ -334,7 +334,7 @@ export const V2 = () => {
           {/* Guide list content area */}
           <Box p="1" overflow="auto" style={{ maxHeight: "calc(80vh - 96px)" }}>
             {result.status === "error" ? (
-              <Box px="2" pb="1">
+              <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
                 <Text
                   as="span"
                   size="1"
