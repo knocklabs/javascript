@@ -12,6 +12,7 @@ export type {
   SelectFilterParams as KnockGuideFilterParams,
   SelectGuideOpts as KnockSelectGuideOpts,
   SelectGuidesOpts as KnockSelectGuidesOpts,
+  StepMessageState as KnockGuideStepMessageState,
   StoreState as KnockGuideClientStoreState,
   GroupStage as KnockGuideClientGroupStage,
   SelectionResult as KnockGuideSelectionResult,
