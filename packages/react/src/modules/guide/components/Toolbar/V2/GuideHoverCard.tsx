@@ -6,19 +6,19 @@ import * as React from "react";
 
 import {
   AnnotatedGuide,
-  UnknownGuide,
-  isUnknownGuide,
+  UncommittedGuide,
+  isUncommittedGuide,
 } from "./useInspectGuideClientStore";
 
 type Props = {
-  guide: AnnotatedGuide | UnknownGuide;
+  guide: AnnotatedGuide | UncommittedGuide;
 };
 
 export const GuideHoverCard = ({
   children,
   guide,
 }: React.PropsWithChildren<Props>) => {
-  if (isUnknownGuide(guide)) {
+  if (isUncommittedGuide(guide)) {
     return <Stack align="center">{children}</Stack>;
   }
 

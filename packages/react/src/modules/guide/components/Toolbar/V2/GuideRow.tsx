@@ -16,8 +16,8 @@ import { GuideRowDetails } from "./GuideRowDetails";
 import {
   AnnotatedGuide,
   AnnotatedStatuses,
-  UnknownGuide,
-  isUnknownGuide,
+  UncommittedGuide,
+  isUncommittedGuide,
 } from "./useInspectGuideClientStore";
 
 const Pill = ({
@@ -56,9 +56,9 @@ type StatusSummary = {
 };
 
 const getStatusSummary = (
-  guide: AnnotatedGuide | UnknownGuide,
+  guide: AnnotatedGuide | UncommittedGuide,
 ): StatusSummary => {
-  if (isUnknownGuide(guide)) {
+  if (isUncommittedGuide(guide)) {
     return {
       color: "red",
       label: "Inactive",
@@ -135,9 +135,9 @@ type StatusDot = {
 };
 
 const getStatusDots = (
-  guide: AnnotatedGuide | UnknownGuide,
+  guide: AnnotatedGuide | UncommittedGuide,
 ): Record<keyof AnnotatedStatuses, StatusDot> => {
-  if (isUnknownGuide(guide)) {
+  if (isUncommittedGuide(guide)) {
     return {
       active: { color: "gray" },
       archived: { color: "gray" },
@@ -193,7 +193,7 @@ const getStatusDots = (
 };
 
 type Props = {
-  guide: UnknownGuide | AnnotatedGuide;
+  guide: UncommittedGuide | AnnotatedGuide;
   orderIndex: number;
   isExpanded: boolean;
   onClick: (guideKey: string) => void;
@@ -311,7 +311,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
           <Pill
             label="Elig:"
             color={
-              isUnknownGuide(guide)
+              isUncommittedGuide(guide)
                 ? "disabled"
                 : guide.annotation.isEligible
                   ? "blue"
@@ -334,7 +334,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
           <Pill
             label="Vis:"
             color={
-              isUnknownGuide(guide)
+              isUncommittedGuide(guide)
                 ? "disabled"
                 : guide.annotation.isQualified &&
                     guide.annotation.selectable.status === "returned"
@@ -354,7 +354,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
 
           <Tooltip
             label={
-              isUnknownGuide(guide) ||
+              isUncommittedGuide(guide) ||
               guide.annotation.selectable.status === undefined
                 ? "No component found that can render this guide"
                 : isFocused
@@ -367,7 +367,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
               variant={isFocused ? "solid" : "outline"}
               color={isFocused ? "blue" : "gray"}
               disabled={
-                isUnknownGuide(guide) ||
+                isUncommittedGuide(guide) ||
                 guide.annotation.selectable.status === undefined
               }
               onClick={(e: React.MouseEvent) => {
