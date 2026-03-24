@@ -61,7 +61,7 @@
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
     "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^16.3.0",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.1.8",
     "@types/react-native-htmlview": "^0.16.6",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
