@@ -169,6 +169,7 @@ export const V2 = () => {
             cursor: isDragging ? "grabbing" : "grab",
             touchAction: "none",
             userSelect: "none",
+            animation: "toolbar-collapse-fade-in 150ms ease-out",
           }}
         >
           <Box
@@ -197,6 +198,7 @@ export const V2 = () => {
           style={{
             width: TOOLBAR_WIDTH,
             boxShadow: "0 8px 32px var(--tgph-gray-5)",
+            animation: "toolbar-expand-fade-in 150ms ease-out",
           }}
         >
           {/* Header — also acts as drag handle area */}
