@@ -12,7 +12,11 @@ import {
   StatusColor,
   GuideAnnotatedStatusDot as StatusDot,
 } from "./GuideAnnotatedStatusDot";
-import { GuideRowDetails } from "./GuideRowDetails";
+import {
+  GuideRowDetails,
+  StatusSummary,
+  getSelectableStatusSummary,
+} from "./GuideRowDetails";
 import { ERROR_MESSAGE } from "./helpers";
 import {
   AnnotatedGuide,
@@ -50,12 +54,6 @@ const Pill = ({
   );
 };
 
-type StatusSummary = {
-  color: StatusColor;
-  label: string;
-  tooltip: string;
-};
-
 const getStatusSummary = (
   guide: AnnotatedGuide | UncommittedGuide,
 ): StatusSummary => {
@@ -63,7 +61,7 @@ const getStatusSummary = (
     return {
       color: "red",
       label: "Inactive",
-      tooltip: "This guide has never been committed and published yet",
+      description: "This guide has never been committed and published yet",
     };
   }
 
@@ -73,61 +71,49 @@ const getStatusSummary = (
     return {
       color: "red",
       label: "Inactive",
-      tooltip: "This guide is inactive",
+      description: "This guide is inactive",
     };
   }
   if (annotation.archived.status) {
     return {
       color: "red",
       label: "Archived",
-      tooltip: "User has already dismissed this guide",
+      description: "User has already dismissed this guide",
     };
   }
   if (!annotation.targetable.status) {
     return {
       color: "red",
       label: "Not targeted",
-      tooltip: annotation.targetable.message,
+      description: annotation.targetable.message,
     };
   }
+
+  const selectableStatusSummary = getSelectableStatusSummary(
+    annotation.selectable.status,
+  );
+
+  // Prioritize an undefined selectable status ahead of activatable status.
   if (annotation.selectable.status === undefined) {
-    return {
-      color: "red",
-      label: "Not found",
-      tooltip: "No component that can query this guide was found",
-    };
+    return selectableStatusSummary;
   }
+
   if (!annotation.activatable.status) {
     return {
       color: "red",
       label: "Not activated",
-      tooltip: "This guide cannot be activated in the current location",
+      description: "This guide cannot be activated in the current location",
     };
   }
-  if (annotation.selectable.status === "queried") {
-    return {
-      color: "gray",
-      label: "Queued",
-      tooltip: "This guide is queried but is not ready to display",
-    };
-  }
-  if (annotation.selectable.status === "throttled") {
-    return {
-      color: "yellow",
-      label: "Throttled",
-      tooltip:
-        "This guide is queried and ready to display, but throttled currently",
-    };
-  }
-  if (annotation.selectable.status === "returned") {
-    return {
-      color: "blue",
-      label: "Display",
-      tooltip: "This guide is queried and ready to display",
-    };
-  }
-  // Should never happen though.
-  return { color: "red", label: "Unknown status", tooltip: "Unknown status" };
+
+  return {
+    ...selectableStatusSummary,
+
+    // Shorten the label we display here for space.
+    ...(annotation.selectable.status === "returned"
+      ? { label: "Display" }
+      : undefined),
+  };
 };
 
 type StatusDot = {
@@ -162,7 +148,7 @@ const getStatusDots = (
 
   const targetable: StatusDot = {
     color: annotation.targetable.status ? "blue" : "red",
-    tooltip: `Targeted: ${annotation.targetable.status ? "Yes" : "No"}`,
+    tooltip: `Targeting: ${annotation.targetable.status ? "Yes" : "No"}`,
   };
 
   const activatable: StatusDot = {
@@ -302,7 +288,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
         {/* Right section: verdict + pills + focus */}
         <Stack align="center" gap="1_5" style={{ flexShrink: 0 }}>
           {!hasFocus && (
-            <Tooltip label={summary.tooltip}>
+            <Tooltip label={summary.description}>
               <Tag size="0" variant="soft" color={summary.color}>
                 {summary.label}
               </Tag>
