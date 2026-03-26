@@ -156,25 +156,14 @@ const getStatusDots = (
     tooltip: `Activated: ${annotation.activatable.status ? "Yes" : "No"}`,
   };
 
-  let selectable: StatusDot;
-  switch (annotation.selectable.status) {
-    case "returned":
-      selectable = { color: "blue", tooltip: "Ready for display" };
-      break;
+  const selectableStatusSummary = getSelectableStatusSummary(
+    annotation.selectable.status,
+  );
 
-    case "throttled":
-      selectable = { color: "yellow", tooltip: "Throttled" };
-      break;
-
-    case "queried":
-      selectable = { color: "gray", tooltip: "Queued" };
-      break;
-
-    case undefined:
-    default:
-      selectable = { color: "red", tooltip: "Not found" };
-      break;
-  }
+  const selectable = {
+    color: selectableStatusSummary.color,
+    tooltip: selectableStatusSummary.label,
+  };
 
   return { active, archived, targetable, activatable, selectable };
 };
