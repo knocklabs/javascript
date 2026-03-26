@@ -101,9 +101,9 @@ export const GuideRowDetails = ({
           color={annotation.active.status ? "blue" : "red"}
         />
         <StatusRow
-          label="Not archived"
-          value={!annotation.archived.status ? "Yes" : "No"}
-          color={!annotation.archived.status ? "blue" : "red"}
+          label="Archived"
+          value={annotation.archived.status ? "Yes" : "No"}
+          color={annotation.archived.status ? "red" : "blue"}
         />
         <StatusRow
           label="Targeting"
