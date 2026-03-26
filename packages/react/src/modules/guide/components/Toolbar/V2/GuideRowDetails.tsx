@@ -6,6 +6,7 @@ import {
   StatusColor,
   GuideAnnotatedStatusDot as StatusDot,
 } from "./GuideAnnotatedStatusDot";
+import { ERROR_MESSAGE } from "./helpers";
 import {
   AnnotatedGuide,
   UncommittedGuide,
@@ -49,7 +50,7 @@ const StatusRow = ({
   label: string;
   value: string;
   color: StatusColor;
-  tooltip?: string;
+  tooltip?: React.ReactNode;
 }) => {
   return (
     <Stack align="center" gap="1">
@@ -101,8 +102,7 @@ export const getSelectableStatusSummary = (
       return {
         label: "Not queried",
         color: "red",
-        description:
-          "This guide is not queried, no component that can display this guide is present",
+        description: `This guide is not queried (${ERROR_MESSAGE.focusUnselectableGuide.toLowerCase()})`,
       };
   }
 };
@@ -161,7 +161,16 @@ export const GuideRowDetails = ({
           label="Display"
           value={selectableStatusSummary.label}
           color={selectableStatusSummary.color}
-          tooltip="Visible when the guide is queried on the current page via `useGuide(s)`, and ready to display per its position in the display pipeline"
+          tooltip={
+            <Text as="span" size="1">
+              Visible when the guide is queried via `useGuide(s)` in the current
+              page,
+              <br />
+              and ready to display per its position in the display pipeline:
+              <br />
+              {selectableStatusSummary.description}
+            </Text>
+          }
         />
       </CardContainer>
     </Stack>
