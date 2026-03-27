@@ -12,9 +12,9 @@ export const GuideContextDetails = () => {
 
   return (
     <Box py="3" px="3">
-      <Stack direction="column" gap="2" width="full">
+      <Stack direction="column" gap="1" width="full">
         <Text as="label" size="1" weight="medium" display="block">
-          Settings
+          Toolbar settings
         </Text>
         <Stack direction="column" gap="1">
           <Stack direction="row" gap="2" align="center" h="7">
