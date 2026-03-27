@@ -1,9 +1,8 @@
 import { useGuideContext, useStore } from "@knocklabs/react-core";
-import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
+import { Toggle } from "@telegraph/toggle";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
-import { Box as BoxIcon, Gauge } from "lucide-react";
 
 export const GuideContextDetails = () => {
   const { client } = useGuideContext();
@@ -17,43 +16,60 @@ export const GuideContextDetails = () => {
         <Text as="label" size="1" weight="medium" display="block">
           Settings
         </Text>
-        <Stack direction="row" gap="2">
-          <Tooltip label="Sandbox: Contain engagement actions to client side only">
-            <Button
+        <Stack direction="column" gap="1">
+          <Stack direction="row" gap="2" align="center" h="7">
+            <Tooltip label="Contain engagement actions to client side only">
+              <Text
+                as="span"
+                size="1"
+                weight="medium"
+                color="gray"
+                width="36"
+                mt="1"
+              >
+                Sandbox engagement
+              </Text>
+            </Tooltip>
+            <Toggle.Default
               size="1"
-              variant={
-                debugSettings.skipEngagementTracking ? "outline" : "ghost"
-              }
-              color={debugSettings.skipEngagementTracking ? "blue" : "gray"}
-              icon={{ icon: BoxIcon, alt: "Sandbox mode" }}
-              onClick={() => {
+              pt="1_5"
+              value={!!debugSettings.skipEngagementTracking}
+              onValueChange={(value: boolean) => {
                 client.setDebug({
                   ...debugSettings,
-                  skipEngagementTracking: !debugSettings.skipEngagementTracking,
+                  skipEngagementTracking: value,
                 });
               }}
             />
-          </Tooltip>
-
-          <Tooltip label="Ignore throttle: Show next guide immediately">
-            <Button
+          </Stack>
+          <Stack direction="row" gap="2" align="center" h="7">
+            <Tooltip label="Ignore throttle and show next guide immediately">
+              <Text
+                as="span"
+                size="1"
+                weight="medium"
+                color="gray"
+                width="36"
+                mt="1"
+              >
+                Ignore throttle
+              </Text>
+            </Tooltip>
+            <Toggle.Default
               size="1"
-              variant={
-                debugSettings.ignoreDisplayInterval ? "outline" : "ghost"
-              }
-              color={debugSettings.ignoreDisplayInterval ? "blue" : "gray"}
-              icon={{ icon: Gauge, alt: "Ignore throttle" }}
-              onClick={() => {
+              pt="1_5"
+              value={!!debugSettings.ignoreDisplayInterval}
+              onValueChange={(value: boolean) => {
                 client.setDebug({
                   ...debugSettings,
-                  ignoreDisplayInterval: !debugSettings.ignoreDisplayInterval,
+                  ignoreDisplayInterval: value,
                 });
               }}
             />
-          </Tooltip>
+          </Stack>
         </Stack>
       </Stack>
-      <Stack direction="column" gap="2" width="full">
+      <Stack direction="column" gap="1" width="full">
         <Tooltip
           label={
             <Text as="span" size="1">

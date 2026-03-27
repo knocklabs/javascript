@@ -84,6 +84,7 @@
     "@telegraph/segmented-control": "^0.2.2",
     "@telegraph/select": "^0.0.86",
     "@telegraph/tag": "^0.1.4",
+    "@telegraph/toggle": "0.1.1",
     "@telegraph/tokens": "^0.1.4",
     "@telegraph/tooltip": "0.1.3",
     "@telegraph/typography": "^0.2.1",
