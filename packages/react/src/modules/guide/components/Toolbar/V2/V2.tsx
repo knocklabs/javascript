@@ -32,6 +32,22 @@ import {
 
 const TOOLBAR_WIDTH = "540px";
 
+const Kbd = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <kbd
+      style={{
+        display: "inline-block",
+        padding: "1px 4px",
+        borderRadius: "var(--tgph-rounded-2)",
+        border: "1px solid rgba(255, 255, 255, 0.3)",
+        backgroundColor: "rgba(255, 255, 255, 0.15)",
+      }}
+    >
+      {children}
+    </kbd>
+  );
+};
+
 type DisplayOption = "all-guides" | "only-eligible" | "only-displayable";
 
 const GuidesList = ({
@@ -105,6 +121,33 @@ export const V2 = () => {
     };
   }, [runConfig, client, setDisplayOption]);
 
+  // Toggle collapsed state when Ctrl is pressed and released alone
+  // (without combining with another key), similar to Vercel's toolbar.
+  React.useEffect(() => {
+    let ctrlUsedInCombo = false;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Control") {
+        ctrlUsedInCombo = false;
+      } else if (e.ctrlKey) {
+        ctrlUsedInCombo = true;
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Control" && !ctrlUsedInCombo) {
+        setIsCollapsed((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { position, isDragging, handlePointerDown, hasDraggedRef } =
     useDraggable({
@@ -129,37 +172,48 @@ export const V2 = () => {
       }}
     >
       {isCollapsed ? (
-        <Stack
-          border="px"
-          rounded="4"
-          align="center"
-          justify="center"
-          w="10"
-          h="10"
-          onPointerDown={handlePointerDown}
-          backgroundColor="surface-1"
-          style={{
-            cursor: isDragging ? "grabbing" : "grab",
-            touchAction: "none",
-            userSelect: "none",
-          }}
+        <Tooltip
+          side="left"
+          delayDuration={500}
+          label={
+            <Text as="span" size="1">
+              Guide Toolbar <Kbd>ctrl</Kbd>
+            </Text>
+          }
         >
-          <Box
+          <Stack
+            border="px"
+            rounded="4"
+            align="center"
+            justify="center"
+            w="10"
+            h="10"
+            onPointerDown={handlePointerDown}
+            backgroundColor="surface-1"
             style={{
-              transform: "scale(0.7)",
-              transformOrigin: "center center",
+              cursor: isDragging ? "grabbing" : "grab",
+              touchAction: "none",
+              userSelect: "none",
+              animation: "toolbar-collapse-fade-in 150ms ease-out",
             }}
           >
-            <KnockButton
-              onClick={() => {
-                if (!hasDraggedRef.current) {
-                  setIsCollapsed(false);
-                }
+            <Box
+              style={{
+                transform: "scale(0.7)",
+                transformOrigin: "center center",
               }}
-              positioned={false}
-            />
-          </Box>
-        </Stack>
+            >
+              <KnockButton
+                onClick={() => {
+                  if (!hasDraggedRef.current) {
+                    setIsCollapsed(false);
+                  }
+                }}
+                positioned={false}
+              />
+            </Box>
+          </Stack>
+        </Tooltip>
       ) : (
         <Stack
           direction="column"
@@ -170,6 +224,7 @@ export const V2 = () => {
           style={{
             width: TOOLBAR_WIDTH,
             boxShadow: "0 8px 32px var(--tgph-gray-5)",
+            animation: "toolbar-expand-fade-in 150ms ease-out",
           }}
         >
           {/* Header — also acts as drag handle area */}
