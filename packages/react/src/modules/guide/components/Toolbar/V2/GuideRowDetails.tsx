@@ -7,8 +7,8 @@ import {
 } from "./GuideAnnotatedStatusDot";
 import {
   AnnotatedGuide,
-  UnknownGuide,
-  isUnknownGuide,
+  UncommittedGuide,
+  isUncommittedGuide,
 } from "./useInspectGuideClientStore";
 
 const CardContainer = ({
@@ -77,9 +77,9 @@ const getDisplayValue = (
 export const GuideRowDetails = ({
   guide,
 }: {
-  guide: AnnotatedGuide | UnknownGuide;
+  guide: AnnotatedGuide | UncommittedGuide;
 }) => {
-  if (isUnknownGuide(guide)) {
+  if (isUncommittedGuide(guide)) {
     return (
       <Box px="3" py="2">
         <Text as="span" size="1" color="gray">
