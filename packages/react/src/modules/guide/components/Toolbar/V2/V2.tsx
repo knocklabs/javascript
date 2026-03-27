@@ -1,4 +1,4 @@
-import { useGuideContext, useStore } from "@knocklabs/react-core";
+import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
@@ -6,10 +6,8 @@ import { SegmentedControl } from "@telegraph/segmented-control";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 import {
-  Box as BoxIcon,
   ChevronDown,
   ChevronRight,
-  Gauge,
   GripVertical,
   LogOut,
   Minimize2,
@@ -101,10 +99,6 @@ export const V2 = () => {
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
-
-  const { debugSettings } = useStore(client.store, (state) => ({
-    debugSettings: state.debug || {},
-  }));
 
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
@@ -289,47 +283,7 @@ export const V2 = () => {
                   </SegmentedControl.Option>
                 </SegmentedControl.Root>
 
-                <Tooltip label="Sandbox: Contain engagement actions to client side only">
-                  <Button
-                    size="1"
-                    variant={
-                      debugSettings.skipEngagementTracking ? "outline" : "ghost"
-                    }
-                    color={
-                      debugSettings.skipEngagementTracking ? "blue" : "gray"
-                    }
-                    icon={{ icon: BoxIcon, alt: "Sandbox mode" }}
-                    onClick={() => {
-                      client.setDebug({
-                        ...debugSettings,
-                        skipEngagementTracking:
-                          !debugSettings.skipEngagementTracking,
-                      });
-                    }}
-                  />
-                </Tooltip>
-
-                <Tooltip label="Ignore throttle: Show next guide immediately">
-                  <Button
-                    size="1"
-                    variant={
-                      debugSettings.ignoreDisplayInterval ? "outline" : "ghost"
-                    }
-                    color={
-                      debugSettings.ignoreDisplayInterval ? "blue" : "gray"
-                    }
-                    icon={{ icon: Gauge, alt: "Ignore throttle" }}
-                    onClick={() => {
-                      client.setDebug({
-                        ...debugSettings,
-                        ignoreDisplayInterval:
-                          !debugSettings.ignoreDisplayInterval,
-                      });
-                    }}
-                  />
-                </Tooltip>
-
-                <Tooltip label="Inspect target params">
+                <Tooltip label="Settings & target params">
                   <Button
                     size="1"
                     variant={isContextPanelOpen ? "outline" : "ghost"}
