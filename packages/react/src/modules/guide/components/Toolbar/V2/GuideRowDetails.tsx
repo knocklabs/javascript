@@ -1,10 +1,12 @@
 import { Box, Stack } from "@telegraph/layout";
+import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 
 import {
   StatusColor,
   GuideAnnotatedStatusDot as StatusDot,
 } from "./GuideAnnotatedStatusDot";
+import { ERROR_MESSAGE } from "./helpers";
 import {
   AnnotatedGuide,
   UncommittedGuide,
@@ -43,34 +45,65 @@ const StatusRow = ({
   label,
   value,
   color,
+  tooltip,
 }: {
   label: string;
   value: string;
   color: StatusColor;
-}) => (
-  <Stack align="center" gap="1">
-    <StatusDot color={color} tooltip={`${label}: ${value}`} />
-    <Text as="span" size="1" weight="medium">
-      {label}:
-    </Text>
-    <Text as="span" size="1" weight="medium" color={color}>
-      {value}
-    </Text>
-  </Stack>
-);
+  tooltip?: React.ReactNode;
+}) => {
+  return (
+    <Stack align="center" gap="1">
+      <Tooltip enabled={!!tooltip} label={tooltip} delayDuration={500}>
+        <Stack as="span" align="center" gap="1" display="inline-flex">
+          <StatusDot color={color} tooltip={`${label}: ${value}`} />
+          <Text as="span" size="1" weight="medium">
+            {label}:
+          </Text>
+          <Text as="span" size="1" weight="medium" color={color}>
+            {value}
+          </Text>
+        </Stack>
+      </Tooltip>
+    </Stack>
+  );
+};
 
-const getDisplayValue = (
+export type StatusSummary = {
+  color: StatusColor;
+  label: string;
+  description: string;
+};
+
+export const getSelectableStatusSummary = (
   status: "returned" | "throttled" | "queried" | undefined,
-): { value: string; color: StatusColor } => {
+): StatusSummary => {
   switch (status) {
     case "returned":
-      return { value: "Ready to display", color: "blue" };
+      return {
+        label: "Ready to display",
+        color: "blue",
+        description: "This guide is queried and ready to display",
+      };
     case "throttled":
-      return { value: "Throttled", color: "yellow" };
+      return {
+        label: "Throttled",
+        color: "yellow",
+        description:
+          "This guide is queried and ready to display, but throttled currently",
+      };
     case "queried":
-      return { value: "Queued", color: "gray" };
+      return {
+        label: "Queued",
+        color: "gray",
+        description: "This guide is queried but is not ready to display",
+      };
     default:
-      return { value: "Not found", color: "red" };
+      return {
+        label: "Not queried",
+        color: "red",
+        description: `This guide is not queried (${ERROR_MESSAGE.focusUnselectableGuide.toLowerCase()})`,
+      };
   }
 };
 
@@ -90,7 +123,9 @@ export const GuideRowDetails = ({
   }
 
   const { annotation } = guide;
-  const display = getDisplayValue(annotation.selectable.status);
+  const selectableStatusSummary = getSelectableStatusSummary(
+    annotation.selectable.status,
+  );
 
   return (
     <Stack px="3" py="2" gap="2" direction="row" align="flex-start">
@@ -99,16 +134,19 @@ export const GuideRowDetails = ({
           label="Active"
           value={annotation.active.status ? "Yes" : "No"}
           color={annotation.active.status ? "blue" : "red"}
+          tooltip="Eligible if the guide is currently active"
         />
         <StatusRow
-          label="Not archived"
-          value={!annotation.archived.status ? "Yes" : "No"}
-          color={!annotation.archived.status ? "blue" : "red"}
+          label="Archived"
+          value={annotation.archived.status ? "Yes" : "No"}
+          color={annotation.archived.status ? "red" : "blue"}
+          tooltip="Eligible if the guide has not been dismissed/archived by the user already"
         />
         <StatusRow
           label="Targeting"
           value={annotation.targetable.status ? "Yes" : "No"}
           color={annotation.targetable.status ? "blue" : "red"}
+          tooltip="Eligible if the user meets the guide's targeting conditions"
         />
       </CardContainer>
 
@@ -117,11 +155,22 @@ export const GuideRowDetails = ({
           label="Activation"
           value={annotation.activatable.status ? "Yes" : "No"}
           color={annotation.activatable.status ? "blue" : "red"}
+          tooltip="Visible when the user's current location matches the guide's activation rules"
         />
         <StatusRow
           label="Display"
-          value={display.value}
-          color={display.color}
+          value={selectableStatusSummary.label}
+          color={selectableStatusSummary.color}
+          tooltip={
+            <Text as="span" size="1">
+              Visible when the guide is queried via `useGuide(s)` in the current
+              page,
+              <br />
+              and ready to display per its position in the display pipeline:
+              <br />
+              {selectableStatusSummary.description}
+            </Text>
+          }
         />
       </CardContainer>
     </Stack>
