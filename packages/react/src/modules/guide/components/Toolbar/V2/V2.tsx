@@ -30,6 +30,8 @@ import {
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
 
+const HOTKEY_TOGGLE_IS_COLLAPSED = "Control";
+
 const TOOLBAR_WIDTH = "540px";
 
 const Kbd = ({ children }: { children: React.ReactNode }) => {
@@ -127,7 +129,7 @@ export const V2 = () => {
     let ctrlUsedInCombo = false;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Control" && !e.repeat) {
+      if (e.key === HOTKEY_TOGGLE_IS_COLLAPSED && !e.repeat) {
         ctrlUsedInCombo = false;
       } else if (e.ctrlKey) {
         ctrlUsedInCombo = true;
@@ -135,7 +137,7 @@ export const V2 = () => {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Control" && !ctrlUsedInCombo) {
+      if (e.key === HOTKEY_TOGGLE_IS_COLLAPSED && !ctrlUsedInCombo) {
         setIsCollapsed((prev) => !prev);
       }
     };
