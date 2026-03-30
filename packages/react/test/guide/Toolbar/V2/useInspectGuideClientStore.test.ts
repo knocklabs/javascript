@@ -1548,10 +1548,10 @@ describe("useInspectGuideClientStore", () => {
     });
   });
 
-  // ----- focused guide (no_guide_present) -----
+  // ----- focused guide errors -----
 
   describe("focused guide filtering", () => {
-    test("returns no_guide_present when focused guide is not selectable on closed stage", () => {
+    test("returns focus_unknown_guide when focused guide key is not in ordered guides", () => {
       mockGroupStage = {
         status: "closed",
         ordered: ["g1"],
@@ -1574,8 +1574,66 @@ describe("useInspectGuideClientStore", () => {
       });
       expect(result).toEqual({
         status: "error",
-        error: "no_guide_present",
-        message: "No component that can render `other_guide` was found",
+        error: "focus_unknown_guide",
+        message: "Unable to display `other_guide`, no such guide exists.",
+      });
+    });
+
+    test("returns focus_uncommitted_guide when focused guide is uncommitted", () => {
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["uncommitted_g"],
+        resolved: undefined,
+        timeoutId: null,
+        results: {},
+      };
+      // Guide key is in display_sequence but NOT in guides map => UncommittedGuide
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["uncommitted_g"])],
+        guides: {},
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect({
+        isVisible: true,
+        focusedGuideKeys: { uncommitted_g: true },
+      });
+      expect(result).toEqual({
+        status: "error",
+        error: "focus_uncommitted_guide",
+        message:
+          "Unable to display `uncommitted_g`, this guide has not been committed.",
+      });
+    });
+
+    test("returns focus_unselectable_guide when focused guide exists but is not selectable", () => {
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1"],
+        resolved: "g1",
+        timeoutId: null,
+        results: {
+          key: { g1: { one: makeSelectionResult() } },
+        },
+      };
+      const guide = makeGuide({ key: "g1" });
+      // Guide is in the group but not queried by any matching selection result,
+      // so selectable.status will be undefined (not selectable).
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1", "g2"])],
+        guides: { g1: guide, g2: makeGuide({ key: "g2" }) },
+        ineligibleGuides: {},
+      });
+
+      const result = renderInspect({
+        isVisible: true,
+        focusedGuideKeys: { g2: true },
+      });
+      expect(result).toEqual({
+        status: "error",
+        error: "focus_unselectable_guide",
+        message:
+          "Unable to display `g2`, no component that can render this guide is present.",
       });
     });
 

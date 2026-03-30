@@ -13,6 +13,7 @@ import {
   GuideAnnotatedStatusDot as StatusDot,
 } from "./GuideAnnotatedStatusDot";
 import { GuideRowDetails } from "./GuideRowDetails";
+import { FOCUS_ERRORS } from "./helpers";
 import {
   AnnotatedGuide,
   AnnotatedStatuses,
@@ -354,12 +355,15 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
 
           <Tooltip
             label={
+              isUncommittedGuide(guide)
+                ? FOCUS_ERRORS.focusUncommittedGuide
+                : guide.annotation.selectable.status === undefined
+                  ? FOCUS_ERRORS.focusUnselectableGuide
+                  : ""
+            }
+            enabled={
               isUncommittedGuide(guide) ||
               guide.annotation.selectable.status === undefined
-                ? "No component found that can render this guide"
-                : isFocused
-                  ? "Unfocus this guide"
-                  : "Focus on this guide"
             }
           >
             <Button

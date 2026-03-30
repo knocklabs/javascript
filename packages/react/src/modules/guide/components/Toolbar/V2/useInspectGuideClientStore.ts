@@ -9,7 +9,7 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
-import { ToolbarV2RunConfig } from "./helpers";
+import { FOCUS_ERRORS, ToolbarV2RunConfig } from "./helpers";
 
 const byKey = <T extends { key: string }>(items: T[]) => {
   return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});
@@ -121,7 +121,12 @@ export type InspectionResultOk = {
 };
 type InspectionResultError = {
   status: "error";
-  error: "no_guides_fetched" | "no_guide_group" | "no_guide_present";
+  error:
+    | "no_guides_fetched"
+    | "no_guide_group"
+    | "focus_unknown_guide"
+    | "focus_uncommitted_guide"
+    | "focus_unselectable_guide";
   message: string;
 };
 type InspectionResult = InspectionResultOk | InspectionResultError;
@@ -465,14 +470,34 @@ export const useInspectGuideClientStore = (
   // Check if the focused guide actually exists and is selectable on the page.
   const focusedGuideKey = Object.keys(runConfig.focusedGuideKeys || {})[0];
   if (groupStage?.status === "closed" && focusedGuideKey) {
-    const focusableGuide = orderedGuides.find(
-      (g) => g.key === focusedGuideKey && g.annotation.selectable.status,
-    );
-    if (!focusableGuide) {
+    const foundGuide = orderedGuides.find((g) => g.key === focusedGuideKey);
+
+    // No such guide exists for the given focused guide key.
+    if (!foundGuide) {
       return {
         status: "error",
-        error: "no_guide_present",
-        message: `No component that can render \`${focusedGuideKey}\` was found`,
+        error: "focus_unknown_guide",
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUnknownGuide.toLowerCase()}.`,
+      };
+    }
+
+    // This guide exists but has never been committed and published, so it is
+    // not present in the API response.
+    if (isUncommittedGuide(foundGuide)) {
+      return {
+        status: "error",
+        error: "focus_uncommitted_guide",
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUncommittedGuide.toLowerCase()}.`,
+      };
+    }
+
+    // This guide exists and is present in the response, but it is not queried
+    // in the current page so it is impossible to force render this guide.
+    if (!foundGuide.annotation.selectable.status) {
+      return {
+        status: "error",
+        error: "focus_unselectable_guide",
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUnselectableGuide.toLowerCase()}.`,
       };
     }
   }
