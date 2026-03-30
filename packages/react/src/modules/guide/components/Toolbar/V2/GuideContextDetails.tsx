@@ -14,7 +14,7 @@ export const GuideContextDetails = () => {
             The tenant and data payload passed to the guide client that are used
             for targeting
             <br />
-            (via the `targetParams` prop to `KnockGuideProvider`)
+            (via the targetParams prop to KnockGuideProvider)
           </Text>
         }
         delayDuration={500}
