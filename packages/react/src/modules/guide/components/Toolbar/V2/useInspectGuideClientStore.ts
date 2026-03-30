@@ -101,8 +101,8 @@ export type AnnotatedGuide = KnockGuide & {
 // Exists and ordered in control but absent in switchboard (therefore not
 // included in the api response), which implies a newly created guide that has
 // never been published to switchboard.
-export type UnknownGuide = {
-  __typename: "UnknownGuide";
+export type UncommittedGuide = {
+  __typename: "UncommittedGuide";
   key: KnockGuide["key"];
   active: false;
   bypass_global_group_limit: false;
@@ -117,7 +117,7 @@ export type UnknownGuide = {
 
 export type InspectionResultOk = {
   status: "ok";
-  guides: (AnnotatedGuide | UnknownGuide)[];
+  guides: (AnnotatedGuide | UncommittedGuide)[];
 };
 type InspectionResultError = {
   status: "error";
@@ -388,9 +388,9 @@ const annotateGuide = (
   };
 };
 
-const newUnknownGuide = (key: KnockGuide["key"]) =>
+const newUncommittedGuide = (key: KnockGuide["key"]) =>
   ({
-    __typename: "UnknownGuide",
+    __typename: "UncommittedGuide",
     key,
     active: false,
     bypass_global_group_limit: false,
@@ -401,7 +401,7 @@ const newUnknownGuide = (key: KnockGuide["key"]) =>
         status: undefined,
       },
     },
-  }) as UnknownGuide;
+  }) as UncommittedGuide;
 
 export const useInspectGuideClientStore = (
   runConfig: ToolbarV2RunConfig,
@@ -456,7 +456,7 @@ export const useInspectGuideClientStore = (
   const orderedGuides = defaultGroup.display_sequence.map((guideKey) => {
     const guide = snapshot.guides[guideKey];
     if (!guide) {
-      return newUnknownGuide(guideKey);
+      return newUncommittedGuide(guideKey);
     }
 
     return annotateGuide(guide, snapshot, groupStage);
@@ -483,8 +483,8 @@ export const useInspectGuideClientStore = (
   };
 };
 
-export const isUnknownGuide = (input: unknown): input is UnknownGuide =>
+export const isUncommittedGuide = (input: unknown): input is UncommittedGuide =>
   typeof input === "object" &&
   input !== null &&
   "__typename" in input &&
-  (input as UnknownGuide).__typename === "UnknownGuide";
+  (input as UncommittedGuide).__typename === "UncommittedGuide";
