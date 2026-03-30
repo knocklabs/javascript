@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   type AnnotatedGuide,
+  type InspectionResultOk,
   isUncommittedGuide,
   resolveIsQualified,
   useInspectGuideClientStore,
@@ -130,6 +131,15 @@ const renderInspect = (
   return result.current;
 };
 
+/** Asserts the result is defined with status "ok" and narrows the type. */
+const expectOk = (
+  result: ReturnType<typeof renderInspect>,
+): InspectionResultOk => {
+  expect(result).toBeDefined();
+  expect(result!.status).toBe("ok");
+  return result as InspectionResultOk;
+};
+
 // Helper to build a mock selection result (Map with metadata).
 const makeSelectionResult = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -181,7 +191,7 @@ describe("useInspectGuideClientStore", () => {
       guides: {},
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     expect(result.guides).toHaveLength(1);
     expect(isUncommittedGuide(result.guides[0])).toBe(true);
 
@@ -202,7 +212,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: {},
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     expect(result.guides).toHaveLength(1);
 
     const annotated = result.guides[0] as AnnotatedGuide;
@@ -223,7 +233,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: { g1: marker },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.active).toEqual({ status: false });
@@ -244,7 +254,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: { g1: marker },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.targetable).toEqual({
@@ -271,7 +281,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: { g1: marker },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.targetable).toEqual({
@@ -293,7 +303,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: { g1: marker },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     // archived reason falls through the targetable switch default, so targetable stays true
@@ -324,7 +334,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: {},
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.archived).toEqual({ status: true });
@@ -353,7 +363,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: {},
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(true);
     expect(annotated.annotation.archived).toEqual({ status: false });
@@ -376,7 +386,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: {},
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.archived).toEqual({ status: true });
@@ -397,7 +407,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: { g1: marker },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     expect(annotated.annotation.isEligible).toBe(false);
     expect(annotated.annotation.archived).toEqual({ status: true });
@@ -418,7 +428,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: { g1: marker },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     const annotated = result.guides[0] as AnnotatedGuide;
     // Unknown reasons don't affect targetable or archived, so the guide is still eligible
     expect(annotated.annotation.isEligible).toBe(true);
@@ -439,7 +449,7 @@ describe("useInspectGuideClientStore", () => {
       ineligibleGuides: {},
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     expect(result.guides.map((g) => g.key)).toEqual(["c", "a", "b"]);
   });
 
@@ -475,7 +485,7 @@ describe("useInspectGuideClientStore", () => {
       },
     });
 
-    const result = renderInspect()!;
+    const result = expectOk(renderInspect());
     expect(result.guides).toHaveLength(4);
 
     // eligible guide
@@ -511,7 +521,7 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.isEligible).toBe(true);
     });
@@ -538,7 +548,7 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.activatable).toEqual({ status: true });
       expect(annotated.annotation.selectable.status).toBe("returned");
@@ -554,7 +564,7 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.activatable).toEqual({ status: false });
       expect(annotated.annotation.isQualified).toBe(false);
@@ -585,7 +595,7 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.isEligible).toBe(true);
       expect(annotated.annotation.isQualified).toBe(false);
@@ -614,7 +624,7 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: { g1: marker },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.isEligible).toBe(false);
       expect(annotated.annotation.isQualified).toBe(true);
@@ -632,7 +642,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable).toEqual({ status: undefined });
     });
@@ -650,7 +660,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable).toEqual({ status: undefined });
     });
@@ -671,7 +681,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -693,7 +703,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("throttled");
     });
@@ -719,7 +729,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -744,7 +754,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -772,7 +782,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -794,7 +804,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable).toEqual({ status: undefined });
     });
@@ -820,7 +830,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -852,7 +862,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -877,7 +887,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -906,7 +916,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -932,7 +942,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("throttled");
     });
@@ -960,7 +970,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -985,7 +995,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -1010,7 +1020,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1035,7 +1045,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -1062,7 +1072,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1092,7 +1102,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1122,7 +1132,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("throttled");
     });
@@ -1155,7 +1165,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("throttled");
     });
@@ -1188,7 +1198,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1221,7 +1231,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1249,7 +1259,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -1280,7 +1290,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1308,7 +1318,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -1335,7 +1345,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -1362,7 +1372,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("queried");
     });
@@ -1385,7 +1395,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable).toEqual({ status: undefined });
     });
@@ -1414,7 +1424,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       // Key query: resolved === guide.key → "returned" (not "queried" from type)
       expect(annotated.annotation.selectable.status).toBe("returned");
@@ -1429,7 +1439,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.activatable).toEqual({ status: true });
       expect(annotated.annotation.selectable).toEqual({ status: undefined });
@@ -1453,7 +1463,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.activatable).toEqual({ status: false });
       expect(annotated.annotation.selectable.status).toBe("returned");
@@ -1478,7 +1488,7 @@ describe("useInspectGuideClientStore", () => {
         guides: { g1: guide },
       });
 
-      const result = renderInspect()!;
+      const result = expectOk(renderInspect());
       const annotated = result.guides[0] as AnnotatedGuide;
       expect(annotated.annotation.selectable.status).toBe("returned");
     });
@@ -1654,13 +1664,14 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect({
-        isVisible: true,
-        focusedGuideKeys: { g1: true },
-      });
-      expect(result!.guides).toHaveLength(1);
-      expect(result!.guides[0]!.key).toBe("g1");
-      expect(result!.error).toBeUndefined();
+      const result = expectOk(
+        renderInspect({
+          isVisible: true,
+          focusedGuideKeys: { g1: true },
+        }),
+      );
+      expect(result.guides).toHaveLength(1);
+      expect(result.guides[0]!.key).toBe("g1");
     });
 
     test("skips focused guide check when focusedGuideKeys is not set", () => {
@@ -1680,9 +1691,8 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect({ isVisible: true });
-      expect(result!.guides).toHaveLength(1);
-      expect(result!.error).toBeUndefined();
+      const result = expectOk(renderInspect({ isVisible: true }));
+      expect(result.guides).toHaveLength(1);
     });
 
     test("skips focused guide check when stage is not closed", () => {
@@ -1699,12 +1709,13 @@ describe("useInspectGuideClientStore", () => {
         ineligibleGuides: {},
       });
 
-      const result = renderInspect({
-        isVisible: true,
-        focusedGuideKeys: { missing: true },
-      });
-      expect(result!.guides).toHaveLength(1);
-      expect(result!.error).toBeUndefined();
+      const result = expectOk(
+        renderInspect({
+          isVisible: true,
+          focusedGuideKeys: { missing: true },
+        }),
+      );
+      expect(result.guides).toHaveLength(1);
     });
   });
 });
