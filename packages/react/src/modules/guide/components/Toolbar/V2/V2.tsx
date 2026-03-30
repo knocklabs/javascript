@@ -127,7 +127,7 @@ export const V2 = () => {
     let ctrlUsedInCombo = false;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Control") {
+      if (e.key === "Control" && !e.repeat) {
         ctrlUsedInCombo = false;
       } else if (e.ctrlKey) {
         ctrlUsedInCombo = true;
