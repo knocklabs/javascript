@@ -1633,7 +1633,7 @@ describe("useInspectGuideClientStore", () => {
         status: "error",
         error: "focus_unselectable_guide",
         message:
-          "Unable to display `g2`, no component that can render this guide is present.",
+          "Unable to display `g2`, no component that can display this guide is present.",
       });
     });
 
