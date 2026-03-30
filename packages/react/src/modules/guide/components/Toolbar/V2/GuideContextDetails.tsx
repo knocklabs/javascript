@@ -20,7 +20,7 @@ export const GuideContextDetails = () => {
         delayDuration={500}
       >
         <Text
-          as="label"
+          as="span"
           size="1"
           weight="medium"
           borderBottom="px"
