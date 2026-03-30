@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   type AnnotatedGuide,
-  isUnknownGuide,
+  isUncommittedGuide,
   resolveIsQualified,
   useInspectGuideClientStore,
 } from "../../../../src/modules/guide/components/Toolbar/V2/useInspectGuideClientStore";
@@ -173,9 +173,9 @@ describe("useInspectGuideClientStore", () => {
     });
   });
 
-  // ----- Unknown guide -----
+  // ----- Uncommitted guide -----
 
-  test("produces an UnknownGuide when key is in display_sequence but not in guides", () => {
+  test("produces an UncommittedGuide when key is in display_sequence but not in guides", () => {
     setSnapshot({
       guideGroups: [makeGuideGroup(["missing_key"])],
       guides: {},
@@ -183,7 +183,7 @@ describe("useInspectGuideClientStore", () => {
 
     const result = renderInspect()!;
     expect(result.guides).toHaveLength(1);
-    expect(isUnknownGuide(result.guides[0])).toBe(true);
+    expect(isUncommittedGuide(result.guides[0])).toBe(true);
 
     const unknown = result.guides[0]!;
     expect(unknown.key).toBe("missing_key");
@@ -445,7 +445,7 @@ describe("useInspectGuideClientStore", () => {
 
   // ----- Mixed guides: eligible, ineligible, and unknown -----
 
-  test("handles a mix of eligible, ineligible, and unknown guides", () => {
+  test("handles a mix of eligible, ineligible, and uncommitted guides", () => {
     const eligible = makeGuide({ key: "eligible", active: true });
     const inactive = makeGuide({ key: "inactive", active: false });
     const archived = makeGuide({ key: "archived", active: true });
@@ -495,10 +495,10 @@ describe("useInspectGuideClientStore", () => {
     expect(g2.annotation.isEligible).toBe(false);
     expect(g2.annotation.archived.status).toBe(true);
 
-    // unknown guide
+    // uncommitted guide
     const g3 = result.guides[3]!;
     expect(g3.key).toBe("unknown_key");
-    expect(isUnknownGuide(g3)).toBe(true);
+    expect(isUncommittedGuide(g3)).toBe(true);
     expect(g3.annotation.isEligible).toBe(false);
   });
 
