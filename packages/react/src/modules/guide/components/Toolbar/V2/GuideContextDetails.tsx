@@ -13,7 +13,7 @@ export const GuideContextDetails = () => {
   return (
     <Box py="3" px="3">
       <Stack direction="column" gap="1" width="full">
-        <Text as="label" size="1" weight="medium" display="block">
+        <Text as="span" size="1" weight="medium" display="block">
           Toolbar settings
         </Text>
         <Stack direction="column" gap="1">
@@ -82,7 +82,7 @@ export const GuideContextDetails = () => {
           delayDuration={500}
         >
           <Text
-            as="label"
+            as="span"
             size="1"
             weight="medium"
             borderBottom="px"
