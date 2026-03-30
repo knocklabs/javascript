@@ -1,5 +1,6 @@
 import { useGuideContext } from "@knocklabs/react-core";
 import { Box, Stack } from "@telegraph/layout";
+import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 
 export const GuideContextDetails = () => {
@@ -7,9 +8,30 @@ export const GuideContextDetails = () => {
 
   return (
     <Box py="3" px="3">
-      <Text as="span" size="1" weight="medium">
-        Target params
-      </Text>
+      <Tooltip
+        label={
+          <Text as="span" size="1">
+            The tenant and data payload passed to the guide client that are used
+            for targeting
+            <br />
+            (via the targetParams prop to KnockGuideProvider)
+          </Text>
+        }
+        delayDuration={500}
+      >
+        <Text
+          as="span"
+          size="1"
+          weight="medium"
+          borderBottom="px"
+          borderStyle="dashed"
+          style={{
+            whiteSpace: "nowrap",
+          }}
+        >
+          Target params
+        </Text>
+      </Tooltip>
       <Stack direction="column" gap="2" mt="2">
         <Stack direction="row" gap="2" align="center">
           <Text
