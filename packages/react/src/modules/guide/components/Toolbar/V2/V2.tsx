@@ -362,7 +362,7 @@ export const V2 = () => {
           </Box>
 
           {/* Focus chin with dedicated controls */}
-          <FocusChin guides={guides} displayOption={displayOption} />
+          <FocusChin guides={guides} />
         </Stack>
       )}
     </Box>

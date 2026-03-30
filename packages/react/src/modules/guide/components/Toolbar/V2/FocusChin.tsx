@@ -5,52 +5,13 @@ import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-import { DisplayOption } from "./helpers";
-// import React from "react";
-
 import { InspectionResultOk } from "./useInspectGuideClientStore";
-
-// const findNextPrevKey = (
-//   currKey: string,
-//   guides: InspectionResultOk["guides"]
-// ) => {
-//   const selectableGuides = guides.filter(g => !!g.annotation.selectable);
-//   const currIndex = selectableGuides.findIndex(g => g.key === currKey);
-//
-//   const prevGuide = currIndex === 0
-//     ? undefined
-//     : selectableGuides[currIndex - 1];
-//
-//   const nextGuide = currIndex + 1 > selectableGuides.length - 1
-//     ? undefined
-//     : selectableGuides[currIndex + 1];
-//
-//   return { prev: prevGuide, next: nextGuide };
-// }
-// const findNextGuideKey = (
-//   currKey: string,
-//   guides: InspectionResultOk["guides"]
-// ) => {
-//   const selectableGuides = guides.filter(g => !!g.annotation.selectable);
-//   const currIndex = selectableGuides.findIndex(g => g.key === currKey);
-//
-//   const prevGuide = currIndex === 0
-//     ? undefined
-//     : selectableGuides[currIndex - 1];
-//
-//   const nextGuide = currIndex + 1 > selectableGuides.length - 1
-//     ? undefined
-//     : selectableGuides[currIndex + 1];
-//
-//   return { prev: prevGuide, next: nextGuide };
-// }
 
 type Props = {
   guides: InspectionResultOk["guides"];
-  displayOption: DisplayOption;
 };
 
-export const FocusChin = ({ guides, displayOption }: Props) => {
+export const FocusChin = ({ guides }: Props) => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
     debugSettings: state.debug || {},
@@ -58,33 +19,12 @@ export const FocusChin = ({ guides, displayOption }: Props) => {
 
   const focusedKeys = Object.keys(debugSettings.focusedGuideKeys || {});
 
-  // const { prev, next } = React.useMemo(() => {
-  //   if (focusedKeys.length === 0) {
-  //     return {}
-  //   }
-  //   const currentKey = focusedKeys[0];
-  //
-  //   return findNextAndPrevGuideKey(currentKey, guides)
-  // }, [displayOption, focusedKeys.length]);
-
   const isFocused = focusedKeys.length > 0;
   if (!isFocused) {
     return null;
   }
 
-  const currentKey = focusedKeys[0];
-
-  // const currentIndex = currentKey ? guideKeys.indexOf(currentKey) : -1;
-
-  // const setFocus = (key: string) => {
-  //   client.setDebug({
-  //     ...debugSettings,
-  //     focusedGuideKeys: { [key]: true },
-  //   });
-  // };
-  //
-  // const hasPrev = currentIndex > 0;
-  // const hasNext = currentIndex >= 0 && currentIndex < guideKeys.length - 1;
+  const currentKey = focusedKeys[0]!;
 
   return (
     <Box
@@ -105,7 +45,6 @@ export const FocusChin = ({ guides, displayOption }: Props) => {
               variant="ghost"
               color="blue"
               leadingIcon={{ icon: ChevronLeft, alt: "Previous guide" }}
-              // disabled={!hasPrev}
               onClick={() => {
                 const selectableGuides = guides.filter(
                   (g) => !!g.annotation.selectable.status,
@@ -113,7 +52,6 @@ export const FocusChin = ({ guides, displayOption }: Props) => {
                 const currIndex = selectableGuides.findIndex(
                   (g) => g.key === currentKey,
                 );
-
                 const prevGuide =
                   currIndex === 0 ? undefined : selectableGuides[currIndex - 1];
 
@@ -132,16 +70,13 @@ export const FocusChin = ({ guides, displayOption }: Props) => {
               variant="ghost"
               color="blue"
               leadingIcon={{ icon: ChevronRight, alt: "Next guide" }}
-              // disabled={!hasNext}
               onClick={() => {
                 const selectableGuides = guides.filter(
                   (g) => !!g.annotation.selectable.status,
                 );
-                console.log(1, selectableGuides);
                 const currIndex = selectableGuides.findIndex(
                   (g) => g.key === currentKey,
                 );
-
                 const nextGuide =
                   currIndex + 1 > selectableGuides.length - 1
                     ? undefined
