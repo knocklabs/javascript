@@ -6,7 +6,7 @@ import {
   StatusColor,
   GuideAnnotatedStatusDot as StatusDot,
 } from "./GuideAnnotatedStatusDot";
-import { ERROR_MESSAGE } from "./helpers";
+import { FOCUS_ERRORS } from "./helpers";
 import {
   AnnotatedGuide,
   UncommittedGuide,
@@ -102,7 +102,7 @@ export const getSelectableStatusSummary = (
       return {
         label: "Not queried",
         color: "red",
-        description: `This guide is not queried (${ERROR_MESSAGE.focusUnselectableGuide.toLowerCase()})`,
+        description: `This guide is not queried (${FOCUS_ERRORS.focusUnselectableGuide.toLowerCase()})`,
       };
   }
 };
