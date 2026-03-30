@@ -85,7 +85,7 @@ export const clearRunConfigLS = () => {
   }
 };
 
-export const ERROR_MESSAGE = {
+export const FOCUS_ERRORS = {
   focusUnknownGuide: "No such guide exists",
   focusUncommittedGuide: "This guide has not been committed",
   focusUnselectableGuide: "No component that can render this guide is present",

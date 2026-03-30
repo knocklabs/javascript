@@ -9,7 +9,7 @@ import {
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
-import { ERROR_MESSAGE, ToolbarV2RunConfig } from "./helpers";
+import { FOCUS_ERRORS, ToolbarV2RunConfig } from "./helpers";
 
 const byKey = <T extends { key: string }>(items: T[]) => {
   return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});
@@ -477,7 +477,7 @@ export const useInspectGuideClientStore = (
       return {
         status: "error",
         error: "focus_unknown_guide",
-        message: `Unable to display \`${focusedGuideKey}\`, ${ERROR_MESSAGE.focusUnknownGuide.toLowerCase()}.`,
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUnknownGuide.toLowerCase()}.`,
       };
     }
 
@@ -487,7 +487,7 @@ export const useInspectGuideClientStore = (
       return {
         status: "error",
         error: "focus_uncommitted_guide",
-        message: `Unable to display \`${focusedGuideKey}\`, ${ERROR_MESSAGE.focusUncommittedGuide.toLowerCase()}.`,
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUncommittedGuide.toLowerCase()}.`,
       };
     }
 
@@ -497,7 +497,7 @@ export const useInspectGuideClientStore = (
       return {
         status: "error",
         error: "focus_unselectable_guide",
-        message: `Unable to display \`${focusedGuideKey}\`, ${ERROR_MESSAGE.focusUnselectableGuide.toLowerCase()}.`,
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUnselectableGuide.toLowerCase()}.`,
       };
     }
   }
