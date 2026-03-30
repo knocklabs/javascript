@@ -472,6 +472,7 @@ export const useInspectGuideClientStore = (
   if (groupStage?.status === "closed" && focusedGuideKey) {
     const foundGuide = orderedGuides.find((g) => g.key === focusedGuideKey);
 
+    // No such guide exists for the given focused guide key.
     if (!foundGuide) {
       return {
         status: "error",
@@ -480,6 +481,8 @@ export const useInspectGuideClientStore = (
       };
     }
 
+    // This guide exists but has never been committed and published, so it is
+    // not present in the API response.
     if (isUncommittedGuide(foundGuide)) {
       return {
         status: "error",
@@ -488,6 +491,8 @@ export const useInspectGuideClientStore = (
       };
     }
 
+    // This guide exists and is present in the response, but it is not queried
+    // in the current page so it is impossible to force render this guide.
     if (!foundGuide.annotation.selectable.status) {
       return {
         status: "error",
