@@ -19,9 +19,10 @@ import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
+import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import { clearRunConfigLS, getRunConfig } from "./helpers";
+import { DisplayOption, clearRunConfigLS, getRunConfig } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
@@ -48,46 +49,21 @@ const Kbd = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-type DisplayOption = "all-guides" | "only-eligible" | "only-displayable";
-
-const GuidesList = ({
-  guides,
-  displayOption,
-}: {
-  guides: InspectionResultOk["guides"];
-  displayOption: DisplayOption;
-}) => {
-  const [expandedGuideRowKey, setExpandedGuideRowKey] = React.useState<
-    string | undefined
-  >();
-
-  React.useEffect(() => {
-    setExpandedGuideRowKey(undefined);
-  }, [displayOption]);
-
-  return guides.map((guide, idx) => {
+const filterGuides = (
+  guides: InspectionResultOk["guides"],
+  displayOption: DisplayOption,
+) => {
+  return guides.filter((guide) => {
     const { isEligible, isQualified } = guide.annotation;
     const isDisplayable = isEligible && isQualified;
 
     if (displayOption === "only-displayable" && !isDisplayable) {
-      return null;
+      return false;
     }
     if (displayOption === "only-eligible" && !isEligible) {
-      return null;
+      return false;
     }
-    return (
-      <GuideRow
-        key={guide.key}
-        guide={guide}
-        orderIndex={idx}
-        isExpanded={guide.key === expandedGuideRowKey}
-        onClick={() => {
-          setExpandedGuideRowKey((k) =>
-            k && k === guide.key ? undefined : guide.key,
-          );
-        }}
-      />
-    );
+    return true;
   });
 };
 
@@ -99,6 +75,14 @@ export const V2 = () => {
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
+
+  const [expandedGuideRowKey, setExpandedGuideRowKey] = React.useState<
+    string | undefined
+  >();
+
+  React.useEffect(() => {
+    setExpandedGuideRowKey(undefined);
+  }, [displayOption]);
 
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
@@ -156,6 +140,9 @@ export const V2 = () => {
   if (!result || !runConfig?.isVisible) {
     return null;
   }
+
+  const guides =
+    result.status === "ok" ? filterGuides(result.guides, displayOption) : [];
 
   return (
     <Box
@@ -358,12 +345,24 @@ export const V2 = () => {
                 </Text>
               </Box>
             ) : (
-              <GuidesList
-                guides={result.guides}
-                displayOption={displayOption}
-              />
+              guides.map((guide, idx) => (
+                <GuideRow
+                  key={guide.key}
+                  guide={guide}
+                  orderIndex={idx}
+                  isExpanded={guide.key === expandedGuideRowKey}
+                  onClick={() => {
+                    setExpandedGuideRowKey((k) =>
+                      k && k === guide.key ? undefined : guide.key,
+                    );
+                  }}
+                />
+              ))
             )}
           </Box>
+
+          {/* Focus chin with dedicated controls */}
+          <FocusChin guides={guides} displayOption={displayOption} />
         </Stack>
       )}
     </Box>

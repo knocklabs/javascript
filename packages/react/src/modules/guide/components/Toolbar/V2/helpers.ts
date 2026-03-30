@@ -2,6 +2,8 @@ import { KnockGuide } from "@knocklabs/client";
 
 import { checkForWindow } from "../../../../../modules/core";
 
+export type DisplayOption = "all-guides" | "only-eligible" | "only-displayable";
+
 // Use this param to start Toolbar and enter into a debugging session when
 // it is present and set to true.
 const TOOLBAR_QUERY_PARAM = "knock_guide_toolbar";
