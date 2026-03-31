@@ -1,7 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
-import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
 
@@ -54,6 +53,23 @@ import {
 
 // How long to wait until we resolve the guides order and determine the
 // prevailing guide.
+// Resolve URLPattern from the native global or the optional polyfill.
+// Browsers that support URLPattern natively (Chrome 95+, Edge 95+, etc.) don't
+// need the polyfill. For older browsers, install `urlpattern-polyfill` as a
+// dependency in your project.
+function getURLPattern(): typeof URLPattern {
+  const native = (globalThis as Record<string, unknown>).URLPattern as
+    | typeof URLPattern
+    | undefined;
+
+  if (native) return native;
+
+  throw new Error(
+    "URLPattern is not available. Install the `urlpattern-polyfill` package " +
+      "or use a browser that supports URLPattern natively.",
+  );
+}
+
 const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
 
 // How often we should increment the counter to refresh the store state and
@@ -1156,11 +1172,12 @@ export class KnockGuideClient {
       return localStep;
     });
 
+    const URLPatternImpl = getURLPattern();
     localGuide.activation_url_patterns =
       remoteGuide.activation_url_patterns.map((rule) => {
         return {
           ...rule,
-          pattern: new URLPattern({
+          pattern: new URLPatternImpl({
             pathname: rule.pathname ?? undefined,
             search: rule.search ?? undefined,
           }),
