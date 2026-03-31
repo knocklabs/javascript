@@ -153,6 +153,27 @@ export const V2 = () => {
       ? filterGuides(result.guides, displayOption, { activeOnly })
       : [];
 
+  // Clear focus lock if the focused guide would be hidden under the given
+  // filter combination.
+  const maybeClearStaleFocus = (
+    nextDisplayOption: DisplayOption,
+    nextActiveOnly: boolean,
+  ) => {
+    if (result?.status !== "ok") return;
+
+    const debugSettings = client.store.state.debug;
+    const focusedKeys = Object.keys(debugSettings?.focusedGuideKeys || {});
+    if (focusedKeys.length === 0) return;
+
+    const stillVisible = filterGuides(result.guides, nextDisplayOption, {
+      activeOnly: nextActiveOnly,
+    }).find((g) => g.key === focusedKeys[0]);
+
+    if (!stillVisible) {
+      client.setDebug({ ...debugSettings, focusedGuideKeys: {} });
+    }
+  };
+
   return (
     <Box
       tgphRef={containerRef}
@@ -265,29 +286,7 @@ export const V2 = () => {
                   value={displayOption}
                   onValueChange={(val: DisplayOption) => {
                     if (!val) return;
-
-                    const debugSettings = client.store.state.debug;
-
-                    const focusedGuideKeys = Object.keys(
-                      debugSettings?.focusedGuideKeys || {},
-                    );
-
-                    // Exit out of focus if the currently focused guide is not
-                    // part of the selected list filter.
-                    if (result.status === "ok" && focusedGuideKeys.length > 0) {
-                      const currFocusedGuide = filterGuides(
-                        result.guides,
-                        val,
-                      ).find((g) => g.key === focusedGuideKeys[0]);
-
-                      if (!currFocusedGuide) {
-                        client.setDebug({
-                          ...debugSettings,
-                          focusedGuideKeys: {},
-                        });
-                      }
-                    }
-
+                    maybeClearStaleFocus(val, activeOnly);
                     setDisplayOption(val);
                   }}
                 >
@@ -359,7 +358,10 @@ export const V2 = () => {
             <Box borderBottom="px">
               <GuideContextDetails
                 activeOnly={activeOnly}
-                onActiveOnlyChange={setActiveOnly}
+                onActiveOnlyChange={(nextActiveOnly) => {
+                  maybeClearStaleFocus(displayOption, nextActiveOnly);
+                  setActiveOnly(nextActiveOnly);
+                }}
               />
             </Box>
           )}
