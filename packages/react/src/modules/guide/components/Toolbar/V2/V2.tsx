@@ -33,10 +33,6 @@ const HOTKEY_TOGGLE_IS_COLLAPSED = "Control";
 
 const TOOLBAR_WIDTH = "540px";
 
-// XXX:
-// Empty state message in the list
-// Order index number
-
 const Kbd = ({ children }: { children: React.ReactNode }) => {
   return (
     <kbd
@@ -59,17 +55,13 @@ const filterGuides = (
   opts?: { activeOnly?: boolean },
 ) => {
   return guides.filter((guide) => {
+    if (opts?.activeOnly && !guide.annotation.active.status) {
+      return false;
+    }
+
     const { isEligible, isQualified } = guide.annotation;
     const isDisplayable = isEligible && isQualified;
 
-    if (opts?.activeOnly) {
-      // XXX
-      const isActive =
-        "active" in guide.annotation
-          ? guide.annotation.active.status
-          : guide.active;
-      if (!isActive) return false;
-    }
     if (displayOption === "only-displayable" && !isDisplayable) {
       return false;
     }

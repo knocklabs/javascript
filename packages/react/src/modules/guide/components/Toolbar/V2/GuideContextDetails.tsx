@@ -4,7 +4,7 @@ import { Toggle } from "@telegraph/toggle";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 
-type GuideContextDetailsProps = {
+type Props = {
   activeOnly: boolean;
   onActiveOnlyChange: (value: boolean) => void;
 };
@@ -12,7 +12,7 @@ type GuideContextDetailsProps = {
 export const GuideContextDetails = ({
   activeOnly,
   onActiveOnlyChange,
-}: GuideContextDetailsProps) => {
+}: Props) => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
     debugSettings: state.debug || {},
