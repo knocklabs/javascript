@@ -368,11 +368,11 @@ export const V2 = () => {
                 </Text>
               </Box>
             ) : (
-              guides.map((guide, idx) => (
+              guides.map((guide) => (
                 <GuideRow
                   key={guide.key}
                   guide={guide}
-                  orderIndex={idx}
+                  orderIndex={guide.orderIndex}
                   isExpanded={guide.key === expandedGuideRowKey}
                   onClick={() => {
                     setExpandedGuideRowKey((k) =>
