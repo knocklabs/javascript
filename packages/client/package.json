@@ -44,6 +44,9 @@
     "build:cjs": "BUILD_TARGET=cjs;  vite build",
     "prepublishOnly": "npm run build"
   },
+  "resolutions": {
+    "axios": "1.14.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.27.2",
     "@babel/core": "^7.28.0",
@@ -72,7 +75,7 @@
     "@knocklabs/types": "workspace:^",
     "@tanstack/store": "^0.7.2",
     "@types/phoenix": "^1.6.7",
-    "axios": "^1.11.0",
+    "axios": "1.14.0",
     "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
