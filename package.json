@@ -40,6 +40,9 @@
       "INTERNAL_MISMATCH"
     ]
   },
+  "resolutions": {
+    "axios": "1.14.0"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
     "@knocklabs/eslint-config": "workspace:^",
