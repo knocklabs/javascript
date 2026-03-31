@@ -256,6 +256,29 @@ export const V2 = () => {
                   value={displayOption}
                   onValueChange={(val: DisplayOption) => {
                     if (!val) return;
+
+                    const debugSettings = client.store.state.debug;
+
+                    const focusedGuideKeys = Object.keys(
+                      debugSettings?.focusedGuideKeys || {},
+                    );
+
+                    // Exit out of focus if the currently focused guide is not
+                    // part of the selected list filter.
+                    if (result.status === "ok" && focusedGuideKeys.length > 0) {
+                      const currFocusedGuide = filterGuides(
+                        result.guides,
+                        val,
+                      ).find((g) => g.key === focusedGuideKeys[0]);
+
+                      if (!currFocusedGuide) {
+                        client.setDebug({
+                          ...debugSettings,
+                          focusedGuideKeys: {},
+                        });
+                      }
+                    }
+
                     setDisplayOption(val);
                   }}
                 >

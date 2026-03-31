@@ -14,10 +14,10 @@ type Props = {
 export const FocusChin = ({ guides }: Props) => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
-    debugSettings: state.debug || {},
+    debugSettings: state.debug,
   }));
 
-  const focusedKeys = Object.keys(debugSettings.focusedGuideKeys || {});
+  const focusedKeys = Object.keys(debugSettings?.focusedGuideKeys || {});
 
   const isFocused = focusedKeys.length > 0;
   if (!isFocused) {
@@ -25,8 +25,6 @@ export const FocusChin = ({ guides }: Props) => {
   }
 
   const currentKey = focusedKeys[0]!;
-
-  // TODO: clear if focused guide key not found in guides.
 
   return (
     <Box
