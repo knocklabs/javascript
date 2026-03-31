@@ -4556,6 +4556,7 @@ __metadata:
     "@telegraph/segmented-control": "npm:^0.2.2"
     "@telegraph/select": "npm:^0.0.86"
     "@telegraph/tag": "npm:^0.1.4"
+    "@telegraph/toggle": "npm:0.1.1"
     "@telegraph/tokens": "npm:^0.1.4"
     "@telegraph/tooltip": "npm:0.1.3"
     "@telegraph/typography": "npm:^0.2.1"
@@ -7503,6 +7504,26 @@ __metadata:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
   checksum: 10c0/63cbbc13a33a02c20fd3bc1b6400a2852638986ede544621065e96c6bfcc0fa95c88531b75456d4cf78b6f0265d135d5aa2738df53d0c460ac6bc27b02ea1352
+  languageName: node
+  linkType: hard
+
+"@telegraph/toggle@npm:0.1.1":
+  version: 0.1.1
+  resolution: "@telegraph/toggle@npm:0.1.1"
+  dependencies:
+    "@radix-ui/react-use-controllable-state": "npm:^1.2.2"
+    "@radix-ui/react-visually-hidden": "npm:^1.2.4"
+    "@telegraph/button": "npm:^0.5.0"
+    "@telegraph/helpers": "npm:^0.0.15"
+    "@telegraph/icon": "npm:^0.4.0"
+    "@telegraph/layout": "npm:^0.5.0"
+    "@telegraph/tag": "npm:^0.1.4"
+    "@telegraph/typography": "npm:^0.2.1"
+    lucide-react: "npm:^0.544.0"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/5ebdb275d8b758fbfb7b893c5558255e0bf50a2c9c5b4132f4d31de7495861a4ee0a31a56ca5c1fd73d2d93aa8622b93050139241c365b7c460612933c7bc88b
   languageName: node
   linkType: hard
 
