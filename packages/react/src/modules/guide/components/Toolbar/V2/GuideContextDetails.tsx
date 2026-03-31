@@ -4,7 +4,15 @@ import { Toggle } from "@telegraph/toggle";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 
-export const GuideContextDetails = () => {
+type GuideContextDetailsProps = {
+  activeOnly: boolean;
+  onActiveOnlyChange: (value: boolean) => void;
+};
+
+export const GuideContextDetails = ({
+  activeOnly,
+  onActiveOnlyChange,
+}: GuideContextDetailsProps) => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
     debugSettings: state.debug || {},
@@ -65,6 +73,26 @@ export const GuideContextDetails = () => {
                   ignoreDisplayInterval: value,
                 });
               }}
+            />
+          </Stack>
+          <Stack direction="row" gap="2" align="center" h="7">
+            <Tooltip label="Only show guides that are active">
+              <Text
+                as="span"
+                size="1"
+                weight="medium"
+                color="gray"
+                width="36"
+                mt="1"
+              >
+                Active only
+              </Text>
+            </Tooltip>
+            <Toggle.Default
+              size="1"
+              pt="1_5"
+              value={activeOnly}
+              onValueChange={onActiveOnlyChange}
             />
           </Stack>
         </Stack>

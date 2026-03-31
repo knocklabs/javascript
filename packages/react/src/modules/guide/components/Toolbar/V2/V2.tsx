@@ -33,6 +33,10 @@ const HOTKEY_TOGGLE_IS_COLLAPSED = "Control";
 
 const TOOLBAR_WIDTH = "540px";
 
+// XXX:
+// Empty state message in the list
+// Order index number
+
 const Kbd = ({ children }: { children: React.ReactNode }) => {
   return (
     <kbd
@@ -52,11 +56,20 @@ const Kbd = ({ children }: { children: React.ReactNode }) => {
 const filterGuides = (
   guides: InspectionResultOk["guides"],
   displayOption: DisplayOption,
+  opts?: { activeOnly?: boolean },
 ) => {
   return guides.filter((guide) => {
     const { isEligible, isQualified } = guide.annotation;
     const isDisplayable = isEligible && isQualified;
 
+    if (opts?.activeOnly) {
+      // XXX
+      const isActive =
+        "active" in guide.annotation
+          ? guide.annotation.active.status
+          : guide.active;
+      if (!isActive) return false;
+    }
     if (displayOption === "only-displayable" && !isDisplayable) {
       return false;
     }
@@ -72,6 +85,7 @@ export const V2 = () => {
 
   const [displayOption, setDisplayOption] =
     React.useState<DisplayOption>("only-eligible");
+  const [activeOnly, setActiveOnly] = React.useState(false);
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
@@ -143,7 +157,9 @@ export const V2 = () => {
   }
 
   const guides =
-    result.status === "ok" ? filterGuides(result.guides, displayOption) : [];
+    result.status === "ok"
+      ? filterGuides(result.guides, displayOption, { activeOnly })
+      : [];
 
   return (
     <Box
@@ -284,7 +300,7 @@ export const V2 = () => {
                   }}
                 >
                   <SegmentedControl.Option value="all-guides">
-                    All guides
+                    {activeOnly ? "All active" : "All guides"}
                   </SegmentedControl.Option>
                   <SegmentedControl.Option value="only-eligible">
                     Eligible
@@ -349,7 +365,10 @@ export const V2 = () => {
           {/* Collapsible panel to show context data */}
           {isContextPanelOpen && (
             <Box borderBottom="px">
-              <GuideContextDetails />
+              <GuideContextDetails
+                activeOnly={activeOnly}
+                onActiveOnlyChange={setActiveOnly}
+              />
             </Box>
           )}
 
