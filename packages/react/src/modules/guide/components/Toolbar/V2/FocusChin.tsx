@@ -26,6 +26,8 @@ export const FocusChin = ({ guides }: Props) => {
 
   const currentKey = focusedKeys[0]!;
 
+  // TODO: clear if focused guide key not found in guides.
+
   return (
     <Box
       borderTop="px"
@@ -53,7 +55,7 @@ export const FocusChin = ({ guides }: Props) => {
                   (g) => g.key === currentKey,
                 );
                 const prevGuide =
-                  currIndex === 0 ? undefined : selectableGuides[currIndex - 1];
+                  currIndex <= 0 ? undefined : selectableGuides[currIndex - 1];
 
                 if (!prevGuide) return;
 
@@ -78,7 +80,7 @@ export const FocusChin = ({ guides }: Props) => {
                   (g) => g.key === currentKey,
                 );
                 const nextGuide =
-                  currIndex + 1 > selectableGuides.length - 1
+                  currIndex < 0 || currIndex + 1 > selectableGuides.length - 1
                     ? undefined
                     : selectableGuides[currIndex + 1];
 
