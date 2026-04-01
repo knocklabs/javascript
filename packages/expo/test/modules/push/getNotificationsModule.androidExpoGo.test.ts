@@ -47,10 +47,8 @@ describe("getNotificationsModule (Android Expo Go)", () => {
       "../../../src/modules/push/getNotificationsModule"
     );
 
-    // First call already happened in previous test (module cached),
-    // but since vitest runs each test() sequentially in the same module
-    // context, the cache from the first test persists here.
-    // Call again to verify caching — warn should not fire again.
+    // Cache is already set from the previous test (same module context).
+    // Calling again should return cached null without another warning.
     const callCountBefore = warnSpy.mock.calls.length;
     getNotificationsModule();
     const callCountAfter = warnSpy.mock.calls.length;

@@ -44,6 +44,13 @@ function isAndroidExpoGo(): boolean {
   );
 }
 
+// Abstracted for testability — Vitest cannot intercept require() calls
+// inside dynamically imported modules after vi.resetModules().
+/* v8 ignore next 3 -- default require is replaced in tests via _resetForTesting */
+let requireNotifications: () => NotificationsModule = () =>
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require("expo-notifications") as NotificationsModule;
+
 export function getNotificationsModule(): NotificationsModule | null {
   if (cachedModule !== undefined) {
     return cachedModule;
@@ -64,8 +71,7 @@ export function getNotificationsModule(): NotificationsModule | null {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    cachedModule = require("expo-notifications") as NotificationsModule;
+    cachedModule = requireNotifications();
   } catch {
     console.warn(
       "[Knock] expo-notifications could not be loaded. " +
@@ -75,4 +81,17 @@ export function getNotificationsModule(): NotificationsModule | null {
   }
 
   return cachedModule;
+}
+
+/**
+ * @internal Test-only — reset the cached module and optionally override
+ * the require function used to load expo-notifications.
+ */
+export function _resetForTesting(
+  overrideRequire?: () => NotificationsModule,
+): void {
+  cachedModule = undefined;
+  if (overrideRequire) {
+    requireNotifications = overrideRequire;
+  }
 }
