@@ -56,7 +56,7 @@
     "@knocklabs/react-native": "workspace:^",
     "react-native-gesture-handler": "~2.30.0",
     "react-native-render-html": "^6.3.4",
-    "react-native-svg": "15.15.3"
+    "react-native-svg": "~15.15.3"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
