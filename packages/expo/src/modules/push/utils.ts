@@ -167,6 +167,12 @@ export async function registerForPushNotifications(
 
   const permissionStatus = await requestPushPermission();
 
+  if (permissionStatus === "unavailable") {
+    // Module couldn't be loaded (e.g. Android Expo Go) — the warning is
+    // already emitted by getNotificationsModule, so just bail silently.
+    return null;
+  }
+
   if (permissionStatus !== "granted") {
     console.warn(
       `[Knock] Push notification permission not granted. Status: ${permissionStatus}. ` +
