@@ -36,7 +36,7 @@ export const FocusChin = ({ guides }: Props) => {
     >
       <Stack align="center" justify="space-between">
         <Text as="span" size="1" weight="medium" color="blue">
-          Focus lock: {currentKey}
+          Focus mode: {currentKey}
         </Text>
         <Stack align="center" gap="1">
           <Tooltip label="Focus previous guide">
