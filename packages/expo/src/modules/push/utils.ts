@@ -1,22 +1,44 @@
 import Constants from "expo-constants";
 import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+
+import { getNotificationsModule } from "./getNotificationsModule";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ExpoConstants = typeof Constants & Record<string, any>;
 
 /**
+ * Permission status values returned by expo-notifications.
+ * "unavailable" is returned when the notifications module could not be loaded
+ * (e.g. Android Expo Go where push support was removed in SDK 53).
+ */
+export type PushPermissionStatus =
+  | "granted"
+  | "denied"
+  | "undetermined"
+  | "unavailable";
+
+/**
+ * Configuration for how a notification should be presented when received in the foreground.
+ */
+type NotificationBehavior = {
+  shouldShowAlert: boolean;
+  shouldPlaySound: boolean;
+  shouldSetBadge: boolean;
+  shouldShowBanner: boolean;
+  shouldShowList: boolean;
+};
+
+/**
  * Default notification behavior when a notification is received.
  */
-export const DEFAULT_NOTIFICATION_BEHAVIOR: Notifications.NotificationBehavior =
-  {
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  };
+export const DEFAULT_NOTIFICATION_BEHAVIOR: NotificationBehavior = {
+  shouldShowAlert: true,
+  shouldPlaySound: true,
+  shouldSetBadge: true,
+  shouldShowBanner: true,
+  shouldShowList: true,
+};
 
 /**
  * Get the Expo project ID from various possible sources.
@@ -50,17 +72,23 @@ export function getProjectId(): string | null {
 
 /**
  * Request push notification permissions if not already granted.
- * @returns The permission status string
+ * @returns The permission status
  */
-export async function requestPushPermission(): Promise<string> {
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+export async function requestPushPermission(): Promise<PushPermissionStatus> {
+  const NotificationsModule = getNotificationsModule();
+  if (!NotificationsModule) {
+    return "unavailable";
+  }
+
+  const { status: existingStatus } =
+    await NotificationsModule.getPermissionsAsync();
 
   if (existingStatus === "granted") {
     return existingStatus;
   }
 
-  const { status } = await Notifications.requestPermissionsAsync();
-  return status;
+  const { status } = await NotificationsModule.requestPermissionsAsync();
+  return status as PushPermissionStatus;
 }
 
 /**
@@ -79,7 +107,12 @@ export async function getExpoPushToken(): Promise<string | null> {
     return null;
   }
 
-  const token = await Notifications.getExpoPushTokenAsync({ projectId });
+  const NotificationsModule = getNotificationsModule();
+  if (!NotificationsModule) {
+    return null;
+  }
+
+  const token = await NotificationsModule.getExpoPushTokenAsync({ projectId });
   return token?.data ?? null;
 }
 
@@ -87,9 +120,14 @@ export async function getExpoPushToken(): Promise<string | null> {
  * Set up the default Android notification channel.
  */
 export async function setupDefaultAndroidChannel(): Promise<void> {
-  await Notifications.setNotificationChannelAsync("default", {
+  const NotificationsModule = getNotificationsModule();
+  if (!NotificationsModule) {
+    return;
+  }
+
+  await NotificationsModule.setNotificationChannelAsync("default", {
     name: "Default",
-    importance: Notifications.AndroidImportance.MAX,
+    importance: NotificationsModule.AndroidImportance.MAX,
     vibrationPattern: [0, 250, 250, 250],
     lightColor: "#FF231F7C",
   });
