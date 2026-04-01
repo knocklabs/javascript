@@ -34,11 +34,23 @@ export const FocusChin = ({ guides }: Props) => {
       overflow="hidden"
       backgroundColor="blue-2"
     >
-      <Stack align="center" justify="space-between">
-        <Text as="span" size="1" weight="medium" color="blue">
+      <Stack align="center" justify="space-between" gap="4">
+        <Text
+          as="span"
+          size="1"
+          weight="medium"
+          color="blue"
+          style={{
+            display: "block",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            minWidth: 0,
+          }}
+        >
           Focus mode: {currentKey}
         </Text>
-        <Stack align="center" gap="1">
+        <Stack align="center" gap="1" style={{ flexShrink: 0 }}>
           <Tooltip label="Focus previous guide">
             <Button
               size="0"
