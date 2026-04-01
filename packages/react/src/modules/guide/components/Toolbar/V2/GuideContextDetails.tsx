@@ -19,16 +19,18 @@ export const GuideContextDetails = () => {
         <Stack direction="column" gap="1">
           <Stack direction="row" gap="2" align="center" h="7">
             <Tooltip label="Contain engagement actions to client side only">
-              <Text
-                as="span"
-                size="1"
-                weight="medium"
-                color="gray"
-                width="36"
-                mt="1"
-              >
-                Sandbox engagement
-              </Text>
+              <Box width="36" mt="1">
+                <Text
+                  as="span"
+                  size="1"
+                  weight="medium"
+                  color="gray"
+                  borderBottom="px"
+                  borderStyle="dashed"
+                >
+                  Sandbox engagement
+                </Text>
+              </Box>
             </Tooltip>
             <Toggle.Default
               size="1"
@@ -44,16 +46,18 @@ export const GuideContextDetails = () => {
           </Stack>
           <Stack direction="row" gap="2" align="center" h="7">
             <Tooltip label="Ignore throttle and show next guide immediately">
-              <Text
-                as="span"
-                size="1"
-                weight="medium"
-                color="gray"
-                width="36"
-                mt="1"
-              >
-                Ignore throttle
-              </Text>
+              <Box width="36" mt="1">
+                <Text
+                  as="span"
+                  size="1"
+                  weight="medium"
+                  color="gray"
+                  borderBottom="px"
+                  borderStyle="dashed"
+                >
+                  Ignore throttle
+                </Text>
+              </Box>
             </Tooltip>
             <Toggle.Default
               size="1"
