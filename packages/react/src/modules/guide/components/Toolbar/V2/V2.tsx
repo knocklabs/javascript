@@ -74,7 +74,7 @@ export const V2 = () => {
   const { client } = useGuideContext();
 
   const [displayOption, setDisplayOption] =
-    React.useState<DisplayOption>("only-eligible");
+    React.useState<DisplayOption>("only-active");
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
@@ -286,13 +286,22 @@ export const V2 = () => {
                     setDisplayOption(val);
                   }}
                 >
-                  <SegmentedControl.Option value="all-guides">
+                  <SegmentedControl.Option
+                    value="all-guides"
+                    style={{ width: "54px" }}
+                  >
                     All
                   </SegmentedControl.Option>
-                  <SegmentedControl.Option value="only-active">
+                  <SegmentedControl.Option
+                    value="only-active"
+                    style={{ width: "54px" }}
+                  >
                     Active
                   </SegmentedControl.Option>
-                  <SegmentedControl.Option value="only-eligible">
+                  <SegmentedControl.Option
+                    value="only-eligible"
+                    style={{ width: "54px" }}
+                  >
                     Eligible
                   </SegmentedControl.Option>
                   {/* Note: `only-displayable` is not available for now */}
