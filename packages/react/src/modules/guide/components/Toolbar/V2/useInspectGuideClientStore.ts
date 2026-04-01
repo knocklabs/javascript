@@ -91,6 +91,7 @@ type GuideAnnotation = AnnotatedStatuses & {
 };
 
 export type AnnotatedGuide = KnockGuide & {
+  orderIndex: number;
   annotation: GuideAnnotation;
 
   // Legacy fields, typed only to make tsc happy when we prune these out.
@@ -103,6 +104,7 @@ export type AnnotatedGuide = KnockGuide & {
 // never been published to switchboard.
 export type UncommittedGuide = {
   __typename: "UncommittedGuide";
+  orderIndex: number;
   key: KnockGuide["key"];
   active: false;
   bypass_global_group_limit: false;
@@ -364,6 +366,7 @@ export const resolveIsQualified = ({
 
 const annotateGuide = (
   guide: KnockGuide,
+  orderIndex: number,
   snapshot: StoreStateSnapshot,
   stage: KnockGuideClientGroupStage | undefined,
 ): AnnotatedGuide => {
@@ -389,14 +392,16 @@ const annotateGuide = (
 
   return {
     ...guide,
+    orderIndex,
     annotation,
   };
 };
 
-const newUncommittedGuide = (key: KnockGuide["key"]) =>
+const newUncommittedGuide = (key: KnockGuide["key"], orderIndex: number) =>
   ({
     __typename: "UncommittedGuide",
     key,
+    orderIndex,
     active: false,
     bypass_global_group_limit: false,
     annotation: {
@@ -458,13 +463,13 @@ export const useInspectGuideClientStore = (
 
   // Annotate guides for various eligibility, activation and query statuses
   // that are useful for debugging purposes.
-  const orderedGuides = defaultGroup.display_sequence.map((guideKey) => {
+  const orderedGuides = defaultGroup.display_sequence.map((guideKey, index) => {
     const guide = snapshot.guides[guideKey];
     if (!guide) {
-      return newUncommittedGuide(guideKey);
+      return newUncommittedGuide(guideKey, index);
     }
 
-    return annotateGuide(guide, snapshot, groupStage);
+    return annotateGuide(guide, index, snapshot, groupStage);
   });
 
   // Check if the focused guide actually exists and is selectable on the page.

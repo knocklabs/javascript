@@ -25,6 +25,8 @@ import {
   isUncommittedGuide,
 } from "./useInspectGuideClientStore";
 
+export const GUIDE_ROW_DATA_SELECTOR = "data-kgt-guide-row-key";
+
 const Pill = ({
   label,
   color = "gray",
@@ -188,6 +190,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
 
   const dots = getStatusDots(guide);
   const summary = getStatusSummary(guide);
+  const dataAttrs = { [GUIDE_ROW_DATA_SELECTOR]: guide.key };
 
   return (
     <Box
@@ -199,6 +202,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{ cursor: "pointer" }}
+      {...dataAttrs}
     >
       <Stack
         h="7"

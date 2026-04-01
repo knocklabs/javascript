@@ -19,9 +19,10 @@ import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
 
+import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import { clearRunConfigLS, getRunConfig } from "./helpers";
+import { DisplayOption, clearRunConfigLS, getRunConfig } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
@@ -48,46 +49,21 @@ const Kbd = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-type DisplayOption = "all-guides" | "only-eligible" | "only-displayable";
-
-const GuidesList = ({
-  guides,
-  displayOption,
-}: {
-  guides: InspectionResultOk["guides"];
-  displayOption: DisplayOption;
-}) => {
-  const [expandedGuideRowKey, setExpandedGuideRowKey] = React.useState<
-    string | undefined
-  >();
-
-  React.useEffect(() => {
-    setExpandedGuideRowKey(undefined);
-  }, [displayOption]);
-
-  return guides.map((guide, idx) => {
+const filterGuides = (
+  guides: InspectionResultOk["guides"],
+  displayOption: DisplayOption,
+) => {
+  return guides.filter((guide) => {
     const { isEligible, isQualified } = guide.annotation;
     const isDisplayable = isEligible && isQualified;
 
     if (displayOption === "only-displayable" && !isDisplayable) {
-      return null;
+      return false;
     }
     if (displayOption === "only-eligible" && !isEligible) {
-      return null;
+      return false;
     }
-    return (
-      <GuideRow
-        key={guide.key}
-        guide={guide}
-        orderIndex={idx}
-        isExpanded={guide.key === expandedGuideRowKey}
-        onClick={() => {
-          setExpandedGuideRowKey((k) =>
-            k && k === guide.key ? undefined : guide.key,
-          );
-        }}
-      />
-    );
+    return true;
   });
 };
 
@@ -99,6 +75,14 @@ export const V2 = () => {
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
+
+  const [expandedGuideRowKey, setExpandedGuideRowKey] = React.useState<
+    string | undefined
+  >();
+
+  React.useEffect(() => {
+    setExpandedGuideRowKey(undefined);
+  }, [displayOption]);
 
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
@@ -145,6 +129,7 @@ export const V2 = () => {
   }, []);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const guideListRef = React.useRef<HTMLDivElement>(null);
   const { position, isDragging, handlePointerDown, hasDraggedRef } =
     useDraggable({
       elementRef: containerRef,
@@ -156,6 +141,9 @@ export const V2 = () => {
   if (!result || !runConfig?.isVisible) {
     return null;
   }
+
+  const guides =
+    result.status === "ok" ? filterGuides(result.guides, displayOption) : [];
 
   return (
     <Box
@@ -269,6 +257,29 @@ export const V2 = () => {
                   value={displayOption}
                   onValueChange={(val: DisplayOption) => {
                     if (!val) return;
+
+                    const debugSettings = client.store.state.debug;
+
+                    const focusedGuideKeys = Object.keys(
+                      debugSettings?.focusedGuideKeys || {},
+                    );
+
+                    // Exit out of focus if the currently focused guide is not
+                    // part of the selected list filter.
+                    if (result.status === "ok" && focusedGuideKeys.length > 0) {
+                      const currFocusedGuide = filterGuides(
+                        result.guides,
+                        val,
+                      ).find((g) => g.key === focusedGuideKeys[0]);
+
+                      if (!currFocusedGuide) {
+                        client.setDebug({
+                          ...debugSettings,
+                          focusedGuideKeys: {},
+                        });
+                      }
+                    }
+
                     setDisplayOption(val);
                   }}
                 >
@@ -343,7 +354,12 @@ export const V2 = () => {
           )}
 
           {/* Guide list content area */}
-          <Box p="1" overflow="auto" style={{ maxHeight: "calc(80vh - 96px)" }}>
+          <Box
+            tgphRef={guideListRef}
+            p="1"
+            overflow="auto"
+            style={{ maxHeight: "calc(80vh - 96px)" }}
+          >
             {result.status === "error" ? (
               <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
                 <Text
@@ -357,13 +373,31 @@ export const V2 = () => {
                   {result.message}
                 </Text>
               </Box>
+            ) : guides.length === 0 ? (
+              <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
+                <Text as="span" size="1" weight="medium" color="default">
+                  No guides match the current filter.
+                </Text>
+              </Box>
             ) : (
-              <GuidesList
-                guides={result.guides}
-                displayOption={displayOption}
-              />
+              guides.map((guide) => (
+                <GuideRow
+                  key={guide.key}
+                  guide={guide}
+                  orderIndex={guide.orderIndex}
+                  isExpanded={guide.key === expandedGuideRowKey}
+                  onClick={() => {
+                    setExpandedGuideRowKey((k) =>
+                      k && k === guide.key ? undefined : guide.key,
+                    );
+                  }}
+                />
+              ))
             )}
           </Box>
+
+          {/* Focus chin with dedicated controls */}
+          <FocusChin guides={guides} guideListRef={guideListRef} />
         </Stack>
       )}
     </Box>
