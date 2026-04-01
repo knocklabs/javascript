@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.7
+
+### Patch Changes
+
+- 6d3c9e2: pin axios to 1.14.0
+
 ## 0.21.6
 
 ### Patch Changes
