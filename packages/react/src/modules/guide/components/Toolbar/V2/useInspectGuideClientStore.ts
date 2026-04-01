@@ -111,6 +111,9 @@ export type UncommittedGuide = {
   annotation: {
     isEligible: false;
     isQualified: false;
+    active: {
+      status: false;
+    };
     selectable: {
       status: undefined;
     };
@@ -407,6 +410,9 @@ const newUncommittedGuide = (key: KnockGuide["key"], orderIndex: number) =>
     annotation: {
       isEligible: false,
       isQualified: false,
+      active: {
+        status: false,
+      },
       selectable: {
         status: undefined,
       },

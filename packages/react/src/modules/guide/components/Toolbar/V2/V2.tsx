@@ -29,7 +29,7 @@ import {
   useInspectGuideClientStore,
 } from "./useInspectGuideClientStore";
 
-const HOTKEY_TOGGLE_IS_COLLAPSED = "Control";
+const TOGGLE_COLLAPSED_HOTKEY = ".";
 
 const TOOLBAR_WIDTH = "540px";
 
@@ -63,6 +63,9 @@ const filterGuides = (
     if (displayOption === "only-eligible" && !isEligible) {
       return false;
     }
+    if (displayOption === "only-active" && !guide.annotation.active.status) {
+      return false;
+    }
     return true;
   });
 };
@@ -71,7 +74,7 @@ export const V2 = () => {
   const { client } = useGuideContext();
 
   const [displayOption, setDisplayOption] =
-    React.useState<DisplayOption>("only-eligible");
+    React.useState<DisplayOption>("only-active");
   const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
@@ -101,30 +104,18 @@ export const V2 = () => {
     };
   }, [runConfig, client, setDisplayOption]);
 
-  // Toggle collapsed state when Ctrl is pressed and released alone
-  // (without combining with another key), similar to Vercel's toolbar.
+  // Toggle collapsed state with Ctrl + .
   React.useEffect(() => {
-    let ctrlUsedInCombo = false;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === HOTKEY_TOGGLE_IS_COLLAPSED && !e.repeat) {
-        ctrlUsedInCombo = false;
-      } else if (e.ctrlKey) {
-        ctrlUsedInCombo = true;
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === HOTKEY_TOGGLE_IS_COLLAPSED && !ctrlUsedInCombo) {
+      if (e.ctrlKey && e.key === TOGGLE_COLLAPSED_HOTKEY && !e.repeat) {
+        e.preventDefault();
         setIsCollapsed((prev) => !prev);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
     };
   }, []);
 
@@ -161,7 +152,10 @@ export const V2 = () => {
           delayDuration={500}
           label={
             <Text as="span" size="1">
-              Guide Toolbar <Kbd>ctrl</Kbd>
+              Guide Toolbar
+              <Stack display="inline-block" ml="3">
+                <Kbd>ctrl</Kbd> + <Kbd>.</Kbd>
+              </Stack>
             </Text>
           }
         >
@@ -283,15 +277,25 @@ export const V2 = () => {
                     setDisplayOption(val);
                   }}
                 >
-                  <SegmentedControl.Option value="all-guides">
-                    All guides
+                  <SegmentedControl.Option
+                    value="all-guides"
+                    style={{ width: "54px" }}
+                  >
+                    All
                   </SegmentedControl.Option>
-                  <SegmentedControl.Option value="only-eligible">
+                  <SegmentedControl.Option
+                    value="only-active"
+                    style={{ width: "54px" }}
+                  >
+                    Active
+                  </SegmentedControl.Option>
+                  <SegmentedControl.Option
+                    value="only-eligible"
+                    style={{ width: "54px" }}
+                  >
                     Eligible
                   </SegmentedControl.Option>
-                  <SegmentedControl.Option value="only-displayable">
-                    On this page
-                  </SegmentedControl.Option>
+                  {/* Note: `only-displayable` is not available for now */}
                 </SegmentedControl.Root>
 
                 <Tooltip label="Settings & target params">
