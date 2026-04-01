@@ -367,6 +367,12 @@ export const V2 = () => {
                   {result.message}
                 </Text>
               </Box>
+            ) : guides.length === 0 ? (
+              <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
+                <Text as="span" size="1" weight="medium" color="default">
+                  No guides match the current filter.
+                </Text>
+              </Box>
             ) : (
               guides.map((guide) => (
                 <GuideRow
