@@ -4,14 +4,51 @@ import { Box, Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import * as React from "react";
 
+import { GUIDE_ROW_DATA_SELECTOR } from "./GuideRow";
 import { InspectionResultOk } from "./useInspectGuideClientStore";
+
+// Extra scroll overshoot so the focused guide plus ~1-2 neighbors are visible,
+// reducing how often consecutive next/prev clicks trigger a scroll.
+const SCROLL_OVERSHOOT = 60;
+
+const maybeScrollGuideIntoView = (container: HTMLElement, guideKey: string) => {
+  requestAnimationFrame(() => {
+    const el = container.querySelector(
+      `[${GUIDE_ROW_DATA_SELECTOR}="${CSS.escape(guideKey)}"]`,
+    );
+    if (!el || !(el instanceof HTMLElement)) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+
+    if (elRect.top < containerRect.top) {
+      container.scrollTo({
+        top:
+          container.scrollTop -
+          (containerRect.top - elRect.top) -
+          SCROLL_OVERSHOOT,
+        behavior: "smooth",
+      });
+    } else if (elRect.bottom > containerRect.bottom) {
+      container.scrollTo({
+        top:
+          container.scrollTop +
+          (elRect.bottom - containerRect.bottom) +
+          SCROLL_OVERSHOOT,
+        behavior: "smooth",
+      });
+    }
+  });
+};
 
 type Props = {
   guides: InspectionResultOk["guides"];
+  guideListRef: React.RefObject<HTMLDivElement | null>;
 };
 
-export const FocusChin = ({ guides }: Props) => {
+export const FocusChin = ({ guides, guideListRef }: Props) => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
     debugSettings: state.debug,
@@ -73,6 +110,10 @@ export const FocusChin = ({ guides }: Props) => {
                   ...debugSettings,
                   focusedGuideKeys: { [prevGuide.key]: true },
                 });
+
+                if (guideListRef.current) {
+                  maybeScrollGuideIntoView(guideListRef.current, prevGuide.key);
+                }
               }}
             />
           </Tooltip>
@@ -100,6 +141,10 @@ export const FocusChin = ({ guides }: Props) => {
                   ...debugSettings,
                   focusedGuideKeys: { [nextGuide.key]: true },
                 });
+
+                if (guideListRef.current) {
+                  maybeScrollGuideIntoView(guideListRef.current, nextGuide.key);
+                }
               }}
             />
           </Tooltip>

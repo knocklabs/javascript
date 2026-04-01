@@ -129,6 +129,7 @@ export const V2 = () => {
   }, []);
 
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const guideListRef = React.useRef<HTMLDivElement>(null);
   const { position, isDragging, handlePointerDown, hasDraggedRef } =
     useDraggable({
       elementRef: containerRef,
@@ -353,7 +354,12 @@ export const V2 = () => {
           )}
 
           {/* Guide list content area */}
-          <Box p="1" overflow="auto" style={{ maxHeight: "calc(80vh - 96px)" }}>
+          <Box
+            tgphRef={guideListRef}
+            p="1"
+            overflow="auto"
+            style={{ maxHeight: "calc(80vh - 96px)" }}
+          >
             {result.status === "error" ? (
               <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
                 <Text
@@ -391,7 +397,7 @@ export const V2 = () => {
           </Box>
 
           {/* Focus chin with dedicated controls */}
-          <FocusChin guides={guides} />
+          <FocusChin guides={guides} guideListRef={guideListRef} />
         </Stack>
       )}
     </Box>
