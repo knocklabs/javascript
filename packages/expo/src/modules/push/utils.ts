@@ -2,7 +2,10 @@ import Constants from "expo-constants";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
 
-import { getNotificationsModule } from "./getNotificationsModule";
+import {
+  type NotificationBehavior,
+  getNotificationsModule,
+} from "./getNotificationsModule";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ExpoConstants = typeof Constants & Record<string, any>;
@@ -17,17 +20,6 @@ export type PushPermissionStatus =
   | "denied"
   | "undetermined"
   | "unavailable";
-
-/**
- * Configuration for how a notification should be presented when received in the foreground.
- */
-type NotificationBehavior = {
-  shouldShowAlert: boolean;
-  shouldPlaySound: boolean;
-  shouldSetBadge: boolean;
-  shouldShowBanner: boolean;
-  shouldShowList: boolean;
-};
 
 /**
  * Default notification behavior when a notification is received.
