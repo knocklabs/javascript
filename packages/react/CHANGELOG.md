@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.12
+
+### Patch Changes
+
+- 82c646d: [Guides] Improve tooltips in guide toolbar v2 in various places
+- e060fcb: [Guides] Change filter options to (All,Active,Eligible) in guide toolbar v2
+- 6931347: [Guides] Add FocusChin to highlight focus mode w/ dedicated controls
+- 79155de: [guides] handle better errors for focused guide key param in toolbar v2
+- 6f079ff: [Guides] Move the guide toolbar v2 setting UIs into the expandable area
+- e6dc9af: [guides] Add a hotkey to toggle toolbar v2 expanded/collapsed
+- Updated dependencies [6d3c9e2]
+  - @knocklabs/client@0.21.7
+  - @knocklabs/react-core@0.13.7
+
 ## 0.11.11
 
 ### Patch Changes
