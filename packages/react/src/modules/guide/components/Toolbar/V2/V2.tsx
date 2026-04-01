@@ -63,6 +63,9 @@ const filterGuides = (
     if (displayOption === "only-eligible" && !isEligible) {
       return false;
     }
+    if (displayOption === "only-active" && !guide.annotation.active.status) {
+      return false;
+    }
     return true;
   });
 };
@@ -284,14 +287,15 @@ export const V2 = () => {
                   }}
                 >
                   <SegmentedControl.Option value="all-guides">
-                    All guides
+                    All
+                  </SegmentedControl.Option>
+                  <SegmentedControl.Option value="only-active">
+                    Active
                   </SegmentedControl.Option>
                   <SegmentedControl.Option value="only-eligible">
                     Eligible
                   </SegmentedControl.Option>
-                  <SegmentedControl.Option value="only-displayable">
-                    On this page
-                  </SegmentedControl.Option>
+                  {/* Note: `only-displayable` is not available for now */}
                 </SegmentedControl.Root>
 
                 <Tooltip label="Settings & target params">
