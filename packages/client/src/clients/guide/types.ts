@@ -72,6 +72,7 @@ export interface GuideData<TContent = Any> {
   activation_url_rules: GuideActivationUrlRuleData[];
   activation_url_patterns: GuideActivationUrlPatternData[];
   bypass_global_group_limit: boolean;
+  dashboard_url: string;
   inserted_at: string;
   updated_at: string;
 }
