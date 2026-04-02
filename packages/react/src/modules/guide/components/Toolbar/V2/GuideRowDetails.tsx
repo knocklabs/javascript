@@ -194,6 +194,14 @@ export const GuideRowDetails = ({
         <Button
           size="0"
           variant="outline"
+          // TODO(KNO-11468): Placeholder button
+          onClick={() => {}}
+        >
+          Reset engagement
+        </Button>
+        <Button
+          size="0"
+          variant="outline"
           onClick={() => window.open(guide.dashboard_url, "_blank", "noopener")}
         >
           Open in dashboard
