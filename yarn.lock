@@ -4502,6 +4502,7 @@ __metadata:
     expo-notifications: "*"
     react: "*"
     react-native: "*"
+    react-native-gesture-handler: ">=2.0.0"
   languageName: unknown
   linkType: soft
 
@@ -4612,6 +4613,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
+    react-native-gesture-handler: ">=2.0.0"
   languageName: unknown
   linkType: soft
 
