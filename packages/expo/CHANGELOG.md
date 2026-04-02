@@ -1,5 +1,18 @@
 # @knocklabs/expo
 
+## 0.6.0
+
+### Minor Changes
+
+- ecbfed1: chore: upgrade expo and react native packages to their latest version, ensure expo go builds on android get the proper warning about deprecated notification support from expo, ensure expo-example app works as expected.
+
+### Patch Changes
+
+- b932f46: Move `react-native-gesture-handler` from dependencies to peer dependencies so consumer apps do not install duplicate native module copies.
+- Updated dependencies [b932f46]
+- Updated dependencies [ecbfed1]
+  - @knocklabs/react-native@0.9.0
+
 ## 0.5.7
 
 ### Patch Changes
