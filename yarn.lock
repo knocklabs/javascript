@@ -4425,6 +4425,7 @@ __metadata:
     expo-notifications: "*"
     react: "*"
     react-native: "*"
+    react-native-gesture-handler: ^2.27.1
   languageName: unknown
   linkType: soft
 
@@ -4535,6 +4536,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
+    react-native-gesture-handler: ^2.27.1
   languageName: unknown
   linkType: soft
 
