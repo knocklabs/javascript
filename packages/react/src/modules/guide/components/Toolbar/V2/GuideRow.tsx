@@ -17,7 +17,7 @@ import {
   StatusSummary,
   getSelectableStatusSummary,
 } from "./GuideRowDetails";
-import { FOCUS_ERRORS, sharedTooltipProps } from "./helpers";
+import { sharedTooltipProps } from "./helpers";
 import {
   AnnotatedGuide,
   AnnotatedStatuses,
@@ -333,39 +333,24 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
             />
           </Pill>
 
-          <Tooltip
-            label={
-              isUncommittedGuide(guide)
-                ? FOCUS_ERRORS.focusUncommittedGuide
-                : guide.annotation.selectable.status === undefined
-                  ? FOCUS_ERRORS.focusUnselectableGuide
-                  : ""
-            }
-            enabled={
+          <Button
+            size="0"
+            variant={isFocused ? "solid" : "outline"}
+            color={isFocused ? "blue" : "gray"}
+            disabled={
               isUncommittedGuide(guide) ||
               guide.annotation.selectable.status === undefined
             }
-            {...sharedTooltipProps}
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              client.setDebug({
+                ...debugSettings,
+                focusedGuideKeys: isFocused ? {} : { [guide.key]: true },
+              });
+            }}
           >
-            <Button
-              size="0"
-              variant={isFocused ? "solid" : "outline"}
-              color={isFocused ? "blue" : "gray"}
-              disabled={
-                isUncommittedGuide(guide) ||
-                guide.annotation.selectable.status === undefined
-              }
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                client.setDebug({
-                  ...debugSettings,
-                  focusedGuideKeys: isFocused ? {} : { [guide.key]: true },
-                });
-              }}
-            >
-              Focus
-            </Button>
-          </Tooltip>
+            Focus
+          </Button>
         </Stack>
       </Stack>
 
