@@ -56,24 +56,22 @@ const StatusRow = ({
 }) => {
   return (
     <Stack align="center" gap="1">
-      <Stack as="span" align="center" gap="1" display="inline-flex">
-        <Tooltip enabled={!!tooltip} label={tooltip} {...sharedTooltipProps}>
-          <Stack gap="1">
-            <StatusDot color={color} tooltip={`${label}: ${value}`} />
-            <Text as="span" size="1" weight="medium">
-              {label}:
+      <Tooltip enabled={!!tooltip} label={tooltip} {...sharedTooltipProps}>
+        <Stack align="center" gap="1" display="inline-flex">
+          <StatusDot color={color} tooltip={`${label}: ${value}`} />
+          <Text as="span" size="1" weight="medium">
+            {label}:
+          </Text>
+          {/* User children over value when provided, for cases when we want to
+              have its own tooltip over it */}
+          {!children && (
+            <Text as="span" size="1" weight="medium" color={color}>
+              {value}
             </Text>
-            {/* User children over value when provided, for cases when we want to
-                have its own tooltip over it */}
-            {!children && (
-              <Text as="span" size="1" weight="medium" color={color}>
-                {value}
-              </Text>
-            )}
-          </Stack>
-        </Tooltip>
-        {children}
-      </Stack>
+          )}
+        </Stack>
+      </Tooltip>
+      {children}
     </Stack>
   );
 };
