@@ -17,7 +17,7 @@ import {
   StatusSummary,
   getSelectableStatusSummary,
 } from "./GuideRowDetails";
-import { FOCUS_ERRORS } from "./helpers";
+import { FOCUS_ERRORS, sharedTooltipProps } from "./helpers";
 import {
   AnnotatedGuide,
   AnnotatedStatuses,
@@ -259,6 +259,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
           </Stack>
           <Tooltip
             label={`${guide.key}${guide.bypass_global_group_limit ? " (unthrottled)" : ""}`}
+            {...sharedTooltipProps}
           >
             <Text
               as="code"
@@ -281,7 +282,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
         {/* Right section: verdict + pills + focus */}
         <Stack align="center" gap="1_5" style={{ flexShrink: 0 }}>
           {!hasFocus && (
-            <Tooltip label={summary.description}>
+            <Tooltip label={summary.description} {...sharedTooltipProps}>
               <Tag size="0" variant="soft" color={summary.color}>
                 {summary.label}
               </Tag>
@@ -344,6 +345,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
               isUncommittedGuide(guide) ||
               guide.annotation.selectable.status === undefined
             }
+            {...sharedTooltipProps}
           >
             <Button
               size="0"

@@ -22,7 +22,12 @@ import "../styles.css";
 import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import { DisplayOption, clearRunConfigLS, getRunConfig } from "./helpers";
+import {
+  DisplayOption,
+  clearRunConfigLS,
+  getRunConfig,
+  sharedTooltipProps,
+} from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
@@ -158,7 +163,6 @@ export const V2 = () => {
       {isCollapsed ? (
         <Tooltip
           side="left"
-          delayDuration={500}
           label={
             <Text as="span" size="1">
               Guide Toolbar
@@ -167,6 +171,7 @@ export const V2 = () => {
               </Stack>
             </Text>
           }
+          {...sharedTooltipProps}
         >
           <Stack
             border="px"
@@ -306,7 +311,7 @@ export const V2 = () => {
                   {/* Note: `only-displayable` is not available for now */}
                 </SegmentedControl.Root>
 
-                <Tooltip label="Settings & target params">
+                <Tooltip label="Settings" {...sharedTooltipProps}>
                   <Button
                     size="1"
                     variant={isContextPanelOpen ? "outline" : "ghost"}
@@ -346,7 +351,7 @@ export const V2 = () => {
                 >
                   Exit
                 </Button>
-                <Tooltip label="Minimize toolbar">
+                <Tooltip label="Minimize toolbar" {...sharedTooltipProps}>
                   <Button
                     size="1"
                     variant="outline"

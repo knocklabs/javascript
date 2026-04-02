@@ -2,6 +2,10 @@ import { KnockGuide } from "@knocklabs/client";
 
 import { checkForWindow } from "../../../../../modules/core";
 
+export const sharedTooltipProps = {
+  delayDuration: 1000,
+};
+
 export type DisplayOption =
   | "all-guides"
   | "only-active"
