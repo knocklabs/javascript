@@ -33,6 +33,15 @@ const TOGGLE_COLLAPSED_HOTKEY = ".";
 
 const TOOLBAR_WIDTH = "540px";
 
+const TOOLBAR_BOX_SHADOW = [
+  "0 0 0 1px rgba(0, 0, 0, 0.06)",
+  "0 0 0 1px rgba(255, 255, 255, 0.10)",
+  "inset 0 1px 0 rgba(255, 255, 255, 0.04)",
+  "0 1px 1px 0 rgba(0, 0, 0, 0.04)",
+  "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+  "0 8px 16px -4px rgba(0, 0, 0, 0.06)",
+].join(", ");
+
 const Kbd = ({ children }: { children: React.ReactNode }) => {
   return (
     <kbd
@@ -197,11 +206,10 @@ export const V2 = () => {
           direction="column"
           backgroundColor="surface-1"
           rounded="4"
-          border="px"
           overflow="hidden"
           style={{
             width: TOOLBAR_WIDTH,
-            boxShadow: "0 8px 32px var(--tgph-gray-5)",
+            boxShadow: TOOLBAR_BOX_SHADOW,
             animation: "toolbar-expand-fade-in 150ms ease-out",
           }}
         >
