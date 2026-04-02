@@ -1,3 +1,4 @@
+import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
@@ -135,7 +136,7 @@ export const GuideRowDetails = ({
   );
 
   return (
-    <Stack px="3" py="2" gap="2" direction="row" align="flex-start">
+    <Stack p="1" gap="2" direction="row" align="flex-start">
       <CardContainer title="Eligibility">
         <StatusRow
           label="Active"
@@ -156,7 +157,6 @@ export const GuideRowDetails = ({
           tooltip="Whether the current user matches the guide's targeting conditions."
         />
       </CardContainer>
-
       <CardContainer title="Visibility">
         <StatusRow
           label="Activation"
@@ -185,6 +185,23 @@ export const GuideRowDetails = ({
           </Tooltip>
         </StatusRow>
       </CardContainer>
+      <Stack direction="column" gap="1">
+        <Button
+          size="0"
+          variant="outline"
+          // TODO(KNO-11468): Placeholder button
+          onClick={() => {}}
+        >
+          Reset engagement
+        </Button>
+        <Button
+          size="0"
+          variant="outline"
+          onClick={() => window.open(guide.dashboard_url, "_blank", "noopener")}
+        >
+          Open in dashboard
+        </Button>
+      </Stack>
     </Stack>
   );
 };
