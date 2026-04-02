@@ -1,5 +1,17 @@
 # @knocklabs/expo-example
 
+## 1.1.0
+
+### Minor Changes
+
+- ecbfed1: chore: upgrade expo and react native packages to their latest version, ensure expo go builds on android get the proper warning about deprecated notification support from expo, ensure expo-example app works as expected.
+
+### Patch Changes
+
+- Updated dependencies [b932f46]
+- Updated dependencies [ecbfed1]
+  - @knocklabs/expo@0.6.0
+
 ## 1.0.46
 
 ### Patch Changes
