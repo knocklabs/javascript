@@ -42,12 +42,12 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.0.0"
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
-    "react-native-gesture-handler": "~2.30.0",
     "react-native-get-random-values": "^1.11.0",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "~15.15.3"
@@ -66,6 +66,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-native": "^0.83.4",
+    "react-native-gesture-handler": "~2.30.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
