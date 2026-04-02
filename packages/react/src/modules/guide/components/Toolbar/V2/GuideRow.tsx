@@ -17,7 +17,7 @@ import {
   StatusSummary,
   getSelectableStatusSummary,
 } from "./GuideRowDetails";
-import { FOCUS_ERRORS } from "./helpers";
+import { sharedTooltipProps } from "./helpers";
 import {
   AnnotatedGuide,
   AnnotatedStatuses,
@@ -259,6 +259,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
           </Stack>
           <Tooltip
             label={`${guide.key}${guide.bypass_global_group_limit ? " (unthrottled)" : ""}`}
+            {...sharedTooltipProps}
           >
             <Text
               as="code"
@@ -281,7 +282,7 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
         {/* Right section: verdict + pills + focus */}
         <Stack align="center" gap="1_5" style={{ flexShrink: 0 }}>
           {!hasFocus && (
-            <Tooltip label={summary.description}>
+            <Tooltip label={summary.description} {...sharedTooltipProps}>
               <Tag size="0" variant="soft" color={summary.color}>
                 {summary.label}
               </Tag>
@@ -332,38 +333,24 @@ export const GuideRow = ({ guide, orderIndex, isExpanded, onClick }: Props) => {
             />
           </Pill>
 
-          <Tooltip
-            label={
-              isUncommittedGuide(guide)
-                ? FOCUS_ERRORS.focusUncommittedGuide
-                : guide.annotation.selectable.status === undefined
-                  ? FOCUS_ERRORS.focusUnselectableGuide
-                  : ""
-            }
-            enabled={
+          <Button
+            size="0"
+            variant={isFocused ? "solid" : "outline"}
+            color={isFocused ? "blue" : "gray"}
+            disabled={
               isUncommittedGuide(guide) ||
               guide.annotation.selectable.status === undefined
             }
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              client.setDebug({
+                ...debugSettings,
+                focusedGuideKeys: isFocused ? {} : { [guide.key]: true },
+              });
+            }}
           >
-            <Button
-              size="0"
-              variant={isFocused ? "solid" : "outline"}
-              color={isFocused ? "blue" : "gray"}
-              disabled={
-                isUncommittedGuide(guide) ||
-                guide.annotation.selectable.status === undefined
-              }
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                client.setDebug({
-                  ...debugSettings,
-                  focusedGuideKeys: isFocused ? {} : { [guide.key]: true },
-                });
-              }}
-            >
-              Focus
-            </Button>
-          </Tooltip>
+            Focus
+          </Button>
         </Stack>
       </Stack>
 

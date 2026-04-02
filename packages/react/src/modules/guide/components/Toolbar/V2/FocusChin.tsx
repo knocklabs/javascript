@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import * as React from "react";
 
 import { GUIDE_ROW_DATA_SELECTOR } from "./GuideRow";
+import { sharedTooltipProps } from "./helpers";
 import { InspectionResultOk } from "./useInspectGuideClientStore";
 
 // Extra scroll overshoot so the focused guide plus ~1-2 neighbors are visible,
@@ -88,7 +89,7 @@ export const FocusChin = ({ guides, guideListRef }: Props) => {
           Focus mode: {currentKey}
         </Text>
         <Stack align="center" gap="1" style={{ flexShrink: 0 }}>
-          <Tooltip label="Focus previous guide">
+          <Tooltip label="Focus previous guide" {...sharedTooltipProps}>
             <Button
               size="0"
               variant="ghost"
@@ -117,7 +118,7 @@ export const FocusChin = ({ guides, guideListRef }: Props) => {
               }}
             />
           </Tooltip>
-          <Tooltip label="Focus next guide">
+          <Tooltip label="Focus next guide" {...sharedTooltipProps}>
             <Button
               size="0"
               variant="ghost"
@@ -148,7 +149,7 @@ export const FocusChin = ({ guides, guideListRef }: Props) => {
               }}
             />
           </Tooltip>
-          <Tooltip label="Exit focus lock">
+          <Tooltip label="Exit focus mode" {...sharedTooltipProps}>
             <Button
               size="0"
               variant="ghost"
