@@ -35,7 +35,7 @@ const CardContainer = ({
     <Text as="span" size="0" color="gray" weight="medium">
       {title}
     </Text>
-    <Stack direction="column" gap="1" mt="1">
+    <Stack direction="column" gap="1">
       {children}
     </Stack>
   </Stack>
