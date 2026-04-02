@@ -63,18 +63,23 @@ const Kbd = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const getEmptyStateMessage = (displayOption: DisplayOption) => {
+  switch (displayOption) {
+    case "all-guides":
+      return "You have no guides. Get started by creating a guide.";
+    case "only-active":
+      return "There are no active guides.";
+    case "only-eligible":
+      return "Your current user is not eligible for any guides.";
+  }
+};
+
 const filterGuides = (
   guides: InspectionResultOk["guides"],
   displayOption: DisplayOption,
 ) => {
   return guides.filter((guide) => {
-    const { isEligible, isQualified } = guide.annotation;
-    const isDisplayable = isEligible && isQualified;
-
-    if (displayOption === "only-displayable" && !isDisplayable) {
-      return false;
-    }
-    if (displayOption === "only-eligible" && !isEligible) {
+    if (displayOption === "only-eligible" && !guide.annotation.isEligible) {
       return false;
     }
     if (displayOption === "only-active" && !guide.annotation.active.status) {
@@ -308,7 +313,6 @@ export const V2 = () => {
                   >
                     Eligible
                   </SegmentedControl.Option>
-                  {/* Note: `only-displayable` is not available for now */}
                 </SegmentedControl.Root>
 
                 <Tooltip label="Settings" {...sharedTooltipProps}>
@@ -393,7 +397,7 @@ export const V2 = () => {
             ) : guides.length === 0 ? (
               <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
                 <Text as="span" size="1" weight="medium" color="default">
-                  No guides match the current filter.
+                  {getEmptyStateMessage(displayOption)}
                 </Text>
               </Box>
             ) : (

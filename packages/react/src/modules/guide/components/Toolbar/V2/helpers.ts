@@ -6,11 +6,7 @@ export const sharedTooltipProps = {
   delayDuration: 1000,
 };
 
-export type DisplayOption =
-  | "all-guides"
-  | "only-active"
-  | "only-eligible"
-  | "only-displayable";
+export type DisplayOption = "all-guides" | "only-active" | "only-eligible";
 
 // Use this param to start Toolbar and enter into a debugging session when
 // it is present and set to true.
