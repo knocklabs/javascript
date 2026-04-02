@@ -31,7 +31,7 @@ const CardContainer = ({
     bg="surface-1"
     border="px"
     borderColor="gray-4"
-    style={{ flex: 1 }}
+    style={{ flex: 1, alignSelf: "stretch" }}
   >
     <Text as="span" size="0" color="gray" weight="medium">
       {title}
@@ -185,15 +185,12 @@ export const GuideRowDetails = ({
           </Tooltip>
         </StatusRow>
       </CardContainer>
-      <Stack direction="column" gap="1">
-        <Button
-          size="0"
-          variant="outline"
-          // TODO(KNO-11468): Placeholder button
-          onClick={() => {}}
-        >
-          Reset engagement
-        </Button>
+      <Stack
+        direction="column"
+        justify="flex-end"
+        gap="1"
+        style={{ alignSelf: "stretch" }}
+      >
         <Button
           size="0"
           variant="outline"
