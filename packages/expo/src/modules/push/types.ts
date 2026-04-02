@@ -1,6 +1,11 @@
 import type { KnockPushNotificationContextType } from "@knocklabs/react-native";
-import type * as Notifications from "expo-notifications";
 import type React from "react";
+
+import type {
+  Notification,
+  NotificationBehavior,
+  NotificationResponse,
+} from "./getNotificationsModule";
 
 /**
  * Context type for the Expo push notification provider.
@@ -16,12 +21,12 @@ export interface KnockExpoPushNotificationContextType
 
   /** Register a handler for when a notification is received in the foreground */
   onNotificationReceived: (
-    handler: (notification: Notifications.Notification) => void,
+    handler: (notification: Notification) => void,
   ) => void;
 
   /** Register a handler for when a notification is tapped */
   onNotificationTapped: (
-    handler: (response: Notifications.NotificationResponse) => void,
+    handler: (response: NotificationResponse) => void,
   ) => void;
 }
 
@@ -37,8 +42,8 @@ export interface KnockExpoPushNotificationProviderProps {
    * If not provided, notifications will show alerts, play sounds, and set badges.
    */
   customNotificationHandler?: (
-    notification: Notifications.Notification,
-  ) => Promise<Notifications.NotificationBehavior>;
+    notification: Notification,
+  ) => Promise<NotificationBehavior>;
 
   /**
    * Custom function to set up the Android notification channel.

@@ -4,7 +4,6 @@ import {
   KnockPushNotificationProvider,
   usePushNotifications,
 } from "@knocklabs/react-native";
-import * as Notifications from "expo-notifications";
 import React, {
   createContext,
   useCallback,
@@ -14,6 +13,11 @@ import React, {
   useState,
 } from "react";
 
+import {
+  type Notification,
+  type NotificationResponse,
+  getNotificationsModule,
+} from "./getNotificationsModule";
 import type {
   KnockExpoPushNotificationContextType,
   KnockExpoPushNotificationProviderProps,
@@ -70,18 +74,18 @@ const InternalExpoPushNotificationProvider: React.FC<
 
   // Use refs for handlers to avoid re-running effects when handlers change
   const notificationReceivedHandlerRef = useRef<
-    (notification: Notifications.Notification) => void
+    (notification: Notification) => void
   >(() => {});
 
   const notificationTappedHandlerRef = useRef<
-    (response: Notifications.NotificationResponse) => void
+    (response: NotificationResponse) => void
   >(() => {});
 
   /**
    * Register a handler to be called when a notification is received in the foreground.
    */
   const onNotificationReceived = useCallback(
-    (handler: (notification: Notifications.Notification) => void) => {
+    (handler: (notification: Notification) => void) => {
       notificationReceivedHandlerRef.current = handler;
     },
     [],
@@ -91,7 +95,7 @@ const InternalExpoPushNotificationProvider: React.FC<
    * Register a handler to be called when a notification is tapped.
    */
   const onNotificationTapped = useCallback(
-    (handler: (response: Notifications.NotificationResponse) => void) => {
+    (handler: (response: NotificationResponse) => void) => {
       notificationTappedHandlerRef.current = handler;
     },
     [],
@@ -130,7 +134,7 @@ const InternalExpoPushNotificationProvider: React.FC<
    */
   const updateMessageStatus = useCallback(
     async (
-      notification: Notifications.Notification,
+      notification: Notification,
       status: MessageEngagementStatus,
     ): Promise<Message | void> => {
       const messageId = notification.request.content.data?.[
@@ -153,11 +157,14 @@ const InternalExpoPushNotificationProvider: React.FC<
 
   // Set up the notification handler for foreground notifications
   useEffect(() => {
+    const NotificationsModule = getNotificationsModule();
+    if (!NotificationsModule) return;
+
     const handleNotification = customNotificationHandler
       ? customNotificationHandler
       : async () => DEFAULT_NOTIFICATION_BEHAVIOR;
 
-    Notifications.setNotificationHandler({ handleNotification });
+    NotificationsModule.setNotificationHandler({ handleNotification });
   }, [customNotificationHandler]);
 
   // Auto-register for push notifications on mount if enabled
@@ -196,20 +203,24 @@ const InternalExpoPushNotificationProvider: React.FC<
 
   // Set up notification listeners for received and tapped notifications
   useEffect(() => {
-    const receivedSubscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
+    const NotificationsModule = getNotificationsModule();
+    if (!NotificationsModule) return;
+
+    const receivedSubscription =
+      NotificationsModule.addNotificationReceivedListener((notification) => {
         knockClient.log("[Knock] Notification received in foreground");
         updateMessageStatus(notification, "interacted");
         notificationReceivedHandlerRef.current(notification);
-      },
-    );
+      });
 
     const responseSubscription =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        knockClient.log("[Knock] Notification was tapped");
-        updateMessageStatus(response.notification, "interacted");
-        notificationTappedHandlerRef.current(response);
-      });
+      NotificationsModule.addNotificationResponseReceivedListener(
+        (response) => {
+          knockClient.log("[Knock] Notification was tapped");
+          updateMessageStatus(response.notification, "interacted");
+          notificationTappedHandlerRef.current(response);
+        },
+      );
 
     return () => {
       receivedSubscription.remove();

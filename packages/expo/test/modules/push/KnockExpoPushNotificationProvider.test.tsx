@@ -31,7 +31,7 @@ vi.mock("react-native", () => ({
   },
 }));
 
-vi.mock("expo-notifications", () => ({
+const mockNotifications = {
   setNotificationHandler: vi.fn(),
   getPermissionsAsync: vi.fn().mockResolvedValue({ status: "granted" }),
   requestPermissionsAsync: vi.fn().mockResolvedValue({ status: "granted" }),
@@ -44,6 +44,13 @@ vi.mock("expo-notifications", () => ({
   AndroidImportance: {
     MAX: 5,
   },
+};
+
+vi.mock("expo-notifications", () => mockNotifications);
+
+// Mock the lazy loader to return our mock directly (avoids require() in test env)
+vi.mock("../../../src/modules/push/getNotificationsModule", () => ({
+  getNotificationsModule: () => mockNotifications,
 }));
 
 // Create stable mock functions for usePushNotifications

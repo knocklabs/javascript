@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "expoexample",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.knocklabs.expoexample"
@@ -17,7 +16,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.knocklabs.expoexample"
     },
     "web": {
@@ -38,8 +36,7 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCanary": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {},
