@@ -191,6 +191,14 @@ export const GuideRowDetails = ({
         gap="1"
         style={{ alignSelf: "stretch" }}
       >
+        <Button
+          size="0"
+          variant="outline"
+          // TODO(KNO-11468): Placeholder button
+          onClick={() => {}}
+        >
+          Reset engagement
+        </Button>
         {dashboardUrl && (
           <Button
             size="0"
