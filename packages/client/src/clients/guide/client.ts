@@ -1132,6 +1132,7 @@ export class KnockGuideClient {
       return {
         ...state,
         guides: { ...state.guides, [guide.key]: { ...target, steps } },
+        counter: state.counter + 1,
       };
     });
   }
