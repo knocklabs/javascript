@@ -130,7 +130,7 @@ export const GuideRowDetails = ({
     );
   }
 
-  const { annotation } = guide;
+  const { annotation, dashboard_url: dashboardUrl } = guide;
   const selectableStatusSummary = getSelectableStatusSummary(
     annotation.selectable.status,
   );
@@ -191,13 +191,15 @@ export const GuideRowDetails = ({
         gap="1"
         style={{ alignSelf: "stretch" }}
       >
-        <Button
-          size="0"
-          variant="outline"
-          onClick={() => window.open(guide.dashboard_url, "_blank", "noopener")}
-        >
-          Open in dashboard
-        </Button>
+        {dashboardUrl && (
+          <Button
+            size="0"
+            variant="outline"
+            onClick={() => window.open(dashboardUrl, "_blank", "noopener")}
+          >
+            Open in dashboard
+          </Button>
+        )}
       </Stack>
     </Stack>
   );
