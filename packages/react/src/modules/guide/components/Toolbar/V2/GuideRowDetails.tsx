@@ -1,3 +1,4 @@
+import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
@@ -30,7 +31,7 @@ const CardContainer = ({
     bg="surface-1"
     border="px"
     borderColor="gray-4"
-    style={{ flex: 1 }}
+    style={{ flex: 1, alignSelf: "stretch" }}
   >
     <Text as="span" size="0" color="gray" weight="medium">
       {title}
@@ -129,13 +130,13 @@ export const GuideRowDetails = ({
     );
   }
 
-  const { annotation } = guide;
+  const { annotation, dashboard_url: dashboardUrl } = guide;
   const selectableStatusSummary = getSelectableStatusSummary(
     annotation.selectable.status,
   );
 
   return (
-    <Stack px="3" py="2" gap="2" direction="row" align="flex-start">
+    <Stack p="1" gap="2" direction="row" align="flex-start">
       <CardContainer title="Eligibility">
         <StatusRow
           label="Active"
@@ -156,7 +157,6 @@ export const GuideRowDetails = ({
           tooltip="Whether the current user matches the guide's targeting conditions."
         />
       </CardContainer>
-
       <CardContainer title="Visibility">
         <StatusRow
           label="Activation"
@@ -185,6 +185,22 @@ export const GuideRowDetails = ({
           </Tooltip>
         </StatusRow>
       </CardContainer>
+      <Stack
+        direction="column"
+        justify="flex-end"
+        gap="1"
+        style={{ alignSelf: "stretch" }}
+      >
+        {dashboardUrl && (
+          <Button
+            size="0"
+            variant="outline"
+            onClick={() => window.open(dashboardUrl, "_blank", "noopener")}
+          >
+            Open in dashboard
+          </Button>
+        )}
+      </Stack>
     </Stack>
   );
 };
