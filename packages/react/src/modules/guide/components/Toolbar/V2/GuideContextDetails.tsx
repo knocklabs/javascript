@@ -4,6 +4,8 @@ import { Toggle } from "@telegraph/toggle";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 
+import { sharedTooltipProps } from "./helpers";
+
 export const GuideContextDetails = () => {
   const { client } = useGuideContext();
   const { debugSettings } = useStore(client.store, (state) => ({
@@ -18,7 +20,10 @@ export const GuideContextDetails = () => {
         </Text>
         <Stack direction="column" gap="1">
           <Stack direction="row" gap="2" align="center" h="7">
-            <Tooltip label="Contain engagement actions to client side only">
+            <Tooltip
+              label="When enabled, engagement actions are not sent to Knock."
+              {...sharedTooltipProps}
+            >
               <Box width="36" mt="1">
                 <Text
                   as="span"
@@ -45,7 +50,10 @@ export const GuideContextDetails = () => {
             />
           </Stack>
           <Stack direction="row" gap="2" align="center" h="7">
-            <Tooltip label="Ignore throttle and show next guide immediately">
+            <Tooltip
+              label="Ignore throttle and show next guide immediately"
+              {...sharedTooltipProps}
+            >
               <Box width="36" mt="1">
                 <Text
                   as="span"
@@ -77,13 +85,11 @@ export const GuideContextDetails = () => {
         <Tooltip
           label={
             <Text as="span" size="1">
-              The tenant and data payload passed to the guide client that are
-              used for targeting
-              <br />
-              (via the targetParams prop to KnockGuideProvider)
+              The tenant and data payload passed to KnockGuideProvider.
+              Available for use in runtime conditions.
             </Text>
           }
-          delayDuration={500}
+          {...sharedTooltipProps}
         >
           <Text
             as="span"
