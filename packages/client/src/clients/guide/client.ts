@@ -1101,6 +1101,41 @@ export class KnockGuideClient {
     return updatedStep;
   }
 
+  async resetEngagement(guide: GuideData) {
+    const target = this.store.state.guides[guide.key];
+    if (!target) return;
+
+    this.knock.log(`[Guide] Resetting engagement (Guide key: ${guide.key})`);
+
+    // Note: Bypasse the skipEngagementTracking debug setting, so that the user
+    // can reset engagement from the toolbar while debugging.
+    const response = await this.knock.user.resetGuideEngagement({
+      guide_key: guide.key,
+      tenant: this.targetParams.tenant,
+    });
+
+    if (response.status !== "ok") return;
+
+    // Nullify all step message state fields for this guide in the local store.
+    this.store.setState((state) => {
+      const steps = target.steps.map((step) => ({
+        ...step,
+        message: {
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        } as StepMessageState,
+      }));
+
+      return {
+        ...state,
+        guides: { ...state.guides, [guide.key]: { ...target, steps } },
+      };
+    });
+  }
+
   private shouldSkipEngagementApi(): boolean {
     return !!this.store.state.debug?.skipEngagementTracking;
   }

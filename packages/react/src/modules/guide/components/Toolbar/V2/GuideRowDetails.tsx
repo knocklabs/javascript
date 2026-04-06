@@ -3,6 +3,8 @@ import { Box, Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
 
+import { useGuideContext } from "@knocklabs/react-core";
+
 import {
   StatusColor,
   GuideAnnotatedStatusDot as StatusDot,
@@ -120,6 +122,8 @@ export const GuideRowDetails = ({
 }: {
   guide: AnnotatedGuide | UncommittedGuide;
 }) => {
+  const { client } = useGuideContext();
+
   if (isUncommittedGuide(guide)) {
     return (
       <Box px="3" py="2">
@@ -194,8 +198,7 @@ export const GuideRowDetails = ({
         <Button
           size="0"
           variant="outline"
-          // TODO(KNO-11468): Placeholder button
-          onClick={() => {}}
+          onClick={() => client.resetEngagement(guide)}
         >
           Reset engagement
         </Button>

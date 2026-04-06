@@ -143,6 +143,15 @@ export type MarkGuideAsResponse = {
   status: "ok";
 };
 
+export type ResetGuideEngagementParams = {
+  guide_key: string;
+  tenant?: string;
+};
+
+export type ResetGuideEngagementResponse = {
+  status: "ok";
+};
+
 //
 // Socket events
 //
