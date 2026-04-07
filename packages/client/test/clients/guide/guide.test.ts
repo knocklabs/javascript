@@ -372,6 +372,28 @@ describe("KnockGuideClient", () => {
         });
       }
     });
+
+    test("fetch with force: true bypasses the cache and refetches", async () => {
+      const mockResponse = {
+        entries: [],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First fetch populates the query cache
+      await client.fetch();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(1);
+
+      // Second fetch without force is a noop (cache hit)
+      await client.fetch();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(1);
+
+      // Third fetch with force bypasses the cache
+      await client.fetch({ force: true });
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe("subscribe/unsubscribe", () => {
@@ -1365,6 +1387,100 @@ describe("KnockGuideClient", () => {
 
       expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
       expect(mockStore.setState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("hasEngagement", () => {
+    test("returns true when a step has a seen_at timestamp", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide" as const,
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [
+              {
+                ref: "step_1",
+                schema_key: "test",
+                schema_semver: "1.0.0",
+                schema_variant_key: "default",
+                message: {
+                  id: "msg_123",
+                  seen_at: "2026-01-01T00:00:00Z",
+                  read_at: null,
+                  interacted_at: null,
+                  archived_at: null,
+                  link_clicked_at: null,
+                },
+                content: {},
+              },
+            ],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      const guide = client.store.state.guides["test_guide"];
+      expect(guide.hasEngagement()).toBe(true);
+    });
+
+    test("returns false when no steps have engagement timestamps", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide" as const,
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [
+              {
+                ref: "step_1",
+                schema_key: "test",
+                schema_semver: "1.0.0",
+                schema_variant_key: "default",
+                message: {
+                  id: "msg_123",
+                  seen_at: null,
+                  read_at: null,
+                  interacted_at: null,
+                  archived_at: null,
+                  link_clicked_at: null,
+                },
+                content: {},
+              },
+            ],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      const guide = client.store.state.guides["test_guide"];
+      expect(guide.hasEngagement()).toBe(false);
     });
   });
 
