@@ -1,9 +1,8 @@
+import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
 import { Text } from "@telegraph/typography";
-
-import { useGuideContext } from "@knocklabs/react-core";
 
 import {
   StatusColor,

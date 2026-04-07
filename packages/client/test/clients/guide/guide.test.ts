@@ -1285,24 +1285,12 @@ describe("KnockGuideClient", () => {
       );
     });
 
-    test("resetEngagement calls API and nullifies step message state", async () => {
+    test("resetEngagement calls API and refetches guides", async () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-
-      const engagedStep = {
-        ...mockStep,
-        message: {
-          id: "msg_123",
-          seen_at: "2026-01-01T00:00:00.000Z",
-          read_at: "2026-01-01T00:00:00.000Z",
-          interacted_at: "2026-01-01T00:00:00.000Z",
-          archived_at: "2026-01-01T00:00:00.000Z",
-          link_clicked_at: "2026-01-01T00:00:00.000Z",
-        },
-      } as unknown as KnockGuideStep;
 
       const engagedGuide = {
         ...mockGuide,
-        steps: [engagedStep],
+        hasEngagement: () => true,
       } as unknown as KnockGuide;
 
       const stateWithGuides = {
@@ -1311,7 +1299,7 @@ describe("KnockGuideClient", () => {
         guides: { [engagedGuide.key]: engagedGuide },
         ineligibleGuides: {},
         previewGuides: {},
-        queries: {},
+        queries: { someQuery: { status: "ok" as const } },
         location: undefined,
         counter: 0,
         debug: { forcedGuideKey: null, previewSessionId: null },
@@ -1326,15 +1314,35 @@ describe("KnockGuideClient", () => {
         tenant: undefined,
       });
 
-      // Verify the store state was updated with nullified message fields
-      const updatedGuide = mockStore.state.guides[engagedGuide.key]!;
-      for (const step of updatedGuide.steps) {
-        expect(step.message.seen_at).toBeNull();
-        expect(step.message.read_at).toBeNull();
-        expect(step.message.interacted_at).toBeNull();
-        expect(step.message.archived_at).toBeNull();
-        expect(step.message.link_clicked_at).toBeNull();
-      }
+      // Verify fetch was triggered with force to refetch fresh guide state
+      expect(mockKnock.user.getGuides).toHaveBeenCalled();
+    });
+
+    test("resetEngagement noops when no step has engagement timestamps", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const unengagedGuide = {
+        ...mockGuide,
+        hasEngagement: () => false,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [unengagedGuide.key]: unengagedGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.resetEngagement(unengagedGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
     });
 
     test("resetEngagement noops when guide is not in the store", async () => {
@@ -1356,33 +1364,6 @@ describe("KnockGuideClient", () => {
       await client.resetEngagement(mockGuide);
 
       expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
-      expect(mockStore.setState).not.toHaveBeenCalled();
-    });
-
-    test("resetEngagement does not update store when API response is not ok", async () => {
-      const client = new KnockGuideClient(mockKnock, channelId);
-
-      const stateWithGuides = {
-        guideGroups: [mockDefaultGroup],
-        guideGroupDisplayLogs: {},
-        guides: { [mockGuide.key]: mockGuide },
-        ineligibleGuides: {},
-        previewGuides: {},
-        queries: {},
-        location: undefined,
-        counter: 0,
-        debug: { forcedGuideKey: null, previewSessionId: null },
-      };
-      mockStore.state = stateWithGuides;
-      mockStore.getState.mockReturnValue(stateWithGuides);
-
-      (mockKnock.user.resetGuideEngagement as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        status: "error",
-      });
-
-      await client.resetEngagement(mockGuide);
-
-      expect(mockKnock.user.resetGuideEngagement).toHaveBeenCalled();
       expect(mockStore.setState).not.toHaveBeenCalled();
     });
   });

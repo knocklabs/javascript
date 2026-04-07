@@ -230,6 +230,7 @@ export interface KnockGuide<TContent = Any> extends GuideData<TContent> {
   steps: KnockGuideStep<TContent>[];
   activation_url_patterns: KnockGuideActivationUrlPattern[];
   getStep: () => KnockGuideStep<TContent> | undefined;
+  hasEngagement: () => boolean;
 }
 
 type QueryKey = string;
