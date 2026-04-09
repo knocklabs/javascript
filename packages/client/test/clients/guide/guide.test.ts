@@ -4806,6 +4806,21 @@ describe("KnockGuideClient", () => {
 
       expect(client.store.state.debug!.ignoreDisplayInterval).toBe(false);
     });
+
+    test("returns early without setting debug when not authenticated", () => {
+      vi.mocked(mockKnock.isAuthenticated).mockReturnValue(false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+
+      client.setDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
   });
 
   describe("unsetDebug", () => {
@@ -4864,6 +4879,26 @@ describe("KnockGuideClient", () => {
 
       expect(client.store.state.debug).toBe(undefined);
 
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+
+    test("clears debug state but does not fetch when not authenticated", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      vi.mocked(mockKnock.isAuthenticated).mockReturnValue(false);
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(subscribeSpy).not.toHaveBeenCalled();
     });
