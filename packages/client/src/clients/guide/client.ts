@@ -629,7 +629,6 @@ export class KnockGuideClient {
         `[Guide] Start debugging, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch({ force: true });
-      this.subscribe();
     }
   }
 
@@ -653,8 +652,6 @@ export class KnockGuideClient {
         `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch({ force: true });
-      // TODO: Manage (re)subscribe/unsubscribe in V2 rather than here.
-      this.subscribe();
     }
   }
 
