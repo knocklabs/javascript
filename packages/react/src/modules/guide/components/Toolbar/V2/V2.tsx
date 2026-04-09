@@ -111,7 +111,7 @@ export const V2 = ({ readyToTarget }: Props) => {
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
-    if (readyToTarget && isVisible && !isDebugging) {
+    if (isVisible && !isDebugging && readyToTarget) {
       client.setDebug({ focusedGuideKeys });
 
       // If focused, switch to all guides so you can see in the list.

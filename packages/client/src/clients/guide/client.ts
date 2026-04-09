@@ -599,7 +599,6 @@ export class KnockGuideClient {
     }
   }
 
-  // TODO: Split setDebug into startDebug vs updateDebug.
   setDebug(debugOpts?: Omit<DebugState, "debugging">) {
     this.knock.log("[Guide] .setDebug()");
 
