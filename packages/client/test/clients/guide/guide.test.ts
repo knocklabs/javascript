@@ -4714,9 +4714,9 @@ describe("KnockGuideClient", () => {
 
       expect(client.store.state.debug!.debugging!).toBe(true);
 
-      // calls fetch and subscribe when not already debugging
+      // calls fetch when not already debugging; subscribe is managed by V2 toolbar
       expect(fetchSpy).toHaveBeenCalled();
-      expect(subscribeSpy).toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
     });
 
     test("sets debug state with provided options", () => {
@@ -4859,9 +4859,9 @@ describe("KnockGuideClient", () => {
 
       expect(client.store.state.debug).toBe(undefined);
 
-      // calls fetch and subscribe when was debugging
+      // calls fetch when was debugging; subscribe is managed by V2 toolbar
       expect(fetchSpy).toHaveBeenCalled();
-      expect(subscribeSpy).toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
     });
 
     test("does not call fetch and subscribe when was not debugging", () => {

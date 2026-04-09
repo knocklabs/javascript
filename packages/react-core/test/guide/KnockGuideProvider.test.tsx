@@ -78,6 +78,20 @@ describe("KnockGuideProvider", () => {
     expect(subscribeMock).toHaveBeenCalled();
   });
 
+  it("does not subscribe when listenForUpdates is false", () => {
+    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
+      React.createElement(
+        KnockGuideProvider,
+        { channelId: "feed", readyToTarget: true, listenForUpdates: false },
+        children,
+      );
+
+    renderHook(() => useGuideContext(), { wrapper });
+
+    expect(fetchMock).toHaveBeenCalled();
+    expect(subscribeMock).not.toHaveBeenCalled();
+  });
+
   it("defers fetch/subscribe to toolbar v2 when toolbar is visible", () => {
     getToolbarRunConfigFromUrlMock.mockReturnValue({ isVisible: true });
 
