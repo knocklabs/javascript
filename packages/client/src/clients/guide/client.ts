@@ -1113,7 +1113,7 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Resetting engagement (Guide key: ${guide.key})`);
 
-    // Note: Bypasse the skipEngagementTracking debug setting, so that the user
+    // Note: Bypass the skipEngagementTracking debug setting, so that the user
     // can reset engagement from the toolbar while debugging.
     const response = await this.knock.user.resetGuideEngagement({
       guide_key: guide.key,
