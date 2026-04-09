@@ -1,6 +1,3 @@
-/* TODO(KNO-12330): Include manually for now until telegraph style engine is
-* able to compile automatically with components in the monorepo setup */
-@import "@telegraph/toggle/default.css";
 @telegraph tokens;
 @telegraph components;
 
