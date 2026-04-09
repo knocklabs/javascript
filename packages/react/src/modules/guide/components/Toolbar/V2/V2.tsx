@@ -22,12 +22,7 @@ import "../styles.css";
 import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import {
-  DisplayOption,
-  clearRunConfigLS,
-  getRunConfig,
-  sharedTooltipProps,
-} from "./helpers";
+import { DisplayOption, getRunConfig, sharedTooltipProps } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
@@ -349,7 +344,6 @@ export const V2 = () => {
                   leadingIcon={{ icon: LogOut, alt: "Exit" }}
                   onClick={() => {
                     setRunConfig((curr) => ({ ...curr, isVisible: false }));
-                    clearRunConfigLS();
                     client.unsetDebug();
                   }}
                 >
