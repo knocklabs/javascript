@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.21.8
+
+### Patch Changes
+
+- af81cf2: [Guides] Add a Open in dashboard button to guide toolbar v2
+- 31dffc1: [Guides] Use `readyToTarget` to coordinate fetching guides in guide toolbar v2
+- 2798bbb: [Guides] Add reset engagement button in guide toolbar v2
+
 ## 0.21.7
 
 ### Patch Changes
