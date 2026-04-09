@@ -1,3 +1,4 @@
+import { KnockGuideClient } from "@knocklabs/client";
 import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Icon } from "@telegraph/icon";
@@ -22,7 +23,7 @@ import "../styles.css";
 import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import { DisplayOption, getRunConfig, sharedTooltipProps } from "./helpers";
+import { DisplayOption, sharedTooltipProps } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
@@ -84,12 +85,18 @@ const filterGuides = (
   });
 };
 
-export const V2 = () => {
+type Props = {
+  readyToTarget: boolean;
+};
+
+export const V2 = ({ readyToTarget }: Props) => {
   const { client } = useGuideContext();
 
   const [displayOption, setDisplayOption] =
     React.useState<DisplayOption>("only-active");
-  const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
+  const [runConfig, setRunConfig] = React.useState(() =>
+    KnockGuideClient.getToolbarRunConfigFromUrl(),
+  );
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
 
@@ -104,7 +111,7 @@ export const V2 = () => {
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
-    if (isVisible && !isDebugging) {
+    if (isVisible && !isDebugging && readyToTarget) {
       client.setDebug({ focusedGuideKeys });
 
       // If focused, switch to all guides so you can see in the list.
@@ -116,7 +123,7 @@ export const V2 = () => {
     return () => {
       client.unsetDebug();
     };
-  }, [runConfig, client, setDisplayOption]);
+  }, [readyToTarget, runConfig, client, setDisplayOption]);
 
   // Toggle collapsed state with Ctrl + .
   React.useEffect(() => {

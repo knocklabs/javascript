@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { KnockGuideProvider } from "../../src/modules/guide/context/KnockGuideProvider";
 import { useGuideContext } from "../../src/modules/guide/hooks/useGuideContext";
@@ -29,6 +29,8 @@ var subscribeMock: ReturnType<typeof vi.fn>;
 // eslint-disable-next-line no-var
 var cleanupMock: ReturnType<typeof vi.fn>;
 // eslint-disable-next-line no-var
+var getToolbarRunConfigFromUrlMock: ReturnType<typeof vi.fn>;
+// eslint-disable-next-line no-var
 var MockKnockGuideClient: new () => unknown;
 
 vi.mock("@knocklabs/client", () => {
@@ -36,7 +38,10 @@ vi.mock("@knocklabs/client", () => {
   subscribeMock = vi.fn();
   cleanupMock = vi.fn();
 
+  getToolbarRunConfigFromUrlMock = vi.fn(() => ({ isVisible: false }));
+
   MockKnockGuideClient = class {
+    static getToolbarRunConfigFromUrl = getToolbarRunConfigFromUrlMock;
     fetch = fetchMock;
     subscribe = subscribeMock;
     cleanup = cleanupMock;
@@ -49,6 +54,13 @@ vi.mock("@knocklabs/client", () => {
 describe("KnockGuideProvider", () => {
   // Deliberately omitting negative-case test that asserts throwing without KnockProvider
   // as React swallows errors thrown during rendering, making the assertion unreliable
+
+  beforeEach(() => {
+    fetchMock.mockClear();
+    subscribeMock.mockClear();
+    cleanupMock.mockClear();
+    getToolbarRunConfigFromUrlMock.mockReturnValue({ isVisible: false });
+  });
 
   it("provides context and triggers fetch/subscribe when ready", () => {
     const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
@@ -64,5 +76,21 @@ describe("KnockGuideProvider", () => {
     expect(result.current.client).toBeInstanceOf(MockKnockGuideClient);
     expect(fetchMock).toHaveBeenCalled();
     expect(subscribeMock).toHaveBeenCalled();
+  });
+
+  it("defers fetch/subscribe to toolbar v2 when toolbar is visible", () => {
+    getToolbarRunConfigFromUrlMock.mockReturnValue({ isVisible: true });
+
+    const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
+      React.createElement(
+        KnockGuideProvider,
+        { channelId: "feed", readyToTarget: true },
+        children,
+      );
+
+    renderHook(() => useGuideContext(), { wrapper });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(subscribeMock).not.toHaveBeenCalled();
   });
 });

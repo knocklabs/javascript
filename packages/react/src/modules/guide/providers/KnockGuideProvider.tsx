@@ -16,16 +16,22 @@ type Props = KnockGuideProviderProps & {
 export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   children,
   toolbar = "v2",
+  readyToTarget,
   ...props
 }) => {
   return (
     <KnockGuideProviderCore
       {...props}
+      readyToTarget={readyToTarget}
       // For backward compatibility with toolbar v1. Remove once v2 ships.
       trackDebugParams={toolbar === "v1"}
     >
       {children}
-      {toolbar === "v2" ? <ToolbarV2 /> : <ToolbarV1 />}
+      {toolbar === "v2" ? (
+        <ToolbarV2 readyToTarget={readyToTarget} />
+      ) : (
+        <ToolbarV1 />
+      )}
     </KnockGuideProviderCore>
   );
 };

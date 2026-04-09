@@ -75,7 +75,11 @@ export const KnockGuideProvider: React.FC<
   ]);
 
   React.useEffect(() => {
-    if (readyToTarget) {
+    // When the toolbar v2 is visible, defer fetch/subscribe to the toolbar
+    // so it can drive the debugging session lifecycle.
+    const toolbarRunConfig = KnockGuideClient.getToolbarRunConfigFromUrl();
+
+    if (readyToTarget && !toolbarRunConfig.isVisible) {
       knockGuideClient.fetch();
       if (listenForUpdates) knockGuideClient.subscribe();
     }
