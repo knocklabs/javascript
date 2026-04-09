@@ -1,3 +1,4 @@
+import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Box, Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
@@ -120,6 +121,8 @@ export const GuideRowDetails = ({
 }: {
   guide: AnnotatedGuide | UncommittedGuide;
 }) => {
+  const { client } = useGuideContext();
+
   if (isUncommittedGuide(guide)) {
     return (
       <Box px="3" py="2">
@@ -191,6 +194,13 @@ export const GuideRowDetails = ({
         gap="1"
         style={{ alignSelf: "stretch" }}
       >
+        <Button
+          size="0"
+          variant="outline"
+          onClick={() => client.resetEngagement(guide)}
+        >
+          Reset engagement
+        </Button>
         {dashboardUrl && (
           <Button
             size="0"

@@ -362,16 +362,16 @@ export class KnockGuideClient {
     this.clearCounterInterval();
   }
 
-  async fetch(opts?: { filters?: QueryFilterParams }) {
+  async fetch(opts?: { filters?: QueryFilterParams; force?: boolean }) {
     this.knock.log("[Guide] .fetch");
     this.knock.failIfNotAuthenticated();
 
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
 
-    // If already fetched before, then noop.
+    // If already fetched before, then noop (unless forced).
     const maybeQueryStatus = this.store.state.queries[queryKey];
-    if (maybeQueryStatus) {
+    if (maybeQueryStatus && !opts?.force) {
       return maybeQueryStatus;
     }
 
@@ -396,6 +396,12 @@ export class KnockGuideClient {
         guide_group_display_logs,
         ineligible_guides,
       } = data;
+
+      // Clear group stage if one exists already before (re)setting the store
+      // state.
+      if (this.stage) {
+        this.clearGroupStage();
+      }
 
       this.knock.log("[Guide] Loading fetched guides");
       this.store.setState((state) => ({
@@ -615,7 +621,7 @@ export class KnockGuideClient {
       this.knock.log(
         `[Guide] Start debugging, refetching guides and resubscribing to the websocket channel`,
       );
-      this.fetch();
+      this.fetch({ force: true });
       this.subscribe();
     }
   }
@@ -634,7 +640,7 @@ export class KnockGuideClient {
       this.knock.log(
         `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
       );
-      this.fetch();
+      this.fetch({ force: true });
       this.subscribe();
     }
   }
@@ -1101,6 +1107,26 @@ export class KnockGuideClient {
     return updatedStep;
   }
 
+  async resetEngagement(guide: GuideData) {
+    const target = this.store.state.guides[guide.key];
+    if (!target || !target.hasEngagement()) return;
+
+    this.knock.log(`[Guide] Resetting engagement (Guide key: ${guide.key})`);
+
+    // Note: Bypass the skipEngagementTracking debug setting, so that the user
+    // can reset engagement from the toolbar while debugging.
+    const response = await this.knock.user.resetGuideEngagement({
+      guide_key: guide.key,
+      tenant: this.targetParams.tenant,
+    });
+
+    if (response.status !== "ok") return;
+
+    // Await the refetch so the store has fresh guide state (including
+    // ineligibleGuides) then re-cycle the group stage.
+    await this.fetch({ force: true });
+  }
+
   private shouldSkipEngagementApi(): boolean {
     return !!this.store.state.debug?.skipEngagementTracking;
   }
@@ -1128,9 +1154,21 @@ export class KnockGuideClient {
 
         return this.steps.find((s) => !s.message.archived_at);
       },
+      // Check whether any of its steps have an engagement timestamp.
+      hasEngagement() {
+        return this.steps.some(
+          (step) =>
+            step.message.seen_at ||
+            step.message.read_at ||
+            step.message.interacted_at ||
+            step.message.archived_at ||
+            step.message.link_clicked_at,
+        );
+      },
     } as KnockGuide;
 
     localGuide.getStep = localGuide.getStep.bind(localGuide);
+    localGuide.hasEngagement = localGuide.hasEngagement.bind(localGuide);
 
     localGuide.steps = remoteGuide.steps.map(({ message, ...rest }) => {
       const localStep = {

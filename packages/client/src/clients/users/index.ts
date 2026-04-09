@@ -4,7 +4,11 @@ import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
 import { guidesApiRootPath } from "../guide/client";
-import { GuideEngagementEventBaseParams } from "../guide/types";
+import {
+  GuideEngagementEventBaseParams,
+  ResetGuideEngagementParams,
+  ResetGuideEngagementResponse,
+} from "../guide/types";
 import {
   GetPreferencesOptions,
   PreferenceOptions,
@@ -135,6 +139,16 @@ class UserClient {
     });
 
     return this.handleResponse<R>(result);
+  }
+
+  async resetGuideEngagement(params: ResetGuideEngagementParams) {
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `${guidesApiRootPath(this.instance.userId)}/engagements/reset`,
+      data: params,
+    });
+
+    return this.handleResponse<ResetGuideEngagementResponse>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {

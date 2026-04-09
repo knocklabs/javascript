@@ -135,6 +135,7 @@ describe("KnockGuideClient", () => {
           .fn()
           .mockImplementation(() => Promise.resolve({ entries: [] })),
         markGuideStepAs: vi.fn().mockResolvedValue({ status: "ok" }),
+        resetGuideEngagement: vi.fn().mockResolvedValue({ status: "ok" }),
       },
     } as unknown as Knock;
   });
@@ -370,6 +371,28 @@ describe("KnockGuideClient", () => {
           "/v1/users/user_123/guides": { status: "error", error: mockError },
         });
       }
+    });
+
+    test("fetch with force: true bypasses the cache and refetches", async () => {
+      const mockResponse = {
+        entries: [],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First fetch populates the query cache
+      await client.fetch();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(1);
+
+      // Second fetch without force is a noop (cache hit)
+      await client.fetch();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(1);
+
+      // Third fetch with force bypasses the cache
+      await client.fetch({ force: true });
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -1282,6 +1305,182 @@ describe("KnockGuideClient", () => {
         "archived",
         expect.any(Object),
       );
+    });
+
+    test("resetEngagement calls API and refetches guides", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const engagedGuide = {
+        ...mockGuide,
+        hasEngagement: () => true,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [engagedGuide.key]: engagedGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: { someQuery: { status: "ok" as const } },
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.resetEngagement(engagedGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).toHaveBeenCalledWith({
+        guide_key: "test_guide",
+        tenant: undefined,
+      });
+
+      // Verify fetch was triggered with force to refetch fresh guide state
+      expect(mockKnock.user.getGuides).toHaveBeenCalled();
+    });
+
+    test("resetEngagement noops when no step has engagement timestamps", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const unengagedGuide = {
+        ...mockGuide,
+        hasEngagement: () => false,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [unengagedGuide.key]: unengagedGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.resetEngagement(unengagedGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
+    });
+
+    test("resetEngagement noops when guide is not in the store", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Store has no guides
+      mockStore.state = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      await client.resetEngagement(mockGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
+      expect(mockStore.setState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("hasEngagement", () => {
+    test("returns true when a step has a seen_at timestamp", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide" as const,
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [
+              {
+                ref: "step_1",
+                schema_key: "test",
+                schema_semver: "1.0.0",
+                schema_variant_key: "default",
+                message: {
+                  id: "msg_123",
+                  seen_at: "2026-01-01T00:00:00Z",
+                  read_at: null,
+                  interacted_at: null,
+                  archived_at: null,
+                  link_clicked_at: null,
+                },
+                content: {},
+              },
+            ],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      const guide = client.store.state.guides["test_guide"];
+      expect(guide.hasEngagement()).toBe(true);
+    });
+
+    test("returns false when no steps have engagement timestamps", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide" as const,
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [
+              {
+                ref: "step_1",
+                schema_key: "test",
+                schema_semver: "1.0.0",
+                schema_variant_key: "default",
+                message: {
+                  id: "msg_123",
+                  seen_at: null,
+                  read_at: null,
+                  interacted_at: null,
+                  archived_at: null,
+                  link_clicked_at: null,
+                },
+                content: {},
+              },
+            ],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      const guide = client.store.state.guides["test_guide"];
+      expect(guide.hasEngagement()).toBe(false);
     });
   });
 
@@ -3072,6 +3271,7 @@ describe("KnockGuideClient", () => {
         activation_url_patterns: [],
         activation_url_rules: [],
         bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -3105,6 +3305,7 @@ describe("KnockGuideClient", () => {
         activation_url_patterns: [],
         activation_url_rules: [],
         bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         getStep() {
@@ -3160,6 +3361,7 @@ describe("KnockGuideClient", () => {
         activation_url_patterns: [],
         activation_url_rules: [],
         bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         getStep() {
@@ -3207,6 +3409,7 @@ describe("KnockGuideClient", () => {
         activation_url_rules: [],
         activation_url_patterns: [],
         bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         getStep() {

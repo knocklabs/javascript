@@ -143,6 +143,15 @@ export type MarkGuideAsResponse = {
   status: "ok";
 };
 
+export type ResetGuideEngagementParams = {
+  guide_key: string;
+  tenant?: string;
+};
+
+export type ResetGuideEngagementResponse = {
+  status: "ok";
+};
+
 //
 // Socket events
 //
@@ -221,6 +230,7 @@ export interface KnockGuide<TContent = Any> extends GuideData<TContent> {
   steps: KnockGuideStep<TContent>[];
   activation_url_patterns: KnockGuideActivationUrlPattern[];
   getStep: () => KnockGuideStep<TContent> | undefined;
+  hasEngagement: () => boolean;
 }
 
 type QueryKey = string;
