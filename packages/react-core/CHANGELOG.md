@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.8
+
+### Patch Changes
+
+- 31dffc1: [Guides] Use `readyToTarget` to coordinate fetching guides in guide toolbar v2
+- Updated dependencies [af81cf2]
+- Updated dependencies [31dffc1]
+- Updated dependencies [2798bbb]
+  - @knocklabs/client@0.21.8
+
 ## 0.13.7
 
 ### Patch Changes

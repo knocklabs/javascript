@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.11.13
+
+### Patch Changes
+
+- af81cf2: [Guides] Add a Open in dashboard button to guide toolbar v2
+- 31dffc1: [Guides] Use `readyToTarget` to coordinate fetching guides in guide toolbar v2
+- 2798bbb: [Guides] Add reset engagement button in guide toolbar v2
+- 474120d: [Guides] Remove local storage persistence of guide toolbar v2 run config
+- 8137b4d: [Guides] Address more polish + feedback items in guide toolbar v2
+- Updated dependencies [af81cf2]
+- Updated dependencies [31dffc1]
+- Updated dependencies [2798bbb]
+  - @knocklabs/client@0.21.8
+  - @knocklabs/react-core@0.13.8
+
 ## 0.11.12
 
 ### Patch Changes
