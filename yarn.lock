@@ -4663,6 +4663,7 @@ __metadata:
     "@telegraph/layout": "npm:^0.5.0"
     "@telegraph/segmented-control": "npm:^0.2.2"
     "@telegraph/select": "npm:^0.0.86"
+    "@telegraph/style-engine": "npm:^0.3.2"
     "@telegraph/tag": "npm:^0.1.4"
     "@telegraph/toggle": "npm:0.1.1"
     "@telegraph/tokens": "npm:^0.1.4"
@@ -7541,6 +7542,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@telegraph/style-engine@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "@telegraph/style-engine@npm:0.3.2"
+  dependencies:
+    "@telegraph/tokens": "npm:^0.2.0"
+    postcss: "npm:^8.5.6"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/14bc97ebc98cba9ce5ed6680a266c141191240d6670c2568c35fd38468a396d5b9c6b79152e8b070ffd3f018cb499dfd4f1bb4833725c1cf88ab82eeb88c9bdb
+  languageName: node
+  linkType: hard
+
 "@telegraph/tag@npm:^0.1.4":
   version: 0.1.4
   resolution: "@telegraph/tag@npm:0.1.4"
@@ -7610,6 +7624,15 @@ __metadata:
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
   checksum: 10c0/0c4355816b5b5291e84c5c96dba142326c0df866ea353c9c3de9fb6a1274985cfd29455bdbb8e39fde5458ef127da49bfd4e02a93673cfcb0ccc40f364f16a1a
+  languageName: node
+  linkType: hard
+
+"@telegraph/tokens@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@telegraph/tokens@npm:0.2.0"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+  checksum: 10c0/96db93d0ed5ae9581446894028b04bde31691b64fe3d027d0824aa949ea21a7054ea798924c20737987705c249f1939482a58ed5ac8a686813765974d1311b1e
   languageName: node
   linkType: hard
 
