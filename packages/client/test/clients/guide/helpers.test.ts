@@ -1,8 +1,9 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi, afterEach } from "vitest";
 import { URLPattern } from "urlpattern-polyfill";
 
 import {
   evaluateUrlRule,
+  getToolbarRunConfigFromUrl,
   predicateUrlRules,
   predicateUrlPatterns,
 } from "../../../src/clients/guide/helpers";
@@ -677,5 +678,60 @@ describe("predicateUrlPatterns", () => {
       expect(predicateUrlPatterns(urlWithSearch, patterns)).toBe(false);
       expect(predicateUrlPatterns(urlWithoutSearch, patterns)).toBe(false);
     });
+  });
+});
+
+describe("getToolbarRunConfigFromUrl", () => {
+  const stubWindow = (search: string) => {
+    vi.stubGlobal("window", { location: { search } });
+  };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  test("returns isVisible true when URL param is 'true'", () => {
+    stubWindow("?knock_guide_toolbar=true");
+
+    const config = getToolbarRunConfigFromUrl();
+
+    expect(config).toEqual({ isVisible: true });
+  });
+
+  test("returns isVisible false when URL param is 'false'", () => {
+    stubWindow("?knock_guide_toolbar=false");
+
+    const config = getToolbarRunConfigFromUrl();
+
+    expect(config).toEqual({ isVisible: false });
+  });
+
+  test("returns default config when URL param is absent", () => {
+    stubWindow("");
+
+    const config = getToolbarRunConfigFromUrl();
+
+    expect(config).toEqual({ isVisible: false });
+  });
+
+  test("includes focusedGuideKeys when focused_guide_key URL param is present", () => {
+    stubWindow("?knock_guide_toolbar=true&focused_guide_key=my_guide");
+
+    const config = getToolbarRunConfigFromUrl();
+
+    expect(config).toEqual({
+      isVisible: true,
+      focusedGuideKeys: { my_guide: true },
+    });
+  });
+
+  test("does not include focusedGuideKeys when focused_guide_key param is absent", () => {
+    stubWindow("?knock_guide_toolbar=true");
+
+    const config = getToolbarRunConfigFromUrl();
+
+    expect(config).toEqual({ isVisible: true });
+    expect(config).not.toHaveProperty("focusedGuideKeys");
   });
 });

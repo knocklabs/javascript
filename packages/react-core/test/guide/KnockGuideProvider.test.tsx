@@ -37,6 +37,7 @@ vi.mock("@knocklabs/client", () => {
   cleanupMock = vi.fn();
 
   MockKnockGuideClient = class {
+    static getToolbarRunConfigFromUrl = () => ({ isVisible: false });
     fetch = fetchMock;
     subscribe = subscribeMock;
     cleanup = cleanupMock;

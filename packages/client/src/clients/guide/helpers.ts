@@ -3,6 +3,7 @@ import {
   GuideActivationUrlRuleData,
   GuideData,
   GuideGroupData,
+  KnockGuide,
   KnockGuideActivationUrlPattern,
   SelectFilterParams,
   StoreState,
@@ -224,4 +225,41 @@ export const predicateUrlPatterns = (
       }
     }
   }, predicateDefault);
+};
+
+// Use this param to start Toolbar v2 and enter into a debugging session when
+// it is present and set to true.
+const TOOLBAR_QUERY_PARAM = "knock_guide_toolbar";
+
+// Optional, when present pin/focus on this guide.
+const GUIDE_KEY_PARAM = "focused_guide_key";
+
+export type ToolbarV2RunConfig = {
+  isVisible: boolean;
+  focusedGuideKeys?: Record<KnockGuide["key"], true>;
+};
+
+export const getToolbarRunConfigFromUrl = (): ToolbarV2RunConfig => {
+  const fallback = { isVisible: false };
+
+  if (typeof window === "undefined" || !window.location) {
+    return fallback;
+  }
+
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const toolbarParamValue = urlSearchParams.get(TOOLBAR_QUERY_PARAM);
+  const guideKeyParamValue = urlSearchParams.get(GUIDE_KEY_PARAM);
+
+  if (toolbarParamValue === null) {
+    return fallback;
+  }
+
+  const config: ToolbarV2RunConfig = {
+    isVisible: toolbarParamValue === "true",
+  };
+  if (guideKeyParamValue) {
+    config.focusedGuideKeys = { [guideKeyParamValue]: true };
+  }
+
+  return config;
 };

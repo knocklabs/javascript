@@ -13,6 +13,7 @@ import {
   formatFilters,
   formatGroupStage,
   formatState,
+  getToolbarRunConfigFromUrl,
   mockDefaultGroup,
   newUrl,
   predicateUrlPatterns,
@@ -598,8 +599,15 @@ export class KnockGuideClient {
     }
   }
 
+  // TODO: Split setDebug into startDebug vs updateDebug.
   setDebug(debugOpts?: Omit<DebugState, "debugging">) {
     this.knock.log("[Guide] .setDebug()");
+
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Not authenticated, cannot start debugging");
+      return;
+    }
+
     const shouldRefetch = !this.store.state.debug?.debugging;
 
     // Clear the stage before updating the store state to let the next render
@@ -636,11 +644,17 @@ export class KnockGuideClient {
 
     this.store.setState((state) => ({ ...state, debug: undefined }));
 
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Not authenticated, will not refetch");
+      return;
+    }
+
     if (shouldRefetch) {
       this.knock.log(
         `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch({ force: true });
+      // TODO: Manage (re)subscribe/unsubscribe in V2 rather than here.
       this.subscribe();
     }
   }
@@ -1479,5 +1493,9 @@ export class KnockGuideClient {
       win.history.replaceState = this.replaceStateFn;
       this.replaceStateFn = undefined;
     }
+  }
+
+  static getToolbarRunConfigFromUrl() {
+    return getToolbarRunConfigFromUrl();
   }
 }
