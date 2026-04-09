@@ -12,6 +12,10 @@ const DEFAULT_SLACK_SCOPES = [
   "groups:read",
 ];
 
+export function getSlackNonceStorageKey(channelId: string): string {
+  return `knock:slack-auth-nonce:${channelId}`;
+}
+
 type UseSlackAuthOutput = {
   buildSlackAuthUrl: () => string;
   disconnectFromSlack: () => void;
@@ -83,8 +87,15 @@ function useSlackAuth(
   ]);
 
   const buildSlackAuthUrl = useCallback(() => {
+    const nonce = crypto.randomUUID();
+    sessionStorage.setItem(
+      getSlackNonceStorageKey(knockSlackChannelId),
+      nonce,
+    );
+
     const rawParams = {
       state: JSON.stringify({
+        nonce,
         redirect_url: redirectUrl,
         access_token_object: {
           object_id: tenantId,

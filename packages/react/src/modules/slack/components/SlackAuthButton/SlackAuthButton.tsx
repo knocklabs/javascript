@@ -5,6 +5,7 @@ import {
   useKnockSlackClient,
   useSlackAuth,
   useTranslations,
+  getSlackNonceStorageKey,
 } from "@knocklabs/react-core";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
@@ -64,6 +65,7 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     popupWindowRef,
     setConnectionStatus,
     onAuthenticationComplete,
+    nonceStorageKey: getSlackNonceStorageKey(knockSlackChannelId),
   });
 
   useAuthPolling({
