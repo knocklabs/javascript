@@ -245,6 +245,28 @@ describe("useAuthPostMessageListener", () => {
       expect(onAuthenticationComplete).toHaveBeenCalledWith("authComplete");
     });
 
+    it("should reject authComplete when stored nonce is missing", () => {
+      // Do NOT store a nonce — simulates cleared storage or replay
+      renderHook(() =>
+        useAuthPostMessageListener({
+          knockHost,
+          popupWindowRef,
+          setConnectionStatus,
+          onAuthenticationComplete,
+          nonceStorageKey,
+        }),
+      );
+
+      const event = new MessageEvent("message", {
+        data: { type: "authComplete", nonce: "some-nonce" },
+        origin: knockHost,
+      });
+      window.dispatchEvent(event);
+
+      expect(setConnectionStatus).toHaveBeenCalledWith("error");
+      expect(onAuthenticationComplete).not.toHaveBeenCalled();
+    });
+
     it("should clean up stored nonce on authFailed", () => {
       mockSessionStorage.setItem(nonceStorageKey, "stored-nonce");
 

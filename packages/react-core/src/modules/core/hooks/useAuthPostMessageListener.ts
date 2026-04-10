@@ -82,10 +82,12 @@ export function useAuthPostMessageListener(
       const returnedNonce = getMessageNonce(event.data);
 
       if (messageType === "authComplete") {
-        // Verify CSRF nonce when both a stored nonce and a returned nonce exist
+        // Verify CSRF nonce when a nonceStorageKey is configured and the API
+        // returned a nonce
         if (nonceStorageKey && returnedNonce !== undefined) {
           const storedNonce = sessionStorage.getItem(nonceStorageKey);
-          if (storedNonce && storedNonce !== returnedNonce) {
+          if (!storedNonce || storedNonce !== returnedNonce) {
+            sessionStorage.removeItem(nonceStorageKey);
             setConnectionStatus("error");
             popupWindowRef.current = null;
             return;
