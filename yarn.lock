@@ -3471,6 +3471,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo/config@npm:~55.0.12":
+  version: 55.0.12
+  resolution: "@expo/config@npm:55.0.12"
+  dependencies:
+    "@expo/config-plugins": "npm:~55.0.7"
+    "@expo/config-types": "npm:^55.0.5"
+    "@expo/json-file": "npm:^10.0.13"
+    "@expo/require-utils": "npm:^55.0.3"
+    deepmerge: "npm:^4.3.1"
+    getenv: "npm:^2.0.0"
+    glob: "npm:^13.0.0"
+    resolve-from: "npm:^5.0.0"
+    resolve-workspace-root: "npm:^2.0.0"
+    semver: "npm:^7.6.0"
+    slugify: "npm:^1.3.4"
+  checksum: 10c0/fc49d1558d4ccdcc1f63247532792587a12f6fa1131f53200b462140d29c460de6c34eb2a4d6412df39809601d85d4206b88d4f008ffe12e33b3d26e03c58402
+  languageName: node
+  linkType: hard
+
 "@expo/devcert@npm:^1.2.1":
   version: 1.2.1
   resolution: "@expo/devcert@npm:1.2.1"
@@ -3563,6 +3582,16 @@ __metadata:
     "@babel/code-frame": "npm:^7.20.0"
     json5: "npm:^2.2.3"
   checksum: 10c0/52131a6426e96208ff1b295d580fc70eebb8e292b29fde1db016b2f21a0942a7521feec96b3f58efe5b32dcc1642d569b4211d651146fcdb9bf7e5f08b635878
+  languageName: node
+  linkType: hard
+
+"@expo/json-file@npm:^10.0.13":
+  version: 10.0.13
+  resolution: "@expo/json-file@npm:10.0.13"
+  dependencies:
+    "@babel/code-frame": "npm:^7.20.0"
+    json5: "npm:^2.2.3"
+  checksum: 10c0/81f2073aea613264c0c802b13cfe6b5fdda2469ceabdff105a69e2ba3bc72c1b82f8b3c1c7eb6c9e5a7c4322239e6adcbb37cd3ddb305ed2de3e18e962d57887
   languageName: node
   linkType: hard
 
@@ -4440,7 +4469,7 @@ __metadata:
     expo-haptics: "npm:~55.0.9"
     expo-image: "npm:~55.0.6"
     expo-linking: "npm:~55.0.9"
-    expo-notifications: "npm:~55.0.14"
+    expo-notifications: "npm:~55.0.16"
     expo-router: "npm:~55.0.8"
     expo-splash-screen: "npm:~55.0.13"
     expo-status-bar: "npm:~55.0.4"
@@ -4482,7 +4511,7 @@ __metadata:
     expo: "npm:~55.0.9"
     expo-constants: "npm:~55.0.9"
     expo-device: "npm:~55.0.10"
-    expo-notifications: "npm:~55.0.14"
+    expo-notifications: "npm:~55.0.16"
     jsdom: "npm:^27.1.0"
     react: "npm:^19.0.0"
     react-native: "npm:^0.83.4"
@@ -4617,7 +4646,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/react@npm:0.11.12, @knocklabs/react@workspace:*, @knocklabs/react@workspace:^, @knocklabs/react@workspace:packages/react":
+"@knocklabs/react@npm:0.11.13, @knocklabs/react@workspace:*, @knocklabs/react@workspace:^, @knocklabs/react@workspace:packages/react":
   version: 0.0.0-use.local
   resolution: "@knocklabs/react@workspace:packages/react"
   dependencies:
@@ -4634,6 +4663,7 @@ __metadata:
     "@telegraph/layout": "npm:^0.5.0"
     "@telegraph/segmented-control": "npm:^0.2.2"
     "@telegraph/select": "npm:^0.0.86"
+    "@telegraph/style-engine": "npm:^0.3.2"
     "@telegraph/tag": "npm:^0.1.4"
     "@telegraph/toggle": "npm:0.1.1"
     "@telegraph/tokens": "npm:^0.1.4"
@@ -7512,6 +7542,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@telegraph/style-engine@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "@telegraph/style-engine@npm:0.3.2"
+  dependencies:
+    "@telegraph/tokens": "npm:^0.2.0"
+    postcss: "npm:^8.5.6"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/14bc97ebc98cba9ce5ed6680a266c141191240d6670c2568c35fd38468a396d5b9c6b79152e8b070ffd3f018cb499dfd4f1bb4833725c1cf88ab82eeb88c9bdb
+  languageName: node
+  linkType: hard
+
 "@telegraph/tag@npm:^0.1.4":
   version: 0.1.4
   resolution: "@telegraph/tag@npm:0.1.4"
@@ -7581,6 +7624,15 @@ __metadata:
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
   checksum: 10c0/0c4355816b5b5291e84c5c96dba142326c0df866ea353c9c3de9fb6a1274985cfd29455bdbb8e39fde5458ef127da49bfd4e02a93673cfcb0ccc40f364f16a1a
+  languageName: node
+  linkType: hard
+
+"@telegraph/tokens@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@telegraph/tokens@npm:0.2.0"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+  checksum: 10c0/96db93d0ed5ae9581446894028b04bde31691b64fe3d027d0824aa949ea21a7054ea798924c20737987705c249f1939482a58ed5ac8a686813765974d1311b1e
   languageName: node
   linkType: hard
 
@@ -12881,12 +12933,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-application@npm:~55.0.10":
-  version: 55.0.10
-  resolution: "expo-application@npm:55.0.10"
+"expo-application@npm:~55.0.12":
+  version: 55.0.12
+  resolution: "expo-application@npm:55.0.12"
   peerDependencies:
     expo: "*"
-  checksum: 10c0/96d3c951d4e1622e030f974e88c401995144acd0b991c9ce343f44b145510cd9b7b06d1bcb25f043b7a36fd0ed23e19c8f27f03964fc3e0b8929a5a2d39df8e4
+  checksum: 10c0/5c525f9d16abb0578b34bfa305458b825c39f3e52aee2ebce07747f5fbfb640940709c7b8ae36900cdc3fb8095c8c18e278d7c5ab3fa5bdc1c408c81ea7b4b6b
   languageName: node
   linkType: hard
 
@@ -12912,6 +12964,19 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/8f6bd67fe46ed67601621b01b8d3bde0d670f5db28189919c9350b7d6302037995a236a8c38af4517352a70630f0646a6d97166cd5b8b3b065661f4f0398d3e6
+  languageName: node
+  linkType: hard
+
+"expo-constants@npm:~55.0.11":
+  version: 55.0.11
+  resolution: "expo-constants@npm:55.0.11"
+  dependencies:
+    "@expo/config": "npm:~55.0.12"
+    "@expo/env": "npm:~2.1.1"
+  peerDependencies:
+    expo: "*"
+    react-native: "*"
+  checksum: 10c0/b5a6b267acd78bbbd08b571a95983ade6bafe0626d9f7921d260921f540d4416b38e37ea34126fc2b9ec05afd2bd86086cab073643e43e36a58b4e01c871ef8a
   languageName: node
   linkType: hard
 
@@ -13048,20 +13113,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-notifications@npm:~55.0.14":
-  version: 55.0.14
-  resolution: "expo-notifications@npm:55.0.14"
+"expo-notifications@npm:~55.0.16":
+  version: 55.0.16
+  resolution: "expo-notifications@npm:55.0.16"
   dependencies:
     "@expo/image-utils": "npm:^0.8.12"
     abort-controller: "npm:^3.0.0"
     badgin: "npm:^1.1.5"
-    expo-application: "npm:~55.0.10"
-    expo-constants: "npm:~55.0.9"
+    expo-application: "npm:~55.0.12"
+    expo-constants: "npm:~55.0.11"
   peerDependencies:
     expo: "*"
     react: "*"
     react-native: "*"
-  checksum: 10c0/471cdafc5142eca3cb6d9d1d76dde77ed37493fc97a4585aad2c6737ba6ff954929507f6fde267663cde54e6378d9384865950ee97ceb543372e1b3928c4dbff
+  checksum: 10c0/58f24a1a7ecf39db8ac99a5e60314135509b72aa282f09cbd81e239705b692cfd179e7de54ef1b06dcdf305843b432bec4e91a3d2d2f02711164006db2fd94ce
   languageName: node
   linkType: hard
 
@@ -17043,7 +17108,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ms-teams-connect-example@workspace:examples/ms-teams-connect-example"
   dependencies:
-    "@knocklabs/react": "npm:0.11.12"
+    "@knocklabs/react": "npm:0.11.13"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
@@ -19914,7 +19979,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "slack-connect-example@workspace:examples/slack-connect-example"
   dependencies:
-    "@knocklabs/react": "npm:0.11.12"
+    "@knocklabs/react": "npm:0.11.13"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
@@ -19934,7 +19999,7 @@ __metadata:
   resolution: "slack-kit-example@workspace:examples/slack-kit-example"
   dependencies:
     "@knocklabs/node": "npm:^1.11.2"
-    "@knocklabs/react": "npm:0.11.12"
+    "@knocklabs/react": "npm:0.11.13"
     "@tailwindcss/postcss": "npm:^4.1.18"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
@@ -21110,21 +21175,21 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A5.8.2#optional!builtin<compat/typescript>":
   version: 5.8.2
-  resolution: "typescript@patch:typescript@npm%3A5.8.2#optional!builtin<compat/typescript>::version=5.8.2&hash=d69c25"
+  resolution: "typescript@patch:typescript@npm%3A5.8.2#optional!builtin<compat/typescript>::version=5.8.2&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/8a6cd29dfb59bd5a978407b93ae0edb530ee9376a5b95a42ad057a6f80ffb0c410489ccd6fe48d1d0dfad6e8adf5d62d3874bbd251f488ae30e11a1ce6dabd28
+  checksum: 10c0/5448a08e595cc558ab321e49d4cac64fb43d1fa106584f6ff9a8d8e592111b373a995a1d5c7f3046211c8a37201eb6d0f1566f15cdb7a62a5e3be01d087848e2
   languageName: node
   linkType: hard
 
 "typescript@patch:typescript@npm%3A^5.8.3#optional!builtin<compat/typescript>":
   version: 5.8.3
-  resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=d69c25"
+  resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/92ea03509e06598948559ddcdd8a4ae5a7ab475766d5589f1b796f5731b3d631a4c7ddfb86a3bd44d58d10102b132cd4b4994dda9b63e6273c66d77d6a271dbd
+  checksum: 10c0/39117e346ff8ebd87ae1510b3a77d5d92dae5a89bde588c747d25da5c146603a99c8ee588c7ef80faaf123d89ed46f6dbd918d534d641083177d5fac38b8a1cb
   languageName: node
   linkType: hard
 

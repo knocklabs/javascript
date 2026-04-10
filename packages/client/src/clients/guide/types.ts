@@ -72,6 +72,7 @@ export interface GuideData<TContent = Any> {
   activation_url_rules: GuideActivationUrlRuleData[];
   activation_url_patterns: GuideActivationUrlPatternData[];
   bypass_global_group_limit: boolean;
+  dashboard_url: string | null;
   inserted_at: string;
   updated_at: string;
 }
@@ -139,6 +140,15 @@ export type MarkAsArchivedParams = GuideEngagementEventBaseParams & {
 };
 
 export type MarkGuideAsResponse = {
+  status: "ok";
+};
+
+export type ResetGuideEngagementParams = {
+  guide_key: string;
+  tenant?: string;
+};
+
+export type ResetGuideEngagementResponse = {
   status: "ok";
 };
 
@@ -220,6 +230,7 @@ export interface KnockGuide<TContent = Any> extends GuideData<TContent> {
   steps: KnockGuideStep<TContent>[];
   activation_url_patterns: KnockGuideActivationUrlPattern[];
   getStep: () => KnockGuideStep<TContent> | undefined;
+  hasEngagement: () => boolean;
 }
 
 type QueryKey = string;

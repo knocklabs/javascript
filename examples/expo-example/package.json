@@ -1,7 +1,7 @@
 {
   "name": "@knocklabs/expo-example",
   "main": "expo-router/entry",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -24,7 +24,7 @@
     "expo-haptics": "~55.0.9",
     "expo-image": "~55.0.6",
     "expo-linking": "~55.0.9",
-    "expo-notifications": "~55.0.14",
+    "expo-notifications": "~55.0.16",
     "expo-router": "~55.0.8",
     "expo-splash-screen": "~55.0.13",
     "expo-status-bar": "~55.0.4",

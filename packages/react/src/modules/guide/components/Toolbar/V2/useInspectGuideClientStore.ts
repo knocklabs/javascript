@@ -4,12 +4,13 @@ import {
   KnockGuideClientStoreState,
   KnockGuideIneligibilityMarker,
   KnockGuideSelectionResult,
+  type ToolbarV2RunConfig,
   checkActivatable,
   checkStateIfThrottled,
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
 
-import { FOCUS_ERRORS, ToolbarV2RunConfig } from "./helpers";
+import { FOCUS_ERRORS } from "./helpers";
 
 const byKey = <T extends { key: string }>(items: T[]) => {
   return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});

@@ -1,6 +1,8 @@
 import { Stack } from "@telegraph/layout";
 import { Tooltip } from "@telegraph/tooltip";
 
+import { sharedTooltipProps } from "./helpers";
+
 export type StatusColor = "blue" | "red" | "yellow" | "gray";
 
 // Directly copied from the design prototype.
@@ -59,7 +61,7 @@ export const GuideAnnotatedStatusDot = ({
   tooltip: string;
 }) => {
   return (
-    <Tooltip label={tooltip}>
+    <Tooltip label={tooltip} {...sharedTooltipProps}>
       <Stack
         as="span"
         align="center"

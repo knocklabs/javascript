@@ -1,3 +1,4 @@
+import { KnockGuideClient } from "@knocklabs/client";
 import { useGuideContext } from "@knocklabs/react-core";
 import { Button } from "@telegraph/button";
 import { Icon } from "@telegraph/icon";
@@ -22,7 +23,7 @@ import "../styles.css";
 import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import { DisplayOption, clearRunConfigLS, getRunConfig } from "./helpers";
+import { DisplayOption, sharedTooltipProps } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
@@ -32,6 +33,15 @@ import {
 const TOGGLE_COLLAPSED_HOTKEY = ".";
 
 const TOOLBAR_WIDTH = "540px";
+
+const TOOLBAR_BOX_SHADOW = [
+  "0 0 0 1px rgba(0, 0, 0, 0.06)",
+  "0 0 0 1px rgba(255, 255, 255, 0.10)",
+  "inset 0 1px 0 rgba(255, 255, 255, 0.04)",
+  "0 1px 1px 0 rgba(0, 0, 0, 0.04)",
+  "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+  "0 8px 16px -4px rgba(0, 0, 0, 0.06)",
+].join(", ");
 
 const Kbd = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -49,18 +59,23 @@ const Kbd = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const getEmptyStateMessage = (displayOption: DisplayOption) => {
+  switch (displayOption) {
+    case "all-guides":
+      return "You have no guides. Get started by creating a guide.";
+    case "only-active":
+      return "There are no active guides.";
+    case "only-eligible":
+      return "Your current user is not eligible for any guides.";
+  }
+};
+
 const filterGuides = (
   guides: InspectionResultOk["guides"],
   displayOption: DisplayOption,
 ) => {
   return guides.filter((guide) => {
-    const { isEligible, isQualified } = guide.annotation;
-    const isDisplayable = isEligible && isQualified;
-
-    if (displayOption === "only-displayable" && !isDisplayable) {
-      return false;
-    }
-    if (displayOption === "only-eligible" && !isEligible) {
+    if (displayOption === "only-eligible" && !guide.annotation.isEligible) {
       return false;
     }
     if (displayOption === "only-active" && !guide.annotation.active.status) {
@@ -70,12 +85,18 @@ const filterGuides = (
   });
 };
 
-export const V2 = () => {
+type Props = {
+  readyToTarget: boolean;
+};
+
+export const V2 = ({ readyToTarget }: Props) => {
   const { client } = useGuideContext();
 
   const [displayOption, setDisplayOption] =
     React.useState<DisplayOption>("only-active");
-  const [runConfig, setRunConfig] = React.useState(() => getRunConfig());
+  const [runConfig, setRunConfig] = React.useState(() =>
+    KnockGuideClient.getToolbarRunConfigFromUrl(),
+  );
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = React.useState(false);
 
@@ -90,7 +111,7 @@ export const V2 = () => {
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
-    if (isVisible && !isDebugging) {
+    if (isVisible && !isDebugging && readyToTarget) {
       client.setDebug({ focusedGuideKeys });
 
       // If focused, switch to all guides so you can see in the list.
@@ -102,7 +123,7 @@ export const V2 = () => {
     return () => {
       client.unsetDebug();
     };
-  }, [runConfig, client, setDisplayOption]);
+  }, [readyToTarget, runConfig, client, setDisplayOption]);
 
   // Toggle collapsed state with Ctrl + .
   React.useEffect(() => {
@@ -149,7 +170,6 @@ export const V2 = () => {
       {isCollapsed ? (
         <Tooltip
           side="left"
-          delayDuration={500}
           label={
             <Text as="span" size="1">
               Guide Toolbar
@@ -158,6 +178,7 @@ export const V2 = () => {
               </Stack>
             </Text>
           }
+          {...sharedTooltipProps}
         >
           <Stack
             border="px"
@@ -197,11 +218,10 @@ export const V2 = () => {
           direction="column"
           backgroundColor="surface-1"
           rounded="4"
-          border="px"
           overflow="hidden"
           style={{
             width: TOOLBAR_WIDTH,
-            boxShadow: "0 8px 32px var(--tgph-gray-5)",
+            boxShadow: TOOLBAR_BOX_SHADOW,
             animation: "toolbar-expand-fade-in 150ms ease-out",
           }}
         >
@@ -295,10 +315,9 @@ export const V2 = () => {
                   >
                     Eligible
                   </SegmentedControl.Option>
-                  {/* Note: `only-displayable` is not available for now */}
                 </SegmentedControl.Root>
 
-                <Tooltip label="Settings & target params">
+                <Tooltip label="Settings" {...sharedTooltipProps}>
                   <Button
                     size="1"
                     variant={isContextPanelOpen ? "outline" : "ghost"}
@@ -332,13 +351,12 @@ export const V2 = () => {
                   leadingIcon={{ icon: LogOut, alt: "Exit" }}
                   onClick={() => {
                     setRunConfig((curr) => ({ ...curr, isVisible: false }));
-                    clearRunConfigLS();
                     client.unsetDebug();
                   }}
                 >
                   Exit
                 </Button>
-                <Tooltip label="Minimize toolbar">
+                <Tooltip label="Minimize toolbar" {...sharedTooltipProps}>
                   <Button
                     size="1"
                     variant="outline"
@@ -380,7 +398,7 @@ export const V2 = () => {
             ) : guides.length === 0 ? (
               <Box px="2" pb="1" style={{ lineHeight: "1.2" }}>
                 <Text as="span" size="1" weight="medium" color="default">
-                  No guides match the current filter.
+                  {getEmptyStateMessage(displayOption)}
                 </Text>
               </Box>
             ) : (
