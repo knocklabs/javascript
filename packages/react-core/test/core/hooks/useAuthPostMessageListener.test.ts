@@ -172,7 +172,7 @@ describe("useAuthPostMessageListener", () => {
   });
 
   describe("CSRF nonce verification", () => {
-    const nonceStorageKey = "knock:slack-auth-nonce:channel_123";
+    const nonceStorageKey = "knock:slack-auth-nonce:channel_123:user_123";
 
     it("should accept authComplete when nonce matches", () => {
       mockSessionStorage.setItem(nonceStorageKey, "valid-nonce");
