@@ -1,5 +1,14 @@
 # nextjs-app-dir-example
 
+## 0.0.60
+
+### Patch Changes
+
+- d3587a6: chore: update @telegraph packages to latest versions
+- Updated dependencies [d3587a6]
+- Updated dependencies [014eecc]
+  - @knocklabs/react@0.11.14
+
 ## 0.0.59
 
 ### Patch Changes

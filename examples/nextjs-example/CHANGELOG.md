@@ -1,5 +1,14 @@
 # nextjs-example
 
+## 1.2.26
+
+### Patch Changes
+
+- d3587a6: chore: update @telegraph packages to latest versions
+- Updated dependencies [d3587a6]
+- Updated dependencies [014eecc]
+  - @knocklabs/react@0.11.14
+
 ## 1.2.25
 
 ### Patch Changes
