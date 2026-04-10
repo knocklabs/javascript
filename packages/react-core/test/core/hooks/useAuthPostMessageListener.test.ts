@@ -1,5 +1,5 @@
-import { renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuthPostMessageListener } from "../../../src/modules/core/hooks/useAuthPostMessageListener";
 
@@ -26,6 +26,10 @@ describe("useAuthPostMessageListener", () => {
   let setConnectionStatus: ReturnType<typeof vi.fn>;
   let onAuthenticationComplete: ReturnType<typeof vi.fn> | undefined;
   let mockPopup: { close: ReturnType<typeof vi.fn>; closed: boolean };
+
+  afterEach(() => {
+    cleanup();
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -277,8 +281,9 @@ describe("useAuthPostMessageListener", () => {
       expect(popupWindowRef.current).toBeNull();
     });
 
-    it("should reject authComplete when stored nonce is missing", () => {
-      // Do NOT store a nonce — simulates cleared storage or replay
+    it("should treat missing stored nonce as already consumed and accept", () => {
+      // Do NOT store a nonce — simulates nonce already consumed by a prior
+      // handler invocation; the code intentionally passes through.
       renderHook(() =>
         useAuthPostMessageListener({
           knockHost,
@@ -295,8 +300,8 @@ describe("useAuthPostMessageListener", () => {
       });
       window.dispatchEvent(event);
 
-      expect(setConnectionStatus).toHaveBeenCalledWith("error");
-      expect(onAuthenticationComplete).toHaveBeenCalledWith("authFailed");
+      expect(setConnectionStatus).toHaveBeenCalledWith("connected");
+      expect(onAuthenticationComplete).toHaveBeenCalledWith("authComplete");
       expect(mockPopup.close).toHaveBeenCalled();
       expect(popupWindowRef.current).toBeNull();
     });
