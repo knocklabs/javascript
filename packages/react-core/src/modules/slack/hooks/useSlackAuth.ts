@@ -118,6 +118,7 @@ function useSlackAuth(
     tenantId,
     knockSlackChannelId,
     knock.apiKey,
+    knock.userId,
     knock.userToken,
     knock.branch,
     slackClientId,
