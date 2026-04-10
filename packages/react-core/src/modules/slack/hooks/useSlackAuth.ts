@@ -88,10 +88,7 @@ function useSlackAuth(
 
   const buildSlackAuthUrl = useCallback(() => {
     const nonce = crypto.randomUUID();
-    sessionStorage.setItem(
-      getSlackNonceStorageKey(knockSlackChannelId),
-      nonce,
-    );
+    sessionStorage.setItem(getSlackNonceStorageKey(knockSlackChannelId), nonce);
 
     const rawParams = {
       state: JSON.stringify({

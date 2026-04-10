@@ -1,11 +1,11 @@
 import {
+  getSlackNonceStorageKey,
   useAuthPolling,
   useAuthPostMessageListener,
   useKnockClient,
   useKnockSlackClient,
   useSlackAuth,
   useTranslations,
-  getSlackNonceStorageKey,
 } from "@knocklabs/react-core";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
