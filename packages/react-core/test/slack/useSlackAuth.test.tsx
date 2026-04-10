@@ -2,8 +2,29 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import useSlackAuth from "../../src/modules/slack/hooks/useSlackAuth";
+import { getSlackNonceStorageKey } from "../../src/modules/slack/hooks/useSlackAuth";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-branch";
+
+const mockRandomUUID = vi.fn(() => "test-nonce-uuid");
+vi.stubGlobal("crypto", { randomUUID: mockRandomUUID });
+
+const mockSessionStorage = (() => {
+  const store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      for (const key in store) delete store[key];
+    }),
+  };
+})();
+vi.stubGlobal("sessionStorage", mockSessionStorage);
 
 const mockSetConnectionStatus = vi.fn();
 const mockSetActionLabel = vi.fn();
@@ -26,6 +47,7 @@ vi.mock("../../src/modules/core", () => ({
     slack: mockSlackClient,
     apiKey: "test_api_key",
     userToken: "test_user_token",
+    userId: "test_user_id",
     branch: TEST_BRANCH_SLUG,
   }),
 }));
@@ -48,6 +70,7 @@ describe("useSlackAuth", () => {
       "chat:write,chat:write.public,channels:read,groups:read",
     );
     expect(state).toEqual({
+      nonce: "test-nonce-uuid",
       redirect_url: "http://localhost:3000",
       access_token_object: {
         object_id: "test_tenant_id",
@@ -58,6 +81,42 @@ describe("useSlackAuth", () => {
       user_token: "test_user_token",
       branch_slug: TEST_BRANCH_SLUG,
     });
+  });
+
+  test("buildSlackAuthUrl stores nonce in sessionStorage", () => {
+    const { result } = renderHook(() =>
+      useSlackAuth("test_client_id", "http://localhost:3000"),
+    );
+
+    result.current.buildSlackAuthUrl();
+
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+      getSlackNonceStorageKey("test_channel_id", "test_user_id"),
+      "test-nonce-uuid",
+    );
+  });
+
+  test("buildSlackAuthUrl generates a new nonce each time", () => {
+    mockRandomUUID
+      .mockReturnValueOnce("nonce-1")
+      .mockReturnValueOnce("nonce-2");
+
+    const { result } = renderHook(() =>
+      useSlackAuth("test_client_id", "http://localhost:3000"),
+    );
+
+    const url1 = new URL(result.current.buildSlackAuthUrl());
+    const state1 = JSON.parse(
+      new URLSearchParams(url1.search).get("state") || "{}",
+    );
+
+    const url2 = new URL(result.current.buildSlackAuthUrl());
+    const state2 = JSON.parse(
+      new URLSearchParams(url2.search).get("state") || "{}",
+    );
+
+    expect(state1.nonce).toBe("nonce-1");
+    expect(state2.nonce).toBe("nonce-2");
   });
 
   test("buildSlackAuthUrl uses custom scopes when provided", () => {

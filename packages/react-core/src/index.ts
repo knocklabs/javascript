@@ -59,6 +59,7 @@ export {
   type KnockSlackProviderProps,
   type KnockSlackProviderState,
   type SlackChannelQueryOptions,
+  getSlackNonceStorageKey,
   useConnectedSlackChannels,
   useKnockSlackClient,
   useSlackAuth,
