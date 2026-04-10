@@ -20,12 +20,11 @@ export interface UseAuthPostMessageListenerOptions {
  * Supports both the legacy string format ("authComplete") and the new
  * structured format ({ type: "authComplete", nonce: "..." }).
  */
-function getMessageType(data: unknown): string | undefined {
-  if (typeof data === "string") return data;
+function getMessageType(data: unknown): string {
   if (typeof data === "object" && data !== null && "type" in data) {
     return (data as { type: string }).type;
   }
-  return undefined;
+  return data as string;
 }
 
 /**
@@ -79,14 +78,13 @@ export function useAuthPostMessageListener(
       }
 
       const messageType = getMessageType(event.data);
-      const returnedNonce = getMessageNonce(event.data);
 
       if (messageType === "authComplete") {
-        // Verify CSRF nonce when a nonceStorageKey is configured and the API
-        // returned a nonce
-        if (nonceStorageKey && returnedNonce !== undefined) {
+        // Verify CSRF nonce when a nonceStorageKey is configured.
+        if (nonceStorageKey) {
+          const returnedNonce = getMessageNonce(event.data);
           const storedNonce = sessionStorage.getItem(nonceStorageKey);
-          if (!storedNonce || storedNonce !== returnedNonce) {
+          if (!storedNonce || !returnedNonce || storedNonce !== returnedNonce) {
             sessionStorage.removeItem(nonceStorageKey);
             setConnectionStatus("error");
             popupWindowRef.current = null;
