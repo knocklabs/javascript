@@ -47,6 +47,7 @@ vi.mock("../../src/modules/core", () => ({
     slack: mockSlackClient,
     apiKey: "test_api_key",
     userToken: "test_user_token",
+    userId: "test_user_id",
     branch: TEST_BRANCH_SLUG,
   }),
 }));
@@ -90,7 +91,7 @@ describe("useSlackAuth", () => {
     result.current.buildSlackAuthUrl();
 
     expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
-      getSlackNonceStorageKey("test_channel_id"),
+      getSlackNonceStorageKey("test_channel_id", "test_user_id"),
       "test-nonce-uuid",
     );
   });
