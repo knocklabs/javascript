@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.11.14
+
+### Patch Changes
+
+- d3587a6: chore: update @telegraph packages to latest versions
+- 014eecc: Wire up @telegraph/style-engine PostCSS plugin in the Vite config and remove the manual @import workaround for @telegraph/toggle CSS.
+
 ## 0.11.13
 
 ### Patch Changes
