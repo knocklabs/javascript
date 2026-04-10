@@ -92,7 +92,13 @@ export function useAuthPostMessageListener(
           const returnedNonce = getMessageNonce(event.data);
           const storedNonce = sessionStorage.getItem(nonceStorageKey);
           sessionStorage.removeItem(nonceStorageKey);
-          if (!storedNonce || !returnedNonce || storedNonce !== returnedNonce) {
+
+          // If nonce already consumed by a prior handler invocation, then bail
+          // out from checking again.
+          if (
+            !returnedNonce ||
+            (storedNonce && storedNonce !== returnedNonce)
+          ) {
             setConnectionStatus("error");
             onAuthenticationComplete?.("authFailed");
             closePopup();
