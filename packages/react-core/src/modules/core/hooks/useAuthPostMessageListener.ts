@@ -55,7 +55,7 @@ function getMessageNonce(data: unknown): string | undefined {
  *   popupWindowRef,
  *   setConnectionStatus,
  *   onAuthenticationComplete,
- *   nonceStorageKey: "knock:slack-auth-nonce:channel_123",
+ *   nonceStorageKey: "knock:slack-auth-nonce:channel_123:user_1",
  * });
  * ```
  */
