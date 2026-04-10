@@ -103,6 +103,7 @@ describe("useAuthPostMessageListener", () => {
     window.dispatchEvent(event);
 
     expect(setConnectionStatus).toHaveBeenCalledWith("error");
+    expect(mockPopup.close).toHaveBeenCalled();
     expect(popupWindowRef.current).toBeNull();
   });
 
@@ -123,6 +124,7 @@ describe("useAuthPostMessageListener", () => {
     window.dispatchEvent(event);
 
     expect(setConnectionStatus).toHaveBeenCalledWith("error");
+    expect(mockPopup.close).toHaveBeenCalled();
     expect(popupWindowRef.current).toBeNull();
   });
 
@@ -219,6 +221,8 @@ describe("useAuthPostMessageListener", () => {
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
       expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(mockPopup.close).toHaveBeenCalled();
+      expect(popupWindowRef.current).toBeNull();
     });
 
     it("should reject legacy string format when nonceStorageKey is set", () => {
@@ -243,6 +247,8 @@ describe("useAuthPostMessageListener", () => {
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
       expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(mockPopup.close).toHaveBeenCalled();
+      expect(popupWindowRef.current).toBeNull();
     });
 
     it("should reject structured authComplete without nonce field", () => {
@@ -267,6 +273,8 @@ describe("useAuthPostMessageListener", () => {
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
       expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(mockPopup.close).toHaveBeenCalled();
+      expect(popupWindowRef.current).toBeNull();
     });
 
     it("should reject authComplete when stored nonce is missing", () => {
@@ -289,6 +297,8 @@ describe("useAuthPostMessageListener", () => {
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
       expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(mockPopup.close).toHaveBeenCalled();
+      expect(popupWindowRef.current).toBeNull();
     });
 
     it("should clean up stored nonce on authFailed", () => {
@@ -314,6 +324,8 @@ describe("useAuthPostMessageListener", () => {
       expect(mockSessionStorage.removeItem).toHaveBeenCalledWith(
         nonceStorageKey,
       );
+      expect(mockPopup.close).toHaveBeenCalled();
+      expect(popupWindowRef.current).toBeNull();
     });
   });
 });

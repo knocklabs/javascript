@@ -71,6 +71,13 @@ export function useAuthPostMessageListener(
   } = options;
 
   useEffect(() => {
+    const closePopup = () => {
+      if (popupWindowRef.current && !popupWindowRef.current.closed) {
+        popupWindowRef.current.close();
+      }
+      popupWindowRef.current = null;
+    };
+
     const receiveMessage = (event: MessageEvent) => {
       // Validate message origin for security
       if (event.origin !== knockHost) {
@@ -87,7 +94,7 @@ export function useAuthPostMessageListener(
           if (!storedNonce || !returnedNonce || storedNonce !== returnedNonce) {
             sessionStorage.removeItem(nonceStorageKey);
             setConnectionStatus("error");
-            popupWindowRef.current = null;
+            closePopup();
             return;
           }
           sessionStorage.removeItem(nonceStorageKey);
@@ -95,19 +102,14 @@ export function useAuthPostMessageListener(
 
         setConnectionStatus("connected");
         onAuthenticationComplete?.(messageType);
-        // Clear popup ref so polling stops and doesn't trigger callback again
-        if (popupWindowRef.current && !popupWindowRef.current.closed) {
-          popupWindowRef.current.close();
-        }
-        popupWindowRef.current = null;
+        closePopup();
       } else if (messageType === "authFailed") {
-        // Clean up stored nonce on failure
         if (nonceStorageKey) {
           sessionStorage.removeItem(nonceStorageKey);
         }
         setConnectionStatus("error");
         onAuthenticationComplete?.(messageType);
-        popupWindowRef.current = null;
+        closePopup();
       }
     };
 
