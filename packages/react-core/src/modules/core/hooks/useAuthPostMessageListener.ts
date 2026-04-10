@@ -91,13 +91,13 @@ export function useAuthPostMessageListener(
         if (nonceStorageKey) {
           const returnedNonce = getMessageNonce(event.data);
           const storedNonce = sessionStorage.getItem(nonceStorageKey);
+          sessionStorage.removeItem(nonceStorageKey);
           if (!storedNonce || !returnedNonce || storedNonce !== returnedNonce) {
-            sessionStorage.removeItem(nonceStorageKey);
             setConnectionStatus("error");
+            onAuthenticationComplete?.("authFailed");
             closePopup();
             return;
           }
-          sessionStorage.removeItem(nonceStorageKey);
         }
 
         setConnectionStatus("connected");

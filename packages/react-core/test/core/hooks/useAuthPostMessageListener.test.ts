@@ -220,7 +220,7 @@ describe("useAuthPostMessageListener", () => {
       window.dispatchEvent(event);
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
-      expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(onAuthenticationComplete).toHaveBeenCalledWith("authFailed");
       expect(mockPopup.close).toHaveBeenCalled();
       expect(popupWindowRef.current).toBeNull();
     });
@@ -246,7 +246,7 @@ describe("useAuthPostMessageListener", () => {
       window.dispatchEvent(event);
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
-      expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(onAuthenticationComplete).toHaveBeenCalledWith("authFailed");
       expect(mockPopup.close).toHaveBeenCalled();
       expect(popupWindowRef.current).toBeNull();
     });
@@ -272,7 +272,7 @@ describe("useAuthPostMessageListener", () => {
       window.dispatchEvent(event);
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
-      expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(onAuthenticationComplete).toHaveBeenCalledWith("authFailed");
       expect(mockPopup.close).toHaveBeenCalled();
       expect(popupWindowRef.current).toBeNull();
     });
@@ -296,7 +296,7 @@ describe("useAuthPostMessageListener", () => {
       window.dispatchEvent(event);
 
       expect(setConnectionStatus).toHaveBeenCalledWith("error");
-      expect(onAuthenticationComplete).not.toHaveBeenCalled();
+      expect(onAuthenticationComplete).toHaveBeenCalledWith("authFailed");
       expect(mockPopup.close).toHaveBeenCalled();
       expect(popupWindowRef.current).toBeNull();
     });
