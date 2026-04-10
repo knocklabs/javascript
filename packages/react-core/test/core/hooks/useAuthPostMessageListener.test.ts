@@ -103,7 +103,7 @@ describe("useAuthPostMessageListener", () => {
     window.dispatchEvent(event);
 
     expect(setConnectionStatus).toHaveBeenCalledWith("error");
-    expect(mockPopup.close).toHaveBeenCalled();
+    expect(mockPopup.close).not.toHaveBeenCalled();
     expect(popupWindowRef.current).toBeNull();
   });
 
@@ -124,7 +124,7 @@ describe("useAuthPostMessageListener", () => {
     window.dispatchEvent(event);
 
     expect(setConnectionStatus).toHaveBeenCalledWith("error");
-    expect(mockPopup.close).toHaveBeenCalled();
+    expect(mockPopup.close).not.toHaveBeenCalled();
     expect(popupWindowRef.current).toBeNull();
   });
 
@@ -324,7 +324,7 @@ describe("useAuthPostMessageListener", () => {
       expect(mockSessionStorage.removeItem).toHaveBeenCalledWith(
         nonceStorageKey,
       );
-      expect(mockPopup.close).toHaveBeenCalled();
+      expect(mockPopup.close).not.toHaveBeenCalled();
       expect(popupWindowRef.current).toBeNull();
     });
   });

@@ -109,7 +109,7 @@ export function useAuthPostMessageListener(
         }
         setConnectionStatus("error");
         onAuthenticationComplete?.(messageType);
-        closePopup();
+        popupWindowRef.current = null;
       }
     };
 
