@@ -221,7 +221,7 @@ describe("useAuthPostMessageListener", () => {
       expect(onAuthenticationComplete).not.toHaveBeenCalled();
     });
 
-    it("should accept authComplete with legacy string format even when nonceStorageKey is set", () => {
+    it("should reject legacy string format when nonceStorageKey is set", () => {
       mockSessionStorage.setItem(nonceStorageKey, "stored-nonce");
 
       renderHook(() =>
@@ -234,15 +234,39 @@ describe("useAuthPostMessageListener", () => {
         }),
       );
 
-      // Legacy API sends bare string — no nonce to verify, so allow it
+      // Legacy string has no nonce — fails verification when nonceStorageKey is configured
       const event = new MessageEvent("message", {
         data: "authComplete",
         origin: knockHost,
       });
       window.dispatchEvent(event);
 
-      expect(setConnectionStatus).toHaveBeenCalledWith("connected");
-      expect(onAuthenticationComplete).toHaveBeenCalledWith("authComplete");
+      expect(setConnectionStatus).toHaveBeenCalledWith("error");
+      expect(onAuthenticationComplete).not.toHaveBeenCalled();
+    });
+
+    it("should reject structured authComplete without nonce field", () => {
+      mockSessionStorage.setItem(nonceStorageKey, "stored-nonce");
+
+      renderHook(() =>
+        useAuthPostMessageListener({
+          knockHost,
+          popupWindowRef,
+          setConnectionStatus,
+          onAuthenticationComplete,
+          nonceStorageKey,
+        }),
+      );
+
+      // Structured object but missing nonce — should not bypass verification
+      const event = new MessageEvent("message", {
+        data: { type: "authComplete" },
+        origin: knockHost,
+      });
+      window.dispatchEvent(event);
+
+      expect(setConnectionStatus).toHaveBeenCalledWith("error");
+      expect(onAuthenticationComplete).not.toHaveBeenCalled();
     });
 
     it("should reject authComplete when stored nonce is missing", () => {
