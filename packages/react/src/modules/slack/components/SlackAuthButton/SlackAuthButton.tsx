@@ -65,7 +65,10 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     popupWindowRef,
     setConnectionStatus,
     onAuthenticationComplete,
-    nonceStorageKey: getSlackNonceStorageKey(knockSlackChannelId, knock.userId!),
+    nonceStorageKey: getSlackNonceStorageKey(
+      knockSlackChannelId,
+      knock.userId!,
+    ),
   });
 
   useAuthPolling({
