@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.15
+
+### Patch Changes
+
+- 4863fe5: [Slack] Add support for nonce verification in slack auth
+- Updated dependencies [4863fe5]
+  - @knocklabs/react-core@0.13.9
+
 ## 0.11.14
 
 ### Patch Changes

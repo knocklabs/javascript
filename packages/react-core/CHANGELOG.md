@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.9
+
+### Patch Changes
+
+- 4863fe5: [Slack] Add support for nonce verification in slack auth
+
 ## 0.13.8
 
 ### Patch Changes
