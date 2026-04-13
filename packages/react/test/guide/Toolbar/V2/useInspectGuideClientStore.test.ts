@@ -538,7 +538,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
@@ -609,7 +609,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1", active: true });
@@ -672,7 +672,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
@@ -693,7 +693,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       mockCheckStateIfThrottled.mockReturnValue(true);
@@ -717,7 +717,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: {
+          byKey: {
             g1: {
               one: makeSelectionResult([], { includeThrottled: true }),
             },
@@ -742,7 +742,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other_guide",
         timeoutId: null,
         results: {
-          key: {
+          byKey: {
             g1: { one: makeSelectionResult() },
             other_guide: { one: makeSelectionResult() },
           },
@@ -767,7 +767,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other_guide",
         timeoutId: null,
         results: {
-          key: {
+          byKey: {
             g1: { one: makeSelectionResult() },
             other_guide: { one: makeSelectionResult() },
           },
@@ -795,7 +795,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other_guide",
         timeoutId: null,
         results: {
-          key: { other_guide: { one: makeSelectionResult() } },
+          byKey: { other_guide: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
@@ -818,7 +818,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -848,7 +848,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([
                 [0, { key: "higher_priority_guide" }],
@@ -875,7 +875,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([]),
             },
@@ -904,7 +904,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -930,7 +930,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -956,7 +956,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([[0, { key: "g1" }]], {
                 includeThrottled: true,
@@ -983,7 +983,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other_guide",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -1008,7 +1008,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -1033,7 +1033,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([]),
             },
@@ -1058,7 +1058,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "g1", bypass_global_group_limit: true }],
@@ -1090,7 +1090,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -1120,7 +1120,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([[0, { key: "g1" }]]),
             },
@@ -1150,7 +1150,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "first", bypass_global_group_limit: true }],
@@ -1183,7 +1183,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "first", bypass_global_group_limit: true }],
@@ -1216,7 +1216,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "first",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "first", bypass_global_group_limit: false }],
@@ -1244,7 +1244,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "first", bypass_global_group_limit: false }],
@@ -1272,7 +1272,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult(
                 [
@@ -1303,7 +1303,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult(
                 [[0, { key: "other" }]],
@@ -1331,7 +1331,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "other",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "first", bypass_global_group_limit: true }],
@@ -1358,7 +1358,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "first",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {
               all: makeSelectionResult([
                 [0, { key: "first", bypass_global_group_limit: false }],
@@ -1385,7 +1385,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          type: {
+          byType: {
             banner: {},
           },
         },
@@ -1409,10 +1409,10 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: {
+          byKey: {
             g1: { one: makeSelectionResult() },
           },
-          type: {
+          byType: {
             banner: {
               one: makeSelectionResult([[0, { key: "other" }]]),
             },
@@ -1453,7 +1453,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       mockCheckActivatable.mockReturnValue(false);
@@ -1477,7 +1477,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: {
+          byKey: {
             g1: { one: makeSelectionResult() },
           },
         },
@@ -1568,7 +1568,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
@@ -1623,7 +1623,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
@@ -1654,7 +1654,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
@@ -1681,7 +1681,7 @@ describe("useInspectGuideClientStore", () => {
         resolved: "g1",
         timeoutId: null,
         results: {
-          key: { g1: { one: makeSelectionResult() } },
+          byKey: { g1: { one: makeSelectionResult() } },
         },
       };
       const guide = makeGuide({ key: "g1" });
