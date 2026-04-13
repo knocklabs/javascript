@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.9
+
+### Patch Changes
+
+- e4fe593: chore(deps): bump phoenix from 1.8.3 to 1.8.5
+
 ## 0.21.8
 
 ### Patch Changes
