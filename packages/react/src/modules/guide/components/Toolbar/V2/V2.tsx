@@ -113,15 +113,8 @@ export const V2 = ({ readyToTarget, listenForUpdates }: Props) => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
 
-    const stopDebug = () => {
-      client.unsetDebug();
-      listenForUpdates ? client.subscribe() : client.unsubscribe();
-    };
-
-    // Always subscribe while debugging.
     if (isVisible && !isDebugging && readyToTarget) {
       client.setDebug({ focusedGuideKeys });
-      client.subscribe();
 
       // If focused, switch to all guides so you can see in the list.
       if (Object.keys(focusedGuideKeys).length > 0) {
@@ -130,10 +123,14 @@ export const V2 = ({ readyToTarget, listenForUpdates }: Props) => {
     }
 
     if (!isVisible && isDebugging) {
-      stopDebug();
+      client.unsetDebug({ listenForUpdates });
     }
 
-    return () => stopDebug();
+    return () => {
+      if (isDebugging) {
+        client.unsetDebug({ listenForUpdates });
+      }
+    };
   }, [readyToTarget, listenForUpdates, runConfig, client, setDisplayOption]);
 
   // Toggle collapsed state with Ctrl + .
