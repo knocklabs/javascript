@@ -654,7 +654,11 @@ export class KnockGuideClient {
         `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch({ force: true });
-      opts?.listenForUpdates ? this.subscribe() : this.unsubscribe();
+      if (opts?.listenForUpdates) {
+        this.subscribe();
+      } else {
+        this.unsubscribe();
+      }
     }
   }
 
