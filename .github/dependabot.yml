@@ -13,6 +13,11 @@ updates:
       telegraph-packages:
         patterns:
           - "@telegraph/*"
+      # Keep react and react-dom on the same version (they must stay aligned).
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
     ignore:
       # nanoid >3 drops support for cjs
       - dependency-name: "nanoid"
