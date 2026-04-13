@@ -17,18 +17,23 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
   children,
   toolbar = "v2",
   readyToTarget,
+  listenForUpdates = true,
   ...props
 }) => {
   return (
     <KnockGuideProviderCore
       {...props}
       readyToTarget={readyToTarget}
+      listenForUpdates={listenForUpdates}
       // For backward compatibility with toolbar v1. Remove once v2 ships.
       trackDebugParams={toolbar === "v1"}
     >
       {children}
       {toolbar === "v2" ? (
-        <ToolbarV2 readyToTarget={readyToTarget} />
+        <ToolbarV2
+          readyToTarget={readyToTarget}
+          listenForUpdates={listenForUpdates}
+        />
       ) : (
         <ToolbarV1 />
       )}

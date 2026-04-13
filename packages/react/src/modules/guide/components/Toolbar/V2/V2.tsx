@@ -87,9 +87,10 @@ const filterGuides = (
 
 type Props = {
   readyToTarget: boolean;
+  listenForUpdates: boolean;
 };
 
-export const V2 = ({ readyToTarget }: Props) => {
+export const V2 = ({ readyToTarget, listenForUpdates }: Props) => {
   const { client } = useGuideContext();
 
   const [displayOption, setDisplayOption] =
@@ -111,6 +112,7 @@ export const V2 = ({ readyToTarget }: Props) => {
   React.useEffect(() => {
     const { isVisible = false, focusedGuideKeys = {} } = runConfig || {};
     const isDebugging = client.store.state.debug?.debugging;
+
     if (isVisible && !isDebugging && readyToTarget) {
       client.setDebug({ focusedGuideKeys });
 
@@ -120,10 +122,16 @@ export const V2 = ({ readyToTarget }: Props) => {
       }
     }
 
+    if (!isVisible && isDebugging) {
+      client.unsetDebug({ listenForUpdates });
+    }
+
     return () => {
-      client.unsetDebug();
+      if (client.store.state.debug?.debugging) {
+        client.unsetDebug({ listenForUpdates });
+      }
     };
-  }, [readyToTarget, runConfig, client, setDisplayOption]);
+  }, [readyToTarget, listenForUpdates, runConfig, client, setDisplayOption]);
 
   // Toggle collapsed state with Ctrl + .
   React.useEffect(() => {
@@ -351,7 +359,6 @@ export const V2 = ({ readyToTarget }: Props) => {
                   leadingIcon={{ icon: LogOut, alt: "Exit" }}
                   onClick={() => {
                     setRunConfig((curr) => ({ ...curr, isVisible: false }));
-                    client.unsetDebug();
                   }}
                 >
                   Exit

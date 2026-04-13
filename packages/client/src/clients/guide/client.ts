@@ -629,11 +629,12 @@ export class KnockGuideClient {
         `[Guide] Start debugging, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch({ force: true });
+      // Always subscribe while debugging.
       this.subscribe();
     }
   }
 
-  unsetDebug() {
+  unsetDebug(opts?: { listenForUpdates?: boolean }) {
     this.knock.log("[Guide] .unsetDebug()");
     const shouldRefetch = this.store.state.debug?.debugging;
 
@@ -653,8 +654,11 @@ export class KnockGuideClient {
         `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
       );
       this.fetch({ force: true });
-      // TODO: Manage (re)subscribe/unsubscribe in V2 rather than here.
-      this.subscribe();
+      if (opts?.listenForUpdates) {
+        this.subscribe();
+      } else {
+        this.unsubscribe();
+      }
     }
   }
 
