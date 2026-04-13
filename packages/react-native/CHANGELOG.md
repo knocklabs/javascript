@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.3
+
+### Patch Changes
+
+- Updated dependencies [e4fe593]
+  - @knocklabs/client@0.21.9
+  - @knocklabs/react-core@0.13.10
+
 ## 0.9.2
 
 ### Patch Changes

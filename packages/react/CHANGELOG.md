@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.16
+
+### Patch Changes
+
+- 5d54e48: Update `@telegraph/*` dependencies to use `>=current_version` ranges instead of `^` (caret) ranges. This ensures that any version of a `@telegraph/*` package installed by a downstream project will satisfy `@knocklabs/react`'s dependency range, preventing Yarn from installing duplicate copies of Telegraph packages.
+- Updated dependencies [e4fe593]
+  - @knocklabs/client@0.21.9
+  - @knocklabs/react-core@0.13.10
+
 ## 0.11.15
 
 ### Patch Changes
