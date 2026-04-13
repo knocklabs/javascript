@@ -4856,7 +4856,7 @@ describe("KnockGuideClient", () => {
 
       expect(client.store.state.debug).toBe(undefined);
 
-      // calls fetch when existing debugging
+      // calls fetch when exiting debugging
       expect(fetchSpy).toHaveBeenCalled();
     });
 
