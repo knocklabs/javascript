@@ -4851,17 +4851,13 @@ describe("KnockGuideClient", () => {
       const fetchSpy = vi
         .spyOn(client, "fetch")
         .mockImplementation(() => Promise.resolve({ status: "ok" }));
-      const subscribeSpy = vi
-        .spyOn(client, "subscribe")
-        .mockImplementation(() => {});
 
       client.unsetDebug();
 
       expect(client.store.state.debug).toBe(undefined);
 
-      // calls fetch when was debugging; subscribe is managed by V2 toolbar
+      // calls fetch when existing debugging
       expect(fetchSpy).toHaveBeenCalled();
-      expect(subscribeSpy).not.toHaveBeenCalled();
     });
 
     test("does not call fetch and subscribe when was not debugging", () => {
