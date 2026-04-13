@@ -4472,7 +4472,7 @@ __metadata:
     expo-notifications: "npm:~55.0.16"
     expo-router: "npm:~55.0.8"
     expo-splash-screen: "npm:~55.0.13"
-    expo-status-bar: "npm:~55.0.4"
+    expo-status-bar: "npm:~55.0.5"
     expo-symbols: "npm:~55.0.5"
     expo-system-ui: "npm:~55.0.11"
     expo-web-browser: "npm:~55.0.10"
@@ -13132,15 +13132,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-status-bar@npm:~55.0.4":
-  version: 55.0.4
-  resolution: "expo-status-bar@npm:55.0.4"
+"expo-status-bar@npm:~55.0.5":
+  version: 55.0.5
+  resolution: "expo-status-bar@npm:55.0.5"
   dependencies:
     react-native-is-edge-to-edge: "npm:^1.2.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/80258eb39fa34fec3ee4a6b6e47b224ad1661618876add00d542f797e8db9188753396b77103fac7bd4a1d9c473942071aab0b7a3045fdffd24c3af467b59ffb
+  checksum: 10c0/51839d8cf083f3772a3f702d28ad2d769f38d5651c24e502b2699dcec20bc90964eeaa4a7822523166d33fb32ae575213f6be37dedfe471053926746385e3bb2
   languageName: node
   linkType: hard
 
