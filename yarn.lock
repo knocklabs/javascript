@@ -7343,7 +7343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/combobox@npm:0.2.5, @telegraph/combobox@npm:^0.2.5, @telegraph/combobox@npm:~0.2.5":
+"@telegraph/combobox@npm:0.2.5, @telegraph/combobox@npm:~0.2.5":
   version: 0.2.5
   resolution: "@telegraph/combobox@npm:0.2.5"
   dependencies:
@@ -7407,7 +7407,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/input@npm:^0.3.2":
+"@telegraph/input@npm:^0.3.2, @telegraph/input@npm:~0.3.2":
   version: 0.3.2
   resolution: "@telegraph/input@npm:0.3.2"
   dependencies:
@@ -7476,7 +7476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/select@npm:^0.0.88, @telegraph/select@npm:~0.0.88":
+"@telegraph/select@npm:~0.0.88":
   version: 0.0.88
   resolution: "@telegraph/select@npm:0.0.88"
   dependencies:
@@ -7536,7 +7536,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@telegraph/textarea@npm:^0.2.2":
+"@telegraph/textarea@npm:~0.2.2":
   version: 0.2.2
   resolution: "@telegraph/textarea@npm:0.2.2"
   dependencies:
@@ -17148,15 +17148,15 @@ __metadata:
     "@knocklabs/react": "workspace:*"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.3.1"
-    "@telegraph/button": "npm:^0.6.0"
-    "@telegraph/combobox": "npm:^0.2.5"
-    "@telegraph/icon": "npm:^0.5.0"
-    "@telegraph/input": "npm:^0.3.2"
-    "@telegraph/layout": "npm:^0.5.0"
-    "@telegraph/select": "npm:^0.0.88"
-    "@telegraph/textarea": "npm:^0.2.2"
-    "@telegraph/tokens": "npm:^0.2.0"
-    "@telegraph/typography": "npm:^0.4.0"
+    "@telegraph/button": "npm:~0.6.0"
+    "@telegraph/combobox": "npm:~0.2.5"
+    "@telegraph/icon": "npm:~0.5.0"
+    "@telegraph/input": "npm:~0.3.2"
+    "@telegraph/layout": "npm:~0.5.0"
+    "@telegraph/select": "npm:~0.0.88"
+    "@telegraph/textarea": "npm:~0.2.2"
+    "@telegraph/tokens": "npm:~0.2.0"
+    "@telegraph/typography": "npm:~0.4.0"
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
@@ -17189,15 +17189,15 @@ __metadata:
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.3.1"
-    "@telegraph/button": "npm:^0.6.0"
-    "@telegraph/combobox": "npm:^0.2.5"
-    "@telegraph/icon": "npm:^0.5.0"
-    "@telegraph/input": "npm:^0.3.2"
-    "@telegraph/layout": "npm:^0.5.0"
-    "@telegraph/select": "npm:^0.0.88"
-    "@telegraph/textarea": "npm:^0.2.2"
-    "@telegraph/tokens": "npm:^0.2.0"
-    "@telegraph/typography": "npm:^0.4.0"
+    "@telegraph/button": "npm:~0.6.0"
+    "@telegraph/combobox": "npm:~0.2.5"
+    "@telegraph/icon": "npm:~0.5.0"
+    "@telegraph/input": "npm:~0.3.2"
+    "@telegraph/layout": "npm:~0.5.0"
+    "@telegraph/select": "npm:~0.0.88"
+    "@telegraph/textarea": "npm:~0.2.2"
+    "@telegraph/tokens": "npm:~0.2.0"
+    "@telegraph/typography": "npm:~0.4.0"
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.1.8"
