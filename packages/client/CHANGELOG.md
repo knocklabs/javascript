@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.10
+
+### Patch Changes
+
+- ee35de2: [Guides] Only re-subscribe per listenForUpdates when exiting debugging in guide toolbar v2
+
 ## 0.21.9
 
 ### Patch Changes

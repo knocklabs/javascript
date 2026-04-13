@@ -1,5 +1,14 @@
 # @knocklabs/expo
 
+## 0.6.4
+
+### Patch Changes
+
+- Updated dependencies [ee35de2]
+  - @knocklabs/react-core@0.13.11
+  - @knocklabs/client@0.21.10
+  - @knocklabs/react-native@0.9.4
+
 ## 0.6.3
 
 ### Patch Changes
