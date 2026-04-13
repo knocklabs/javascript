@@ -285,7 +285,6 @@ export type TargetParams = {
 
 export type ConstructorOpts = {
   trackLocationFromWindow?: boolean;
-  trackDebugParams?: boolean;
   orderResolutionDuration?: number;
   throttleCheckInterval?: number;
 };

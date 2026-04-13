@@ -4,10 +4,10 @@ import {
 } from "@knocklabs/react-core";
 import React from "react";
 
-import { ToolbarV1, ToolbarV2 } from "../components";
+import { ToolbarV2 } from "../components";
 
 type Props = KnockGuideProviderProps & {
-  toolbar?: "v1" | "v2";
+  toolbar?: "v2";
 };
 
 // Re-export the core KnockGuideProvider, so we can add React specific
@@ -25,17 +25,13 @@ export const KnockGuideProvider: React.FC<React.PropsWithChildren<Props>> = ({
       {...props}
       readyToTarget={readyToTarget}
       listenForUpdates={listenForUpdates}
-      // For backward compatibility with toolbar v1. Remove once v2 ships.
-      trackDebugParams={toolbar === "v1"}
     >
       {children}
-      {toolbar === "v2" ? (
+      {toolbar === "v2" && (
         <ToolbarV2
           readyToTarget={readyToTarget}
           listenForUpdates={listenForUpdates}
         />
-      ) : (
-        <ToolbarV1 />
       )}
     </KnockGuideProviderCore>
   );

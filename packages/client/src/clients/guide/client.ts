@@ -64,14 +64,6 @@ const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
 // Maximum number of retry attempts for channel subscription
 const SUBSCRIBE_RETRY_LIMIT = 3;
 
-// Debug query param keys
-export const DEBUG_QUERY_PARAMS = {
-  GUIDE_KEY: "knock_guide_key",
-  PREVIEW_SESSION_ID: "knock_preview_session_id",
-};
-
-const DEBUG_STORAGE_KEY = "knock_guide_debug";
-
 // Return the global window object if defined, so to safely guard against SSR.
 const checkForWindow = () => {
   if (typeof window !== "undefined") {
@@ -81,76 +73,6 @@ const checkForWindow = () => {
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
-
-// Detect debug params from URL or local storage
-const detectDebugParams = (): DebugState => {
-  const win = checkForWindow();
-  if (!win || !win.location) {
-    return { forcedGuideKey: null, previewSessionId: null };
-  }
-
-  const urlParams = new URLSearchParams(win.location.search);
-  const urlGuideKey = urlParams.get(DEBUG_QUERY_PARAMS.GUIDE_KEY);
-  const urlPreviewSessionId = urlParams.get(
-    DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID,
-  );
-
-  // If URL params exist, persist them to localStorage and return them
-  if (urlGuideKey || urlPreviewSessionId) {
-    if (win.localStorage) {
-      try {
-        const debugState = {
-          forcedGuideKey: urlGuideKey,
-          previewSessionId: urlPreviewSessionId,
-        };
-        win.localStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(debugState));
-      } catch {
-        // Silently fail in privacy mode
-      }
-    }
-    return {
-      forcedGuideKey: urlGuideKey,
-      previewSessionId: urlPreviewSessionId,
-    };
-  }
-
-  // Check local storage if no URL params
-  let storedGuideKey = null;
-  let storedPreviewSessionId = null;
-
-  if (win.localStorage) {
-    try {
-      const storedDebugState = win.localStorage.getItem(DEBUG_STORAGE_KEY);
-      if (storedDebugState) {
-        const parsedDebugState = safeJsonParseDebugParams(storedDebugState);
-        storedGuideKey = parsedDebugState.forcedGuideKey;
-        storedPreviewSessionId = parsedDebugState.previewSessionId;
-      }
-    } catch {
-      // Silently fail in privacy mode
-    }
-  }
-
-  return {
-    forcedGuideKey: storedGuideKey,
-    previewSessionId: storedPreviewSessionId,
-  };
-};
-
-const safeJsonParseDebugParams = (value: string): DebugState => {
-  try {
-    const parsed = JSON.parse(value);
-    return {
-      forcedGuideKey: parsed?.forcedGuideKey ?? null,
-      previewSessionId: parsed?.previewSessionId ?? null,
-    };
-  } catch {
-    return {
-      forcedGuideKey: null,
-      previewSessionId: null,
-    };
-  }
-};
 
 type SelectQueryMetadata = {
   limit: SelectQueryLimit;
@@ -295,15 +217,11 @@ export class KnockGuideClient {
   ) {
     const {
       trackLocationFromWindow = true,
-      // TODO(KNO-11523): Remove once we ship guide toolbar v2, and offload as
-      // much debugging specific logic and responsibilities to toolbar.
-      trackDebugParams = false,
       throttleCheckInterval = DEFAULT_COUNTER_INCREMENT_INTERVAL,
     } = options;
     const win = checkForWindow();
 
     const location = trackLocationFromWindow ? win?.location?.href : undefined;
-    const debug = trackDebugParams ? detectDebugParams() : undefined;
 
     this.store = new Store<StoreState>({
       guideGroups: [],
@@ -315,7 +233,6 @@ export class KnockGuideClient {
       location,
       // Increment to update the state store and trigger re-selection.
       counter: 0,
-      debug,
     });
 
     // In server environments we might not have a socket connection.
@@ -558,45 +475,6 @@ export class KnockGuideClient {
         location: href,
       };
     });
-  }
-
-  exitDebugMode() {
-    this.knock.log("[Guide] Exiting debug mode");
-
-    // Clear localStorage debug params
-    const win = checkForWindow();
-    if (win?.localStorage) {
-      try {
-        win.localStorage.removeItem(DEBUG_STORAGE_KEY);
-      } catch {
-        // Silently fail in privacy mode
-      }
-    }
-
-    // Clear debug state from store
-    this.store.setState((state) => ({
-      ...state,
-      debug: {
-        forcedGuideKey: null,
-        previewSessionId: null,
-        focusedGuideKeys: {},
-      },
-      previewGuides: {}, // Clear preview guides when exiting debug mode
-    }));
-
-    // Remove URL query params if present
-    // Only update the URL if params need to be cleared to avoid unnecessary navigations
-    if (win?.location) {
-      const url = new URL(win.location.href);
-      if (
-        url.searchParams.has(DEBUG_QUERY_PARAMS.GUIDE_KEY) ||
-        url.searchParams.has(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID)
-      ) {
-        url.searchParams.delete(DEBUG_QUERY_PARAMS.GUIDE_KEY);
-        url.searchParams.delete(DEBUG_QUERY_PARAMS.PREVIEW_SESSION_ID);
-        win.location.href = url.toString();
-      }
-    }
   }
 
   setDebug(debugOpts?: Omit<DebugState, "debugging">) {
@@ -1403,42 +1281,8 @@ export class KnockGuideClient {
 
     this.knock.log(`[Guide] Detected a location change: ${href}`);
 
-    if (!this.options.trackDebugParams) {
-      this.setLocation(href);
-      return;
-    }
-
-    // TODO(KNO-11523): Remove below once we ship toolbar v2.
-
-    // If entering debug mode, fetch all guides.
-    const currentDebugParams = this.store.state.debug || {};
-    const newDebugParams = detectDebugParams();
-
-    this.setLocation(href, { debug: newDebugParams });
-
-    // If debug state has changed, refetch guides and resubscribe to the websocket channel
-    const debugStateChanged = this.checkDebugStateChanged(
-      currentDebugParams,
-      newDebugParams,
-    );
-
-    if (debugStateChanged) {
-      this.knock.log(
-        `[Guide] Debug state changed, refetching guides and resubscribing to the websocket channel`,
-      );
-      this.fetch();
-      this.subscribe();
-    }
+    this.setLocation(href);
   };
-
-  // Returns whether debug params have changed. For guide key, we only check
-  // presence since the exact value has no impact on fetch/subscribe
-  private checkDebugStateChanged(a: DebugState, b: DebugState): boolean {
-    return (
-      Boolean(a.forcedGuideKey) !== Boolean(b.forcedGuideKey) ||
-      a.previewSessionId !== b.previewSessionId
-    );
-  }
 
   private listenForLocationChangesFromWindow() {
     const win = checkForWindow();
