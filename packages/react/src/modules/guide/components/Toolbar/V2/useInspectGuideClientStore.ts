@@ -59,8 +59,8 @@ type SelectionResultByLimit = {
   all?: KnockGuideSelectionResult;
 };
 type SelectionResultByQuery = {
-  key?: SelectionResultByLimit;
-  type?: SelectionResultByLimit;
+  byKey?: SelectionResultByLimit;
+  byType?: SelectionResultByLimit;
 };
 type SelectableStatusPresent = {
   status: "returned" | "throttled" | "queried";
@@ -157,8 +157,8 @@ const inferSelectByKeyReturnStatus = (
   query: SelectionResultByQuery,
 ): SelectableStatusPresent["status"] => {
   const includeThrottled =
-    !!query.key?.one?.metadata?.opts?.includeThrottled ||
-    !!query.key?.all?.metadata?.opts?.includeThrottled;
+    !!query.byKey?.one?.metadata?.opts?.includeThrottled ||
+    !!query.byKey?.all?.metadata?.opts?.includeThrottled;
 
   // If unthrottled, then it should always be returned.
   if (guide.bypass_global_group_limit) {
@@ -185,9 +185,10 @@ const inferSelectOneByTypeReturnStatus = (
   stage: KnockGuideClientGroupStage,
   query: SelectionResultByQuery,
 ): SelectableStatusPresent["status"] => {
-  const includeThrottled = !!query.type?.one?.metadata?.opts?.includeThrottled;
+  const includeThrottled =
+    !!query.byType?.one?.metadata?.opts?.includeThrottled;
 
-  const result = query.type!.one!;
+  const result = query.byType!.one!;
   if (result.size === 0) {
     return "queried";
   }
@@ -229,7 +230,7 @@ const inferSelectAllByTypeReturnStatus = (
   stage: KnockGuideClientGroupStage,
   query: SelectionResultByQuery,
 ): SelectableStatusPresent["status"] => {
-  const result = query.type!.all!;
+  const result = query.byType!.all!;
   if (result.size === 0) {
     return "queried";
   }
@@ -241,7 +242,8 @@ const inferSelectAllByTypeReturnStatus = (
   const guidesByKey: Record<KnockGuide["key"], KnockGuide> = byKey(guides);
 
   // If includeThrottled given, then expect all selected guides to be returned.
-  const includeThrottled = !!query.type?.all?.metadata?.opts?.includeThrottled;
+  const includeThrottled =
+    !!query.byType?.all?.metadata?.opts?.includeThrottled;
   if (includeThrottled) {
     return guidesByKey[guide.key] ? "returned" : "queried";
   }
@@ -270,14 +272,14 @@ const inferSelectReturnStatus = (
 ) => {
   // Querying by key can only return up to a max of one guide, regardless of
   // useGuide or useGuides, and should take precedence in status designation.
-  if (query.key) {
+  if (query.byKey) {
     return inferSelectByKeyReturnStatus(guide, snapshot, stage, query);
   }
 
-  if (query.type?.all) {
+  if (query.byType?.all) {
     return inferSelectAllByTypeReturnStatus(guide, snapshot, stage, query);
   }
-  if (query.type?.one) {
+  if (query.byType?.one) {
     return inferSelectOneByTypeReturnStatus(guide, snapshot, stage, query);
   }
 
@@ -295,11 +297,11 @@ const toSelectableStatus = (
   }
 
   const query = {
-    key: (stage.results.key || {})[guide.key],
-    type: (stage.results.type || {})[guide.type],
+    byKey: (stage.results.byKey || {})[guide.key],
+    byType: (stage.results.byType || {})[guide.type],
   };
 
-  const queried = Boolean(query.key || query.type);
+  const queried = Boolean(query.byKey || query.byType);
   if (!queried) {
     // No present query in the current location can select this guide.
     return { status: undefined };

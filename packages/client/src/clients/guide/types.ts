@@ -296,8 +296,8 @@ type SelectionResultByLimit = {
 };
 
 type RecordedSelectionResults = {
-  key?: Record<KnockGuide["key"], SelectionResultByLimit>;
-  type?: Record<KnockGuide["type"], SelectionResultByLimit>;
+  byKey?: Record<KnockGuide["key"], SelectionResultByLimit>;
+  byType?: Record<KnockGuide["type"], SelectionResultByLimit>;
 };
 
 export type GroupStage = {

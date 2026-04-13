@@ -4152,11 +4152,11 @@ describe("KnockGuideClient", () => {
       const stage = client.getStage();
       expect(stage).toBeDefined();
       expect(stage!.status).toBe("open");
-      expect(stage!.results.key).toBeDefined();
-      expect(stage!.results.key!["onboarding"]).toBeDefined();
-      expect(stage!.results.key!["onboarding"]!.one).toBeDefined();
-      expect(stage!.results.key!["onboarding"]!.one!.metadata).toBeDefined();
-      expect(stage!.results.key!["onboarding"]!.one!.metadata!.limit).toBe(
+      expect(stage!.results.byKey).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]!.one).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]!.one!.metadata).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]!.one!.metadata!.limit).toBe(
         "one",
       );
     });
@@ -4181,9 +4181,9 @@ describe("KnockGuideClient", () => {
 
       const stage = client.getStage();
       expect(stage).toBeDefined();
-      expect(stage!.results.type).toBeDefined();
-      expect(stage!.results.type!["card"]).toBeDefined();
-      expect(stage!.results.type!["card"]!.one).toBeDefined();
+      expect(stage!.results.byType).toBeDefined();
+      expect(stage!.results.byType!["card"]).toBeDefined();
+      expect(stage!.results.byType!["card"]!.one).toBeDefined();
     });
 
     test("does not record when not debugging", () => {
@@ -4248,8 +4248,8 @@ describe("KnockGuideClient", () => {
       client.selectGuide(stateWithGuides, { type: "banner" });
 
       const stage = client.getStage();
-      expect(stage!.results.key!["onboarding"].one).toBeDefined();
-      expect(stage!.results.type!["banner"].one).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"].one).toBeDefined();
+      expect(stage!.results.byType!["banner"].one).toBeDefined();
     });
 
     test("selectGuides records result with 'all' limit", () => {
@@ -4272,14 +4272,14 @@ describe("KnockGuideClient", () => {
       client.selectGuides(stateWithGuides, { type: "card" });
 
       const stage = client.getStage();
-      expect(stage!.results.type).toBeDefined();
-      expect(stage!.results.type!["card"]).toBeDefined();
-      expect(stage!.results.type!["card"]!.all).toBeDefined();
-      expect(stage!.results.type!["card"]!.all!.metadata!.limit).toBe("all");
+      expect(stage!.results.byType).toBeDefined();
+      expect(stage!.results.byType!["card"]).toBeDefined();
+      expect(stage!.results.byType!["card"]!.all).toBeDefined();
+      expect(stage!.results.byType!["card"]!.all!.metadata!.limit).toBe("all");
 
       // selectGuides calls selectGuide internally with recordSelectQuery: false,
       // so the "one" limit should NOT be recorded for the same type filter.
-      expect(stage!.results.type!["card"]!.one).toBeUndefined();
+      expect(stage!.results.byType!["card"]!.one).toBeUndefined();
     });
 
     test("does not record when stage is closed", () => {
@@ -4344,8 +4344,8 @@ describe("KnockGuideClient", () => {
       client.selectGuide(stateWithGuides, { key: "onboarding" });
 
       const stage = client.getStage();
-      expect(stage!.results.key).toBeDefined();
-      expect(stage!.results.key!["onboarding"]).toBeDefined();
+      expect(stage!.results.byKey).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]).toBeDefined();
     });
   });
 
