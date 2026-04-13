@@ -4714,9 +4714,9 @@ describe("KnockGuideClient", () => {
 
       expect(client.store.state.debug!.debugging!).toBe(true);
 
-      // calls fetch when not already debugging; subscribe is managed by V2 toolbar
+      // calls fetch and subscribe when not already debugging
       expect(fetchSpy).toHaveBeenCalled();
-      expect(subscribeSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).toHaveBeenCalled();
     });
 
     test("sets debug state with provided options", () => {
