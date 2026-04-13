@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.11
+
+### Patch Changes
+
+- ee35de2: [Guides] Only re-subscribe per listenForUpdates when exiting debugging in guide toolbar v2
+- Updated dependencies [ee35de2]
+  - @knocklabs/client@0.21.10
+
 ## 0.13.10
 
 ### Patch Changes
