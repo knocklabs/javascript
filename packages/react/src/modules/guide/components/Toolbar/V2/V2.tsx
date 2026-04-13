@@ -127,7 +127,7 @@ export const V2 = ({ readyToTarget, listenForUpdates }: Props) => {
     }
 
     return () => {
-      if (isDebugging) {
+      if (client.store.state.debug?.debugging) {
         client.unsetDebug({ listenForUpdates });
       }
     };
