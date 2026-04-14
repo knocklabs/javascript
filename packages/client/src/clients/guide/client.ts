@@ -868,14 +868,14 @@ export class KnockGuideClient {
     if (!this.stage || this.stage.status === "closed") return;
 
     // Deep merge to accumulate the results.
-    const queriedByKey = this.stage.results.key || {};
+    const queriedByKey = this.stage.results.byKey || {};
     if (filters.key) {
       queriedByKey[filters.key] = {
         ...(queriedByKey[filters.key] || {}),
         ...{ [limit]: result },
       };
     }
-    const queriedByType = this.stage.results.type || {};
+    const queriedByType = this.stage.results.byType || {};
     if (filters.type) {
       queriedByType[filters.type] = {
         ...(queriedByType[filters.type] || {}),
@@ -885,7 +885,7 @@ export class KnockGuideClient {
 
     this.stage = {
       ...this.stage,
-      results: { key: queriedByKey, type: queriedByType },
+      results: { byKey: queriedByKey, byType: queriedByType },
     };
   }
 
