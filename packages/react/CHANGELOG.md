@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.18
+
+### Patch Changes
+
+- c22289c: chore(deps): bump the telegraph-packages group with 5 updates
+
 ## 0.11.17
 
 ### Patch Changes
