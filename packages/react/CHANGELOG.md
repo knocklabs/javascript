@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.11.19
+
+### Patch Changes
+
+- e474413: [Guide] Skip re-rendering in transient state in guide toolbar
+- 9d81dc2: [Guide] Add hotkey support for moving focus in guide toolbar
+
 ## 0.11.18
 
 ### Patch Changes
