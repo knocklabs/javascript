@@ -1718,4 +1718,139 @@ describe("useInspectGuideClientStore", () => {
       expect(result.guides).toHaveLength(1);
     });
   });
+
+  // ----- Stability across transient stage transitions -----
+  //
+  // The group stage is cleared and re-opened on Focus toggles, navigation,
+  // etc. During the order-resolution window, selectable would collapse to
+  // undefined for every guide, causing the status dots to flicker. The hook
+  // caches the last settled orderedGuides and serves it while the stage is
+  // transient (undefined or "open") to keep the toolbar view stable.
+
+  describe("stability across transient stage transitions", () => {
+    const closedStage = {
+      status: "closed" as const,
+      ordered: ["g1"],
+      resolved: "g1",
+      timeoutId: null,
+      results: { byKey: { g1: { one: makeSelectionResult() } } },
+    };
+
+    test("serves the last settled result when stage becomes undefined", () => {
+      mockGroupStage = closedStage;
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const { result, rerender } = renderHook(() =>
+        useInspectGuideClientStore(defaultRunConfig),
+      );
+      const firstResult = expectOk(result.current);
+      expect(
+        (firstResult.guides[0] as AnnotatedGuide).annotation.selectable.status,
+      ).toBe("returned");
+
+      // Simulate stage being cleared (e.g. after setDebug / setLocation).
+      mockGroupStage = undefined;
+      rerender();
+
+      const secondResult = expectOk(result.current);
+      expect(
+        (secondResult.guides[0] as AnnotatedGuide).annotation.selectable.status,
+      ).toBe("returned");
+      expect(secondResult.guides).toBe(firstResult.guides);
+    });
+
+    test("serves the last settled result when a new stage is 'open'", () => {
+      mockGroupStage = closedStage;
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const { result, rerender } = renderHook(() =>
+        useInspectGuideClientStore(defaultRunConfig),
+      );
+      const firstResult = expectOk(result.current);
+
+      // A new stage opens with empty results before resolving later.
+      mockGroupStage = {
+        status: "open",
+        ordered: [],
+        results: {},
+        timeoutId: null,
+      };
+      rerender();
+
+      const secondResult = expectOk(result.current);
+      expect(
+        (secondResult.guides[0] as AnnotatedGuide).annotation.selectable.status,
+      ).toBe("returned");
+      expect(secondResult.guides).toBe(firstResult.guides);
+    });
+
+    test("falls back to fresh (transient) result on first render with no prior settled stage", () => {
+      mockGroupStage = undefined;
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const result = expectOk(renderInspect());
+      // No cache yet — transient selectable status is shown as-is.
+      expect(
+        (result.guides[0] as AnnotatedGuide).annotation.selectable.status,
+      ).toBeUndefined();
+    });
+
+    test("refreshes cache when the stage settles again with different results", () => {
+      mockGroupStage = closedStage;
+      const guide = makeGuide({ key: "g1" });
+      setSnapshot({
+        guideGroups: [makeGuideGroup(["g1"])],
+        guides: { g1: guide },
+      });
+
+      const { result, rerender } = renderHook(() =>
+        useInspectGuideClientStore(defaultRunConfig),
+      );
+      expect(
+        (expectOk(result.current).guides[0] as AnnotatedGuide).annotation
+          .selectable.status,
+      ).toBe("returned");
+
+      // Transient window — serves cached "returned".
+      mockGroupStage = undefined;
+      rerender();
+      expect(
+        (expectOk(result.current).guides[0] as AnnotatedGuide).annotation
+          .selectable.status,
+      ).toBe("returned");
+
+      // Stage closes again with a different resolved guide — cache must
+      // refresh so the toolbar reflects the new state.
+      mockGroupStage = {
+        status: "closed",
+        ordered: ["g1", "other"],
+        resolved: "other",
+        timeoutId: null,
+        results: {
+          byKey: {
+            g1: { one: makeSelectionResult() },
+            other: { one: makeSelectionResult() },
+          },
+        },
+      };
+      rerender();
+
+      expect(
+        (expectOk(result.current).guides[0] as AnnotatedGuide).annotation
+          .selectable.status,
+      ).toBe("queried");
+    });
+  });
 });
