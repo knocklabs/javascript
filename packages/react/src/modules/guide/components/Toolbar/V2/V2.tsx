@@ -23,8 +23,8 @@ import "../styles.css";
 import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
 import { GuideRow } from "./GuideRow";
-import { DisplayOption, sharedTooltipProps } from "./helpers";
 import { Kbd } from "./Kbd";
+import { DisplayOption, sharedTooltipProps } from "./helpers";
 import { useDraggable } from "./useDraggable";
 import {
   InspectionResultOk,
