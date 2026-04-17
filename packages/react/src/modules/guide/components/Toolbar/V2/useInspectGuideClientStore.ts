@@ -9,6 +9,7 @@ import {
   checkStateIfThrottled,
 } from "@knocklabs/client";
 import { useGuideContext, useStore } from "@knocklabs/react-core";
+import * as React from "react";
 
 import { FOCUS_ERRORS } from "./helpers";
 
@@ -443,6 +444,12 @@ export const useInspectGuideClientStore = (
     };
   });
 
+  // Cache of the last settled orderedGuides, used to keep the toolbar stable
+  // while the group stage is transiently cleared or re-opening.
+  const orderedGuidesRef = React.useRef<
+    (AnnotatedGuide | UncommittedGuide)[] | undefined
+  >(undefined);
+
   // Not in debugging session, so noop.
   if (!snapshot.debug?.debugging) {
     return undefined;
@@ -470,16 +477,31 @@ export const useInspectGuideClientStore = (
 
   const groupStage = client.getStage();
 
-  // Annotate guides for various eligibility, activation and query statuses
-  // that are useful for debugging purposes.
-  const orderedGuides = defaultGroup.display_sequence.map((guideKey, index) => {
-    const guide = snapshot.guides[guideKey];
-    if (!guide) {
-      return newUncommittedGuide(guideKey, index);
-    }
+  // The stage is transient while it is undefined (just cleared) or "open"
+  // (new stage with empty results); during these windows the computed
+  // selectable status collapses to undefined for every guide. "closed" and
+  // "patch" both preserve results, so we treat them as settled.
+  const isTransient = !groupStage || groupStage.status === "open";
 
-    return annotateGuide(guide, index, snapshot, groupStage);
-  });
+  // Annotate guides for various eligibility, activation and query statuses
+  // that are useful for debugging purposes. Serve the last settled result
+  // during transient windows to avoid flashing status dots.
+  let orderedGuides: (AnnotatedGuide | UncommittedGuide)[];
+  if (isTransient && orderedGuidesRef.current) {
+    orderedGuides = orderedGuidesRef.current;
+  } else {
+    orderedGuides = defaultGroup.display_sequence.map((guideKey, index) => {
+      const guide = snapshot.guides[guideKey];
+      if (!guide) {
+        return newUncommittedGuide(guideKey, index);
+      }
+      return annotateGuide(guide, index, snapshot, groupStage);
+    });
+
+    if (!isTransient) {
+      orderedGuidesRef.current = orderedGuides;
+    }
+  }
 
   // Check if the focused guide actually exists and is selectable on the page.
   const focusedGuideKey = Object.keys(runConfig.focusedGuideKeys || {})[0];
