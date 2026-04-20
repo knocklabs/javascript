@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.11
+
+### Patch Changes
+
+- a04781b: [Guides] Rename stage results keys to `byKey` and `byType`
+
 ## 0.21.10
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # slack-kit-example
 
+## 0.4.64
+
+### Patch Changes
+
+- Updated dependencies [a04781b]
+  - @knocklabs/react@0.11.20
+
 ## 0.4.63
 
 ### Patch Changes

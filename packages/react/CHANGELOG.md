@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.20
+
+### Patch Changes
+
+- a04781b: [Guides] Rename stage results keys to `byKey` and `byType`
+- Updated dependencies [a04781b]
+  - @knocklabs/client@0.21.11
+  - @knocklabs/react-core@0.13.12
+
 ## 0.11.19
 
 ### Patch Changes
