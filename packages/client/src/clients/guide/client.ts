@@ -30,7 +30,6 @@ import {
   GuideData,
   GuideGroupAddedEvent,
   GuideGroupUpdatedEvent,
-  GuideLivePreviewUpdatedEvent,
   GuideRemovedEvent,
   GuideSocketEvent,
   GuideStepData,
@@ -194,7 +193,6 @@ export class KnockGuideClient {
     "guide.removed",
     "guide_group.added",
     "guide_group.updated",
-    "guide.live_preview_updated",
   ];
   private subscribeRetryCount = 0;
 
@@ -446,9 +444,6 @@ export class KnockGuideClient {
       case "guide_group.added":
       case "guide_group.updated":
         return this.addOrReplaceGuideGroup(payload);
-
-      case "guide.live_preview_updated":
-        return this.updatePreviewGuide(payload);
 
       default:
         return;
@@ -1258,15 +1253,6 @@ export class KnockGuideClient {
       }, guides);
 
       return { ...state, guides, guideGroups };
-    });
-  }
-
-  private updatePreviewGuide({ data }: GuideLivePreviewUpdatedEvent) {
-    const guide = this.localCopy(data.guide);
-
-    this.store.setState((state) => {
-      const previewGuides = { ...state.previewGuides, [guide.key]: guide };
-      return { ...state, previewGuides };
     });
   }
 
