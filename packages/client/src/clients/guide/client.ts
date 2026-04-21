@@ -160,7 +160,7 @@ const predicate = (
 };
 
 export const checkActivatable = (
-  guide: KnockGuide,
+  guide: Pick<KnockGuide, "activation_url_rules" | "activation_url_patterns">,
   location: string | undefined,
 ) => {
   const url = location ? newUrl(location) : undefined;
