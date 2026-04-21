@@ -41,7 +41,7 @@
     ]
   },
   "resolutions": {
-    "axios": "1.14.0"
+    "axios": "1.15.1"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
