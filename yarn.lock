@@ -4557,12 +4557,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@knocklabs/node@npm:^1.11.2":
-  version: 1.11.2
-  resolution: "@knocklabs/node@npm:1.11.2"
+"@knocklabs/node@npm:^1.30.0":
+  version: 1.30.0
+  resolution: "@knocklabs/node@npm:1.30.0"
   dependencies:
     jose: "npm:^6.0.11"
-  checksum: 10c0/82082cd18c0f7a35752b3e705d849781d4a1490d9802180450d53ec9272e2167927010c36d081ce4ac1e1c7760b0e7d6030632650190ce13dc73b4e79644ed98
+  checksum: 10c0/90dca4c1ef2b630e518d68a2e15eef338f8f15c0085ca88fc5fd82c62334d842bdbfbccc16871f0bd7a0f6cd1d1582a259f5943a8bd1fa65165819ac6239a777
   languageName: node
   linkType: hard
 
@@ -17235,7 +17235,7 @@ __metadata:
     "@eslint/eslintrc": "npm:^3"
     "@faker-js/faker": "npm:^9.9.0"
     "@knocklabs/eslint-config": "workspace:^"
-    "@knocklabs/node": "npm:^1.11.2"
+    "@knocklabs/node": "npm:^1.30.0"
     "@knocklabs/react": "workspace:*"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.3.1"
@@ -17276,7 +17276,7 @@ __metadata:
     "@emotion/styled": "npm:^11.14.1"
     "@faker-js/faker": "npm:^9.9.0"
     "@knocklabs/eslint-config": "workspace:^"
-    "@knocklabs/node": "npm:^1.11.2"
+    "@knocklabs/node": "npm:^1.30.0"
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
     "@next/eslint-plugin-next": "npm:^15.3.1"
@@ -19941,7 +19941,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "slack-kit-example@workspace:examples/slack-kit-example"
   dependencies:
-    "@knocklabs/node": "npm:^1.11.2"
+    "@knocklabs/node": "npm:^1.30.0"
     "@knocklabs/react": "npm:0.11.20"
     "@tailwindcss/postcss": "npm:^4.1.18"
     "@types/node": "npm:^24"
