@@ -7,16 +7,25 @@ import {
   TextInput,
 } from "react-native";
 
-import type { ScreenProps } from "../navigation";
+import type { AuthedScreenProps } from "../navigation";
 import { colors, radius, spacing } from "../theme";
 
 export default function MessageComposeScreen({
   navigation,
-}: ScreenProps<"MessageCompose">) {
+}: AuthedScreenProps<"MessageCompose">) {
   const [workflowKey, setWorkflowKey] = useState("new-comment");
   const [body, setBody] = useState("");
 
   const canSend = workflowKey.trim().length > 0 && body.trim().length > 0;
+
+  // Workflow triggers use your Knock secret key, which must not live in a
+  // mobile app. In production, POST this form's values to a trusted backend
+  // that calls Knock on your behalf.
+  const onSend = () => {
+    setWorkflowKey("");
+    setBody("");
+    navigation.goBack();
+  };
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
@@ -41,7 +50,7 @@ export default function MessageComposeScreen({
       />
 
       <Pressable
-        onPress={() => navigation.goBack()}
+        onPress={onSend}
         disabled={!canSend}
         style={({ pressed }) => [
           styles.button,

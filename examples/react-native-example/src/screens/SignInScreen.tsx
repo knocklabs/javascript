@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { config } from "../config";
-import type { ScreenProps } from "../navigation";
+import { useAuth } from "../auth";
+import { KNOCK_USER_ID } from "../config";
 import { colors, radius, spacing } from "../theme";
 
-export default function SignInScreen({ navigation }: ScreenProps<"SignIn">) {
-  const [userId, setUserId] = useState(config.userId);
+export default function SignInScreen() {
+  const { signIn } = useAuth();
+  const [userId, setUserId] = useState(KNOCK_USER_ID);
+
+  const canContinue = userId.trim().length > 0;
 
   return (
     <View style={styles.root}>
@@ -27,8 +30,13 @@ export default function SignInScreen({ navigation }: ScreenProps<"SignIn">) {
       />
 
       <Pressable
-        onPress={() => navigation.replace("Main")}
-        style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+        onPress={() => signIn(userId.trim())}
+        disabled={!canContinue}
+        style={({ pressed }) => [
+          styles.button,
+          !canContinue && styles.disabled,
+          pressed && styles.pressed,
+        ]}
       >
         <Text style={styles.buttonText}>Continue</Text>
       </Pressable>
@@ -77,6 +85,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: radius.md,
     alignItems: "center",
+  },
+  disabled: {
+    opacity: 0.4,
   },
   pressed: {
     opacity: 0.8,

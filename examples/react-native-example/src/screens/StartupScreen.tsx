@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-import type { ScreenProps } from "../navigation";
+import type { UnauthedScreenProps } from "../navigation";
 import { colors, spacing } from "../theme";
 
-export default function StartupScreen({ navigation }: ScreenProps<"Startup">) {
+export default function StartupScreen({
+  navigation,
+}: UnauthedScreenProps<"Startup">) {
   useEffect(() => {
     const t = setTimeout(() => navigation.replace("SignIn"), 600);
     return () => clearTimeout(t);

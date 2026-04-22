@@ -1,7 +1,15 @@
-import { useState } from "react";
-import { ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { usePreferences } from "@knocklabs/react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from "react-native";
 
-import type { ScreenProps } from "../navigation";
+import { useAuth } from "../auth";
 import { colors, radius, spacing } from "../theme";
 
 const channels = [
@@ -17,29 +25,50 @@ const channels = [
 
 type ChannelId = (typeof channels)[number]["id"];
 
-export default function PreferencesScreen(_: ScreenProps<"Preferences">) {
-  const [enabled, setEnabled] = useState<Record<ChannelId, boolean>>({
-    email: true,
-    push: true,
-    in_app_feed: true,
-    sms: false,
-  });
+export default function PreferencesScreen() {
+  const { signOut } = useAuth();
+  const { preferences, setPreferences, isLoading } = usePreferences();
+
+  const channelTypes = preferences?.channel_types ?? {};
+
+  const onToggle = (id: ChannelId, next: boolean) => {
+    setPreferences({
+      channel_types: { ...channelTypes, [id]: next },
+    });
+  };
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-      {channels.map(({ id, label, description }) => (
-        <View key={id} style={styles.row}>
-          <View style={styles.rowText}>
-            <Text style={styles.rowLabel}>{label}</Text>
-            <Text style={styles.rowDescription}>{description}</Text>
-          </View>
-          <Switch
-            value={enabled[id]}
-            onValueChange={(v) => setEnabled((prev) => ({ ...prev, [id]: v }))}
-            trackColor={{ true: colors.accent, false: colors.border }}
-          />
+      {isLoading && !preferences ? (
+        <View style={styles.loading}>
+          <ActivityIndicator color={colors.mutedText} />
         </View>
-      ))}
+      ) : (
+        channels.map(({ id, label, description }) => {
+          const value = channelTypes[id];
+          const enabled = typeof value === "boolean" ? value : true;
+          return (
+            <View key={id} style={styles.row}>
+              <View style={styles.rowText}>
+                <Text style={styles.rowLabel}>{label}</Text>
+                <Text style={styles.rowDescription}>{description}</Text>
+              </View>
+              <Switch
+                value={enabled}
+                onValueChange={(v) => onToggle(id, v)}
+                trackColor={{ true: colors.accent, false: colors.border }}
+              />
+            </View>
+          );
+        })
+      )}
+
+      <Pressable
+        onPress={signOut}
+        style={({ pressed }) => [styles.signOut, pressed && styles.pressed]}
+      >
+        <Text style={styles.signOutText}>Sign out</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -52,6 +81,10 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     gap: spacing.sm,
+  },
+  loading: {
+    paddingVertical: spacing.xl,
+    alignItems: "center",
   },
   row: {
     flexDirection: "row",
@@ -76,5 +109,17 @@ const styles = StyleSheet.create({
   rowDescription: {
     color: colors.mutedText,
     fontSize: 13,
+  },
+  signOut: {
+    marginTop: spacing.lg,
+    alignItems: "center",
+    paddingVertical: spacing.md,
+  },
+  signOutText: {
+    color: colors.mutedText,
+    fontSize: 15,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });
