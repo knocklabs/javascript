@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.21
+
+### Patch Changes
+
+- 06367bf: chore(deps): bump the telegraph-packages group with 2 updates
+- ffa7bd2: [Guide] Remove guide toolbar v1 support
+- Updated dependencies [ffa7bd2]
+  - @knocklabs/react-core@0.13.13
+  - @knocklabs/client@0.21.12
+
 ## 0.11.20
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.12
+
+### Patch Changes
+
+- ffa7bd2: [Guide] Remove guide toolbar v1 support
+
 ## 0.21.11
 
 ### Patch Changes
