@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.13
+
+### Patch Changes
+
+- ffa7bd2: [Guide] Remove guide toolbar v1 support
+- Updated dependencies [ffa7bd2]
+  - @knocklabs/client@0.21.12
+
 ## 0.13.12
 
 ### Patch Changes
