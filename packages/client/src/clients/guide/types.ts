@@ -161,8 +161,7 @@ type SocketEventType =
   | "guide.updated"
   | "guide.removed"
   | "guide_group.added"
-  | "guide_group.updated"
-  | "guide.live_preview_updated";
+  | "guide_group.updated";
 
 type SocketEventPayload<E extends SocketEventType, D> = {
   topic: string;
@@ -195,18 +194,12 @@ export type GuideGroupUpdatedEvent = SocketEventPayload<
   { guide_group: GuideGroupData }
 >;
 
-export type GuideLivePreviewUpdatedEvent = SocketEventPayload<
-  "guide.live_preview_updated",
-  { guide: GuideData; eligible: boolean }
->;
-
 export type GuideSocketEvent =
   | GuideAddedEvent
   | GuideUpdatedEvent
   | GuideRemovedEvent
   | GuideGroupAddedEvent
-  | GuideGroupUpdatedEvent
-  | GuideLivePreviewUpdatedEvent;
+  | GuideGroupUpdatedEvent;
 
 //
 // Guide client
@@ -285,7 +278,6 @@ export type TargetParams = {
 
 export type ConstructorOpts = {
   trackLocationFromWindow?: boolean;
-  trackDebugParams?: boolean;
   orderResolutionDuration?: number;
   throttleCheckInterval?: number;
 };

@@ -1,8 +1,4 @@
-export {
-  KnockGuideClient,
-  DEBUG_QUERY_PARAMS,
-  checkActivatable,
-} from "./client";
+export { KnockGuideClient, checkActivatable } from "./client";
 export { checkStateIfThrottled } from "./helpers";
 export type { ToolbarV2RunConfig } from "./helpers";
 export type {
