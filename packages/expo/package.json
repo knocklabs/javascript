@@ -74,7 +74,7 @@
     "expo-constants": "~55.0.9",
     "expo-device": "~55.0.10",
     "expo-notifications": "~55.0.16",
-    "jsdom": "^27.1.0",
+    "jsdom": "^29.1.0",
     "react": "^19.2.5",
     "react-native": "^0.83.4",
     "react-native-gesture-handler": "~2.30.0",
