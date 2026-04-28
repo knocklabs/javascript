@@ -59,7 +59,7 @@
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "eslint": "^8.56.0",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "rollup": "^4.46.2",
