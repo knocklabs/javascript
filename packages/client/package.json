@@ -76,7 +76,7 @@
     "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "jwt-decode": "^4.0.0",
-    "nanoid": "^3.3.11",
+    "nanoid": "^3.3.12",
     "phoenix": "1.8.5",
     "urlpattern-polyfill": "^10.0.0"
   }
