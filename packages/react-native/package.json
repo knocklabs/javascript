@@ -53,7 +53,7 @@
     "react-native-svg": "~15.15.3"
   },
   "devDependencies": {
-    "@codecov/vite-plugin": "^1.9.1",
+    "@codecov/vite-plugin": "^2.0.1",
     "@types/react": "^19.2.14",
     "@types/react-native-get-random-values": "^1",
     "@types/react-native-htmlview": "^0.16.6",
