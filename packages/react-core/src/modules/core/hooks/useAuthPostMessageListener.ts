@@ -84,6 +84,11 @@ export function useAuthPostMessageListener(
         return;
       }
 
+      // Ignore messages when this integration hasn't opened a popup
+      if (!popupWindowRef.current) {
+        return;
+      }
+
       const messageType = getMessageType(event.data);
 
       if (messageType === "authComplete") {

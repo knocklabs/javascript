@@ -132,6 +132,28 @@ describe("useAuthPostMessageListener", () => {
     expect(popupWindowRef.current).toBeNull();
   });
 
+  it("should ignore messages when popupWindowRef is null", () => {
+    popupWindowRef.current = null;
+
+    renderHook(() =>
+      useAuthPostMessageListener({
+        knockHost,
+        popupWindowRef,
+        setConnectionStatus,
+        onAuthenticationComplete,
+      }),
+    );
+
+    const event = new MessageEvent("message", {
+      data: "authComplete",
+      origin: knockHost,
+    });
+    window.dispatchEvent(event);
+
+    expect(setConnectionStatus).not.toHaveBeenCalled();
+    expect(onAuthenticationComplete).not.toHaveBeenCalled();
+  });
+
   it("should ignore messages from different origins", () => {
     renderHook(() =>
       useAuthPostMessageListener({
