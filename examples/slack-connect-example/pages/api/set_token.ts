@@ -14,10 +14,7 @@ export default async function handler(
 
   const { tenant, user, slackChannelsRecipientObject } = req.body;
   try {
-    const rawKey = process.env.KNOCK_SIGNING_KEY!;
-    const signingKey = rawKey.startsWith("LS0t")
-      ? Buffer.from(rawKey, "base64").toString("utf-8")
-      : rawKey;
+    const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
     // JWT NumericDates specified in seconds:
     const currentTime = Math.floor(Date.now() / 1000);
@@ -33,7 +30,6 @@ export default async function handler(
         grants: {
           [`https://api.knock.app/v1/objects/$tenants/${tenant}`]: {
             "slack/channels_read": [{}],
-            "ms_teams/channels_read": [{}],
           },
           [`https://api.knock.app/v1/objects/${slackChannelsRecipientObject.collection}/${slackChannelsRecipientObject.objectId}`]:
             {

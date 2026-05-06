@@ -1,8 +1,6 @@
 import {
-  KnockMsTeamsProvider,
   KnockProvider,
   KnockSlackProvider,
-  MsTeamsAuthButton,
   SlackAuthButton,
   SlackAuthContainer,
   SlackChannelCombobox,
@@ -28,12 +26,8 @@ export default function Home() {
     collection: process.env.NEXT_PUBLIC_CONNECTIONS_COLLECTION!,
   };
 
-  const onSlackAuthComplete = (result: string) => {
+  const onAuthComplete = (result: string) => {
     console.log("Result from Slack authentication:", result);
-  };
-
-  const onTeamsAuthComplete = (result: string) => {
-    console.log("Result from MS Teams authentication:", result);
   };
 
   const { isLoading, isError } = useSetToken({
@@ -120,7 +114,7 @@ export default function Home() {
                   <SlackAuthButton
                     slackClientId={process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!}
                     redirectUrl={redirectUrl}
-                    onAuthenticationComplete={onSlackAuthComplete}
+                    onAuthenticationComplete={onAuthComplete}
                     additionalScopes={["users:read", "users:read.email"]}
                   />
                 </div>
@@ -152,41 +146,6 @@ export default function Home() {
           </div>
         </>
       </KnockSlackProvider>
-
-      {/* MS Teams provider rendered as sibling to reproduce KNO-13032 */}
-      {process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_CHANNEL_ID && (
-        <KnockMsTeamsProvider
-          knockMsTeamsChannelId={
-            process.env.NEXT_PUBLIC_KNOCK_MS_TEAMS_CHANNEL_ID
-          }
-          tenantId={tenant}
-        >
-          <div
-            style={{
-              marginTop: "60px",
-              borderTop: "2px solid #eee",
-              paddingTop: "20px",
-            }}
-          >
-            <div
-              style={{
-                marginBottom: "20px",
-                fontFamily: "monospace",
-                fontSize: "40px",
-              }}
-            >
-              MS Teams connector
-            </div>
-            <div style={{ margin: "10px", padding: "10px" }}>
-              <MsTeamsAuthButton
-                graphApiClientId={process.env.NEXT_PUBLIC_GRAPH_API_CLIENT_ID!}
-                redirectUrl={redirectUrl}
-                onAuthenticationComplete={onTeamsAuthComplete}
-              />
-            </div>
-          </div>
-        </KnockMsTeamsProvider>
-      )}
     </KnockProvider>
   );
 }
