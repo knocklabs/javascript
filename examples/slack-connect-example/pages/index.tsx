@@ -179,9 +179,7 @@ export default function Home() {
             </div>
             <div style={{ margin: "10px", padding: "10px" }}>
               <MsTeamsAuthButton
-                graphApiClientId={
-                  process.env.NEXT_PUBLIC_GRAPH_API_CLIENT_ID!
-                }
+                graphApiClientId={process.env.NEXT_PUBLIC_GRAPH_API_CLIENT_ID!}
                 redirectUrl={redirectUrl}
                 onAuthenticationComplete={onTeamsAuthComplete}
               />
