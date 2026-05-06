@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.13
+
+### Patch Changes
+
+- 454f947: chore(deps): bump nanoid from 3.3.11 to 3.3.12
+
 ## 0.21.12
 
 ### Patch Changes

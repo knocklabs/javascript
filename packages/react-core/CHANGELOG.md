@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.14
+
+### Patch Changes
+
+- e6ac8cc: chore(deps): bump swr from 2.4.0 to 2.4.1
+- abac967: Fix auth button cross-contamination when SlackKit and TeamsKit are rendered simultaneously. The shared `useAuthPostMessageListener` hook now checks whether its own popup is open before processing `authComplete` messages, preventing one integration's OAuth completion from incorrectly updating the other's connection state.
+- Updated dependencies [454f947]
+  - @knocklabs/client@0.21.13
+
 ## 0.13.13
 
 ### Patch Changes
