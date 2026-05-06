@@ -85,7 +85,7 @@ export function useAuthPostMessageListener(
       }
 
       // Ignore messages when this integration hasn't opened a popup
-      if (!popupWindowRef.current || popupWindowRef.current.closed) {
+      if (!popupWindowRef.current) {
         return;
       }
 

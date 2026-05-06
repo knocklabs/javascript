@@ -154,28 +154,6 @@ describe("useAuthPostMessageListener", () => {
     expect(onAuthenticationComplete).not.toHaveBeenCalled();
   });
 
-  it("should ignore messages when popup is closed", () => {
-    mockPopup.closed = true;
-
-    renderHook(() =>
-      useAuthPostMessageListener({
-        knockHost,
-        popupWindowRef,
-        setConnectionStatus,
-        onAuthenticationComplete,
-      }),
-    );
-
-    const event = new MessageEvent("message", {
-      data: "authComplete",
-      origin: knockHost,
-    });
-    window.dispatchEvent(event);
-
-    expect(setConnectionStatus).not.toHaveBeenCalled();
-    expect(onAuthenticationComplete).not.toHaveBeenCalled();
-  });
-
   it("should ignore messages from different origins", () => {
     renderHook(() =>
       useAuthPostMessageListener({
