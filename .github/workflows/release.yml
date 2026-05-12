@@ -20,7 +20,7 @@ jobs:
       # Checkout the repository with full history and tag data so that
       # Changesets can generate changelogs and tag new releases appropriately.
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-tags: true
           fetch-depth: 0
@@ -44,7 +44,7 @@ jobs:
       # Set up Node.js using the version specified in package.json,
       # and cache Yarn dependencies for faster installs.
       - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           registry-url: "https://registry.npmjs.org"
           node-version-file: "package.json"
@@ -115,7 +115,7 @@ jobs:
       # Create a versioning PR if changeset files exist, or publish packages
       # to npm if version bump commits have already been merged into the branch.
       - name: Create release PR or publish
-        uses: changesets/action@v1
+        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1.8.0
         with:
           commit: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
