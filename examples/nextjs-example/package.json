@@ -38,7 +38,7 @@
   "devDependencies": {
     "@knocklabs/eslint-config": "workspace:^",
     "@knocklabs/typescript-config": "workspace:^",
-    "@next/eslint-plugin-next": "^15.3.1",
+    "@next/eslint-plugin-next": "^16.2.6",
     "@types/eslint": "^8.44.7",
     "@types/node": "^24",
     "@types/react": "^19.2.14",
