@@ -4546,8 +4546,8 @@ __metadata:
     expo-symbols: "npm:~55.0.5"
     expo-system-ui: "npm:~55.0.11"
     expo-web-browser: "npm:~55.0.10"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     react-native: "npm:^0.83.4"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-reanimated: "npm:~4.2.1"
@@ -4583,7 +4583,7 @@ __metadata:
     expo-device: "npm:~55.0.10"
     expo-notifications: "npm:~55.0.16"
     jsdom: "npm:^29.1.0"
-    react: "npm:^19.2.5"
+    react: "npm:^19.2.6"
     react-native: "npm:^0.83.4"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-render-html: "npm:^6.3.4"
@@ -4655,7 +4655,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.2"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
     "@typescript-eslint/parser": "npm:^8.58.0"
     "@vitejs/plugin-react": "npm:^4.5.1"
@@ -4666,8 +4666,8 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.5.2"
     fast-deep-equal: "npm:^3.1.3"
     jsdom: "npm:^29.1.0"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
     swr: "npm:^2.4.1"
@@ -4697,8 +4697,8 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.5.2"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     react-native: "npm:^0.83.4"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-get-random-values: "npm:^1.11.0"
@@ -4744,7 +4744,7 @@ __metadata:
     "@types/eslint-plugin-jsx-a11y": "npm:^6"
     "@types/lodash.debounce": "npm:^4.0.9"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
     "@typescript-eslint/parser": "npm:^8.58.0"
     "@vitejs/plugin-react": "npm:^4.5.1"
@@ -4758,8 +4758,8 @@ __metadata:
     lodash.debounce: "npm:^4.0.8"
     lucide-react: "npm:^0.544.0"
     next: "npm:15.3.6"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     rimraf: "npm:^6.0.1"
     rollup-plugin-execute: "npm:^1.1.1"
     rollup-preserve-directives: "npm:^1.1.3"
@@ -8127,12 +8127,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.1.6":
-  version: 19.1.6
-  resolution: "@types/react-dom@npm:19.1.6"
+"@types/react-dom@npm:^19.2.3":
+  version: 19.2.3
+  resolution: "@types/react-dom@npm:19.2.3"
   peerDependencies:
-    "@types/react": ^19.0.0
-  checksum: 10c0/7ba74eee2919e3f225e898b65fdaa16e54952aaf9e3472a080ddc82ca54585e46e60b3c52018d21d4b7053f09d27b8293e9f468b85f9932ff452cd290cc131e8
+    "@types/react": ^19.2.0
+  checksum: 10c0/b486ebe0f4e2fb35e2e108df1d8fc0927ca5d6002d5771e8a739de11239fe62d0e207c50886185253c99eb9dedfeeb956ea7429e5ba17f6693c7acb4c02f8cd1
   languageName: node
   linkType: hard
 
@@ -10815,8 +10815,8 @@ __metadata:
     "@vitejs/plugin-react-swc": "npm:^4.3.0"
     jsdom: "npm:^29.1.0"
     prettier: "npm:^3.5.3"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     vite: "npm:^5.4.19"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -14106,14 +14106,14 @@ __metadata:
     "@knocklabs/client": "workspace:^"
     "@knocklabs/react": "workspace:^"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^4.5.1"
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.5.2"
     globals: "npm:^16.0.0"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     react-router: "npm:^7.6.3"
     typescript: "npm:^5.8.3"
     typescript-eslint: "npm:^8.58.1"
@@ -16994,13 +16994,13 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.3"
     next: "npm:15.3.6"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
@@ -17192,15 +17192,15 @@ __metadata:
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     framer-motion: "npm:^12.38.0"
     next: "npm:next@15.3.6"
     next-seo: "npm:^6.8.0"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     react-icons: "npm:^5.4.0"
     sonner: "npm:^2.0.7"
     swr: "npm:^2.4.1"
@@ -17233,14 +17233,14 @@ __metadata:
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     framer-motion: "npm:^12.38.0"
     next: "npm:15.3.6"
     next-seo: "npm:^6.8.0"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     react-icons: "npm:^5.4.0"
     sonner: "npm:^2.0.7"
     swr: "npm:^2.4.1"
@@ -18282,14 +18282,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.2.5":
-  version: 19.2.5
-  resolution: "react-dom@npm:19.2.5"
+"react-dom@npm:^19.2.6":
+  version: 19.2.6
+  resolution: "react-dom@npm:19.2.6"
   dependencies:
     scheduler: "npm:^0.27.0"
   peerDependencies:
-    react: ^19.2.5
-  checksum: 10c0/8067606e9f58e4c2e8cb5f09570217dbc71c4843ebcaa20ae2085912d3e3a351f17d8f7c1713313cdda7f272840c8c34ff6c860fcb840862071bceea218e0c63
+    react: ^19.2.6
+  checksum: 10c0/dbf2aef67857c03a612bc9316a4562e5066f43fa04bf28f7f0734963fc1350da2c9f8eb973930655453281079f30cc8222bab383dbec4b5097084e2c081e3334
   languageName: node
   linkType: hard
 
@@ -18691,10 +18691,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.2.5":
-  version: 19.2.5
-  resolution: "react@npm:19.2.5"
-  checksum: 10c0/4b5f231dbef92886f602533c9ce3bde04d99f0e71dfb5d794c43e02726efaad0421c08688f75fc98a6d6e1dc017372e1af7abbfecdc86a79968f461675931a7a
+"react@npm:^19.2.6":
+  version: 19.2.6
+  resolution: "react@npm:19.2.6"
+  checksum: 10c0/66afde33b9a9ee87b1e1cae39d8e7e040d1262e719524fd70660c4d4ce79929c532ac19fc3df5a911edaf02768fdf2c49de4ede1ba99bc6aad72796e0e26e798
   languageName: node
   linkType: hard
 
@@ -19878,13 +19878,13 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.3"
     next: "npm:15.3.6"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
@@ -19898,14 +19898,14 @@ __metadata:
     "@tailwindcss/postcss": "npm:^4.3.0"
     "@types/node": "npm:^24"
     "@types/react": "npm:^19.2.14"
-    "@types/react-dom": "npm:^19.1.6"
+    "@types/react-dom": "npm:^19.2.3"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.3"
     next: "npm:15.3.6"
     postcss: "npm:^8"
-    react: "npm:^19.2.5"
-    react-dom: "npm:^19.2.5"
+    react: "npm:^19.2.6"
+    react-dom: "npm:^19.2.6"
     tailwindcss: "npm:^4.2.2"
     typescript: "npm:^5.8.3"
   languageName: unknown
