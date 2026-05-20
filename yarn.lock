@@ -4537,7 +4537,7 @@ __metadata:
     expo-device: "npm:~55.0.10"
     expo-font: "npm:~55.0.4"
     expo-haptics: "npm:~55.0.9"
-    expo-image: "npm:~55.0.6"
+    expo-image: "npm:~55.0.10"
     expo-linking: "npm:~55.0.9"
     expo-notifications: "npm:~55.0.16"
     expo-router: "npm:~55.0.8"
@@ -13072,7 +13072,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:^55.0.6, expo-image@npm:~55.0.6":
+"expo-image@npm:^55.0.6":
   version: 55.0.6
   resolution: "expo-image@npm:55.0.6"
   dependencies:
@@ -13086,6 +13086,23 @@ __metadata:
     react-native-web:
       optional: true
   checksum: 10c0/1c90cbd4bfd440b060df67a325ff3b40bdc1a83ac0b297e0a68992c327fa439b38eaf73cbce1f7f4116be7cc6aa33076c61a65d1bcdb8a3c65210177fde3a64c
+  languageName: node
+  linkType: hard
+
+"expo-image@npm:~55.0.10":
+  version: 55.0.10
+  resolution: "expo-image@npm:55.0.10"
+  dependencies:
+    sf-symbols-typescript: "npm:^2.2.0"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+    react-native-web: "*"
+  peerDependenciesMeta:
+    react-native-web:
+      optional: true
+  checksum: 10c0/eb67ec01bccaacd608071b56a0b5b7ea2b9d54089f0d56185765752ec1ec92c7946f6095c379aeb5eb549d6c600e141e5bd715847e16cdc9cc4e42d78385572a
   languageName: node
   linkType: hard
 
