@@ -277,4 +277,94 @@ describe("FeedClient", () => {
       expect(feed2.defaultOptions.status).toBe("read");
     });
   });
+
+  describe("prefetch", () => {
+    const makeRequest = vi.fn();
+    const isAuthenticated = vi.fn(() => true);
+    const prefetchKnock = {
+      userId: "user_123",
+      userToken: "token_456",
+      log: vi.fn(),
+      isAuthenticated,
+      failIfNotAuthenticated: vi.fn(() => {
+        if (!isAuthenticated()) {
+          throw new Error(
+            "Not authenticated. Please call `authenticate` first.",
+          );
+        }
+      }),
+      client: vi.fn(() => ({ socket: mockSocket, makeRequest })),
+      feeds: {},
+    } as unknown as Knock;
+
+    beforeEach(() => {
+      makeRequest.mockReset();
+      isAuthenticated.mockReturnValue(true);
+    });
+
+    test("returns the feed response and sends the same request as fetch", async () => {
+      const body = {
+        entries: [],
+        meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+        page_info: { before: null, after: null, page_size: 50 },
+      };
+      makeRequest.mockResolvedValue({ statusCode: "ok", body });
+
+      const feedClient = new FeedClient(prefetchKnock);
+      const result = await feedClient.prefetch(validFeedId, {
+        trigger_data: { organization_id: "org_1" },
+      });
+
+      expect(result).toEqual(body);
+      // Mirrors Feed.fetch: defaults applied and trigger_data stringified
+      expect(makeRequest).toHaveBeenCalledWith({
+        method: "GET",
+        url: `/v1/users/user_123/feeds/${validFeedId}`,
+        params: {
+          archived: "exclude",
+          mode: "compact",
+          trigger_data: JSON.stringify({ organization_id: "org_1" }),
+        },
+      });
+    });
+
+    test("does not create a feed instance or open a socket", async () => {
+      makeRequest.mockResolvedValue({
+        statusCode: "ok",
+        body: {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        },
+      });
+
+      const feedClient = new FeedClient(prefetchKnock);
+      await feedClient.prefetch(validFeedId);
+
+      expect(mockSocket.connect).not.toHaveBeenCalled();
+      expect(feedClient["feedInstances"]).toHaveLength(0);
+    });
+
+    test("rejects when the request fails", async () => {
+      makeRequest.mockResolvedValue({
+        statusCode: "error",
+        error: new Error("nope"),
+      });
+
+      const feedClient = new FeedClient(prefetchKnock);
+
+      await expect(feedClient.prefetch(validFeedId)).rejects.toThrow("nope");
+    });
+
+    test("rejects when the Knock instance is not authenticated", async () => {
+      isAuthenticated.mockReturnValue(false);
+
+      const feedClient = new FeedClient(prefetchKnock);
+
+      await expect(feedClient.prefetch(validFeedId)).rejects.toThrow(
+        "Not authenticated",
+      );
+      expect(makeRequest).not.toHaveBeenCalled();
+    });
+  });
 });

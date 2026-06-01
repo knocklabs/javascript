@@ -1,8 +1,13 @@
 import Knock from "../../knock";
 
-import Feed from "./feed";
-import { FeedClientOptions } from "./interfaces";
+import Feed, { feedClientDefaults, fetchFeed } from "./feed";
+import {
+  FeedClientOptions,
+  FeedResponse,
+  FetchFeedOptions,
+} from "./interfaces";
 import { FeedSocketManager } from "./socket-manager";
+import { mergeDateRangeParams } from "./utils";
 
 class FeedClient {
   private instance: Knock;
@@ -24,6 +29,30 @@ class FeedClient {
     );
     this.feedInstances.push(feedInstance);
     return feedInstance;
+  }
+
+  /**
+   * Fetches a user's feed once and returns the response, without creating a
+   * feed instance, opening a socket, or touching any store. Intended for
+   * server-side prefetching: pair the returned `FeedResponse` (or its promise)
+   * with the `initialData` feed option to render the feed on first paint.
+   *
+   * Sends the same request as `Feed.fetch`, so the prefetched data matches what
+   * the client would otherwise fetch on mount. Throws if the Knock instance is
+   * not authenticated.
+   */
+  async prefetch(
+    feedChannelId: string,
+    options: FetchFeedOptions = {},
+  ): Promise<FeedResponse> {
+    this.instance.failIfNotAuthenticated();
+
+    const defaultOptions: FeedClientOptions = {
+      ...feedClientDefaults,
+      ...mergeDateRangeParams(options),
+    };
+
+    return fetchFeed(this.instance, feedChannelId, defaultOptions, {});
   }
 
   removeInstance(feed: Feed) {
