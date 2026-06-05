@@ -24,7 +24,7 @@ export interface ApiResponse {
 export type ApiRequestConfig = {
   method?: string;
   url?: string;
-  params?: Record<string, unknown> | URLSearchParams;
+  params?: unknown;
   data?: unknown;
   headers?: HeadersInit;
   signal?: AbortSignal;
@@ -192,7 +192,7 @@ class ApiClient {
         params.forEach((value, key) => {
           url.searchParams.append(key, value);
         });
-      } else {
+      } else if (typeof params === "object") {
         Object.entries(params).forEach(([key, value]) => {
           this.appendSearchParam(url.searchParams, key, value);
         });

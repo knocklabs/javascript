@@ -264,23 +264,30 @@ describe("API Client", () => {
 
   describe("Error Handling", () => {
     test("handles network errors gracefully", async () => {
-      const networkError = new TypeError("Failed to fetch");
-      const apiClient = new ApiClient({
-        host: "https://api.knock.app",
-        apiKey: "pk_test_12345",
-        userToken: undefined,
-      });
-      setFetchMock(apiClient, vi.fn().mockRejectedValue(networkError));
-      skipRetryDelays(apiClient);
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        const networkError = new TypeError("Failed to fetch");
+        const apiClient = new ApiClient({
+          host: "https://api.knock.app",
+          apiKey: "pk_test_12345",
+          userToken: undefined,
+        });
+        setFetchMock(apiClient, vi.fn().mockRejectedValue(networkError));
+        skipRetryDelays(apiClient);
 
-      const response = await apiClient.makeRequest({
-        method: "GET",
-        url: "/test",
-      });
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+        });
 
-      expect(response.statusCode).toBe("error");
-      expect(response.status).toBe(500);
-      expect(response.error).toBe(networkError);
+        expect(response.statusCode).toBe("error");
+        expect(response.status).toBe(500);
+        expect(response.error).toBe(networkError);
+      } finally {
+        consoleSpy.mockRestore();
+      }
     });
 
     test("handles API error responses with response metadata", async () => {
