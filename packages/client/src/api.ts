@@ -75,7 +75,7 @@ class ApiClient {
     this.userToken = options.userToken || null;
     this.branch = options.branch || null;
 
-    this.fetchClient = fetch.bind(globalThis);
+    this.fetchClient = this.getFetchClient();
     this.defaultHeaders = this.compactHeaders({
       Accept: "application/json",
       "Content-Type": "application/json",
@@ -263,6 +263,19 @@ class ApiClient {
     return Math.min(100 * 2 ** retryCount, 30_000);
   }
 
+  private getFetchClient(): FetchClient {
+    if (typeof globalThis.fetch === "function") {
+      return globalThis.fetch.bind(globalThis);
+    }
+
+    return () =>
+      Promise.reject(
+        new Error(
+          "Fetch is not available in this environment. Please provide a native fetch implementation.",
+        ),
+      );
+  }
+
   teardown() {
     this.pageVisibility?.teardown();
 
@@ -272,7 +285,7 @@ class ApiClient {
   }
 
   private canRetryRequest(error: unknown) {
-    if (error instanceof TypeError) {
+    if (this.isFetchNetworkError(error)) {
       return true;
     }
 
@@ -290,6 +303,22 @@ class ApiClient {
 
     // Retry if rate limited.
     if (response.status === 429) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private isFetchNetworkError(error: unknown) {
+    if (error instanceof TypeError) {
+      return true;
+    }
+
+    if (
+      typeof DOMException !== "undefined" &&
+      error instanceof DOMException &&
+      error.name === "NetworkError"
+    ) {
       return true;
     }
 

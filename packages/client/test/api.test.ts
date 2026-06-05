@@ -263,6 +263,42 @@ describe("API Client", () => {
   });
 
   describe("Error Handling", () => {
+    test("returns a helpful error when fetch is unavailable", async () => {
+      const originalFetch = globalThis.fetch;
+      Object.defineProperty(globalThis, "fetch", {
+        configurable: true,
+        value: undefined,
+      });
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        const apiClient = new ApiClient({
+          host: "https://api.knock.app",
+          apiKey: "pk_test_12345",
+          userToken: undefined,
+        });
+
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+        });
+
+        expect(response.statusCode).toBe("error");
+        expect(response.error).toBeInstanceOf(Error);
+        expect(response.error.message).toBe(
+          "Fetch is not available in this environment. Please provide a native fetch implementation.",
+        );
+      } finally {
+        Object.defineProperty(globalThis, "fetch", {
+          configurable: true,
+          value: originalFetch,
+        });
+        consoleSpy.mockRestore();
+      }
+    });
+
     test("handles network errors gracefully", async () => {
       const consoleSpy = vi
         .spyOn(console, "error")
@@ -339,6 +375,37 @@ describe("API Client", () => {
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
+    test("does not retry aborted requests", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+      const abortError = new DOMException(
+        "The operation was aborted.",
+        "AbortError",
+      );
+      const fetchMock = vi.fn().mockRejectedValue(abortError);
+      setFetchMock(apiClient, fetchMock);
+      skipRetryDelays(apiClient);
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+        });
+
+        expect(response.statusCode).toBe("error");
+        expect(response.error).toBe(abortError);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
     test("retries on 5xx server errors", async () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -361,6 +428,37 @@ describe("API Client", () => {
 
       expect(response.statusCode).toBe("ok");
       expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    test("returns the final retryable response after retries are exhausted", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(createJsonResponse({ error: "Server Error" }, 500));
+      setFetchMock(apiClient, fetchMock);
+      skipRetryDelays(apiClient);
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+        });
+
+        expect(response.statusCode).toBe("error");
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ error: "Server Error" });
+        expect(response.error.response.status).toBe(500);
+        expect(fetchMock).toHaveBeenCalledTimes(4);
+      } finally {
+        consoleSpy.mockRestore();
+      }
     });
 
     test("retries on rate limit errors (429)", async () => {
