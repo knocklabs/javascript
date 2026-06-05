@@ -1,5 +1,3 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-import axiosRetry from "axios-retry";
 import { Socket } from "phoenix";
 
 import { exponentialBackoffFullJitter } from "./helpers";
@@ -23,12 +21,50 @@ export interface ApiResponse {
   status: number;
 }
 
+export type ApiRequestConfig = {
+  method?: string;
+  url?: string;
+  params?: Record<string, unknown> | URLSearchParams;
+  data?: unknown;
+  headers?: HeadersInit;
+  signal?: AbortSignal;
+};
+
+type FetchClient = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
+type ErrorWithResponse = Error & {
+  response?: {
+    status: number;
+    data?: unknown;
+  };
+};
+
+class ApiRequestError extends Error {
+  response: {
+    status: number;
+    data?: unknown;
+  };
+
+  constructor(response: Response, data: unknown) {
+    super(`Request failed with status code ${response.status}`);
+    this.name = "ApiRequestError";
+    this.response = {
+      status: response.status,
+      data,
+    };
+  }
+}
+
 class ApiClient {
   private host: string;
   private apiKey: string;
   private userToken: string | null;
   private branch: string | null;
-  private axiosClient: AxiosInstance;
+  private fetchClient: FetchClient;
+  private defaultHeaders: Record<string, string>;
 
   public socket: Socket | undefined;
   private pageVisibility: PageVisibilityManager | undefined;
@@ -39,17 +75,14 @@ class ApiClient {
     this.userToken = options.userToken || null;
     this.branch = options.branch || null;
 
-    // Create a retryable axios client
-    this.axiosClient = axios.create({
-      baseURL: this.host,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-        "X-Knock-User-Token": this.userToken,
-        "X-Knock-Client": this.getKnockClientHeader(),
-        "X-Knock-Branch": this.branch,
-      },
+    this.fetchClient = fetch.bind(globalThis);
+    this.defaultHeaders = this.compactHeaders({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.apiKey}`,
+      "X-Knock-User-Token": this.userToken,
+      "X-Knock-Client": this.getKnockClientHeader(),
+      "X-Knock-Branch": this.branch,
     });
 
     if (typeof window !== "undefined") {
@@ -77,36 +110,157 @@ class ApiClient {
         this.pageVisibility = new PageVisibilityManager(this.socket);
       }
     }
-
-    axiosRetry(this.axiosClient, {
-      retries: 3,
-      retryCondition: this.canRetryRequest,
-      retryDelay: axiosRetry.exponentialDelay,
-    });
   }
 
-  async makeRequest(req: AxiosRequestConfig): Promise<ApiResponse> {
+  async makeRequest(req: ApiRequestConfig): Promise<ApiResponse> {
     try {
-      const result = await this.axiosClient(req);
+      const result = await this.requestWithRetries(req);
+      const body = await this.parseResponseBody(result);
 
       return {
-        statusCode: result.status < 300 ? "ok" : "error",
-        body: result.data,
-        error: undefined,
+        statusCode: result.ok ? "ok" : "error",
+        body,
+        error: result.ok ? undefined : new ApiRequestError(result, body),
         status: result.status,
       };
 
       // eslint:disable-next-line
     } catch (e: unknown) {
       console.error(e);
+      const response = (e as ErrorWithResponse)?.response;
 
       return {
         statusCode: "error",
-        status: 500,
-        body: undefined,
+        status: response?.status ?? 500,
+        body: response?.data,
         error: e,
       };
     }
+  }
+
+  private async requestWithRetries(req: ApiRequestConfig) {
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt <= 3; attempt++) {
+      try {
+        const response = await this.fetchClient(
+          this.buildUrl(req.url, req.params),
+          this.buildRequestInit(req),
+        );
+
+        if (!response.ok && this.canRetryRequest({ response })) {
+          lastError = new ApiRequestError(
+            response,
+            await this.parseResponseBody(response.clone()),
+          );
+        } else {
+          return response;
+        }
+      } catch (error) {
+        lastError = error;
+
+        if (!this.canRetryRequest(error)) {
+          throw error;
+        }
+      }
+
+      if (attempt < 3) {
+        await this.delay(this.getRetryDelay(attempt + 1));
+      }
+    }
+
+    throw lastError;
+  }
+
+  private buildRequestInit(req: ApiRequestConfig): RequestInit {
+    return {
+      method: req.method,
+      headers: {
+        ...this.defaultHeaders,
+        ...this.compactHeaders(req.headers),
+      },
+      body: req.data === undefined ? undefined : JSON.stringify(req.data),
+      signal: req.signal,
+    };
+  }
+
+  private buildUrl(path = "", params?: ApiRequestConfig["params"]) {
+    const url = new URL(path, this.host);
+
+    if (params) {
+      if (params instanceof URLSearchParams) {
+        params.forEach((value, key) => {
+          url.searchParams.append(key, value);
+        });
+      } else {
+        Object.entries(params).forEach(([key, value]) => {
+          this.appendSearchParam(url.searchParams, key, value);
+        });
+      }
+    }
+
+    return url.toString();
+  }
+
+  private appendSearchParam(
+    searchParams: URLSearchParams,
+    key: string,
+    value: unknown,
+  ) {
+    if (value === undefined || value === null) {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        this.appendSearchParam(searchParams, `${key}[]`, item);
+      });
+      return;
+    }
+
+    if (value instanceof Date) {
+      searchParams.append(key, value.toISOString());
+      return;
+    }
+
+    if (typeof value === "object") {
+      Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+        this.appendSearchParam(
+          searchParams,
+          `${key}[${nestedKey}]`,
+          nestedValue,
+        );
+      });
+      return;
+    }
+
+    searchParams.append(key, String(value));
+  }
+
+  private async parseResponseBody(response: Response) {
+    if (response.status === 204) {
+      return undefined;
+    }
+
+    const text = await response.text();
+
+    if (!text) {
+      return undefined;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
+  }
+
+  private delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private getRetryDelay(retryCount: number) {
+    return Math.min(100 * 2 ** retryCount, 30_000);
   }
 
   teardown() {
@@ -117,28 +271,59 @@ class ApiClient {
     }
   }
 
-  private canRetryRequest(error: AxiosError) {
-    // Retry Network Errors.
-    if (axiosRetry.isNetworkError(error)) {
+  private canRetryRequest(error: unknown) {
+    if (error instanceof TypeError) {
       return true;
     }
 
-    if (!error.response) {
+    const response = (error as ErrorWithResponse)?.response;
+
+    if (!response) {
       // Cannot determine if the request can be retried
       return false;
     }
 
     // Retry Server Errors (5xx).
-    if (error.response.status >= 500 && error.response.status <= 599) {
+    if (response.status >= 500 && response.status <= 599) {
       return true;
     }
 
     // Retry if rate limited.
-    if (error.response.status === 429) {
+    if (response.status === 429) {
       return true;
     }
 
     return false;
+  }
+
+  private compactHeaders(headers?: Record<string, unknown> | HeadersInit) {
+    const output: Record<string, string> = {};
+
+    if (!headers) {
+      return output;
+    }
+
+    if (headers instanceof Headers) {
+      headers.forEach((value, key) => {
+        output[key] = value;
+      });
+      return output;
+    }
+
+    if (Array.isArray(headers)) {
+      headers.forEach(([key, value]) => {
+        output[key] = value;
+      });
+      return output;
+    }
+
+    Object.entries(headers).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        output[key] = String(value);
+      }
+    });
+
+    return output;
   }
 
   private getKnockClientHeader() {
