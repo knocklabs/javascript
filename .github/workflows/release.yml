@@ -11,14 +11,50 @@ concurrency:
   group: publish-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# TODO(changesets-action-v2): changesets/action v2 + @changesets/cli v3 (both
+# prerelease as of Jul 2026) decompose into /select-mode → /pack → /publish
+# sub-actions that natively cover the custom pieces below — the
+# list-unpublished-packages.mjs gate, the dist artifact handoff, and the
+# `changeset tag` release job — while keeping this same isolated-publish shape.
+# Blocked on: v2/v3 stabilizing, and Changesets publishing yarn repos through
+# npm, which cannot rewrite workspace: ranges.
+#
+# Minimal default token; each job widens only what it needs. The publish job is
+# the ONLY job granted `id-token: write` (OIDC), and it runs nothing but
+# `yarn npm publish` — no install, no build, no dependency lifecycle scripts — so
+# a short-lived OIDC token never coexists with arbitrary third-party code.
+permissions:
+  contents: read
+
 jobs:
-  release:
-    name: Release
+  # ---------------------------------------------------------------------------
+  # version: open/update the "Version Packages" PR and decide whether this push
+  # introduced new versions that need publishing. No npm credentials, no OIDC.
+  # ---------------------------------------------------------------------------
+  version:
+    name: Version
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release-type: ${{ steps.release-type.outputs.release-type }}
+      npm-tag: ${{ steps.dist-tag.outputs.npm-tag }}
+      # Publish only when: (1) the auto exit-prerelease step did NOT run this time — if
+      # it did, it pushed a new commit that re-triggers the workflow, and downstream jobs
+      # would otherwise check out the stale pre-bump github.sha; (2) there are NO pending
+      # changesets (a Version PR has been merged, not changesets still accumulating),
+      # which keeps this gate aligned with the `release` job's changesets/action so we
+      # never publish without tagging; and (3) a committed version is not yet on npm.
+      should-publish: ${{ steps.exit-prerelease.outputs.exited != 'true' && steps.changesets.outputs.hasChangesets == 'false' && steps.detect.outputs.should-publish == 'true' }}
+      # The `release` (tagging) job keys off these directly rather than off
+      # `should-publish`, so it re-runs idempotently to recover missing tags/releases
+      # even on a later push when there is nothing new to publish.
+      has-changesets: ${{ steps.changesets.outputs.hasChangesets }}
+      exited: ${{ steps.exit-prerelease.outputs.exited }}
 
     steps:
-      # Checkout the repository with full history and tag data so that
-      # Changesets can generate changelogs and tag new releases appropriately.
+      # Full history and tags so Changesets can generate changelogs.
       - name: Checkout Repo
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
@@ -26,8 +62,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
 
-      # Determine the release type based on the current branch.
-      # Sets the output `release-type` to 'stable', 'canary', or 'rc'.
+      # Determine the release type ('stable' | 'canary' | 'rc') from the branch.
       - name: Determine release type
         id: release-type
         run: |
@@ -41,23 +76,21 @@ jobs:
             echo "Unsupported branch $GITHUB_REF"; exit 1
           fi
 
-      # Set up Node.js using the version specified in package.json,
-      # and cache Yarn dependencies for faster installs.
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          registry-url: "https://registry.npmjs.org"
           node-version-file: "package.json"
           cache: "yarn"
 
-      # Install dependencies using Yarn with zero tolerance for lockfile drift.
       - name: Install Dependencies
         run: yarn --immutable
 
-      # Auto-exit prerelease mode when canary is merged into main
+      # Auto-exit prerelease mode when canary is merged into main. Pushes the
+      # version bump back to the branch, which re-triggers this workflow.
       - name: Exit prerelease and re-generate versions (auto)
+        id: exit-prerelease
         if: |
-          steps.release-type.outputs.release-type == 'stable' && 
+          steps.release-type.outputs.release-type == 'stable' &&
           hashFiles('.changeset/pre.json') != ''
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
@@ -75,19 +108,23 @@ jobs:
           git commit -m "chore(repo): exit canary prerelease mode on merge to main"
           git push
 
+          # build/publish/release check out the original github.sha (pre-bump), so this
+          # run must NOT publish — it would ship the pre-exit versions. The commit we
+          # just pushed re-triggers the workflow, and that fresh run publishes correctly.
+          echo "exited=true" >> "$GITHUB_OUTPUT"
+
           echo "✅ prerelease exited and lockfile updated – new push will trigger publish"
           exit 0
 
-      # Verify that the current branch is in the correct Changeset prerelease mode.
-      # Prevents accidentally publishing a prerelease with the wrong npm tag.
+      # Verify the branch is in the correct Changeset prerelease mode so we never
+      # publish a prerelease under the wrong npm dist-tag.
       - name: Verify pre.json for pre-release branches
         if: steps.release-type.outputs.release-type != 'stable'
         run: |
           jq -e '.mode=="pre" and .tag=="'${{ steps.release-type.outputs.release-type }}'"' .changeset/pre.json \
             || { echo "::error::Incorrect prerelease mode for this branch"; exit 1; }
 
-      # Prevent a stable release from being published if the repository
-      # is still in Changesets prerelease mode (canary or rc).
+      # Never publish a stable release while still in Changesets prerelease mode.
       - name: Guard against accidental prerelease on main
         if: steps.release-type.outputs.release-type == 'stable'
         run: |
@@ -96,32 +133,182 @@ jobs:
             exit 1
           fi
 
-      # Export the npm dist-tag based on the release type.
+      # Export the npm dist-tag for the publish job (latest | canary | rc).
       - name: Export npm dist-tag
+        id: dist-tag
         run: |
           TAG=${{ steps.release-type.outputs.release-type }}
           [ "$TAG" = "stable" ] && TAG=latest
-          echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "npm-tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      # Configure Yarn to authenticate with the npm registry using a token.
-      - name: Set NPM Auth
-        run: |
-          yarn config set npmRegistryServer "https://registry.npmjs.org"
-          yarn config set npmAlwaysAuth true
-          yarn config set npmAuthToken $NPM_TOKEN
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # Create a versioning PR if changeset files exist, or publish packages
-      # to npm if version bump commits have already been merged into the branch.
-      - name: Create release PR or publish
-        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1.8.0
+      # Create/update the versioning PR when changeset files exist. We intentionally
+      # DO NOT pass a `publish:` input — publishing happens in the isolated publish
+      # job below, so this job never needs npm credentials or `id-token: write`.
+      - name: Create version PR
+        id: changesets
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           commit: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           title: "chore(repo): version packages for ${{ steps.release-type.outputs.release-type }}"
           version: yarn release:version
-          publish: yarn release:publish
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Decide whether any committed version is not yet on npm. Combined with
+      # `hasChangesets == false` (see the job `should-publish` output) this gates the
+      # build/publish/release jobs. Read-only, unauthenticated.
+      - name: Detect unpublished packages
+        id: detect
+        run: node .github/scripts/list-unpublished-packages.mjs
+
+  # ---------------------------------------------------------------------------
+  # build: produce the dist artifacts. Runs the risky steps (install + build,
+  # which execute dependency lifecycle scripts) with NO npm credentials and NO
+  # `id-token: write`, so a poisoned cache here has no publish secret to steal.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build
+    needs: version
+    if: needs.version.outputs.should-publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn --immutable
+
+      - name: Build packages
+        run: yarn build:packages
+
+      # Archive into a single tarball so the restored paths are deterministic
+      # regardless of how many packages are in the release (avoids upload-artifact's
+      # variable least-common-ancestor root).
+      - name: Archive package build output
+        run: tar -czf package-dist.tar.gz packages/*/dist
+
+      - name: Upload package build output
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: package-dist
+          path: package-dist.tar.gz
+          retention-days: 1
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # publish: the ONLY job with `id-token: write`. It runs no install and no build
+  # — it downloads the prebuilt dist and runs `yarn npm publish`, which mints a
+  # short-lived OIDC token, substitutes workspace: ranges, and attaches provenance.
+  # Tagging and GitHub Releases happen in the separate `release` job below so this
+  # job never needs `node_modules` (the changeset CLI) or repo write access.
+  # ---------------------------------------------------------------------------
+  publish:
+    name: Publish
+    needs: [version, build]
+    if: needs.version.outputs.should-publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC trusted publishing
+      contents: read
+    environment: production-release
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      # Node >= 22.14 (repo engines pin 24.x) and yarn >= 4.10.3 (committed in
+      # .yarn/releases) are required for npm OIDC trusted publishing of scoped pkgs.
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: "package.json"
+
+      # Fail loudly BEFORE publishing if any package being released does not exist
+      # on npm yet — its first version cannot use OIDC. Points at the bootstrap
+      # runbook instead of surfacing a misleading auth error mid-publish.
+      - name: Pre-flight — all packages enrolled
+        run: node .github/scripts/list-unpublished-packages.mjs --require-existing
+
+      - name: Download package build output
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: package-dist
+
+      - name: Restore package build output
+        run: tar -xzf package-dist.tar.gz
+
+      # Publish via Yarn's native OIDC trusted publishing. No npm token is set, so
+      # Yarn exchanges the GitHub OIDC id-token for a short-lived publish token and
+      # attaches a provenance attestation. Runs no install and no package scripts.
+      - name: Publish to npm
+        run: yarn release:publish
+        env:
+          NPM_CONFIG_TAG: ${{ needs.version.outputs.npm-tag }}
+
+  # ---------------------------------------------------------------------------
+  # release: push git tags and create GitHub Releases — exactly what
+  # changesets/action did before, driven by parsing `changeset tag` output. Runs
+  # AFTER publish, with install but NO `id-token` and no npm credential, so it's
+  # outside the OIDC blast radius. Using Changesets' own tooling preserves
+  # full fidelity: tags for every package (incl. private example apps) and
+  # GitHub Releases with changelog notes for the published packages.
+  #
+  # `changeset tag` is idempotent (it only creates missing tags), so this job runs
+  # on every non-changeset push — NOT only when `should-publish` is true — to recover
+  # tags/releases if a prior publish succeeded but this job had failed, matching the
+  # original single-job workflow. Two modes, gated on `should-publish`:
+  #   • recovery (should-publish != true): build/publish were intentionally skipped;
+  #     run anyway to (idempotently) tag already-published versions.
+  #   • publish   (should-publish == true): only run if build AND publish SUCCEEDED, so
+  #     a failed/cancelled/skipped publish never gets tagged as if it shipped.
+  # Also skipped on auto exit-prerelease commits and while changesets accumulate.
+  # ---------------------------------------------------------------------------
+  release:
+    name: Tag & GitHub Release
+    needs: [version, build, publish]
+    if: >-
+      !cancelled() &&
+      needs.version.result == 'success' &&
+      needs.version.outputs.exited != 'true' &&
+      needs.version.outputs.has-changesets == 'false' &&
+      (needs.version.outputs.should-publish != 'true' ||
+       (needs.build.result == 'success' && needs.publish.result == 'success'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push tags + create GitHub Releases
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+          token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: "package.json"
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn --immutable
+
+      # `changeset tag` creates `<name>@<version>` git tags for every package;
+      # changesets/action parses its "New tag:" output to push the tags and open
+      # the matching GitHub Releases (with changelog notes) for published packages.
+      - name: Tag versions and create GitHub Releases
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        with:
+          publish: yarn changeset tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}

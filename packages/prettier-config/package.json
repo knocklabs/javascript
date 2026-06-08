@@ -2,7 +2,11 @@
   "name": "@knocklabs/prettier-config",
   "version": "0.0.1",
   "main": "index.js",
-  "repository": "https://github.com/knocklabs/javascript/blob/main/packages/prettier-config",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knocklabs/javascript.git",
+    "directory": "packages/prettier-config"
+  },
   "author": "@knocklabs",
   "license": "MIT",
   "exports": {
