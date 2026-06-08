@@ -36,7 +36,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knocklabs/javascript.git"
+    "url": "git+https://github.com/knocklabs/javascript.git",
+    "directory": "packages/react-native"
   },
   "bugs": {
     "url": "https://github.com/knocklabs/javascript/issues"
