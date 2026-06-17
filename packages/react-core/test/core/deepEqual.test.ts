@@ -62,4 +62,11 @@ describe("deepEqual", () => {
     expect(deepEqual(/abc/g, /abc/i)).toBe(false);
     expect(deepEqual(/abc/, /abd/)).toBe(false);
   });
+
+  test("compares objects with a custom toString but default valueOf", () => {
+    const tag = (label: string) => ({ toString: () => label });
+
+    expect(deepEqual(tag("x"), tag("x"))).toBe(true);
+    expect(deepEqual(tag("x"), tag("y"))).toBe(false);
+  });
 });

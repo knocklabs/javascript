@@ -68,4 +68,17 @@ describe("jwtDecode", () => {
       InvalidTokenError,
     );
   });
+
+  test("throws InvalidTokenError when the payload has an invalid base64 length", () => {
+    // A 5-character segment can never be valid base64 (length % 4 === 1).
+    expect(() => jwtDecode("header.abcde.signature")).toThrow(
+      InvalidTokenError,
+    );
+  });
+
+  test("falls back to raw base64 for payloads that are not valid UTF-8", () => {
+    // "_w" base64url-decodes to the byte 0xFF (invalid UTF-8), so the decoder
+    // falls back to atob; the decoded value is not valid JSON, so it throws.
+    expect(() => jwtDecode("header._w.signature")).toThrow(InvalidTokenError);
+  });
 });
