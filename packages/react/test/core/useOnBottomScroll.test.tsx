@@ -5,12 +5,10 @@ import { describe, expect, test, vi } from "vitest";
 import useOnBottomScroll from "../../src/modules/core/hooks/useOnBottomScroll";
 import { renderWithProviders } from "../test-utils";
 
-// Mock debounce so callback executes immediately
-vi.mock("lodash.debounce", () => {
-  return {
-    default: (fn: unknown) => fn,
-  };
-});
+// Mock debounce so the callback executes immediately
+vi.mock("../../src/modules/core/debounce", () => ({
+  debounce: (fn: () => void) => fn,
+}));
 
 describe("useOnBottomScroll", () => {
   function TestComponent({
