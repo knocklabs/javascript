@@ -40,6 +40,20 @@
       "INTERNAL_MISMATCH"
     ]
   },
+  "dependenciesMeta": {
+    "@swc/core": {
+      "built": true
+    },
+    "esbuild": {
+      "built": true
+    },
+    "sharp": {
+      "built": true
+    },
+    "unrs-resolver": {
+      "built": true
+    }
+  },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
     "@knocklabs/eslint-config": "workspace:^",

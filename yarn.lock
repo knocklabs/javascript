@@ -5005,6 +5005,15 @@ __metadata:
     prettier: "npm:^3.5.3"
     turbo: "npm:^2.5.8"
     vitest: "npm:^3.2.4"
+  dependenciesMeta:
+    "@swc/core":
+      built: true
+    esbuild:
+      built: true
+    sharp:
+      built: true
+    unrs-resolver:
+      built: true
   languageName: unknown
   linkType: soft
 
