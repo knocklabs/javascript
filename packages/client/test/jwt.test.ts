@@ -4,13 +4,13 @@ import { InvalidTokenError, jwtDecode } from "../src/jwt";
 
 // Builds a JWT-shaped string for the given payload. Only the payload segment
 // is meaningful to `jwtDecode`; the header and signature are placeholders.
-function encodeToken(payload: Record<string, unknown>): string {
+const encodeToken = (payload: Record<string, unknown>): string => {
   const header = Buffer.from(
     JSON.stringify({ alg: "HS256", typ: "JWT" }),
   ).toString("base64url");
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
   return `${header}.${body}.signature`;
-}
+};
 
 describe("jwtDecode", () => {
   test("decodes standard registered claims", () => {
@@ -43,13 +43,14 @@ describe("jwtDecode", () => {
     expect(decoded.name).toBe("José Ünïcode 🚀");
   });
 
-  test("decodes base64url payloads regardless of length (padding)", () => {
-    // Vary payload length to exercise each `length % 4` padding branch.
-    for (const id of ["a", "ab", "abc", "abcd"]) {
+  // Vary payload length to exercise each `length % 4` padding branch.
+  test.each(["a", "ab", "abc", "abcd"])(
+    "decodes a base64url payload of length %s (padding)",
+    (id) => {
       const decoded = jwtDecode<{ id: string }>(encodeToken({ id }));
       expect(decoded.id).toBe(id);
-    }
-  });
+    },
+  );
 
   test("throws InvalidTokenError when the token is not a string", () => {
     // @ts-expect-error - exercising the runtime guard against non-string input

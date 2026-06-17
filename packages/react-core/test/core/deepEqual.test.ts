@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import deepEqual from "../../src/modules/core/deepEqual";
+import { deepEqual } from "../../src/modules/core/deepEqual";
 
 describe("deepEqual", () => {
   test("treats identical references and equal primitives as equal", () => {

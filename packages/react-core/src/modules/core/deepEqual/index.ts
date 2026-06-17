@@ -2,7 +2,7 @@
  * Deep structural equality check. Recursively compares primitives, plain
  * objects, arrays, `Date`, and `RegExp` values. Does not special-case Map/Set.
  */
-export default function deepEqual(a: unknown, b: unknown): boolean {
+export const deepEqual = (a: unknown, b: unknown): boolean => {
   if (a === b) return true;
 
   if (a && b && typeof a === "object" && typeof b === "object") {
@@ -12,12 +12,9 @@ export default function deepEqual(a: unknown, b: unknown): boolean {
     if (objA.constructor !== objB.constructor) return false;
 
     if (Array.isArray(a) && Array.isArray(b)) {
-      const length = a.length;
-      if (length !== b.length) return false;
-      for (let i = length; i-- !== 0; ) {
-        if (!deepEqual(a[i], b[i])) return false;
-      }
-      return true;
+      return (
+        a.length === b.length && a.every((value, i) => deepEqual(value, b[i]))
+      );
     }
 
     if (a.constructor === RegExp) {
@@ -33,21 +30,15 @@ export default function deepEqual(a: unknown, b: unknown): boolean {
     }
 
     const keys = Object.keys(objA);
-    const length = keys.length;
-    if (length !== Object.keys(objB).length) return false;
+    if (keys.length !== Object.keys(objB).length) return false;
 
-    for (let i = length; i-- !== 0; ) {
-      if (!Object.prototype.hasOwnProperty.call(objB, keys[i]!)) return false;
-    }
-
-    for (let i = length; i-- !== 0; ) {
-      const key = keys[i]!;
-      if (!deepEqual(objA[key], objB[key])) return false;
-    }
-
-    return true;
+    return keys.every(
+      (key) =>
+        Object.prototype.hasOwnProperty.call(objB, key) &&
+        deepEqual(objA[key], objB[key]),
+    );
   }
 
   // true if both NaN, false otherwise
   return a !== a && b !== b;
-}
+};
