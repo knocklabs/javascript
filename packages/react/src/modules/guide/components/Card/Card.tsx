@@ -1,5 +1,4 @@
 import { ColorMode, useGuide } from "@knocklabs/react-core";
-import clsx from "clsx";
 import React from "react";
 
 import { isValidHttpUrl, maybeNavigateToUrlWithDelay } from "../helpers";
@@ -20,7 +19,10 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card", className)} {...props}>
+    <div
+      className={["knock-guide-card", className].filter(Boolean).join(" ")}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -31,7 +33,12 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__message", className)} {...props}>
+    <div
+      className={["knock-guide-card__message", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -42,7 +49,12 @@ const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__header", className)} {...props}>
+    <div
+      className={["knock-guide-card__header", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -53,7 +65,12 @@ const Headline: React.FC<
   { headline: string } & React.ComponentPropsWithRef<"div">
 > = ({ headline, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__headline", className)} {...props}>
+    <div
+      className={["knock-guide-card__headline", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {headline}
     </div>
   );
@@ -64,7 +81,12 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__title", className)} {...props}>
+    <div
+      className={["knock-guide-card__title", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {title}
     </div>
   );
@@ -78,7 +100,9 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <div
-      className={clsx("knock-guide-card__body", className)}
+      className={["knock-guide-card__body", className]
+        .filter(Boolean)
+        .join(" ")}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -91,7 +115,7 @@ const Img: React.FC<
 > = ({ children, className, alt, ...props }) => {
   return (
     <img
-      className={clsx("knock-guide-card__img", className)}
+      className={["knock-guide-card__img", className].filter(Boolean).join(" ")}
       alt={alt || ""}
       {...props}
     >
@@ -105,7 +129,12 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__actions", className)} {...props}>
+    <div
+      className={["knock-guide-card__actions", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -116,7 +145,12 @@ const PrimaryButton: React.FC<
   ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <button className={clsx("knock-guide-card__action", className)} {...props}>
+    <button
+      className={["knock-guide-card__action", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       {text}
     </button>
   );
@@ -128,10 +162,12 @@ const SecondaryButton: React.FC<
 > = ({ text, action, className, ...props }) => {
   return (
     <button
-      className={clsx(
+      className={[
         "knock-guide-card__action knock-guide-card__action--secondary",
         className,
-      )}
+      ]
+        .filter(Boolean)
+        .join(" ")}
       {...props}
     >
       {text}
@@ -145,7 +181,12 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button className={clsx("knock-guide-card__close", className)} {...props}>
+    <button
+      className={["knock-guide-card__close", className]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"

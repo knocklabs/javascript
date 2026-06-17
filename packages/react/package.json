@@ -88,7 +88,6 @@
     "@telegraph/tokens": ">=0.2.0",
     "@telegraph/tooltip": ">=0.2.2",
     "@telegraph/typography": ">=0.4.0",
-    "clsx": "^2.1.1",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.544.0"
   },
