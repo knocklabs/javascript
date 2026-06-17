@@ -1,6 +1,7 @@
 import { ColorMode, useGuide } from "@knocklabs/react-core";
 import React from "react";
 
+import { cx } from "../../../core/cx";
 import { maybeNavigateToUrlWithDelay } from "../helpers";
 import { ButtonContent, TargetButton, TargetButtonWithGuide } from "../types";
 
@@ -12,10 +13,7 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div
-      className={["knock-guide-banner", className].filter(Boolean).join(" ")}
-      {...props}
-    >
+    <div className={cx("knock-guide-banner", className)} {...props}>
       {children}
     </div>
   );
@@ -26,12 +24,7 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div
-      className={["knock-guide-banner__message", className]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    >
+    <div className={cx("knock-guide-banner__message", className)} {...props}>
       {children}
     </div>
   );
@@ -42,12 +35,7 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div
-      className={["knock-guide-banner__title", className]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    >
+    <div className={cx("knock-guide-banner__title", className)} {...props}>
       {title}
     </div>
   );
@@ -61,9 +49,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <div
-      className={["knock-guide-banner__body", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={cx("knock-guide-banner__body", className)}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -75,12 +61,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div
-      className={["knock-guide-banner__actions", className]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    >
+    <div className={cx("knock-guide-banner__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -91,12 +72,7 @@ const PrimaryButton: React.FC<
   ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <button
-      className={["knock-guide-banner__action", className]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    >
+    <button className={cx("knock-guide-banner__action", className)} {...props}>
       {text}
     </button>
   );
@@ -108,12 +84,10 @@ const SecondaryButton: React.FC<
 > = ({ text, action, className, ...props }) => {
   return (
     <button
-      className={[
+      className={cx(
         "knock-guide-banner__action knock-guide-banner__action--secondary",
         className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      )}
       {...props}
     >
       {text}
@@ -127,12 +101,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button
-      className={["knock-guide-banner__close", className]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    >
+    <button className={cx("knock-guide-banner__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
