@@ -1,15 +1,15 @@
-import { jwtDecode } from "jwt-decode";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import { jwtDecode } from "../src/jwt";
 import Knock from "../src/knock";
 
 import { authenticateKnock, createMockKnock } from "./test-utils/mocks";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
-// ✅ Mock the named export `jwtDecode` from the "jwt-decode" module.
+// ✅ Mock the named export `jwtDecode` from the internal jwt module.
 // It will always return a decoded token with an `exp` 61 seconds in the future.
-vi.mock("jwt-decode", () => ({
+vi.mock("../src/jwt", () => ({
   jwtDecode: vi.fn(() => ({
     exp: Math.floor(Date.now() / 1000) + 61,
   })),

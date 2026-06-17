@@ -1,5 +1,3 @@
-import { jwtDecode } from "jwt-decode";
-
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import MessageClient from "./clients/messages";
@@ -16,6 +14,7 @@ import {
   UserIdOrUserWithProperties,
   UserTokenExpiringCallback,
 } from "./interfaces";
+import { jwtDecode } from "./jwt";
 
 const DEFAULT_HOST = "https://api.knock.app";
 
