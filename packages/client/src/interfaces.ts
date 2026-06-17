@@ -1,6 +1,6 @@
 import { GenericData } from "@knocklabs/types";
-import { JwtPayload } from "jwt-decode";
 
+import { JwtPayload } from "./jwt";
 import Knock from "./knock";
 
 export type LogLevel = "debug";

@@ -1,8 +1,8 @@
 import { ColorMode, useGuide } from "@knocklabs/react-core";
 import * as Dialog from "@radix-ui/react-dialog";
-import clsx from "clsx";
 import React from "react";
 
+import { cx } from "../../../core/cx";
 import { isValidHttpUrl, maybeNavigateToUrlWithDelay } from "../helpers";
 import {
   ButtonContent,
@@ -40,7 +40,7 @@ const Overlay = React.forwardRef<OverlayRef, OverlayProps>(
   ({ className, ...props }, forwardedRef) => {
     return (
       <Dialog.Overlay
-        className={clsx("knock-guide-modal__overlay", className)}
+        className={cx("knock-guide-modal__overlay", className)}
         ref={forwardedRef}
         {...props}
       />
@@ -57,7 +57,7 @@ const Content = React.forwardRef<ContentRef, ContentProps>(
   ({ children, className, ...props }, forwardedRef) => {
     return (
       <Dialog.Content
-        className={clsx("knock-guide-modal", className)}
+        className={cx("knock-guide-modal", className)}
         ref={forwardedRef}
         {...props}
       >
@@ -72,7 +72,7 @@ const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-modal__header", className)} {...props}>
+    <div className={cx("knock-guide-modal__header", className)} {...props}>
       {children}
     </div>
   );
@@ -87,7 +87,7 @@ type TitleProps = React.ComponentPropsWithoutRef<typeof Dialog.Title> &
 const Title = ({ title, className, ...props }: TitleProps) => {
   return (
     <Dialog.Title
-      className={clsx("knock-guide-modal__title", className)}
+      className={cx("knock-guide-modal__title", className)}
       {...props}
     >
       {title}
@@ -103,7 +103,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <Dialog.Description
-      className={clsx("knock-guide-modal__body", className)}
+      className={cx("knock-guide-modal__body", className)}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -116,7 +116,7 @@ const Img: React.FC<
 > = ({ children, className, alt, ...props }) => {
   return (
     <img
-      className={clsx("knock-guide-modal__img", className)}
+      className={cx("knock-guide-modal__img", className)}
       alt={alt || ""}
       {...props}
     >
@@ -130,7 +130,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-modal__actions", className)} {...props}>
+    <div className={cx("knock-guide-modal__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -141,7 +141,7 @@ const PrimaryButton: React.FC<
   ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <button className={clsx("knock-guide-modal__action", className)} {...props}>
+    <button className={cx("knock-guide-modal__action", className)} {...props}>
       {text}
     </button>
   );
@@ -153,7 +153,7 @@ const SecondaryButton: React.FC<
 > = ({ text, action, className, ...props }) => {
   return (
     <button
-      className={clsx(
+      className={cx(
         "knock-guide-modal__action knock-guide-modal__action--secondary",
         className,
       )}
@@ -171,7 +171,7 @@ type CloseProps = React.ComponentPropsWithoutRef<typeof Dialog.Close> &
 const Close = ({ className, ...props }: CloseProps) => {
   return (
     <Dialog.Close
-      className={clsx("knock-guide-modal__close", className)}
+      className={cx("knock-guide-modal__close", className)}
       {...props}
     >
       <svg
