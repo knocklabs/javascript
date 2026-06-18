@@ -436,9 +436,13 @@ describe("API Client", () => {
         apiKey: "pk_test_12345",
         userToken: undefined,
       });
+      // Return a fresh Response per call, like a real fetch — a Response body
+      // can only be consumed once, so each retry must get its own.
       const fetchMock = vi
         .fn()
-        .mockResolvedValue(createJsonResponse({ error: "Server Error" }, 500));
+        .mockImplementation(() =>
+          createJsonResponse({ error: "Server Error" }, 500),
+        );
       setFetchMock(apiClient, fetchMock);
       skipRetryDelays(apiClient);
 

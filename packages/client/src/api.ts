@@ -149,9 +149,11 @@ class ApiClient {
         );
 
         if (!response.ok && this.canRetryRequest({ response })) {
+          // This response is discarded before the next attempt, so read its
+          // body directly (no clone) to drain it and release the connection.
           lastError = new ApiRequestError(
             response,
-            await this.parseResponseBody(response.clone()),
+            await this.parseResponseBody(response),
           );
         } else {
           return response;
