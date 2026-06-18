@@ -489,6 +489,46 @@ describe("API Client", () => {
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
+    test("honors the Retry-After header before retrying", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ error: "Rate limited" }), {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "2",
+            },
+          }),
+        )
+        .mockResolvedValue(createJsonResponse({ success: true }));
+      setFetchMock(apiClient, fetchMock);
+
+      // Capture the backoff durations instead of skipping them.
+      const delays: number[] = [];
+      (apiClient as unknown as Record<string, unknown>).delay = vi.fn(
+        (ms: number) => {
+          delays.push(ms);
+          return Promise.resolve();
+        },
+      );
+
+      const response = await apiClient.makeRequest({
+        method: "GET",
+        url: "/test",
+      });
+
+      expect(response.statusCode).toBe("ok");
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      // Retry-After: 2 seconds -> wait at least 2000ms before retrying.
+      expect(delays[0]).toBeGreaterThanOrEqual(2000);
+    });
+
     test("does not retry on client errors (4xx except 429)", async () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",

@@ -142,6 +142,8 @@ class ApiClient {
     // Sequential retry loop: each attempt awaits in order and returns early on
     // success or a non-retryable error, so it doesn't reduce to an array method.
     for (let attempt = 0; attempt <= 3; attempt++) {
+      let retryAfterMs = 0;
+
       try {
         const response = await this.fetchClient(
           this.buildUrl(req.url, req.params),
@@ -149,6 +151,7 @@ class ApiClient {
         );
 
         if (!response.ok && this.canRetryRequest({ response })) {
+          retryAfterMs = this.getRetryAfterMs(response);
           // This response is discarded before the next attempt, so read its
           // body directly (no clone) to drain it and release the connection.
           lastError = new ApiRequestError(
@@ -167,7 +170,7 @@ class ApiClient {
       }
 
       if (attempt < 3) {
-        await this.delay(this.getRetryDelay(attempt + 1));
+        await this.delay(this.getRetryDelay(attempt + 1, retryAfterMs));
       }
     }
 
@@ -261,8 +264,31 @@ class ApiClient {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  private getRetryDelay(retryCount: number) {
-    return Math.min(100 * 2 ** retryCount, 30_000);
+  private getRetryDelay(retryCount: number, retryAfterMs = 0) {
+    const backoff = Math.min(100 * 2 ** retryCount, 30_000);
+    const delay = Math.max(backoff, retryAfterMs);
+    // Add up to 20% jitter so retries from many clients don't synchronize.
+    return delay + delay * 0.2 * Math.random();
+  }
+
+  private getRetryAfterMs(response: Response) {
+    const header = response.headers.get("retry-after");
+    if (!header) {
+      return 0;
+    }
+
+    // `Retry-After` is either a number of seconds or an HTTP date.
+    const seconds = Number(header);
+    if (!Number.isNaN(seconds)) {
+      return Math.max(0, seconds * 1000);
+    }
+
+    const dateMs = new Date(header).valueOf();
+    if (Number.isNaN(dateMs)) {
+      return 0;
+    }
+
+    return Math.max(0, dateMs - Date.now());
   }
 
   private getFetchClient(): FetchClient {
