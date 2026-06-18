@@ -54,6 +54,25 @@ describe("useSlackConnectionStatus", () => {
     );
   });
 
+  it("sets status to disconnected when the access token is not set (4xx)", async () => {
+    const knock = buildMockKnock(() =>
+      Promise.resolve({
+        response: {
+          status: 400,
+          data: { message: "slackAccessTokenNotSet" },
+        },
+      }),
+    );
+
+    const { result } = renderHook(() =>
+      useSlackConnectionStatus(knock, channelId, tenantId),
+    );
+
+    await waitFor(() =>
+      expect(result.current.connectionStatus).toBe("disconnected"),
+    );
+  });
+
   it("sets error status and label for slack error", async () => {
     const knock = buildMockKnock(() =>
       Promise.resolve({ connection: { ok: false, error: "account_inactive" } }),

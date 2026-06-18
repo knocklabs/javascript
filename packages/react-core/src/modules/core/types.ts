@@ -21,8 +21,8 @@ export interface AuthCheckResult {
     ok?: boolean;
     error?: string;
   };
-  code?: string;
   response?: {
+    status?: number;
     data?: {
       message?: string;
     };

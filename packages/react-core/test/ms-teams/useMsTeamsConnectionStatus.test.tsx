@@ -61,6 +61,25 @@ describe("useMsTeamsConnectionStatus", () => {
     );
   });
 
+  it("sets status to disconnected when the tenant id is not set (4xx)", async () => {
+    const knock = buildMockKnock(() =>
+      Promise.resolve({
+        response: {
+          status: 400,
+          data: { message: "msTeamsTenantIdNotSet" },
+        },
+      }),
+    );
+
+    const { result } = renderHook(() =>
+      useMsTeamsConnectionStatus(knock, channelId, tenantId),
+    );
+
+    await waitFor(() =>
+      expect(result.current.connectionStatus).toBe("disconnected"),
+    );
+  });
+
   it("sets status to error when authCheck throws", async () => {
     const knock = buildMockKnock(() => Promise.reject(new Error("failure")));
 
