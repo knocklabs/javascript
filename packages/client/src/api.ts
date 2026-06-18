@@ -12,14 +12,14 @@ type ApiClientOptions = {
   disconnectOnPageHidden?: boolean;
 };
 
-export interface ApiResponse {
+export type ApiResponse = {
   // eslint-disable-next-line
   error?: any;
   // eslint-disable-next-line
   body?: any;
   statusCode: "ok" | "error";
   status: number;
-}
+};
 
 export type ApiRequestConfig = {
   method?: string;
@@ -123,8 +123,6 @@ class ApiClient {
         error: result.ok ? undefined : new ApiRequestError(result, body),
         status: result.status,
       };
-
-      // eslint:disable-next-line
     } catch (e: unknown) {
       console.error(e);
       const response = (e as ErrorWithResponse)?.response;
@@ -141,6 +139,8 @@ class ApiClient {
   private async requestWithRetries(req: ApiRequestConfig) {
     let lastError: unknown;
 
+    // Sequential retry loop: each attempt awaits in order and returns early on
+    // success or a non-retryable error, so it doesn't reduce to an array method.
     for (let attempt = 0; attempt <= 3; attempt++) {
       try {
         const response = await this.fetchClient(
