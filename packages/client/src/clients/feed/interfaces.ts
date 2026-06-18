@@ -53,12 +53,36 @@ export interface FeedClientOptions {
    * @default "compact"
    */
   mode?: "rich" | "compact";
+  /**
+   * A feed response fetched ahead of time (typically on the server) used to seed
+   * the feed store on initialization, so the feed renders with content on first
+   * paint instead of an empty/loading state.
+   *
+   * Inspired by TanStack Query's `initialData`: the value is a plain
+   * {@link FeedResponse}, which is exactly the JSON body returned by the
+   * list feed items endpoint — already serializable, so no separate
+   * dehydrate step is required to pass it from the server to the client.
+   *
+   * A `Promise<FeedResponse>` is also accepted. This supports streaming /
+   * deferred data: a server loader can kick off the fetch without awaiting it
+   * and hand the (still-pending) promise to the client, which seeds the store
+   * once the framework resolves it. While the promise is pending the feed
+   * reports a `loading` network status, which also defers a concurrent
+   * mount-time `fetch()` so the client doesn't duplicate the server request.
+   *
+   * The feed still connects to the realtime service and reconciles on its next
+   * fetch, so seeded data is replaced as soon as fresh data arrives.
+   */
+  initialData?: FeedResponse | Promise<FeedResponse>;
 }
 
 export type FetchFeedOptions = {
   __loadingType?: NetworkStatus.loading | NetworkStatus.fetchMore;
   __fetchSource?: "socket" | "http";
-} & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
+} & Omit<
+  FeedClientOptions,
+  "__experimentalCrossBrowserUpdates" | "initialData"
+>;
 
 /**
  * The final data shape that is sent to the the list feed items endpoint of the Knock API.
@@ -67,7 +91,7 @@ export type FetchFeedOptions = {
  */
 export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
-  "trigger_data" | "inserted_at_date_range"
+  "trigger_data" | "inserted_at_date_range" | "initialData"
 > & {
   /** The trigger data of the feed items (as a JSON string). */
   trigger_data?: string;

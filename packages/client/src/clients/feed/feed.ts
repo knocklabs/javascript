@@ -36,12 +36,73 @@ import {
 import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
 // Default options to apply
-const feedClientDefaults: Pick<FeedClientOptions, "archived" | "mode"> = {
-  archived: "exclude",
-  mode: "compact",
-};
+export const feedClientDefaults: Pick<FeedClientOptions, "archived" | "mode"> =
+  {
+    archived: "exclude",
+    mode: "compact",
+  };
 
 const CLIENT_REF_ID_PREFIX = "client_";
+
+function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { then?: unknown }).then === "function"
+  );
+}
+
+/**
+ * Builds the query params sent to the list feed items endpoint. Shared by
+ * `Feed.fetch` and `FeedClient.prefetch` so the request never drifts between
+ * the two.
+ */
+function buildFeedRequestParams(
+  defaultOptions: FeedClientOptions,
+  options: FetchFeedOptions,
+): FetchFeedOptionsForRequest {
+  return {
+    ...defaultOptions,
+    ...mergeDateRangeParams(options),
+    // trigger_data should be a JSON string for the API; this formats it if it's
+    // an object. https://docs.knock.app/reference#get-feed
+    trigger_data: getFormattedTriggerData({ ...defaultOptions, ...options }),
+    // Unset options that should not be sent to the API
+    __loadingType: undefined,
+    __fetchSource: undefined,
+    __experimentalCrossBrowserUpdates: undefined,
+  };
+}
+
+/**
+ * Issues the GET request for a user's feed and returns the response body as a
+ * {@link FeedResponse}, throwing on a non-ok response. This is the shared
+ * transport for `Feed.fetch` (which writes the result into its store) and
+ * `FeedClient.prefetch` (which returns it for server-side hydration), so both
+ * send the same request and parse the same shape.
+ */
+export async function fetchFeed(
+  knock: Knock,
+  feedId: string,
+  defaultOptions: FeedClientOptions,
+  options: FetchFeedOptions = {},
+): Promise<FeedResponse> {
+  const result = await knock.client().makeRequest({
+    method: "GET",
+    url: `/v1/users/${knock.userId}/feeds/${feedId}`,
+    params: buildFeedRequestParams(defaultOptions, options),
+  });
+
+  if (result.statusCode === "error" || !result.body) {
+    throw result.error ?? new Error("[Knock] Failed to fetch feed");
+  }
+
+  return {
+    entries: result.body.entries,
+    meta: result.body.meta,
+    page_info: result.body.page_info,
+  };
+}
 
 class Feed {
   public readonly defaultOptions: FeedClientOptions;
@@ -69,6 +130,10 @@ class Feed {
       );
     }
 
+    // `initialData` is consumed locally to seed the store; it must not leak into
+    // `defaultOptions`, otherwise it would be sent as a query param on every fetch.
+    const { initialData, ...feedOptions } = options;
+
     this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
     this.referenceId = CLIENT_REF_ID_PREFIX + nanoid();
@@ -77,7 +142,7 @@ class Feed {
     this.broadcaster = new EventEmitter({ wildcard: true, delimiter: "." });
     this.defaultOptions = {
       ...feedClientDefaults,
-      ...mergeDateRangeParams(options),
+      ...mergeDateRangeParams(feedOptions),
     };
     this.knock.log(`[Feed] Initialized a feed on channel ${feedId}`);
 
@@ -85,6 +150,62 @@ class Feed {
     this.initializeRealtimeConnection();
 
     this.setupBroadcastChannel();
+
+    // Seed the store with server-fetched data (or a promise of it) so the feed
+    // renders content on first paint instead of an empty/loading state.
+    if (initialData) {
+      this.hydrate(initialData);
+    }
+  }
+
+  /**
+   * Seeds the feed store with a feed response fetched ahead of time, typically on
+   * the server. This is the imperative equivalent of the `initialData` feed
+   * option and is modeled on TanStack Query's `hydrate`.
+   *
+   * Accepts either a resolved {@link FeedResponse} or a `Promise<FeedResponse>`.
+   * The promise form supports streaming / deferred data: a server loader can
+   * fire off the fetch without awaiting it and hand the pending promise to the
+   * client, which seeds the store once the framework resolves it. While pending,
+   * the feed reports a `loading` network status (which also defers a concurrent
+   * mount-time {@link fetch}, avoiding a duplicate request).
+   */
+  hydrate(initialData: FeedResponse | Promise<FeedResponse>) {
+    if (isPromise(initialData)) {
+      // Reflect that data is on the way until the streamed promise resolves.
+      this.store.getState().setNetworkStatus(NetworkStatus.loading);
+
+      initialData.then(
+        (response) => this.setInitialResult(response),
+        (error) => {
+          this.knock.log(
+            `[Feed] Failed to hydrate feed from initialData promise: ${error}`,
+          );
+          this.store.getState().setNetworkStatus(NetworkStatus.error);
+        },
+      );
+
+      return;
+    }
+
+    this.setInitialResult(initialData);
+  }
+
+  /**
+   * Applies a feed response to the store and broadcasts a feed event, mirroring
+   * the side effects of a non-paginated {@link fetch} so event-driven consumers
+   * are notified of the seeded page.
+   */
+  private setInitialResult(response: FeedResponse) {
+    this.store.getState().setResult(response);
+
+    const feedEventType: FeedEvent = "items.received.page";
+
+    this.broadcast(feedEventType, {
+      items: response.entries as FeedItem[],
+      metadata: response.meta as FeedMetadata,
+      event: feedEventType,
+    });
   }
 
   /**
@@ -524,29 +645,10 @@ class Feed {
     // Set the loading type based on the request type it is
     state.setNetworkStatus(options.__loadingType ?? NetworkStatus.loading);
 
-    // trigger_data should be a JSON string for the API
-    // this function will format the trigger data if it's an object
-    // https://docs.knock.app/reference#get-feed
-    const formattedTriggerData = getFormattedTriggerData({
-      ...this.defaultOptions,
-      ...options,
-    });
-
-    // Always include the default params, if they have been set
-    const queryParams: FetchFeedOptionsForRequest = {
-      ...this.defaultOptions,
-      ...mergeDateRangeParams(options),
-      trigger_data: formattedTriggerData,
-      // Unset options that should not be sent to the API
-      __loadingType: undefined,
-      __fetchSource: undefined,
-      __experimentalCrossBrowserUpdates: undefined,
-    };
-
     const result = await this.knock.client().makeRequest({
       method: "GET",
       url: `/v1/users/${this.knock.userId}/feeds/${this.feedId}`,
-      params: queryParams,
+      params: buildFeedRequestParams(this.defaultOptions, options),
     });
 
     if (result.statusCode === "error" || !result.body) {

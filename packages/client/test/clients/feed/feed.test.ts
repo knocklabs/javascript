@@ -1,12 +1,12 @@
 import { describe, expect, test, vi } from "vitest";
 
-import type { FetchFeedOptions } from "../../../src";
-
+import type { FeedResponse, FetchFeedOptions } from "../../../src";
 import Feed from "../../../src/clients/feed/feed";
 import { FeedSocketManager } from "../../../src/clients/feed/socket-manager";
 import { NetworkStatus } from "../../../src/networkStatus";
 import {
   createMockFeedItems,
+  createSuccessfulFeedResponse,
   createUnreadFeedItem,
 } from "../../test-utils/fixtures";
 import { authenticateKnock, createMockKnock } from "../../test-utils/mocks";
@@ -1038,7 +1038,6 @@ describe("Feed", () => {
     });
   });
 
-
   describe("Socket Event Handling", () => {
     test("handles new message socket events", async () => {
       const { knock, mockApiClient, cleanup } = getTestSetup();
@@ -1489,6 +1488,118 @@ describe("Feed", () => {
 
         expect(result).toBeDefined();
         expect(result!.data).toEqual(mockFeedResponse);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Feed Hydration", () => {
+    const FEED_ID = "01234567-89ab-cdef-0123-456789abcdef";
+
+    test("seeds the store from synchronous initialData", () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const initialData = createSuccessfulFeedResponse(
+          createMockFeedItems(3),
+        ).body;
+
+        const feed = new Feed(knock, FEED_ID, { initialData }, undefined);
+
+        expect(feed.store.getState().items).toHaveLength(3);
+        expect(feed.store.getState().networkStatus).toBe(NetworkStatus.ready);
+        // The feed renders from seeded data without hitting the network
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("does not forward initialData as a fetch query param", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const initialData = createSuccessfulFeedResponse(
+          createMockFeedItems(2),
+        ).body;
+        mockApiClient.makeRequest.mockResolvedValue(
+          createSuccessfulFeedResponse(createMockFeedItems(2)),
+        );
+
+        const feed = new Feed(knock, FEED_ID, { initialData }, undefined);
+        await feed.fetch();
+
+        const params = mockApiClient.makeRequest.mock.calls[0][0].params;
+        expect(params).not.toHaveProperty("initialData");
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("seeds the store once a streamed initialData promise resolves", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const response = createSuccessfulFeedResponse(
+          createMockFeedItems(4),
+        ).body;
+        let resolveInitialData: (value: FeedResponse) => void = () => {};
+        const initialData = new Promise<FeedResponse>((resolve) => {
+          resolveInitialData = resolve;
+        });
+
+        const feed = new Feed(knock, FEED_ID, { initialData }, undefined);
+
+        // While pending, the feed reports loading so the UI can show a skeleton
+        // and a concurrent mount-time fetch is deferred.
+        expect(feed.store.getState().networkStatus).toBe(NetworkStatus.loading);
+        expect(feed.store.getState().items).toHaveLength(0);
+
+        resolveInitialData(response);
+        await initialData;
+
+        expect(feed.store.getState().items).toHaveLength(4);
+        expect(feed.store.getState().networkStatus).toBe(NetworkStatus.ready);
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("sets an error network status when the initialData promise rejects", async () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        const initialData = Promise.reject<FeedResponse>(new Error("boom"));
+
+        const feed = new Feed(knock, FEED_ID, { initialData }, undefined);
+
+        await initialData.catch(() => {});
+
+        expect(feed.store.getState().networkStatus).toBe(NetworkStatus.error);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("broadcasts items.received.page when hydrated imperatively", () => {
+      const { knock, cleanup } = getTestSetup();
+
+      try {
+        const feed = new Feed(knock, FEED_ID, {}, undefined);
+        const handler = vi.fn();
+        feed.on("items.received.page", handler);
+
+        const response = createSuccessfulFeedResponse(
+          createMockFeedItems(2),
+        ).body;
+        feed.hydrate(response);
+
+        expect(feed.store.getState().items).toHaveLength(2);
+        expect(handler).toHaveBeenCalledWith(
+          expect.objectContaining({ event: "items.received.page" }),
+        );
       } finally {
         cleanup();
       }
