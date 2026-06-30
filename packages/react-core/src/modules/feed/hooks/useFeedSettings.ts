@@ -11,7 +11,7 @@ function useFeedSettings(feedClient: Feed): {
   settings: FeedSettings | null;
   loading: boolean;
 } {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState<FeedSettings | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // TODO: consider moving this into the feed client and into the feed store state when
@@ -29,7 +29,13 @@ function useFeedSettings(feedClient: Feed): {
       });
 
       if (!response.error) {
-        setSettings(response.body);
+        setSettings({
+          features: {
+            branding_required: Boolean(
+              response.body?.features?.branding_required,
+            ),
+          },
+        });
       }
 
       setIsLoading(false);

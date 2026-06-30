@@ -55,4 +55,24 @@ describe("useFeedSettings", () => {
 
     expect(result.current.settings).toBeNull();
   });
+
+  it("handles partial settings response by defaulting features", async () => {
+    const { feed, mockApiClient } = createMockFeed("feed_123");
+
+    mockNetworkSuccess(mockApiClient, {});
+
+    const { result } = renderHook(() =>
+      useFeedSettings(feed as unknown as Feed),
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.settings).toEqual({
+      features: {
+        branding_required: false,
+      },
+    });
+  });
 });
