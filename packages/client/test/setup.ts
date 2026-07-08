@@ -87,7 +87,6 @@ console.warn = (message: unknown, ...args: unknown[]) => {
 };
 
 // Completely suppress console.error during tests since we're testing error scenarios
-// This prevents axios errors from showing up in test output
 console.error = noOp;
 
 // Suppress console.log during tests to prevent Knock debug messages

@@ -72,8 +72,6 @@
     "@knocklabs/types": "workspace:^",
     "@tanstack/store": "^0.7.2",
     "@types/phoenix": "^1.6.7",
-    "axios": "^1.15.1",
-    "axios-retry": "^4.5.0",
     "eventemitter2": "^6.4.5",
     "nanoid": "^3.3.12",
     "phoenix": "1.8.5",
