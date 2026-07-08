@@ -11,7 +11,7 @@ function useFeedSettings(feedClient: Feed): {
   settings: FeedSettings | null;
   loading: boolean;
 } {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState<FeedSettings | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // TODO: consider moving this into the feed client and into the feed store state when
@@ -28,8 +28,19 @@ function useFeedSettings(feedClient: Feed): {
         url: feedSettingsPath,
       });
 
-      if (!response.error) {
-        setSettings(response.body);
+      // Only trust a genuine success whose body actually contains the settings
+      // payload. On flaky connections a captive portal or proxy can return a
+      // 200 with a body that isn't the feed settings object; treat that as
+      // "unknown" (leave settings null) rather than fabricating a default that
+      // would silently suppress branding when it is required.
+      if (response.statusCode === "ok" && response.body?.features) {
+        setSettings({
+          features: {
+            branding_required: Boolean(
+              response.body.features.branding_required,
+            ),
+          },
+        });
       }
 
       setIsLoading(false);

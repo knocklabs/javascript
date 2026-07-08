@@ -55,4 +55,23 @@ describe("useFeedSettings", () => {
 
     expect(result.current.settings).toBeNull();
   });
+
+  it("leaves settings null when a success response is missing the features payload", async () => {
+    const { feed, mockApiClient } = createMockFeed("feed_123");
+
+    // A degraded connection (captive portal / proxy) can return a 200 whose
+    // body is not the feed settings object. We must not fabricate a default
+    // from it, which would silently suppress branding when it is required.
+    mockNetworkSuccess(mockApiClient, {});
+
+    const { result } = renderHook(() =>
+      useFeedSettings(feed as unknown as Feed),
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.settings).toBeNull();
+  });
 });

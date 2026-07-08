@@ -160,7 +160,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
       />
-      {settings?.features.branding_required && (
+      {settings?.features?.branding_required && (
         <View style={styles.branding}>
           <PoweredByKnockIcon />
         </View>
