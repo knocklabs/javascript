@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.13.15
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 70e7669: Handle missing `features` in feed settings responses to prevent crashes on partial API responses.
+- 3dd0aa8: Remove the `fast-deep-equal` dependency in favor of an internal `deepEqual` util.
+- b6c9be4: Keep Slack and MS Teams connection-status detection working with the new fetch-based `@knocklabs/client` transport by reading the HTTP response status instead of the previous axios-specific error `code`. The exported `AuthCheckResult` type no longer includes `code` and now exposes `response.status`.
+- Updated dependencies [dd1b724]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+
 ## 0.13.14
 
 ### Patch Changes

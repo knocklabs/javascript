@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.11.23
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 70e7669: Handle missing `features` in feed settings responses to prevent crashes on partial API responses.
+- 3dd0aa8: Remove the `clsx` and `lodash.debounce` dependencies. Guide components compose `className` with a small internal `cx` helper, and an internal trailing-edge debounce replaces `lodash.debounce`.
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+  - @knocklabs/react-core@0.13.15
+
 ## 0.11.22
 
 ### Patch Changes
