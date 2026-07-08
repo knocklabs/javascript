@@ -23,7 +23,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Include the label (or event) in the group so an unrelated `labeled` event on
+  # the same PR lands in a different group and can't cancel an in-flight opt-in
+  # EAS build. Pushes to main still coalesce (they share the `push` discriminator).
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.label.name || github.event_name }}
   cancel-in-progress: true
 
 jobs:
