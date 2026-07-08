@@ -3,6 +3,22 @@ import { Socket } from "phoenix";
 import { exponentialBackoffFullJitter } from "./helpers";
 import { PageVisibilityManager } from "./pageVisibility";
 
+// Ceiling for socket reconnect backoff. This is intentionally much larger than
+// the channel rejoin cap: a client that can never reconnect (e.g. a rotated
+// API key that now returns 403 on every upgrade) should settle into a slow
+// retry cadence rather than hammering the API indefinitely.
+const SOCKET_RECONNECT_MAX_DELAY_MS = 600_000;
+
+// A connection that stays open at least this long is treated as healthy, which
+// resets the reconnect backoff escalation so a later transient drop reconnects
+// quickly.
+const STABLE_CONNECTION_THRESHOLD_MS = 30_000;
+
+// Upper bound for the escalation counter. Past this the reconnect delay is
+// already pinned to SOCKET_RECONNECT_MAX_DELAY_MS, so there's no need to keep
+// counting.
+const MAX_UNSTABLE_CONNECTION_COUNT = 15;
+
 type ApiClientOptions = {
   host: string;
   apiKey: string;
@@ -69,6 +85,18 @@ class ApiClient {
   public socket: Socket | undefined;
   private pageVisibility: PageVisibilityManager | undefined;
 
+  // Count of consecutive connection attempts that failed or dropped before
+  // stabilizing. Drives reconnect backoff escalation and, unlike Phoenix's own
+  // attempt counter, is not reset each time a short-lived connection opens.
+  private unstableConnectionCount = 0;
+
+  // Timestamp (ms) of the current connection's open, or null when not open.
+  private socketOpenedAt: number | null = null;
+
+  // Whether the socket has ever attempted to connect. Used to avoid forcing a
+  // connection the consumer never asked for when connectivity returns.
+  private socketWasActive = false;
+
   constructor(options: ApiClientOptions) {
     this.host = options.host;
     this.apiKey = options.apiKey;
@@ -93,10 +121,18 @@ class ApiClient {
           branch_slug: this.branch,
         },
         reconnectAfterMs: (tries: number) => {
-          return exponentialBackoffFullJitter(tries, {
-            baseDelayMs: 1000,
-            maxDelayMs: 30_000,
-          });
+          // Escalate using whichever is larger: Phoenix's own attempt counter
+          // (which it resets on every successful open) or our count of
+          // consecutive unstable connections (which survives brief opens). The
+          // latter keeps the delay growing through "accept then immediately
+          // drop" cycles that would otherwise reset Phoenix's counter each time.
+          return exponentialBackoffFullJitter(
+            Math.max(tries, this.unstableConnectionCount),
+            {
+              baseDelayMs: 1000,
+              maxDelayMs: SOCKET_RECONNECT_MAX_DELAY_MS,
+            },
+          );
         },
         rejoinAfterMs: (tries: number) => {
           return exponentialBackoffFullJitter(tries, {
@@ -106,11 +142,77 @@ class ApiClient {
         },
       });
 
+      this.trackConnectionStability(this.socket);
+
+      // Recover promptly when connectivity returns instead of waiting out a
+      // potentially long reconnect backoff window.
+      if (typeof window.addEventListener === "function") {
+        window.addEventListener("online", this.handleOnline);
+      }
+
       if (options.disconnectOnPageHidden !== false) {
         this.pageVisibility = new PageVisibilityManager(this.socket);
       }
     }
   }
+
+  // Observes socket open/close events to drive reconnect backoff escalation.
+  // The escalation is what turns a permanent failure (e.g. a rejected upgrade
+  // after a key rotation) from a tight retry loop into a slow one.
+  private trackConnectionStability(socket: Socket) {
+    socket.onOpen(() => {
+      this.socketWasActive = true;
+      this.socketOpenedAt = Date.now();
+    });
+
+    socket.onClose((event) => {
+      this.socketWasActive = true;
+
+      const openedAt = this.socketOpenedAt;
+      this.socketOpenedAt = null;
+
+      const stayedConnected =
+        openedAt !== null &&
+        Date.now() - openedAt >= STABLE_CONNECTION_THRESHOLD_MS;
+
+      if (stayedConnected) {
+        // A connection that stayed up long enough is considered healthy, so
+        // allow fast reconnects again after a transient drop.
+        this.unstableConnectionCount = 0;
+      } else if (!event?.wasClean) {
+        // A rejected upgrade (never opened) or a connection dropped shortly
+        // after opening keeps escalating the backoff. Clean closes — our own
+        // disconnect() or a graceful server close — are intentional, won't be
+        // retried by Phoenix, and so don't count.
+        this.unstableConnectionCount = Math.min(
+          this.unstableConnectionCount + 1,
+          MAX_UNSTABLE_CONNECTION_COUNT,
+        );
+      }
+    });
+  }
+
+  private handleOnline = () => {
+    const socket = this.socket;
+    if (!socket) {
+      return;
+    }
+
+    // Only act if the consumer previously opened a connection that isn't
+    // currently live. When the page is hidden, PageVisibilityManager owns the
+    // connection lifecycle, so leave it be.
+    if (!this.socketWasActive || socket.isConnected()) {
+      return;
+    }
+
+    if (typeof document !== "undefined" && document.hidden) {
+      return;
+    }
+
+    // Cancel any pending backoff and make a single immediate attempt. If it
+    // fails, the escalated schedule resumes (unstableConnectionCount persists).
+    socket.disconnect(() => socket.connect());
+  };
 
   async makeRequest(req: ApiRequestConfig): Promise<ApiResponse> {
     try {
@@ -307,9 +409,18 @@ class ApiClient {
   teardown() {
     this.pageVisibility?.teardown();
 
-    if (this.socket?.isConnected()) {
-      this.socket.disconnect();
+    if (
+      typeof window !== "undefined" &&
+      typeof window.removeEventListener === "function"
+    ) {
+      window.removeEventListener("online", this.handleOnline);
     }
+
+    // Always disconnect, even when not currently connected: a socket that is
+    // mid-reconnect still holds a pending retry timer, and disconnect() is the
+    // only thing that cancels it. Otherwise a reauth that replaces this client
+    // would leak a socket that retries forever with stale credentials.
+    this.socket?.disconnect();
   }
 
   private canRetryRequest(error: unknown) {

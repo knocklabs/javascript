@@ -33,11 +33,14 @@ const skipRetryDelays = (apiClient: ApiClient) => {
     .mockResolvedValue(undefined);
 };
 
-vi.mock("phoenix", () => ({
-  Socket: vi.fn().mockImplementation(() => ({
+const { createSocketMock } = vi.hoisted(() => ({
+  createSocketMock: () => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
     isConnected: vi.fn().mockReturnValue(false),
+    onOpen: vi.fn(),
+    onClose: vi.fn(),
+    onError: vi.fn(),
     channel: vi.fn().mockReturnValue({
       join: vi.fn(),
       leave: vi.fn(),
@@ -45,12 +48,45 @@ vi.mock("phoenix", () => ({
       on: vi.fn(),
       off: vi.fn(),
     }),
-  })),
+  }),
 }));
+
+vi.mock("phoenix", () => ({
+  Socket: vi.fn(createSocketMock),
+}));
+
+type MockSocket = {
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  isConnected: ReturnType<typeof vi.fn>;
+  onOpen: ReturnType<typeof vi.fn>;
+  onClose: ReturnType<typeof vi.fn>;
+};
+
+// ApiClient registers its connection-stability handlers first (before
+// PageVisibilityManager), so calls[0] is always the escalation handler. The new
+// socket tests disable PageVisibilityManager anyway to isolate this behavior.
+const getOnCloseHandler = (apiClient: ApiClient) => {
+  const socket = apiClient.socket as unknown as MockSocket;
+  return socket.onClose.mock.calls[0]![0] as (event: {
+    wasClean: boolean;
+  }) => void;
+};
+
+const getOnOpenHandler = (apiClient: ApiClient) => {
+  const socket = apiClient.socket as unknown as MockSocket;
+  return socket.onOpen.mock.calls[0]![0] as () => void;
+};
 
 describe("API Client", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // afterEach's restoreAllMocks() strips the Socket mock's implementation, so
+    // re-establish it before each test (the ApiClient constructor now calls
+    // socket.onOpen/onClose).
+    vi.mocked(Socket).mockImplementation(
+      createSocketMock as unknown as () => Socket,
+    );
   });
 
   afterEach(() => {
@@ -684,8 +720,134 @@ describe("API Client", () => {
       for (let i = 0; i < 50; i++) {
         const delay = reconnectAfterMs(100);
         expect(delay).toBeGreaterThanOrEqual(250);
-        expect(delay).toBeLessThanOrEqual(30_000);
+        expect(delay).toBeLessThanOrEqual(600_000);
       }
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("reconnectAfterMs escalates as connections keep failing", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      vi.mocked(Socket).mockClear();
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const reconnectAfterMs = socketOpts.reconnectAfterMs as (
+        tries: number,
+      ) => number;
+      const onClose = getOnCloseHandler(apiClient);
+
+      // Before any failures, the delay for the first attempt stays within the
+      // original ~1s window.
+      const initialMax = Math.max(
+        ...Array.from({ length: 200 }, () => reconnectAfterMs(1)),
+      );
+      expect(initialMax).toBeLessThanOrEqual(1000);
+
+      // Simulate a run of connections that never open and close uncleanly, as
+      // happens when every upgrade is rejected (e.g. a rotated API key).
+      for (let i = 0; i < 20; i++) {
+        onClose({ wasClean: false });
+      }
+
+      // Even for Phoenix's "first" attempt, the escalation counter now pushes
+      // the ceiling well past the original 30s cap, up to the 10-minute cap.
+      const escalatedMax = Math.max(
+        ...Array.from({ length: 200 }, () => reconnectAfterMs(1)),
+      );
+      expect(escalatedMax).toBeGreaterThan(30_000);
+      expect(escalatedMax).toBeLessThanOrEqual(600_000);
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("a connection that stays up long enough resets the escalation", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      const nowSpy = vi.spyOn(Date, "now").mockReturnValue(0);
+      vi.mocked(Socket).mockClear();
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const reconnectAfterMs = socketOpts.reconnectAfterMs as (
+        tries: number,
+      ) => number;
+      const onOpen = getOnOpenHandler(apiClient);
+      const onClose = getOnCloseHandler(apiClient);
+
+      for (let i = 0; i < 20; i++) {
+        onClose({ wasClean: false });
+      }
+
+      // A connection opens and stays up beyond the stability threshold.
+      nowSpy.mockReturnValue(1_000);
+      onOpen();
+      nowSpy.mockReturnValue(1_000 + 30_000);
+      onClose({ wasClean: false });
+
+      // Escalation is reset, so the first attempt is back in the ~1s window.
+      const resetMax = Math.max(
+        ...Array.from({ length: 200 }, () => reconnectAfterMs(1)),
+      );
+      expect(resetMax).toBeLessThanOrEqual(1000);
+
+      nowSpy.mockRestore();
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("clean closes do not escalate the reconnect backoff", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      vi.mocked(Socket).mockClear();
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const reconnectAfterMs = socketOpts.reconnectAfterMs as (
+        tries: number,
+      ) => number;
+      const onClose = getOnCloseHandler(apiClient);
+
+      // Intentional (clean) closes — our own disconnect or a graceful server
+      // close — must not push the backoff up.
+      for (let i = 0; i < 20; i++) {
+        onClose({ wasClean: true });
+      }
+
+      const max = Math.max(
+        ...Array.from({ length: 200 }, () => reconnectAfterMs(1)),
+      );
+      expect(max).toBeLessThanOrEqual(1000);
 
       (global as GlobalWithWindow).window = originalWindow;
     });
@@ -736,6 +898,78 @@ describe("API Client", () => {
       });
 
       expect(apiClient.socket).toBeUndefined();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("teardown disconnects the socket even when it is not connected", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      (global as GlobalWithWindow).window = {};
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      const socket = apiClient.socket as unknown as MockSocket;
+      socket.isConnected.mockReturnValue(false);
+
+      apiClient.teardown();
+
+      // A socket mid-reconnect must still be disconnected so its pending retry
+      // timer is cancelled and it doesn't keep looping after the client is torn
+      // down.
+      expect(socket.disconnect).toHaveBeenCalledOnce();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("reconnects a single time when connectivity returns via the online event", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      const addEventListener = vi.fn();
+      const removeEventListener = vi.fn();
+      (global as GlobalWithWindow).window = {
+        addEventListener,
+        removeEventListener,
+      };
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      const onlineHandler = addEventListener.mock.calls.find(
+        (call) => call[0] === "online",
+      )![1] as () => void;
+
+      const socket = apiClient.socket as unknown as MockSocket;
+      socket.isConnected.mockReturnValue(false);
+
+      // Before any connection attempt, the online event is a no-op: we never
+      // force a connection the consumer didn't ask for.
+      onlineHandler();
+      expect(socket.disconnect).not.toHaveBeenCalled();
+
+      // Simulate a prior failed attempt so the socket counts as "active".
+      getOnCloseHandler(apiClient)({ wasClean: false });
+
+      onlineHandler();
+      expect(socket.disconnect).toHaveBeenCalledOnce();
+
+      // The disconnect callback triggers a single fresh connect.
+      const disconnectCallback = socket.disconnect.mock.calls[0]![0] as
+        | (() => void)
+        | undefined;
+      disconnectCallback?.();
+      expect(socket.connect).toHaveBeenCalledOnce();
+
+      // Teardown unregisters the listener.
+      apiClient.teardown();
+      expect(removeEventListener).toHaveBeenCalledWith("online", onlineHandler);
 
       (global as GlobalWithWindow).window = originalWindow;
     });
