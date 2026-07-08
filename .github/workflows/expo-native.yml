@@ -1,0 +1,55 @@
+name: Expo Native Build
+on:
+  # Post-merge native signal — catches native-only regressions (Expo SDK /
+  # native module bumps) that the per-PR Metro bundle check can't see.
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/types/**"
+      - "packages/client/**"
+      - "packages/react-core/**"
+      - "packages/react-native/**"
+      - "packages/expo/**"
+      - "examples/expo-example/**"
+      - ".github/workflows/expo-native.yml"
+      - "yarn.lock"
+  # Opt-in on a risky PR: add the `expo:native-build` label to run the full build.
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: EAS build (Android)
+    # On pull_request this only runs for the opt-in label; push/dispatch always run.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.label.name == 'expo:native-build'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.x"
+          cache: yarn
+          registry-url: "https://registry.npmjs.org"
+          scope: "@knocklabs"
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Build packages
+        run: yarn build:packages
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # 8.2.1
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build on EAS
+        run: cd examples/expo-example && eas build --platform android --profile preview --non-interactive
