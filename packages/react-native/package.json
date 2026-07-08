@@ -11,10 +11,11 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts",
       "react-native": "./src/index.ts",
-      "default": "./dist/esm/index.mjs"
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.mjs",
+      "default": "./dist/cjs/index.js"
     }
   },
   "files": [
