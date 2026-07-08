@@ -973,5 +973,38 @@ describe("API Client", () => {
 
       (global as GlobalWithWindow).window = originalWindow;
     });
+
+    test("does not revive a cleanly (deliberately) disconnected socket on the online event", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      const addEventListener = vi.fn();
+      (global as GlobalWithWindow).window = {
+        addEventListener,
+        removeEventListener: vi.fn(),
+      };
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      const onlineHandler = addEventListener.mock.calls.find(
+        (call) => call[0] === "online",
+      )![1] as () => void;
+
+      const socket = apiClient.socket as unknown as MockSocket;
+      socket.isConnected.mockReturnValue(false);
+
+      // A clean close is a deliberate disconnect (or graceful server close); the
+      // online event must not resurrect a connection the app chose to stop.
+      getOnCloseHandler(apiClient)({ wasClean: true });
+
+      onlineHandler();
+      expect(socket.disconnect).not.toHaveBeenCalled();
+      expect(socket.connect).not.toHaveBeenCalled();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
   });
 });

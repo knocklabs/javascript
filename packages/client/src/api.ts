@@ -93,9 +93,12 @@ class ApiClient {
   // Timestamp (ms) of the current connection's open, or null when not open.
   private socketOpenedAt: number | null = null;
 
-  // Whether the socket has ever attempted to connect. Used to avoid forcing a
-  // connection the consumer never asked for when connectivity returns.
-  private socketWasActive = false;
+  // Whether the socket wants to reconnect but isn't connected — i.e. it dropped
+  // uncleanly or a connection attempt failed, as opposed to being cleanly and
+  // deliberately disconnected or never started. Gates the `online` handler so
+  // it only shortcuts the backoff and never revives a socket the app chose to
+  // close.
+  private awaitingReconnect = false;
 
   constructor(options: ApiClientOptions) {
     this.host = options.host;
@@ -161,15 +164,18 @@ class ApiClient {
   // after a key rotation) from a tight retry loop into a slow one.
   private trackConnectionStability(socket: Socket) {
     socket.onOpen(() => {
-      this.socketWasActive = true;
+      this.awaitingReconnect = false;
       this.socketOpenedAt = Date.now();
     });
 
     socket.onClose((event) => {
-      this.socketWasActive = true;
-
       const openedAt = this.socketOpenedAt;
       this.socketOpenedAt = null;
+
+      // An unclean close means Phoenix will keep trying to reconnect; a clean
+      // close (our own disconnect() or a graceful server close) means it won't,
+      // so the `online` handler shouldn't revive it.
+      this.awaitingReconnect = !event?.wasClean;
 
       const stayedConnected =
         openedAt !== null &&
@@ -198,10 +204,12 @@ class ApiClient {
       return;
     }
 
-    // Only act if the consumer previously opened a connection that isn't
-    // currently live. When the page is hidden, PageVisibilityManager owns the
+    // Only shortcut the backoff for a socket that is actually trying to
+    // reconnect. A cleanly/deliberately disconnected socket — or one that was
+    // never started — is left alone so we don't revive realtime the app chose
+    // to stop. When the page is hidden, PageVisibilityManager owns the
     // connection lifecycle, so leave it be.
-    if (!this.socketWasActive || socket.isConnected()) {
+    if (!this.awaitingReconnect || socket.isConnected()) {
       return;
     }
 
