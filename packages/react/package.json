@@ -10,6 +10,7 @@
   "typings": "dist/types/index.d.ts",
   "style": "dist/index.css",
   "exports": {
+    "./package.json": "./package.json",
     "./dist/index.css": "./dist/index.css",
     ".": {
       "require": "./dist/cjs/index.js",
