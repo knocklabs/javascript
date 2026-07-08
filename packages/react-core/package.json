@@ -10,6 +10,7 @@
   "typings": "dist/types/index.d.ts",
   "react-native": "./src/index.ts",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "types": "./dist/types/index.d.ts",
       "react-native": "./src/index.ts",
