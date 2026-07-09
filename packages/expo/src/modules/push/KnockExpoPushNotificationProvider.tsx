@@ -1,5 +1,5 @@
 import { Message, MessageEngagementStatus } from "@knocklabs/client";
-import { useKnockClient } from "@knocklabs/react-core";
+import { useKnockAuthState, useKnockClient } from "@knocklabs/react-core";
 import {
   KnockPushNotificationProvider,
   usePushNotifications,
@@ -67,6 +67,8 @@ const InternalExpoPushNotificationProvider: React.FC<
   autoRegister = true,
 }) => {
   const knockClient = useKnockClient();
+  const { status: authStatus } = useKnockAuthState(knockClient);
+  const isAuthenticated = authStatus === "authenticated";
   const { registerPushTokenToChannel, unregisterPushTokenFromChannel } =
     usePushNotifications();
 
@@ -150,6 +152,15 @@ const InternalExpoPushNotificationProvider: React.FC<
         return;
       }
 
+      // Skip when there's no authenticated user (e.g. a notification tapped
+      // after logout) — otherwise this fires a messages request with no user.
+      if (!knockClient.isAuthenticated()) {
+        knockClient.log(
+          "[Knock] Skipping status update; user is not authenticated",
+        );
+        return;
+      }
+
       return knockClient.messages.updateStatus(messageId, status);
     },
     [knockClient],
@@ -167,9 +178,12 @@ const InternalExpoPushNotificationProvider: React.FC<
     NotificationsModule.setNotificationHandler({ handleNotification });
   }, [customNotificationHandler]);
 
-  // Auto-register for push notifications on mount if enabled
+  // Auto-register for push notifications once there is an authenticated user.
+  // Gating on auth defers the OS permission prompt (prompting a logged-out user
+  // is hostile) and avoids registering a token against no user. Because
+  // `isAuthenticated` is a dependency, enabling auth later re-runs registration.
   useEffect(() => {
-    if (!autoRegister) {
+    if (!autoRegister || !isAuthenticated) {
       return;
     }
 
@@ -195,6 +209,7 @@ const InternalExpoPushNotificationProvider: React.FC<
     };
   }, [
     autoRegister,
+    isAuthenticated,
     knockExpoChannelId,
     registerForPushNotifications,
     registerPushTokenToChannel,

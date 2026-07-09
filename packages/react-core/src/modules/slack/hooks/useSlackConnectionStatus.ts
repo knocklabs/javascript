@@ -1,6 +1,7 @@
 import Knock from "@knocklabs/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { useKnockAuthState } from "../../core/hooks/useKnockAuthState";
 import { type ConnectionStatus } from "../../core/types";
 import { useTranslations } from "../../i18n";
 
@@ -31,10 +32,23 @@ function useSlackConnectionStatus(
   tenantId: string,
 ): UseSlackConnectionStatusOutput {
   const { t } = useTranslations();
+  const { userId } = useKnockAuthState(knock);
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("connecting");
   const [errorLabel, setErrorLabel] = useState<string | null>(null);
   const [actionLabel, setActionLabel] = useState<string | null>(null);
+
+  // When the authenticated user changes (login, logout, or switch), reset back
+  // to "connecting" so the effect below re-runs `authCheck` for the new user
+  // instead of leaving the previous user's latched status in place.
+  const previousUserIdRef = useRef(userId);
+  useEffect(() => {
+    if (previousUserIdRef.current !== userId) {
+      previousUserIdRef.current = userId;
+      setConnectionStatus("connecting");
+      setErrorLabel(null);
+    }
+  }, [userId]);
 
   useEffect(() => {
     const checkAuthStatus = async () => {

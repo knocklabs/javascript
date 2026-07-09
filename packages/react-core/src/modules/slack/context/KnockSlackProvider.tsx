@@ -58,6 +58,7 @@ export const KnockSlackProvider: React.FC<
   return (
     <SlackProviderStateContext.Provider
       key={slackProviderKey({
+        userId: knock.userId,
         knockSlackChannelId,
         tenantId,
         connectionStatus,
