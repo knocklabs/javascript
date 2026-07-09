@@ -60,6 +60,24 @@ export interface AuthenticateOptions {
   identificationStrategy?: "inline" | "skip";
 }
 
+/**
+ * Whether a `Knock` instance currently has a user identity to act on behalf of.
+ * When `unauthenticated`, the instance is fully quiescent: no network requests
+ * and no real-time socket activity occur until `authenticate` is called.
+ */
+export type KnockAuthStatus = "authenticated" | "unauthenticated";
+
+/**
+ * The shape of the subscribable auth-state store exposed on `knock.authStore`.
+ * Subsystems and React hooks can subscribe to this to react to auth transitions
+ * (login / logout / user switch) without polling `isAuthenticated()`.
+ */
+export interface KnockAuthState {
+  status: KnockAuthStatus;
+  userId: UserId;
+  userToken: string | undefined;
+}
+
 export interface BulkOperation {
   id: string;
   name: string;
