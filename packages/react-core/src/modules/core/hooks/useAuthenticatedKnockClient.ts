@@ -73,12 +73,6 @@ function useAuthenticatedKnockClient(
 ) {
   const knockRef = React.useRef<Knock | undefined>(undefined);
 
-  // Tracks whether the current client was torn down by a prior effect cleanup
-  // (e.g. a React StrictMode simulated unmount) so we can rebuild it.
-  const disposedRef = React.useRef(false);
-  // Bumping this forces the memo below to build a fresh client after a teardown.
-  const [generation, setGeneration] = React.useState(0);
-
   const { enabled = true, ...authenticateOptions } = options;
 
   const stableOptions = useStableOptions(authenticateOptions);
@@ -141,34 +135,14 @@ function useAuthenticatedKnockClient(
     knockRef.current = knock;
 
     return knock;
-    // `generation` is included so a post-teardown revival (in the effect below)
-    // rebuilds the client; it is intentionally not read in the memo body.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    apiKey,
-    enabled,
-    stableUserIdOrObject,
-    userToken,
-    stableOptions,
-    generation,
-  ]);
+  }, [apiKey, enabled, stableUserIdOrObject, userToken, stableOptions]);
 
   // Tear the client down when the provider unmounts so we don't leak the socket,
-  // the token-expiration timer, or the page-visibility listener. Uses empty deps
-  // so it only fires on real unmount (transition teardown is handled in the memo
-  // above, and firing here on every `knock` change would double-tear-down).
-  //
-  // StrictMode double-invokes effects: the simulated unmount tears the client
-  // down, so on the simulated remount we rebuild a fresh one (mirrors the
-  // dispose/re-init pattern in `useNotifications`).
+  // the token-expiration timer, or the page-visibility listener. Transition
+  // teardown is handled in the memo above, so this uses empty deps to fire only
+  // on unmount.
   React.useEffect(() => {
-    if (disposedRef.current) {
-      disposedRef.current = false;
-      setGeneration((g) => g + 1);
-    }
-
     return () => {
-      disposedRef.current = true;
       knockRef.current?.teardown();
     };
   }, []);
