@@ -1006,5 +1006,98 @@ describe("API Client", () => {
 
       (global as GlobalWithWindow).window = originalWindow;
     });
+
+    test("online event is a no-op when there is no socket", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      const addEventListener = vi.fn();
+      (global as GlobalWithWindow).window = {
+        addEventListener,
+        removeEventListener: vi.fn(),
+      };
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      const onlineHandler = addEventListener.mock.calls.find(
+        (call) => call[0] === "online",
+      )![1] as () => void;
+
+      const socket = apiClient.socket as unknown as MockSocket;
+      // Simulate a torn-down / missing socket.
+      (apiClient as unknown as { socket: undefined }).socket = undefined;
+
+      expect(() => onlineHandler()).not.toThrow();
+      expect(socket.disconnect).not.toHaveBeenCalled();
+      expect(socket.connect).not.toHaveBeenCalled();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("online event does not reconnect an already-connected socket", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      const addEventListener = vi.fn();
+      (global as GlobalWithWindow).window = {
+        addEventListener,
+        removeEventListener: vi.fn(),
+      };
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      const onlineHandler = addEventListener.mock.calls.find(
+        (call) => call[0] === "online",
+      )![1] as () => void;
+
+      const socket = apiClient.socket as unknown as MockSocket;
+      socket.isConnected.mockReturnValue(true);
+      // Awaiting a reconnect, but already connected — nothing to do.
+      getOnCloseHandler(apiClient)({ wasClean: false });
+
+      onlineHandler();
+      expect(socket.disconnect).not.toHaveBeenCalled();
+
+      (global as GlobalWithWindow).window = originalWindow;
+    });
+
+    test("online event does not reconnect while the page is hidden", () => {
+      const originalWindow = (global as GlobalWithWindow).window;
+      const originalDocument = (global as GlobalWithWindow).document;
+      const addEventListener = vi.fn();
+      (global as GlobalWithWindow).window = {
+        addEventListener,
+        removeEventListener: vi.fn(),
+      };
+      // A hidden page: PageVisibilityManager owns the reconnect lifecycle here.
+      (global as GlobalWithWindow).document = { hidden: true };
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+        disconnectOnPageHidden: false,
+      });
+
+      const onlineHandler = addEventListener.mock.calls.find(
+        (call) => call[0] === "online",
+      )![1] as () => void;
+
+      const socket = apiClient.socket as unknown as MockSocket;
+      socket.isConnected.mockReturnValue(false);
+      getOnCloseHandler(apiClient)({ wasClean: false });
+
+      onlineHandler();
+      expect(socket.disconnect).not.toHaveBeenCalled();
+
+      (global as GlobalWithWindow).window = originalWindow;
+      (global as GlobalWithWindow).document = originalDocument;
+    });
   });
 });
