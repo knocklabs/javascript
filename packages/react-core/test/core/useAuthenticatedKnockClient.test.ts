@@ -294,4 +294,107 @@ describe("useAuthenticatedKnockClient", () => {
 
     expect(result.current.branch).toEqual(TEST_BRANCH_SLUG);
   });
+
+  describe("enabled option", () => {
+    it("creates an unauthenticated, quiescent client when enabled is false", () => {
+      const { result } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userToken: "token_123",
+            options: { enabled: false },
+          },
+        },
+      );
+
+      expect(result.current).toBeInstanceOf(Knock);
+      expect(result.current.isAuthenticated()).toBe(false);
+      expect(result.current.userId).toBeUndefined();
+    });
+
+    it("authenticates with a fresh instance when enabled flips true (like a login)", () => {
+      const { result, rerender } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userToken: "token_123",
+            options: { enabled: false },
+          },
+        },
+      );
+
+      const disabledInstance = result.current;
+      expect(disabledInstance.isAuthenticated()).toBe(false);
+
+      rerender({
+        ...defaultProps,
+        userToken: "token_123",
+        options: { enabled: true },
+      });
+
+      // A brand-new instance is required so the feed subtree remounts and refetches.
+      expect(result.current).not.toBe(disabledInstance);
+      expect(result.current.isAuthenticated()).toBe(true);
+      expect(result.current.userId).toEqual("user_123");
+    });
+
+    it("tears down and creates a fresh unauthenticated instance when enabled flips false (like a logout)", () => {
+      const { result, rerender } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: {
+            ...defaultProps,
+            userToken: "token_123",
+            options: { enabled: true },
+          },
+        },
+      );
+
+      const enabledInstance = result.current;
+      expect(enabledInstance.isAuthenticated()).toBe(true);
+      const teardownSpy = vi.spyOn(enabledInstance, "teardown");
+
+      rerender({
+        ...defaultProps,
+        userToken: "token_123",
+        options: { enabled: false },
+      });
+
+      expect(teardownSpy).toHaveBeenCalled();
+      // Fresh instance guarantees the previous user's stores don't linger.
+      expect(result.current).not.toBe(enabledInstance);
+      expect(result.current.isAuthenticated()).toBe(false);
+    });
+
+    it("defaults to enabled (authenticated) when the option is omitted", () => {
+      const { result } = renderHook(
+        ({ apiKey, userId, userToken, options }) =>
+          useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+        {
+          initialProps: { ...defaultProps, userToken: "token_123" },
+        },
+      );
+
+      expect(result.current.isAuthenticated()).toBe(true);
+    });
+  });
+
+  it("tears down the client on unmount", () => {
+    const { result, unmount } = renderHook(
+      ({ apiKey, userId, userToken, options }) =>
+        useAuthenticatedKnockClient(apiKey, userId, userToken, options),
+      { initialProps: { ...defaultProps, userToken: "token_123" } },
+    );
+
+    const teardownSpy = vi.spyOn(result.current, "teardown");
+
+    unmount();
+
+    expect(teardownSpy).toHaveBeenCalled();
+  });
 });

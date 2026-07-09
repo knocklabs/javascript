@@ -26,6 +26,26 @@ export type KnockProviderProps = {
   i18n?: I18nContent;
   logLevel?: LogLevel;
   branch?: string;
+  /**
+   * When `false`, render children but keep the Knock client unauthenticated and
+   * fully quiescent — no identify, network, or socket activity. Flipping it to
+   * `true` authenticates and mounts everything (like a login); flipping it back
+   * to `false` tears everything down (like a logout). Defaults to `true`.
+   *
+   * This is the recommended way to gate the provider on a complete identity —
+   * e.g. an enhanced-security token that loads asynchronously — instead of
+   * conditionally mounting `KnockProvider`:
+   *
+   * ```tsx
+   * <KnockProvider
+   *   apiKey={apiKey}
+   *   user={{ id: userId }}
+   *   userToken={userToken}
+   *   enabled={Boolean(userId && userToken)}
+   * >
+   * ```
+   */
+  enabled?: boolean;
 } & (
   | {
       /**
@@ -66,6 +86,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   i18n,
   identificationStrategy,
   branch,
+  enabled,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -79,6 +100,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       logLevel,
       identificationStrategy,
       branch,
+      enabled,
     }),
     [
       host,
@@ -87,6 +109,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       logLevel,
       identificationStrategy,
       branch,
+      enabled,
     ],
   );
 
