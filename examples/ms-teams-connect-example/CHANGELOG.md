@@ -1,5 +1,14 @@
 # ms-teams-connect-example
 
+## 0.0.70
+
+### Patch Changes
+
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+  - @knocklabs/react@0.11.23
+
 ## 0.0.69
 
 ### Patch Changes

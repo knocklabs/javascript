@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.21.14
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 3dd0aa8: Remove the `jwt-decode` dependency in favor of an internal JWT payload decoder.
+- b6c9be4: Replace the internal axios transport with native fetch and remove axios dependencies.
+
 ## 0.21.13
 
 ### Patch Changes

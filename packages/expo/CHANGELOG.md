@@ -1,5 +1,20 @@
 # @knocklabs/expo
 
+## 0.6.8
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+  - @knocklabs/react-core@0.13.15
+  - @knocklabs/react-native@0.9.8
+
 ## 0.6.7
 
 ### Patch Changes
