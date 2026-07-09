@@ -43,6 +43,26 @@ knockClient.authenticate(
 );
 ```
 
+### Logging out and authentication state
+
+While a client is unauthenticated it is fully quiescent: user-scoped calls (feed
+fetches, mark-as-read, guides, Slack/Teams checks, etc.) become no-ops rather
+than firing requests or throwing, and no real-time socket is opened. This makes
+it safe to construct a client before you have a user.
+
+Call `logout()` to clear the current user and tear down all stateful
+connections (the socket, the token-expiration timer, and the page-visibility
+listener):
+
+```typescript
+knockClient.logout();
+```
+
+You can observe authentication state via `knockClient.authStatus`
+(`"authenticated" | "unauthenticated"`) or subscribe to the `knockClient.authStore`
+for changes. In React, prefer the `enabled` prop on `KnockProvider` (see
+`@knocklabs/react`), which manages this lifecycle for you.
+
 ### Retrieving new items from the feed
 
 ```typescript
