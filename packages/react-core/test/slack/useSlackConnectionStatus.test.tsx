@@ -125,7 +125,11 @@ describe("useSlackConnectionStatus", () => {
     // Switching users must reset the latched status and re-run authCheck.
     rerender({ knock: buildKnockWithUser("user_B") });
 
-    await waitFor(() => expect(authCheck).toHaveBeenCalledTimes(2));
-    expect(result.current.connectionStatus).toBe("connected");
+    // Wait for the re-check to resolve back to "connected" (which only happens
+    // after the second authCheck resolves), then assert it ran again.
+    await waitFor(() =>
+      expect(result.current.connectionStatus).toBe("connected"),
+    );
+    expect(authCheck).toHaveBeenCalledTimes(2);
   });
 });
