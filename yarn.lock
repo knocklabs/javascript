@@ -5000,7 +5000,7 @@ __metadata:
     "@manypkg/cli": "npm:^0.25.0"
     "@vitest/coverage-v8": "npm:^3.2.4"
     prettier: "npm:^3.5.3"
-    turbo: "npm:^2.5.8"
+    turbo: "npm:^2.9.16"
     vitest: "npm:^3.2.4"
   dependenciesMeta:
     "@swc/core":
@@ -8136,6 +8136,48 @@ __metadata:
     svelte:
       optional: true
   checksum: 10c0/62ee7d74c9cb6318cf7b3a6faf8fb794853c30bae6dc9e27c9ae1b22ffd160d45286c0c143881064020329edd6ec8ae529d625dbe5e2867e092886d84b1a13fe
+  languageName: node
+  linkType: hard
+
+"@turbo/darwin-64@npm:2.9.16":
+  version: 2.9.16
+  resolution: "@turbo/darwin-64@npm:2.9.16"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@turbo/darwin-arm64@npm:2.9.16":
+  version: 2.9.16
+  resolution: "@turbo/darwin-arm64@npm:2.9.16"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@turbo/linux-64@npm:2.9.16":
+  version: 2.9.16
+  resolution: "@turbo/linux-64@npm:2.9.16"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@turbo/linux-arm64@npm:2.9.16":
+  version: 2.9.16
+  resolution: "@turbo/linux-arm64@npm:2.9.16"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@turbo/windows-64@npm:2.9.16":
+  version: 2.9.16
+  resolution: "@turbo/windows-64@npm:2.9.16"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@turbo/windows-arm64@npm:2.9.16":
+  version: 2.9.16
+  resolution: "@turbo/windows-arm64@npm:2.9.16"
+  conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
@@ -20893,74 +20935,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:2.5.8":
-  version: 2.5.8
-  resolution: "turbo-darwin-64@npm:2.5.8"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"turbo-darwin-arm64@npm:2.5.8":
-  version: 2.5.8
-  resolution: "turbo-darwin-arm64@npm:2.5.8"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"turbo-linux-64@npm:2.5.8":
-  version: 2.5.8
-  resolution: "turbo-linux-64@npm:2.5.8"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"turbo-linux-arm64@npm:2.5.8":
-  version: 2.5.8
-  resolution: "turbo-linux-arm64@npm:2.5.8"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"turbo-windows-64@npm:2.5.8":
-  version: 2.5.8
-  resolution: "turbo-windows-64@npm:2.5.8"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"turbo-windows-arm64@npm:2.5.8":
-  version: 2.5.8
-  resolution: "turbo-windows-arm64@npm:2.5.8"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"turbo@npm:^2.5.8":
-  version: 2.5.8
-  resolution: "turbo@npm:2.5.8"
+"turbo@npm:^2.9.16":
+  version: 2.9.16
+  resolution: "turbo@npm:2.9.16"
   dependencies:
-    turbo-darwin-64: "npm:2.5.8"
-    turbo-darwin-arm64: "npm:2.5.8"
-    turbo-linux-64: "npm:2.5.8"
-    turbo-linux-arm64: "npm:2.5.8"
-    turbo-windows-64: "npm:2.5.8"
-    turbo-windows-arm64: "npm:2.5.8"
+    "@turbo/darwin-64": "npm:2.9.16"
+    "@turbo/darwin-arm64": "npm:2.9.16"
+    "@turbo/linux-64": "npm:2.9.16"
+    "@turbo/linux-arm64": "npm:2.9.16"
+    "@turbo/windows-64": "npm:2.9.16"
+    "@turbo/windows-arm64": "npm:2.9.16"
   dependenciesMeta:
-    turbo-darwin-64:
+    "@turbo/darwin-64":
       optional: true
-    turbo-darwin-arm64:
+    "@turbo/darwin-arm64":
       optional: true
-    turbo-linux-64:
+    "@turbo/linux-64":
       optional: true
-    turbo-linux-arm64:
+    "@turbo/linux-arm64":
       optional: true
-    turbo-windows-64:
+    "@turbo/windows-64":
       optional: true
-    turbo-windows-arm64:
+    "@turbo/windows-arm64":
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/34e8dc87fc2c5d63c3cd5aede9068c1123509d88f9bb99283ffec1687de6ad6df7ebfb83a5d348580afb3fdac53af479456e36938a1b6ed80fc1c3416c6dc3f3
+  checksum: 10c0/490dd844ca4bd3adbe016b9828a74a8bcf83bd4bf3efbdddc06b79efc3c5f10f76d812c5194151cc1ab438c07fde6fb6a0898d8e34994355f4793aca242f9ac1
   languageName: node
   linkType: hard
 
