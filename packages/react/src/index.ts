@@ -79,6 +79,7 @@ export {
   type KnockProviderProps,
   type KnockProviderState,
   useAuthenticatedKnockClient,
+  useKnockAuthState,
   useKnockClient,
   useStableOptions,
   KnockFeedProvider,
