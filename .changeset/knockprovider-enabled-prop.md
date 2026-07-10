@@ -7,20 +7,15 @@
 
 Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
 
-When `enabled` is `false`, the provider renders its children but keeps the Knock client **unauthenticated and fully quiescent** — no identify, no network requests, and no real-time socket activity. Flipping it to `true` authenticates and mounts everything (like a login); flipping it back to `false` tears everything down and clears the client's stores (like a logout). It defaults to `true`, so existing usage is unchanged.
+When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
 
-This is the recommended replacement for conditionally mounting `KnockProvider`, and the canonical way to defer activity until you have a complete identity — e.g. an enhanced-security user token that loads asynchronously:
+Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
 
 ```tsx
-<KnockProvider
-  apiKey={apiKey}
-  user={{ id: userId }}
-  userToken={userToken}
-  enabled={Boolean(userId && userToken)}
->
+<KnockProvider apiKey={apiKey} user={{ id: userId }} userToken={userToken} enabled={Boolean(userId && userToken)} />
 ```
 
-Also fixed while here:
+Also fixed:
 
-- `useFeedSettings` no longer fires `GET /v1/users/undefined/feeds/.../settings` for an unauthenticated user.
-- `KnockProvider` now tears down its Knock client (socket, token-expiration timer, and page-visibility listener) on unmount instead of leaking it.
+- `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+- `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.

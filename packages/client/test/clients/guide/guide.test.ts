@@ -596,7 +596,7 @@ describe("KnockGuideClient", () => {
     });
   });
 
-  describe("Unauthenticated quiescence", () => {
+  describe("Does nothing when unauthenticated", () => {
     const unauthGuide = {
       __typename: "Guide",
       channel_id: channelId,

@@ -61,9 +61,9 @@ export interface AuthenticateOptions {
 }
 
 /**
- * Whether a `Knock` instance currently has a user identity to act on behalf of.
- * When `unauthenticated`, the instance is fully quiescent: no network requests
- * and no real-time socket activity occur until `authenticate` is called.
+ * Whether a `Knock` instance currently has a signed-in user. When
+ * `unauthenticated`, the instance stays idle (no requests, no websocket) until
+ * `authenticate` is called.
  */
 export type KnockAuthStatus = "authenticated" | "unauthenticated";
 

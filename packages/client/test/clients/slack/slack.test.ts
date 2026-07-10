@@ -511,7 +511,7 @@ describe("Slack Client", () => {
     });
   });
 
-  describe("Unauthenticated quiescence", () => {
+  describe("Does nothing when unauthenticated", () => {
     test("authCheck returns a disconnected shape without calling the API", async () => {
       const { knock, mockApiClient } = createMockKnock(); // not authenticated
       const client = new SlackClient(knock);

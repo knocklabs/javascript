@@ -198,10 +198,10 @@ class Knock {
    * (real-time feed channels, the socket, the token-expiration timer, and the
    * page-visibility listener).
    *
-   * After `logout()` the instance is fully quiescent — no network or socket
-   * activity occurs until `authenticate()` is called again. The API client is
-   * dropped so that a fresh one is lazily constructed on next use rather than
-   * holding an open socket + document listener while logged out.
+   * After `logout()` the instance stays idle (no requests, no websocket) until
+   * `authenticate()` is called again. The API client is dropped so a fresh one
+   * is built on next use, rather than holding an open socket and document
+   * listener while logged out.
    */
   logout() {
     this.log("Logging out and tearing down connections");

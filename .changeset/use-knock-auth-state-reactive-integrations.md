@@ -5,8 +5,8 @@
 "@knocklabs/expo": minor
 ---
 
-Add `useKnockAuthState()` and make the Slack, MS Teams, and Expo integrations react to authentication changes.
+Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
 
-- New `useKnockAuthState(knock)` hook subscribes to a client's authentication state (`{ status, userId, userToken }`), re-rendering on login, logout, or a user switch. Backed by the subscribable `authStore` on `@knocklabs/client`.
-- Slack and MS Teams connection status now reset and re-run `authCheck` when the authenticated user changes, instead of latching on the first check. The provider keys now include the userId so a user switch reliably re-renders consumers. Combined with the client-side guards, an unauthenticated user resolves to `disconnected` (never `error`) without a network request.
-- Expo: `autoRegister` now waits for an authenticated user before registering a push token — deferring the OS permission prompt (no longer prompting logged-out users) and re-running registration once a user signs in. A notification tapped while logged out no longer fires a message-status update.
+- New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+- Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+- Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.

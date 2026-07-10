@@ -27,14 +27,13 @@ export type KnockProviderProps = {
   logLevel?: LogLevel;
   branch?: string;
   /**
-   * When `false`, render children but keep the Knock client unauthenticated and
-   * fully quiescent — no identify, network, or socket activity. Flipping it to
-   * `true` authenticates and mounts everything (like a login); flipping it back
-   * to `false` tears everything down (like a logout). Defaults to `true`.
+   * When `false`, render children but keep the Knock client idle: no identify
+   * call, no API requests, and no websocket. Set it to `true` and it connects
+   * like a login; set it back to `false` and it disconnects like a logout.
+   * Defaults to `true`.
    *
-   * This is the recommended way to gate the provider on a complete identity —
-   * e.g. an enhanced-security token that loads asynchronously — instead of
-   * conditionally mounting `KnockProvider`:
+   * Use this to wait for a complete identity (for example, a user token that
+   * loads asynchronously) instead of conditionally mounting `KnockProvider`:
    *
    * ```tsx
    * <KnockProvider

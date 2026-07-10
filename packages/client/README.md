@@ -45,10 +45,10 @@ knockClient.authenticate(
 
 ### Logging out and authentication state
 
-While a client is unauthenticated it is fully quiescent: user-scoped calls (feed
-fetches, mark-as-read, guides, Slack/Teams checks, etc.) become no-ops rather
-than firing requests or throwing, and no real-time socket is opened. This makes
-it safe to construct a client before you have a user.
+While no user is signed in, the client stays idle: user-scoped calls (feed
+fetches, mark-as-read, Guides, Slack/Teams checks, and so on) do nothing instead
+of throwing or making requests, and no websocket is opened. This makes it safe
+to construct a client before you have a user.
 
 Call `logout()` to clear the current user and tear down all stateful
 connections (the socket, the token-expiration timer, and the page-visibility

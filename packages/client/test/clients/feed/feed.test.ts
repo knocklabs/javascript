@@ -1495,7 +1495,7 @@ describe("Feed", () => {
     });
   });
 
-  describe("Unauthenticated mutations are quiescent", () => {
+  describe("Does nothing when unauthenticated", () => {
     const getUnauthenticatedSetup = () => {
       const { knock, mockApiClient } = createMockKnock(); // not authenticated
       const feed = new Feed(

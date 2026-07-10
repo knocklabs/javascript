@@ -113,7 +113,7 @@ const YourAppLayout = () => {
 
 ## Deferring activity with `enabled`
 
-`KnockProvider` accepts an `enabled` prop (default `true`). When it is `false`, the provider renders its children but keeps the Knock client **unauthenticated and fully quiescent** — no user identification, network requests, or real-time socket connections. Auto push-notification registration also waits for `enabled` to become `true`, so a logged-out user is never shown the OS permission prompt. Setting it back to `true` authenticates and connects everything (like a login); setting it to `false` again tears everything down and clears the client's stores (like a logout).
+`KnockProvider` takes an `enabled` prop (default `true`). When it's `false`, the provider still renders its children but the Knock client sits idle: it doesn't identify the user, make any API requests, or open a websocket. Auto push-notification registration also waits for `enabled` to become `true`, so logged-out users never see the OS permission prompt. Set it back to `true` and it connects like a login; set it to `false` again and it disconnects and clears its data like a logout.
 
 This is the recommended way to gate the provider on a complete identity — for example an enhanced-security user token that loads asynchronously — instead of conditionally mounting `KnockProvider`:
 

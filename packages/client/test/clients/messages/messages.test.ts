@@ -748,7 +748,7 @@ describe("MessageClient", () => {
     });
   });
 
-  describe("Unauthenticated quiescence", () => {
+  describe("Does nothing when unauthenticated", () => {
     test("batchUpdateStatuses returns an empty array without calling the API", async () => {
       const { knock, mockApiClient } = createMockKnock(); // not authenticated
 

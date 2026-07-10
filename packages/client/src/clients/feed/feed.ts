@@ -165,11 +165,11 @@ class Feed {
   }
 
   /**
-   * Returns `true` when the current user is authenticated. When not, logs and
-   * returns `false` so mutation methods can no-op early — without touching the
-   * store (no optimistic update) or the network. This upholds the SDK-wide
-   * "unauthenticated ⇒ quiescent" invariant for auto-fired paths such as the
-   * popover's `markAllAsSeen` on open or a cell's `markAsInteracted` on click.
+   * Returns `true` when a user is signed in. When not, logs and returns `false`
+   * so mutation methods can skip early, without touching the store (no
+   * optimistic update) or the network. This matters for actions that fire
+   * automatically, like the popover's `markAllAsSeen` on open or a cell's
+   * `markAsInteracted` on click.
    */
   private canMutate(operation: string): boolean {
     if (this.knock.isAuthenticated()) {
