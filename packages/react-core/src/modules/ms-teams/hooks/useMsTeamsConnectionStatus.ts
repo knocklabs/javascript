@@ -36,10 +36,13 @@ function useMsTeamsConnectionStatus(
       previousUserIdRef.current = userId;
       setConnectionStatus("connecting");
       setErrorLabel(null);
+      setActionLabel(null);
     }
   }, [userId]);
 
   useEffect(() => {
+    let ignore = false;
+
     const checkAuthStatus = async () => {
       if (connectionStatus !== "connecting") return;
 
@@ -48,6 +51,10 @@ function useMsTeamsConnectionStatus(
           tenant: tenantId,
           knockChannelId: knockMsTeamsChannelId,
         });
+
+        // A newer user/tenant/instance superseded this check while it was in
+        // flight; drop its result so we don't latch the previous user's status.
+        if (ignore) return;
 
         if (authRes.connection?.ok === true) {
           return setConnectionStatus("connected");
@@ -73,12 +80,23 @@ function useMsTeamsConnectionStatus(
         // This is for any Knock errors that would require a reconnect.
         setConnectionStatus("error");
       } catch (_error) {
+        if (ignore) return;
         setConnectionStatus("error");
       }
     };
 
     checkAuthStatus();
-  }, [connectionStatus, tenantId, knockMsTeamsChannelId, knock.msTeams, t]);
+    return () => {
+      ignore = true;
+    };
+  }, [
+    connectionStatus,
+    tenantId,
+    knockMsTeamsChannelId,
+    knock.msTeams,
+    t,
+    userId,
+  ]);
 
   return {
     connectionStatus,

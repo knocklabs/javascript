@@ -47,10 +47,13 @@ function useSlackConnectionStatus(
       previousUserIdRef.current = userId;
       setConnectionStatus("connecting");
       setErrorLabel(null);
+      setActionLabel(null);
     }
   }, [userId]);
 
   useEffect(() => {
+    let ignore = false;
+
     const checkAuthStatus = async () => {
       if (connectionStatus !== "connecting") return;
 
@@ -59,6 +62,10 @@ function useSlackConnectionStatus(
           tenant: tenantId,
           knockChannelId: knockSlackChannelId,
         });
+
+        // A newer user/tenant/instance superseded this check while it was in
+        // flight; drop its result so we don't latch the previous user's status.
+        if (ignore) return;
 
         if (authRes.connection?.ok) {
           return setConnectionStatus("connected");
@@ -91,12 +98,16 @@ function useSlackConnectionStatus(
 
         setConnectionStatus("error");
       } catch (_error) {
+        if (ignore) return;
         setConnectionStatus("error");
       }
     };
 
     checkAuthStatus();
-  }, [connectionStatus, tenantId, knockSlackChannelId, knock.slack, t]);
+    return () => {
+      ignore = true;
+    };
+  }, [connectionStatus, tenantId, knockSlackChannelId, knock.slack, t, userId]);
 
   return {
     connectionStatus,
