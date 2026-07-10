@@ -230,6 +230,9 @@ class Knock {
   teardown() {
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
+      // Clear the reference so an in-flight refresh callback can detect that it
+      // was torn down and skip re-authenticating (see maybeScheduleUserTokenExpiration).
+      this.tokenExpirationTimer = null;
     }
     this.apiClient?.teardown();
   }
@@ -292,8 +295,16 @@ class Knock {
       // ^ now               ^ expiration offset       ^ expires at
       const msInFuture = expiresAtMs - timeBeforeExpirationInMs - nowMs;
 
-      this.tokenExpirationTimer = setTimeout(async () => {
+      const timerId = setTimeout(async () => {
         const newToken = await callbackFn(this.userToken as string, decoded);
+
+        // If we were torn down (logout/unmount) or re-authenticated while the
+        // callback was awaiting, the timer reference will have changed (or been
+        // cleared). Bail so we don't resurrect a logged-out instance by
+        // re-authenticating and re-opening connections.
+        if (this.tokenExpirationTimer !== timerId) {
+          return;
+        }
 
         // Reauthenticate which will handle reinitializing sockets
         if (typeof newToken === "string") {
@@ -303,6 +314,7 @@ class Knock {
           });
         }
       }, msInFuture);
+      this.tokenExpirationTimer = timerId;
     }
   }
 

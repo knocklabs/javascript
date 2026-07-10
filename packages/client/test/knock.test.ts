@@ -625,6 +625,44 @@ describe("Knock Client", () => {
 
       expect(onUserTokenExpiring).not.toHaveBeenCalled();
     });
+
+    test("does not re-authenticate from an in-flight token refresh after logout", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      const futureExp = Math.floor((Date.now() + 60000) / 1000);
+      vi.mocked(jwtDecode).mockReturnValueOnce({ exp: futureExp });
+
+      // A refresh callback we can hold open while the user logs out.
+      let resolveRefresh!: (token: string) => void;
+      const onUserTokenExpiring = vi.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            resolveRefresh = resolve;
+          }),
+      );
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      });
+      authenticateSpy.mockClear();
+
+      // Fire the refresh timer; the callback is now awaiting.
+      await vi.advanceTimersByTimeAsync(50000);
+      expect(onUserTokenExpiring).toHaveBeenCalled();
+
+      // The user logs out while the refresh is still in flight.
+      knock.logout();
+
+      // The refresh resolves with a fresh token.
+      resolveRefresh("token_new");
+      await vi.runAllTimersAsync();
+
+      // It must NOT resurrect the logged-out instance.
+      expect(authenticateSpy).not.toHaveBeenCalled();
+      expect(knock.isAuthenticated()).toBe(false);
+    });
   });
 
   describe("Authentication with reinitialize", () => {
