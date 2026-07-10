@@ -20,5 +20,9 @@
     "@knocklabs/types": "0.1.5",
     "@knocklabs/typescript-config": "0.0.2"
   },
-  "changesets": []
+  "changesets": [
+    "knockprovider-enabled-client",
+    "knockprovider-enabled-prop",
+    "use-knock-auth-state-reactive-integrations"
+  ]
 }

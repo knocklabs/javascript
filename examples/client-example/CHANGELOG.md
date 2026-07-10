@@ -1,5 +1,12 @@
 # client-example
 
+## 0.3.60-rc.0
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+  - @knocklabs/client@0.22.0-rc.0
+
 ## 0.3.59
 
 ### Patch Changes
