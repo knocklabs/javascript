@@ -296,7 +296,7 @@ describe("useAuthenticatedKnockClient", () => {
   });
 
   describe("enabled option", () => {
-    it("creates an unauthenticated, quiescent client when enabled is false", () => {
+    it("creates an idle, signed-out client when enabled is false", () => {
       const { result } = renderHook(
         ({ apiKey, userId, userToken, options }) =>
           useAuthenticatedKnockClient(apiKey, userId, userToken, options),

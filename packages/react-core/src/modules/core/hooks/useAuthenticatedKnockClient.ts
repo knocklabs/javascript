@@ -24,15 +24,14 @@ function authenticateWithOptions(
 export type AuthenticatedKnockClientOptions = KnockOptions &
   AuthenticateOptions & {
     /**
-     * When `false`, the Knock client is created but left **unauthenticated and
-     * fully quiescent** — no identify, no network requests, and no real-time
-     * socket activity — while children still render. Flipping it back to `true`
-     * authenticates and mounts everything, like a login; flipping it to `false`
-     * tears everything down, like a logout.
+     * When `false`, the Knock client is created but left idle: no identify call,
+     * no API requests, and no websocket, while children still render. Set it to
+     * `true` and it connects like a login; set it back to `false` and it
+     * disconnects like a logout.
      *
-     * The canonical use is to defer all activity until you have a complete
-     * identity — e.g. an enhanced-security user token that loads asynchronously
-     * (without this, a present `userId` with a not-yet-loaded token fires 401s):
+     * Use this to wait for a complete identity, for example a user token that
+     * loads asynchronously (without it, a present `userId` with a not-yet-loaded
+     * token fires 401s):
      *
      * ```tsx
      * useAuthenticatedKnockClient(apiKey, { id: userId }, userToken, {
@@ -79,9 +78,9 @@ function useAuthenticatedKnockClient(
   const stableUserIdOrObject = useStableOptions(userIdOrUserWithProperties);
 
   const knock = React.useMemo(() => {
-    // When disabled, behave as if no user was provided: null the credentials so
-    // a fresh, unauthenticated client is created and stays fully quiescent. This
-    // makes `enabled: false → true` behave like a login (and the reverse like a
+    // When disabled, behave as if no user was provided: drop the credentials so
+    // a fresh, signed-out client is created and stays idle. This makes
+    // `enabled: false -> true` behave like a login (and the reverse like a
     // logout) through the same code path headless hook consumers already use.
     const activeUserIdOrObject = enabled ? stableUserIdOrObject : undefined;
     const activeUserToken = enabled ? userToken : undefined;
