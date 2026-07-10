@@ -195,6 +195,36 @@ describe("KnockExpoPushNotificationProvider", () => {
     }
   });
 
+  test("skips the message-status update for a notification received while unauthenticated", () => {
+    mockKnockClient.isAuthenticated.mockReturnValue(false);
+    mockKnockClient.messages.updateStatus.mockClear();
+    mockNotifications.addNotificationReceivedListener.mockClear();
+
+    try {
+      const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+      render(
+        <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      // Fire the received-notification handler the provider registered, with a
+      // Knock notification (it has a knock_message_id).
+      const receivedHandler =
+        mockNotifications.addNotificationReceivedListener.mock.calls.at(-1)?.[0];
+      expect(receivedHandler).toBeDefined();
+      receivedHandler({
+        request: { content: { data: { knock_message_id: "msg_1" } } },
+      });
+
+      // The status update is skipped because no user is signed in.
+      expect(mockKnockClient.messages.updateStatus).not.toHaveBeenCalled();
+    } finally {
+      mockKnockClient.isAuthenticated.mockReturnValue(true);
+    }
+  });
+
   test("useExpoPushNotifications provides context values", () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">

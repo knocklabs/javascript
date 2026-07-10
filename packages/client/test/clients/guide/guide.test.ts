@@ -3867,6 +3867,31 @@ describe("KnockGuideClient", () => {
       expect(windowWithHistory.history.pushState).toBe(originalPushState);
       expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
     });
+
+    test("fires a location change when the patched history.pushState is called", () => {
+      const originalPushState = vi.fn();
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        location: { href: "https://example.com/next" },
+        history: { pushState: originalPushState, replaceState: vi.fn() },
+      });
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+      const setLocationSpy = vi.spyOn(client, "setLocation");
+
+      // Calling the patched pushState runs the original and schedules a check.
+      window.history.pushState(null, "", "/next");
+      expect(originalPushState).toHaveBeenCalled();
+
+      // The location check runs on the next tick.
+      vi.advanceTimersByTime(1);
+      expect(setLocationSpy).toHaveBeenCalledWith("https://example.com/next");
+    });
   });
 
   describe("private methods", () => {
