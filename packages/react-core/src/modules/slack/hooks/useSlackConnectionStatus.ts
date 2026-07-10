@@ -1,6 +1,7 @@
 import Knock from "@knocklabs/client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { useKnockAuthState } from "../../core/hooks/useKnockAuthState";
 import { type ConnectionStatus } from "../../core/types";
 import { useTranslations } from "../../i18n";
 
@@ -31,12 +32,28 @@ function useSlackConnectionStatus(
   tenantId: string,
 ): UseSlackConnectionStatusOutput {
   const { t } = useTranslations();
+  const { userId } = useKnockAuthState(knock);
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("connecting");
   const [errorLabel, setErrorLabel] = useState<string | null>(null);
   const [actionLabel, setActionLabel] = useState<string | null>(null);
 
+  // When the authenticated user changes (login, logout, or switch), reset back
+  // to "connecting" so the effect below re-runs `authCheck` for the new user
+  // instead of leaving the previous user's latched status in place.
+  const previousUserIdRef = useRef(userId);
   useEffect(() => {
+    if (previousUserIdRef.current !== userId) {
+      previousUserIdRef.current = userId;
+      setConnectionStatus("connecting");
+      setErrorLabel(null);
+      setActionLabel(null);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    let ignore = false;
+
     const checkAuthStatus = async () => {
       if (connectionStatus !== "connecting") return;
 
@@ -45,6 +62,10 @@ function useSlackConnectionStatus(
           tenant: tenantId,
           knockChannelId: knockSlackChannelId,
         });
+
+        // A newer user/tenant/instance superseded this check while it was in
+        // flight; drop its result so we don't latch the previous user's status.
+        if (ignore) return;
 
         if (authRes.connection?.ok) {
           return setConnectionStatus("connected");
@@ -77,12 +98,16 @@ function useSlackConnectionStatus(
 
         setConnectionStatus("error");
       } catch (_error) {
+        if (ignore) return;
         setConnectionStatus("error");
       }
     };
 
     checkAuthStatus();
-  }, [connectionStatus, tenantId, knockSlackChannelId, knock.slack, t]);
+    return () => {
+      ignore = true;
+    };
+  }, [connectionStatus, tenantId, knockSlackChannelId, knock.slack, t, userId]);
 
   return {
     connectionStatus,

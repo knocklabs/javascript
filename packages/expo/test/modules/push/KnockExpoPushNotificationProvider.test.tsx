@@ -81,6 +81,15 @@ const mockKnockClient = {
 
 vi.mock("@knocklabs/react-core", () => ({
   useKnockClient: () => mockKnockClient,
+  // Derive auth state from the same `isAuthenticated` mock so tests only have to
+  // toggle it in one place.
+  useKnockAuthState: () => ({
+    status: mockKnockClient.isAuthenticated()
+      ? "authenticated"
+      : "unauthenticated",
+    userId: mockKnockClient.isAuthenticated() ? "user_1" : undefined,
+    userToken: undefined,
+  }),
 }));
 
 describe("KnockExpoPushNotificationProvider", () => {
@@ -156,6 +165,64 @@ describe("KnockExpoPushNotificationProvider", () => {
     );
 
     expect(getByTestId("test-child")).toBeInTheDocument();
+  });
+
+  test("defers auto-registration and the OS prompt while unauthenticated", async () => {
+    mockKnockClient.isAuthenticated.mockReturnValue(false);
+    mockRegisterPushTokenToChannel.mockClear();
+    mockNotifications.getExpoPushTokenAsync.mockClear();
+
+    try {
+      const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+      const { getByTestId } = render(
+        <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      expect(getByTestId("test-child")).toBeInTheDocument();
+
+      // The auto-register effect must no-op: no channel registration and,
+      // crucially, no OS permission/token prompt for a logged-out user.
+      await waitFor(() => {
+        expect(getByTestId("test-child")).toBeInTheDocument();
+      });
+      expect(mockRegisterPushTokenToChannel).not.toHaveBeenCalled();
+      expect(mockNotifications.getExpoPushTokenAsync).not.toHaveBeenCalled();
+    } finally {
+      mockKnockClient.isAuthenticated.mockReturnValue(true);
+    }
+  });
+
+  test("skips the message-status update for a notification received while unauthenticated", () => {
+    mockKnockClient.isAuthenticated.mockReturnValue(false);
+    mockKnockClient.messages.updateStatus.mockClear();
+    mockNotifications.addNotificationReceivedListener.mockClear();
+
+    try {
+      const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+      render(
+        <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      // Fire the received-notification handler the provider registered, with a
+      // Knock notification (it has a knock_message_id).
+      const receivedHandler =
+        mockNotifications.addNotificationReceivedListener.mock.calls.at(-1)?.[0];
+      expect(receivedHandler).toBeDefined();
+      receivedHandler({
+        request: { content: { data: { knock_message_id: "msg_1" } } },
+      });
+
+      // The status update is skipped because no user is signed in.
+      expect(mockKnockClient.messages.updateStatus).not.toHaveBeenCalled();
+    } finally {
+      mockKnockClient.isAuthenticated.mockReturnValue(true);
+    }
   });
 
   test("useExpoPushNotifications provides context values", () => {

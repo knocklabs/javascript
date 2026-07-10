@@ -12,6 +12,15 @@ const buildMockKnock = (authCheckImpl: () => Promise<unknown>) => {
     msTeams: {
       authCheck: vi.fn(authCheckImpl),
     },
+    // Minimal subscribable auth store so `useKnockAuthState` can read the userId.
+    authStore: {
+      state: {
+        status: "authenticated",
+        userId: "user_1",
+        userToken: undefined,
+      },
+      subscribe: () => () => {},
+    },
   } as unknown as KnockClient;
 };
 
@@ -88,5 +97,39 @@ describe("useMsTeamsConnectionStatus", () => {
     );
 
     await waitFor(() => expect(result.current.connectionStatus).toBe("error"));
+  });
+
+  it("re-checks the connection when the authenticated user changes", async () => {
+    const authCheck = vi.fn(() =>
+      Promise.resolve({ connection: { ok: true } }),
+    );
+    const buildKnockWithUser = (userId: string) =>
+      ({
+        msTeams: { authCheck },
+        authStore: {
+          state: { status: "authenticated", userId, userToken: undefined },
+          subscribe: () => () => {},
+        },
+      }) as unknown as KnockClient;
+
+    const { result, rerender } = renderHook(
+      ({ knock }) => useMsTeamsConnectionStatus(knock, channelId, tenantId),
+      { initialProps: { knock: buildKnockWithUser("user_A") } },
+    );
+
+    await waitFor(() =>
+      expect(result.current.connectionStatus).toBe("connected"),
+    );
+    expect(authCheck).toHaveBeenCalledTimes(1);
+
+    // Switching users must reset the latched status and re-run authCheck.
+    rerender({ knock: buildKnockWithUser("user_B") });
+
+    // Wait for the re-check to resolve back to "connected" (which only happens
+    // after the second authCheck resolves), then assert it ran again.
+    await waitFor(() =>
+      expect(result.current.connectionStatus).toBe("connected"),
+    );
+    expect(authCheck).toHaveBeenCalledTimes(2);
   });
 });

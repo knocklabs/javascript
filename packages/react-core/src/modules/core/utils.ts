@@ -78,17 +78,19 @@ export function feedProviderKey(
   to trigger a re-render of the context when a key property changes.
 */
 export function slackProviderKey({
+  userId,
   knockSlackChannelId,
   tenantId,
   connectionStatus,
   errorLabel,
 }: {
+  userId?: Knock["userId"];
   knockSlackChannelId: string;
   tenantId: string;
   connectionStatus: string;
   errorLabel: string | null;
 }) {
-  return [knockSlackChannelId, tenantId, connectionStatus, errorLabel]
+  return [userId, knockSlackChannelId, tenantId, connectionStatus, errorLabel]
     .filter((f) => f !== null && f !== undefined)
     .join("-");
 }
@@ -98,17 +100,19 @@ export function slackProviderKey({
   to trigger a re-render of the context when a key property changes.
 */
 export function msTeamsProviderKey({
+  userId,
   knockMsTeamsChannelId,
   tenantId,
   connectionStatus,
   errorLabel,
 }: {
+  userId?: Knock["userId"];
   knockMsTeamsChannelId: string;
   tenantId: string;
   connectionStatus: string;
   errorLabel: string | null;
 }) {
-  return [knockMsTeamsChannelId, tenantId, connectionStatus, errorLabel]
+  return [userId, knockMsTeamsChannelId, tenantId, connectionStatus, errorLabel]
     .filter((f) => f !== null && f !== undefined)
     .join("-");
 }

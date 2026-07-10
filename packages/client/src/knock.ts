@@ -1,3 +1,5 @@
+import { Store } from "@tanstack/store";
+
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import MessageClient from "./clients/messages";
@@ -8,6 +10,8 @@ import SlackClient from "./clients/slack";
 import UserClient from "./clients/users";
 import {
   AuthenticateOptions,
+  KnockAuthState,
+  KnockAuthStatus,
   KnockOptions,
   LogLevel,
   UserId,
@@ -34,6 +38,18 @@ class Knock {
   readonly msTeams = new MsTeamsClient(this);
   readonly user = new UserClient(this);
   readonly messages = new MessageClient(this);
+
+  /**
+   * A subscribable store describing whether this instance is currently
+   * authenticated. Fired on `authenticate()` and `logout()`. Subsystems (feed,
+   * guides, Slack/Teams status, push registration) and React hooks can
+   * subscribe to react to auth transitions without polling `isAuthenticated()`.
+   */
+  readonly authStore = new Store<KnockAuthState>({
+    status: "unauthenticated",
+    userId: undefined,
+    userToken: undefined,
+  });
 
   constructor(
     readonly apiKey: string,
@@ -90,13 +106,14 @@ class Knock {
     const currentApiClient = this.apiClient;
     const userId = this.getUserId(userIdOrUserWithProperties);
     const identificationStrategy = options?.identificationStrategy || "inline";
+    const credentialsChanged =
+      this.userId !== userId || this.userToken !== userToken;
 
-    // If we've previously been initialized and the values have now changed, then we
-    // need to reinitialize any stateful connections we have
-    if (
-      currentApiClient &&
-      (this.userId !== userId || this.userToken !== userToken)
-    ) {
+    // If the credentials have changed and we have stateful connections to
+    // rewire, then we need to reinitialize them. This covers both an in-place
+    // user/token switch (live API client) and re-authenticating after a
+    // `logout()` cleared the API client but left feed instances in place.
+    if (credentialsChanged && (currentApiClient || this.feeds.hasInstances())) {
       this.log("userId or userToken changed; reinitializing connections");
       this.feeds.teardownInstances();
       this.teardown();
@@ -123,6 +140,11 @@ class Knock {
       this.feeds.reinitializeInstances();
       this.log("Reinitialized real-time connections");
     }
+
+    // Notify subscribers of the (possibly changed) auth state. Done before the
+    // inline identify below so subscribers observe the new credentials
+    // regardless of identification strategy.
+    this.syncAuthState();
 
     // We explicitly skip the inline identification if the strategy is set to "skip"
     if (identificationStrategy === "skip") {
@@ -166,12 +188,75 @@ class Knock {
     return checkUserToken ? !!(this.userId && this.userToken) : !!this.userId;
   }
 
+  /** The current authentication status of this instance. */
+  get authStatus(): KnockAuthStatus {
+    return this.authStore.state.status;
+  }
+
+  /**
+   * Clears the current authentication and tears down all stateful connections
+   * (real-time feed channels, the socket, the token-expiration timer, and the
+   * page-visibility listener).
+   *
+   * After `logout()` the instance stays idle (no requests, no websocket) until
+   * `authenticate()` is called again. The API client is dropped so a fresh one
+   * is built on next use, rather than holding an open socket and document
+   * listener while logged out.
+   */
+  logout() {
+    this.log("Logging out and tearing down connections");
+
+    // Leave any joined feed channels before we drop the socket.
+    this.feeds.teardownInstances();
+
+    // Disconnect the socket, clear the token-expiration timer, and remove the
+    // page-visibility listener.
+    this.teardown();
+
+    // Clear credentials.
+    this.userId = undefined;
+    this.userToken = undefined;
+
+    // Drop the API client so a fresh one (with no socket/listener) is lazily
+    // constructed only if and when the instance is used again. Feed instances
+    // are left in place and get rewired by a subsequent `authenticate()`.
+    this.apiClient = null;
+
+    // Notify subscribers that we are now unauthenticated.
+    this.syncAuthState();
+  }
+
   // Used to teardown any connected instances
   teardown() {
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);
+      // Clear the reference so an in-flight refresh callback can detect that it
+      // was torn down and skip re-authenticating (see maybeScheduleUserTokenExpiration).
+      this.tokenExpirationTimer = null;
     }
     this.apiClient?.teardown();
+  }
+
+  /**
+   * Recomputes the auth status from the current credentials and pushes it into
+   * the subscribable auth store (no-op if nothing changed).
+   */
+  private syncAuthState() {
+    const status: KnockAuthStatus = this.isAuthenticated()
+      ? "authenticated"
+      : "unauthenticated";
+
+    this.authStore.setState((prev) => {
+      if (
+        prev.status === status &&
+        prev.userId === this.userId &&
+        prev.userToken === this.userToken
+      ) {
+        return prev;
+      }
+
+      return { status, userId: this.userId, userToken: this.userToken };
+    });
   }
 
   log(message: string, force = false) {
@@ -210,8 +295,16 @@ class Knock {
       // ^ now               ^ expiration offset       ^ expires at
       const msInFuture = expiresAtMs - timeBeforeExpirationInMs - nowMs;
 
-      this.tokenExpirationTimer = setTimeout(async () => {
+      const timerId = setTimeout(async () => {
         const newToken = await callbackFn(this.userToken as string, decoded);
+
+        // If we were torn down (logout/unmount) or re-authenticated while the
+        // callback was awaiting, the timer reference will have changed (or been
+        // cleared). Bail so we don't resurrect a logged-out instance by
+        // re-authenticating and re-opening connections.
+        if (this.tokenExpirationTimer !== timerId) {
+          return;
+        }
 
         // Reauthenticate which will handle reinitializing sockets
         if (typeof newToken === "string") {
@@ -221,6 +314,7 @@ class Knock {
           });
         }
       }, msInFuture);
+      this.tokenExpirationTimer = timerId;
     }
   }
 

@@ -7,6 +7,7 @@ export {
 export {
   useAuthenticatedKnockClient,
   useStableOptions,
+  useKnockAuthState,
   useAuthPostMessageListener,
   useAuthPolling,
 } from "./hooks";

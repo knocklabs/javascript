@@ -70,6 +70,80 @@ const checkForWindow = () => {
   }
 };
 
+type LocationListener = () => void;
+
+// State for the shared history monkey-patch is stored on the `history` object
+// itself so it is naturally scoped per-window and free of module-level globals.
+type PatchedHistory = History & {
+  __knockGuidePatch?: {
+    listeners: Set<LocationListener>;
+    originalPushState: History["pushState"];
+    originalReplaceState: History["replaceState"];
+  };
+};
+
+// Register a location-change listener, installing a single shared patch of
+// `history.pushState`/`replaceState` for programmatic navigation. This is
+// idempotent across guide client instances: a provider remount (e.g. toggling
+// `enabled`) constructs a new client while the old one is still tearing down, so
+// patching per-instance would nest proxies and clobber the restore. Sharing one
+// patch keyed on the `history` object avoids that entirely.
+const addHistoryLocationListener = (
+  history: PatchedHistory,
+  listener: LocationListener,
+) => {
+  if (!history.__knockGuidePatch) {
+    const listeners = new Set<LocationListener>();
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    // Notify on the next tick so the browser state can settle first.
+    const notify = () =>
+      setTimeout(() => {
+        for (const l of listeners) l();
+      }, 0);
+
+    const wrap = <T extends History["pushState"] | History["replaceState"]>(
+      target: T,
+    ): T =>
+      new Proxy(target, {
+        apply: (fn, thisArg, args) => {
+          const result = Reflect.apply(fn, thisArg, args);
+          notify();
+          return result;
+        },
+      }) as T;
+
+    history.pushState = wrap(originalPushState);
+    history.replaceState = wrap(originalReplaceState);
+    history.__knockGuidePatch = {
+      listeners,
+      originalPushState,
+      originalReplaceState,
+    };
+  }
+
+  history.__knockGuidePatch.listeners.add(listener);
+};
+
+// Remove a location-change listener, restoring the original history methods once
+// the last guide client on this window has gone away.
+const removeHistoryLocationListener = (
+  history: PatchedHistory,
+  listener: LocationListener,
+) => {
+  const patch = history.__knockGuidePatch;
+  if (!patch) return;
+
+  patch.listeners.delete(listener);
+
+  if (patch.listeners.size === 0) {
+    history.pushState = patch.originalPushState;
+    history.replaceState = patch.originalReplaceState;
+    delete history.__knockGuidePatch;
+  }
+};
+
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
@@ -196,10 +270,6 @@ export class KnockGuideClient {
   ];
   private subscribeRetryCount = 0;
 
-  // Original history methods to monkey patch, or restore in cleanups.
-  private pushStateFn: History["pushState"] | undefined;
-  private replaceStateFn: History["replaceState"] | undefined;
-
   // Guides that are competing to render are "staged" first without rendering
   // and ranked based on its relative order in the group over a duration of time
   // to resolve and render the prevailing one.
@@ -278,9 +348,24 @@ export class KnockGuideClient {
     this.clearCounterInterval();
   }
 
-  async fetch(opts?: { filters?: QueryFilterParams; force?: boolean }) {
+  async fetch(opts?: {
+    filters?: QueryFilterParams;
+    force?: boolean;
+  }): Promise<QueryStatus> {
     this.knock.log("[Guide] .fetch");
-    this.knock.failIfNotAuthenticated();
+
+    // No user to fetch guides for. Return an error status (without caching it,
+    // so a later authenticated fetch still runs) rather than throwing — guide
+    // components auto-fire this and a throw crashes the host app.
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] User is not authenticated, skipping fetch");
+      return {
+        status: "error",
+        error: new Error(
+          "Not authenticated. Please call `authenticate` first.",
+        ),
+      };
+    }
 
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
@@ -341,8 +426,20 @@ export class KnockGuideClient {
   }
 
   subscribe() {
+    // No user to subscribe for; skip silently rather than throwing (this is
+    // reachable from guide components rendered while unauthenticated).
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] User is not authenticated, skipping subscribe");
+      return;
+    }
+
+    // Re-read the socket from the API client on every subscribe. Re-authenticating
+    // replaces the API client (and therefore its socket), so a socket captured
+    // once in the constructor goes stale and reconnects with old credentials.
+    // Reading it here keeps guide real-time working across re-auth (E12).
+    this.socket = this.knock.client().socket;
     if (!this.socket) return;
-    this.knock.failIfNotAuthenticated();
+
     this.knock.log("[Guide] Subscribing to real time updates");
 
     // Ensure a live socket connection if not yet connected.
@@ -897,6 +994,10 @@ export class KnockGuideClient {
   //
 
   async markAsSeen(guide: GuideData, step: GuideStepData) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] User is not authenticated, skipping markAsSeen");
+      return;
+    }
     if (step.message.seen_at) return;
 
     this.knock.log(
@@ -934,6 +1035,13 @@ export class KnockGuideClient {
     step: GuideStepData,
     metadata?: GenericData,
   ) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Guide] User is not authenticated, skipping markAsInteracted",
+      );
+      return;
+    }
+
     this.knock.log(
       `[Guide] Marking as interacted (Guide key: ${guide.key}; Step ref:${step.ref})`,
     );
@@ -966,6 +1074,12 @@ export class KnockGuideClient {
   }
 
   async markAsArchived(guide: GuideData, step: GuideStepData) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Guide] User is not authenticated, skipping markAsArchived",
+      );
+      return;
+    }
     if (step.message.archived_at) return;
 
     this.knock.log(
@@ -1279,31 +1393,13 @@ export class KnockGuideClient {
       // 2. Listen for hash changes in case it's used for routing.
       win.addEventListener("hashchange", this.handleLocationChange);
 
-      // 3. Monkey-patch history methods to catch programmatic navigation.
-      const pushStateFn = win.history.pushState;
-      const replaceStateFn = win.history.replaceState;
-
-      // Use setTimeout to allow the browser state to potentially settle.
-      win.history.pushState = new Proxy(pushStateFn, {
-        apply: (target, history, args) => {
-          Reflect.apply(target, history, args);
-          setTimeout(() => {
-            this.handleLocationChange();
-          }, 0);
-        },
-      });
-      win.history.replaceState = new Proxy(replaceStateFn, {
-        apply: (target, history, args) => {
-          Reflect.apply(target, history, args);
-          setTimeout(() => {
-            this.handleLocationChange();
-          }, 0);
-        },
-      });
-
-      // 4. Keep refs to the original handlers so we can restore during cleanup.
-      this.pushStateFn = pushStateFn;
-      this.replaceStateFn = replaceStateFn;
+      // 3. Catch programmatic navigation via a shared history patch. This is
+      // idempotent across guide client instances so a remount doesn't nest
+      // patches (see `addHistoryLocationListener`).
+      addHistoryLocationListener(
+        win.history as PatchedHistory,
+        this.handleLocationChange,
+      );
     } else {
       this.knock.log(
         "[Guide] Unable to access the `window.history` object to detect location changes",
@@ -1318,14 +1414,10 @@ export class KnockGuideClient {
     win.removeEventListener("popstate", this.handleLocationChange);
     win.removeEventListener("hashchange", this.handleLocationChange);
 
-    if (this.pushStateFn) {
-      win.history.pushState = this.pushStateFn;
-      this.pushStateFn = undefined;
-    }
-    if (this.replaceStateFn) {
-      win.history.replaceState = this.replaceStateFn;
-      this.replaceStateFn = undefined;
-    }
+    removeHistoryLocationListener(
+      win.history as PatchedHistory,
+      this.handleLocationChange,
+    );
   }
 
   static getToolbarRunConfigFromUrl() {

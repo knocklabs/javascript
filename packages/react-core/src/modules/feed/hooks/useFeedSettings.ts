@@ -19,6 +19,15 @@ function useFeedSettings(feedClient: Feed): {
   useEffect(() => {
     async function getSettings() {
       const knock = feedClient.knock;
+
+      // Skip the branding fetch when there's no authenticated user — otherwise
+      // we'd fire `GET /v1/users/undefined/feeds/.../settings`. When the user
+      // authenticates the feed subtree remounts (its `feedProviderKey` includes
+      // the userId), which re-runs this effect with a real user.
+      if (!knock.isAuthenticated()) {
+        return;
+      }
+
       const apiClient = knock.client();
       const feedSettingsPath = `/v1/users/${knock.userId}/feeds/${feedClient.feedId}/settings`;
       setIsLoading(true);
