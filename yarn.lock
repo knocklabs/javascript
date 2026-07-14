@@ -17338,7 +17338,7 @@ __metadata:
     sonner: "npm:^2.0.7"
     swr: "npm:^2.4.1"
     typescript: "npm:^5.8.3"
-    uuid: "npm:^11.1.0"
+    uuid: "npm:^14.0.1"
   languageName: unknown
   linkType: soft
 
@@ -17378,7 +17378,7 @@ __metadata:
     sonner: "npm:^2.0.7"
     swr: "npm:^2.4.1"
     typescript: "npm:^5.8.3"
-    uuid: "npm:^11.1.0"
+    uuid: "npm:^14.0.1"
   languageName: unknown
   linkType: soft
 
@@ -21526,12 +21526,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^11.1.0":
-  version: 11.1.0
-  resolution: "uuid@npm:11.1.0"
+"uuid@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "uuid@npm:14.0.1"
   bin:
-    uuid: dist/esm/bin/uuid
-  checksum: 10c0/34aa51b9874ae398c2b799c88a127701408cd581ee89ec3baa53509dd8728cbb25826f2a038f9465f8b7be446f0fbf11558862965b18d21c993684297628d4d3
+    uuid: dist-node/bin/uuid
+  checksum: 10c0/2d961289097cb68c37d93d1da0b5c3aafc1eb9948a455cca8d0ae53a099b2fe583b8933254a84097f700e6bac2e23033364904df0467c22551d5d9611febcaf6
   languageName: node
   linkType: hard
 
