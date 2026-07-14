@@ -21,6 +21,7 @@
     "@knocklabs/typescript-config": "0.0.2"
   },
   "changesets": [
+    "expo-push-reregister-on-user-switch",
     "knockprovider-enabled-client",
     "knockprovider-enabled-prop",
     "use-knock-auth-state-reactive-integrations"
