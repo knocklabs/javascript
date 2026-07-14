@@ -67,7 +67,7 @@ const InternalExpoPushNotificationProvider: React.FC<
   autoRegister = true,
 }) => {
   const knockClient = useKnockClient();
-  const { status: authStatus } = useKnockAuthState(knockClient);
+  const { status: authStatus, userId } = useKnockAuthState(knockClient);
   const isAuthenticated = authStatus === "authenticated";
   const { registerPushTokenToChannel, unregisterPushTokenFromChannel } =
     usePushNotifications();
@@ -182,6 +182,9 @@ const InternalExpoPushNotificationProvider: React.FC<
   // Gating on auth defers the OS permission prompt (prompting a logged-out user
   // is hostile) and avoids registering a token against no user. Because
   // `isAuthenticated` is a dependency, enabling auth later re-runs registration.
+  // `userId` is also a dependency so that an in-place user switch (same Knock
+  // instance re-authenticated as a different user, where `isAuthenticated` never
+  // flips) re-registers the device token against the new user's channel data.
   useEffect(() => {
     if (!autoRegister || !isAuthenticated) {
       return;
@@ -210,6 +213,7 @@ const InternalExpoPushNotificationProvider: React.FC<
   }, [
     autoRegister,
     isAuthenticated,
+    userId,
     knockExpoChannelId,
     registerForPushNotifications,
     registerPushTokenToChannel,
