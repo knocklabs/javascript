@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.12.0
+
+### Minor Changes
+
+- e8567eb: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- e8567eb: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+  - @knocklabs/client@0.22.0
+  - @knocklabs/react-core@0.14.0
+
 ## 0.12.0-rc.0
 
 ### Minor Changes
