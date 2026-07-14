@@ -164,7 +164,25 @@ class Feed {
     return this.store.getState();
   }
 
+  /**
+   * Returns `true` when a user is signed in. When not, logs and returns `false`
+   * so mutation methods can skip early, without touching the store (no
+   * optimistic update) or the network. This matters for actions that fire
+   * automatically, like the popover's `markAllAsSeen` on open or a cell's
+   * `markAsInteracted` on click.
+   */
+  private canMutate(operation: string): boolean {
+    if (this.knock.isAuthenticated()) {
+      return true;
+    }
+
+    this.knock.log(`[Feed] User is not authenticated, skipping ${operation}`);
+    return false;
+  }
+
   async markAsSeen(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsSeen")) return;
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -177,6 +195,8 @@ class Feed {
   }
 
   async markAllAsSeen() {
+    if (!this.canMutate("markAllAsSeen")) return;
+
     // To mark all of the messages as seen we:
     // 1. Optimistically update *everything* we have in the store
     // 2. We decrement the `unseen_count` to zero optimistically
@@ -219,6 +239,8 @@ class Feed {
   }
 
   async markAsUnseen(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsUnseen")) return;
+
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
       "unseen",
@@ -230,6 +252,8 @@ class Feed {
   }
 
   async markAsRead(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsRead")) return;
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -242,6 +266,8 @@ class Feed {
   }
 
   async markAllAsRead() {
+    if (!this.canMutate("markAllAsRead")) return;
+
     // To mark all of the messages as read we:
     // 1. Optimistically update *everything* we have in the store
     // 2. We decrement the `unread_count` to zero optimistically
@@ -284,6 +310,8 @@ class Feed {
   }
 
   async markAsUnread(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsUnread")) return;
+
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
       "unread",
@@ -298,6 +326,8 @@ class Feed {
     itemOrItems: FeedItemOrItems,
     metadata?: Record<string, string>,
   ) {
+    if (!this.canMutate("markAsInteracted")) return;
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -321,6 +351,8 @@ class Feed {
   TODO: how do we handle rollbacks?
   */
   async markAsArchived(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsArchived")) return;
+
     const state = this.store.getState();
 
     const shouldOptimisticallyRemoveItems =
@@ -392,6 +424,8 @@ class Feed {
   }
 
   async markAllAsArchived() {
+    if (!this.canMutate("markAllAsArchived")) return;
+
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
@@ -419,6 +453,8 @@ class Feed {
   }
 
   async markAllReadAsArchived() {
+    if (!this.canMutate("markAllReadAsArchived")) return;
+
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
@@ -461,6 +497,8 @@ class Feed {
   }
 
   async markAsUnarchived(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsUnarchived")) return;
+
     const state = this.store.getState();
 
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
@@ -595,6 +633,8 @@ class Feed {
   }
 
   async fetchNextPage(options: FetchFeedOptions = {}) {
+    if (!this.canMutate("fetchNextPage")) return;
+
     // Attempts to fetch the next page of results (if we have any)
     const { pageInfo } = this.store.getState();
 

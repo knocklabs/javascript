@@ -3,12 +3,17 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import useFeedSettings from "../../src/modules/feed/hooks/useFeedSettings";
-import { createMockFeed, mockNetworkSuccess } from "../test-utils/mocks";
+import {
+  authenticateKnock,
+  createMockFeed,
+  mockNetworkSuccess,
+} from "../test-utils/mocks";
 
 describe("useFeedSettings", () => {
   it("fetches and returns feed settings", async () => {
     // Arrange: create a mock feed and stub network response
-    const { feed, mockApiClient } = createMockFeed("feed_123");
+    const { feed, knock, mockApiClient } = createMockFeed("feed_123");
+    authenticateKnock(knock);
 
     const fakeSettings = {
       features: {
@@ -36,7 +41,8 @@ describe("useFeedSettings", () => {
   });
 
   it("handles api error by returning null settings", async () => {
-    const { feed, mockApiClient } = createMockFeed("feed_123");
+    const { feed, knock, mockApiClient } = createMockFeed("feed_123");
+    authenticateKnock(knock);
 
     mockApiClient.makeRequest.mockResolvedValue({
       statusCode: "error",
@@ -57,7 +63,8 @@ describe("useFeedSettings", () => {
   });
 
   it("leaves settings null when a success response is missing the features payload", async () => {
-    const { feed, mockApiClient } = createMockFeed("feed_123");
+    const { feed, knock, mockApiClient } = createMockFeed("feed_123");
+    authenticateKnock(knock);
 
     // A degraded connection (captive portal / proxy) can return a 200 whose
     // body is not the feed settings object. We must not fabricate a default
@@ -73,5 +80,18 @@ describe("useFeedSettings", () => {
     });
 
     expect(result.current.settings).toBeNull();
+  });
+
+  it("does not fetch settings when the user is unauthenticated", async () => {
+    // No `authenticateKnock` here: the feed's knock has no user.
+    const { feed, mockApiClient } = createMockFeed("feed_123");
+
+    const { result } = renderHook(() =>
+      useFeedSettings(feed as unknown as Feed),
+    );
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.settings).toBeNull();
+    expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
   });
 });

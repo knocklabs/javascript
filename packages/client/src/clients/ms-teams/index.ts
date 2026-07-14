@@ -18,6 +18,16 @@ class MsTeamsClient {
   }
 
   async authCheck({ tenant: tenantId, knockChannelId }: AuthCheckInput) {
+    // Without a user we can't check a tenant's connection. Return a "not
+    // connected" shape (never an error) so status hooks land on "disconnected"
+    // rather than firing a request to `/v1/providers/ms-teams/.../auth_check`.
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MsTeams] User is not authenticated, skipping authCheck",
+      );
+      return { connection: { ok: false } };
+    }
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/providers/ms-teams/${knockChannelId}/auth_check`,
@@ -36,6 +46,13 @@ class MsTeamsClient {
   async getTeams(
     input: GetMsTeamsTeamsInput,
   ): Promise<GetMsTeamsTeamsResponse> {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MsTeams] User is not authenticated, skipping getTeams",
+      );
+      return { ms_teams_teams: [], skip_token: null };
+    }
+
     const { knockChannelId, tenant: tenantId } = input;
     const queryOptions = input.queryOptions || {};
 
@@ -62,6 +79,13 @@ class MsTeamsClient {
   async getChannels(
     input: GetMsTeamsChannelsInput,
   ): Promise<GetMsTeamsChannelsResponse> {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[MsTeams] User is not authenticated, skipping getChannels",
+      );
+      return { ms_teams_channels: [] };
+    }
+
     const { knockChannelId, teamId, tenant: tenantId } = input;
     const queryOptions = input.queryOptions || {};
 

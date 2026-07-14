@@ -1494,4 +1494,61 @@ describe("Feed", () => {
       }
     });
   });
+
+  describe("Does nothing when unauthenticated", () => {
+    const getUnauthenticatedSetup = () => {
+      const { knock, mockApiClient } = createMockKnock(); // not authenticated
+      const feed = new Feed(
+        knock,
+        "01234567-89ab-cdef-0123-456789abcdef",
+        {},
+        undefined,
+      );
+      return { knock, mockApiClient, feed };
+    };
+
+    const mutations: Array<[string, (feed: Feed) => Promise<unknown>]> = [
+      ["markAsSeen", (f) => f.markAsSeen(createUnreadFeedItem())],
+      ["markAsUnseen", (f) => f.markAsUnseen(createUnreadFeedItem())],
+      ["markAsRead", (f) => f.markAsRead(createUnreadFeedItem())],
+      ["markAsUnread", (f) => f.markAsUnread(createUnreadFeedItem())],
+      ["markAsInteracted", (f) => f.markAsInteracted(createUnreadFeedItem())],
+      ["markAsArchived", (f) => f.markAsArchived(createUnreadFeedItem())],
+      ["markAsUnarchived", (f) => f.markAsUnarchived(createUnreadFeedItem())],
+      ["markAllAsSeen", (f) => f.markAllAsSeen()],
+      ["markAllAsRead", (f) => f.markAllAsRead()],
+      ["markAllAsArchived", (f) => f.markAllAsArchived()],
+      ["markAllReadAsArchived", (f) => f.markAllReadAsArchived()],
+      ["fetchNextPage", (f) => f.fetchNextPage()],
+    ];
+
+    test.each(mutations)(
+      "%s is a no-op that never touches the network",
+      async (_name, invoke) => {
+        const { mockApiClient, feed } = getUnauthenticatedSetup();
+
+        const result = await invoke(feed);
+
+        expect(result).toBeUndefined();
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      },
+    );
+
+    test("skips the optimistic store update, leaving badge counts intact", async () => {
+      const { mockApiClient, feed } = getUnauthenticatedSetup();
+      const item = createUnreadFeedItem();
+
+      // Seed badge counts so we can assert they are not optimistically changed.
+      feed.getState().setMetadata({
+        total_count: 1,
+        unread_count: 1,
+        unseen_count: 1,
+      });
+
+      await feed.markAsSeen(item);
+
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      expect(feed.getState().metadata.unseen_count).toBe(1);
+    });
+  });
 });

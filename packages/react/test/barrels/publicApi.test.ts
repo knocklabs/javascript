@@ -9,6 +9,10 @@ const expectedExports = [
   "NotificationFeed",
   "NotificationIconButton",
   "UnseenBadge",
+  // Hooks forwarded from @knocklabs/react-core (this package curates its exports
+  // by name, so a missing forward is otherwise invisible to type-check).
+  "useKnockClient",
+  "useKnockAuthState",
 ];
 
 describe("Public API barrel exports", () => {

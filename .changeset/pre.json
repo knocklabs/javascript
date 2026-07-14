@@ -1,0 +1,29 @@
+{
+  "mode": "pre",
+  "tag": "rc",
+  "initialVersions": {
+    "client-example": "0.3.59",
+    "@knocklabs/expo-example": "1.1.9",
+    "guide-example": "0.0.84",
+    "ms-teams-connect-example": "0.0.71",
+    "nextjs-app-dir-example": "0.0.70",
+    "nextjs-example": "1.2.36",
+    "slack-connect-example": "0.3.70",
+    "slack-kit-example": "0.4.68",
+    "@knocklabs/client": "0.21.15",
+    "@knocklabs/eslint-config": "0.0.6",
+    "@knocklabs/expo": "0.6.9",
+    "@knocklabs/prettier-config": "0.0.1",
+    "@knocklabs/react": "0.11.24",
+    "@knocklabs/react-core": "0.13.16",
+    "@knocklabs/react-native": "0.9.9",
+    "@knocklabs/types": "0.1.5",
+    "@knocklabs/typescript-config": "0.0.2"
+  },
+  "changesets": [
+    "expo-push-reregister-on-user-switch",
+    "knockprovider-enabled-client",
+    "knockprovider-enabled-prop",
+    "use-knock-auth-state-reactive-integrations"
+  ]
+}

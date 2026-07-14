@@ -630,4 +630,46 @@ describe("Microsoft Teams Client", () => {
       }
     });
   });
+
+  describe("Does nothing when unauthenticated", () => {
+    test("authCheck returns a disconnected shape without calling the API", async () => {
+      const { knock, mockApiClient } = createMockKnock(); // not authenticated
+      const client = new MsTeamsClient(knock);
+
+      const result = await client.authCheck({
+        tenant: "tenant_123",
+        knockChannelId: "channel_123",
+      });
+
+      expect(result).toEqual({ connection: { ok: false } });
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+
+    test("getTeams returns an empty list without calling the API", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      const client = new MsTeamsClient(knock);
+
+      const result = await client.getTeams({
+        tenant: "tenant_123",
+        knockChannelId: "channel_123",
+      });
+
+      expect(result).toEqual({ ms_teams_teams: [], skip_token: null });
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+
+    test("getChannels returns an empty list without calling the API", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      const client = new MsTeamsClient(knock);
+
+      const result = await client.getChannels({
+        tenant: "tenant_123",
+        knockChannelId: "channel_123",
+        teamId: "team_123",
+      });
+
+      expect(result).toEqual({ ms_teams_channels: [] });
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+  });
 });

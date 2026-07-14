@@ -62,6 +62,16 @@ class MessageClient {
     status: MessageEngagementStatus | "unseen" | "unread" | "unarchived",
     options?: UpdateMessageStatusOptions,
   ): Promise<Message[]> {
+    // The feed's mark methods already guard on auth; this guards the same path
+    // against direct calls so a stale-rendered cell can't fire a status update
+    // for a logged-out user.
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Messages] User is not authenticated, skipping batchUpdateStatuses",
+      );
+      return [];
+    }
+
     // Metadata is only required for the "interacted" status
     const additionalPayload =
       status === "interacted" && options ? { metadata: options.metadata } : {};

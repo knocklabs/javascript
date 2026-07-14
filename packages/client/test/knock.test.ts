@@ -625,6 +625,44 @@ describe("Knock Client", () => {
 
       expect(onUserTokenExpiring).not.toHaveBeenCalled();
     });
+
+    test("does not re-authenticate from an in-flight token refresh after logout", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      const futureExp = Math.floor((Date.now() + 60000) / 1000);
+      vi.mocked(jwtDecode).mockReturnValueOnce({ exp: futureExp });
+
+      // A refresh callback we can hold open while the user logs out.
+      let resolveRefresh!: (token: string) => void;
+      const onUserTokenExpiring = vi.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            resolveRefresh = resolve;
+          }),
+      );
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      });
+      authenticateSpy.mockClear();
+
+      // Fire the refresh timer; the callback is now awaiting.
+      await vi.advanceTimersByTimeAsync(50000);
+      expect(onUserTokenExpiring).toHaveBeenCalled();
+
+      // The user logs out while the refresh is still in flight.
+      knock.logout();
+
+      // The refresh resolves with a fresh token.
+      resolveRefresh("token_new");
+      await vi.runAllTimersAsync();
+
+      // It must NOT resurrect the logged-out instance.
+      expect(authenticateSpy).not.toHaveBeenCalled();
+      expect(knock.isAuthenticated()).toBe(false);
+    });
   });
 
   describe("Authentication with reinitialize", () => {
@@ -777,6 +815,164 @@ describe("Knock Client", () => {
       knock.authenticate("user_123", "token_456");
 
       expect(knock.isAuthenticated(true)).toBe(true);
+    });
+  });
+
+  describe("Auth state store", () => {
+    test("starts unauthenticated", () => {
+      const knock = new Knock("pk_test_12345");
+
+      expect(knock.authStatus).toBe("unauthenticated");
+      expect(knock.authStore.state).toEqual({
+        status: "unauthenticated",
+        userId: undefined,
+        userToken: undefined,
+      });
+    });
+
+    test("transitions to authenticated on authenticate()", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate("user_123", "token_456");
+
+      expect(knock.authStatus).toBe("authenticated");
+      expect(knock.authStore.state).toEqual({
+        status: "authenticated",
+        userId: "user_123",
+        userToken: "token_456",
+      });
+    });
+
+    test("notifies subscribers on login", () => {
+      const knock = new Knock("pk_test_12345");
+      const listener = vi.fn();
+      const unsubscribe = knock.authStore.subscribe(listener);
+
+      knock.authenticate("user_123", "token_456");
+
+      expect(listener).toHaveBeenCalled();
+      expect(knock.authStore.state.status).toBe("authenticated");
+      unsubscribe();
+    });
+
+    test("keeps a stable state reference when re-authenticating with identical credentials", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const stateBefore = knock.authStore.state;
+
+      // Re-authenticating with the same credentials should not churn the store
+      // reference, so React `useStore` selectors don't re-render needlessly.
+      knock.authenticate("user_123", "token_456");
+
+      expect(knock.authStore.state).toBe(stateBefore);
+    });
+
+    test("updates the store userId on a user switch", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+      // Realize the api client so the switch takes the reinitialize path.
+      knock.client();
+
+      knock.authenticate("user_789", "token_456");
+
+      expect(knock.authStatus).toBe("authenticated");
+      expect(knock.authStore.state.userId).toBe("user_789");
+    });
+  });
+
+  describe("Logout", () => {
+    test("clears credentials and marks the instance unauthenticated", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+
+      knock.logout();
+
+      expect(knock.userId).toBeUndefined();
+      expect(knock.userToken).toBeUndefined();
+      expect(knock.isAuthenticated()).toBe(false);
+      expect(knock.authStatus).toBe("unauthenticated");
+    });
+
+    test("tears down feed instances and connections", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const teardownInstancesSpy = vi.spyOn(knock.feeds, "teardownInstances");
+      const teardownSpy = vi.spyOn(knock, "teardown");
+
+      knock.logout();
+
+      expect(teardownInstancesSpy).toHaveBeenCalled();
+      expect(teardownSpy).toHaveBeenCalled();
+    });
+
+    test("clears the token expiration timer", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+      knock["tokenExpirationTimer"] = setTimeout(() => {}, 1000);
+
+      knock.logout();
+
+      expect(clearTimeoutSpy).toHaveBeenCalled();
+      clearTimeoutSpy.mockRestore();
+    });
+
+    test("drops the api client so a fresh one is created on next use", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const client1 = knock.client();
+      knock.logout();
+      const client2 = knock.client();
+
+      expect(client1).not.toBe(client2);
+    });
+
+    test("notifies auth-state subscribers", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const listener = vi.fn();
+      const unsubscribe = knock.authStore.subscribe(listener);
+
+      knock.logout();
+
+      expect(listener).toHaveBeenCalled();
+      expect(knock.authStore.state.status).toBe("unauthenticated");
+      unsubscribe();
+    });
+
+    test("is safe to call when never authenticated", () => {
+      const knock = new Knock("pk_test_12345");
+
+      expect(() => knock.logout()).not.toThrow();
+      expect(knock.authStatus).toBe("unauthenticated");
+    });
+  });
+
+  describe("Logout then re-authenticate", () => {
+    test("reinitializes existing feed instances after logout", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      // Create a feed instance so there is real-time state to rewire.
+      knock.feeds.initialize("01234567-89ab-cdef-0123-456789abcdef");
+      expect(knock.feeds.hasInstances()).toBe(true);
+
+      knock.logout();
+
+      const reinitializeSpy = vi.spyOn(knock.feeds, "reinitializeInstances");
+
+      // Re-authenticating must rewire the surviving feed instances even though
+      // `logout()` dropped the api client.
+      knock.authenticate("user_123", "token_456");
+
+      expect(reinitializeSpy).toHaveBeenCalled();
+      expect(knock.isAuthenticated()).toBe(true);
     });
   });
 });

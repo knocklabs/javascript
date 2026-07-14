@@ -1,6 +1,6 @@
 {
   "name": "nextjs-app-dir-example",
-  "version": "0.0.70",
+  "version": "0.0.71-rc.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
