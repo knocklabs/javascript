@@ -5543,12 +5543,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/eslint-plugin-next@npm:^15.3.1":
-  version: 15.3.2
-  resolution: "@next/eslint-plugin-next@npm:15.3.2"
+"@next/eslint-plugin-next@npm:^16.2.10":
+  version: 16.2.10
+  resolution: "@next/eslint-plugin-next@npm:16.2.10"
   dependencies:
     fast-glob: "npm:3.3.1"
-  checksum: 10c0/b03e512c275d33f4159522a66d4aa56f60dbf8f2dbfca6db9dcb5ce4c51ab701d8b28d719499d5728913b1ed71f76a93d770797670d04ca525ea318a32aa8fab
+  checksum: 10c0/05ac24ad9545696e437a9a61437dda0dd05ad2755e42b8c1fd0fe0e7d607b48f4be2eb4ca0ab7a8452872a7a88f0c9aa52eaf424158675321ff9008cf09c0e31
   languageName: node
   linkType: hard
 
@@ -17105,7 +17105,7 @@ __metadata:
     "@knocklabs/node": "npm:^1.30.0"
     "@knocklabs/react": "workspace:*"
     "@knocklabs/typescript-config": "workspace:^"
-    "@next/eslint-plugin-next": "npm:^15.3.1"
+    "@next/eslint-plugin-next": "npm:^16.2.10"
     "@telegraph/button": "npm:>=0.7.4"
     "@telegraph/combobox": "npm:>=0.4.2"
     "@telegraph/icon": "npm:>=0.5.4"
@@ -17146,7 +17146,7 @@ __metadata:
     "@knocklabs/node": "npm:^1.30.0"
     "@knocklabs/react": "workspace:^"
     "@knocklabs/typescript-config": "workspace:^"
-    "@next/eslint-plugin-next": "npm:^15.3.1"
+    "@next/eslint-plugin-next": "npm:^16.2.10"
     "@telegraph/button": "npm:>=0.7.4"
     "@telegraph/combobox": "npm:>=0.4.2"
     "@telegraph/icon": "npm:>=0.5.4"
