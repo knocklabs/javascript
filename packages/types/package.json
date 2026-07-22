@@ -4,6 +4,11 @@
   "author": "@knocklabs",
   "version": "0.1.5",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knocklabs/javascript.git",
+    "directory": "packages/types"
+  },
   "types": "./src/index.d.ts",
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
