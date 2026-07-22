@@ -71,7 +71,13 @@ export default defineConfig(({ mode }) => {
             }
             return assetInfo.name;
           },
-          entryFileNames: () => {
+          entryFileNames: (chunkInfo) => {
+            // Chunks from `?inline` CSS imports carry the compiled style
+            // string as code, so they must not be named like the empty .css
+            // proxy chunks that get deleted and stripped below.
+            if (chunkInfo.facadeModuleId?.endsWith("?inline")) {
+              return `[name].inline.${CJS ? "js" : "mjs"}`;
+            }
             return `[name].${CJS ? "js" : "mjs"}`;
           },
         },
