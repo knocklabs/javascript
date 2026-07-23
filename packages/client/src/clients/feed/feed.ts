@@ -772,6 +772,7 @@ class Feed {
       tenants: this.defaultOptions.tenant
         ? [this.defaultOptions.tenant]
         : undefined,
+      trigger_data: getFormattedTriggerData(this.defaultOptions),
     };
 
     return await this.knock.messages.bulkUpdateAllStatusesInChannel({
