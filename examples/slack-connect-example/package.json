@@ -6,9 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "prettier \"**/*.{js,ts,tsx}\" --write",
-    "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
+    "lint": "oxlint --max-warnings=0",
+    "format": "oxfmt \"**/*.{ts,tsx,js}\"",
+    "format:check": "oxfmt --check \"**/*.{ts,tsx,js}\""
   },
   "dependencies": {
     "@knocklabs/react": "0.12.1",
@@ -22,8 +22,6 @@
     "@types/node": "^24",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^8.56.0",
-    "eslint-config-next": "15.4.6",
     "typescript": "^5.8.3"
   },
   "engines": {

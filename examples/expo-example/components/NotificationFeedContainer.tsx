@@ -11,13 +11,13 @@ const NotificationFeedContainer: React.FC<NotificationFeedContainerProps> = ({
   handleClose,
 }) => {
   const onCellActionButtonTap = useCallback(
-    (params: { button: ActionButton; item: FeedItem }) => {
+    (_params: { button: ActionButton; item: FeedItem }) => {
       // handle button tap
     },
     [],
   );
 
-  const onRowTap = useCallback((item: FeedItem) => {
+  const onRowTap = useCallback((_item: FeedItem) => {
     // handle row tap
   }, []);
 
