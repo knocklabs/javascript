@@ -45,7 +45,7 @@ async function setKnockChannelData(
   slackUserId: string,
 ): Promise<void> {
   try {
-    const userChannelData = await knock.users.setChannelData(
+    await knock.users.setChannelData(
       userId,
       process.env.NEXT_PUBLIC_KNOCK_SLACK_CHANNEL_ID as string,
       {

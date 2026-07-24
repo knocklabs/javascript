@@ -27,7 +27,6 @@
     "release:publish": "yarn build:packages && yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish --tag \"$NPM_CONFIG_TAG\" && yarn changeset tag",
     "postinstall": "manypkg check"
   },
-  "prettier": "@knocklabs/prettier-config",
   "packageManager": "yarn@4.9.1",
   "workspaces": [
     "examples/*",
@@ -56,14 +55,11 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
-    "@knocklabs/eslint-config": "workspace:^",
-    "@knocklabs/prettier-config": "workspace:^",
     "@knocklabs/typescript-config": "workspace:^",
     "@manypkg/cli": "^0.25.0",
     "@vitest/coverage-v8": "^3.2.4",
     "oxfmt": "0.60.0",
     "oxlint": "1.75.0",
-    "prettier": "^3.5.3",
     "turbo": "^2.9.16",
     "typescript-7": "npm:typescript@7.0.2",
     "vitest": "^3.2.4"

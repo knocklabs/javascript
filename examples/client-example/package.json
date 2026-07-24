@@ -15,14 +15,8 @@
     "dev": "vite --port 3001",
     "build": "vite build",
     "preview": "vite preview",
-    "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
-    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "format": "oxfmt \"src/**/*.{ts,tsx,js}\"",
+    "format:check": "oxfmt --check \"src/**/*.{ts,tsx,js}\""
   },
   "browserslist": {
     "production": [
@@ -41,7 +35,6 @@
     "@vitejs/plugin-react": "^4.5.1",
     "@vitejs/plugin-react-swc": "^4.3.0",
     "jsdom": "^29.1.0",
-    "prettier": "^3.5.3",
     "vite": "^5.4.19",
     "vitest": "^3.2.4"
   },

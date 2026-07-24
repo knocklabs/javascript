@@ -6,9 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier \"**/*.{js,ts,tsx}\" --write",
-    "format:check": "prettier \"**/*.{js,ts,tsx}\" --check"
+    "lint": "oxlint --max-warnings=0",
+    "format": "oxfmt \"**/*.{ts,tsx,js}\"",
+    "format:check": "oxfmt --check \"**/*.{ts,tsx,js}\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -36,15 +36,11 @@
     "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "@knocklabs/eslint-config": "workspace:^",
     "@knocklabs/typescript-config": "workspace:^",
-    "@next/eslint-plugin-next": "^15.3.1",
-    "@types/eslint": "^8.44.7",
     "@types/node": "^24",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",
-    "eslint": "^8.56.0",
     "typescript": "^5.8.3"
   },
   "engines": {

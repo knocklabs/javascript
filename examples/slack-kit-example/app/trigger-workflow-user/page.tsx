@@ -5,7 +5,7 @@ import triggerWorkflow from "../lib/actions/triggerWorkflow";
 import { getAppDetails } from "../lib/app-details";
 
 export default async function Page() {
-  const { workflowKey, collection, objectId, tenant, userId } = getAppDetails();
+  const { workflowKey, objectId, tenant, userId } = getAppDetails();
   return (
     <>
       <h2 className="text-xl font-bold my-4">Trigger a Workflow</h2>
