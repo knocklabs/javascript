@@ -55,7 +55,7 @@
     "@babel/preset-typescript": "^7.28.5",
     "@codecov/vite-plugin": "^2.0.1",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "jsonwebtoken": "^9.0.3",
