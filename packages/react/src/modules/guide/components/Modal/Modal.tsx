@@ -111,17 +111,17 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 };
 Body.displayName = "ModalView.Body";
 
-const Img: React.FC<
-  React.PropsWithChildren<React.ComponentPropsWithRef<"img">>
-> = ({ children, className, alt, ...props }) => {
+const Img: React.FC<React.ComponentPropsWithRef<"img">> = ({
+  className,
+  alt,
+  ...props
+}) => {
   return (
     <img
       className={cx("knock-guide-modal__img", className)}
       alt={alt || ""}
       {...props}
-    >
-      {children}
-    </img>
+    />
   );
 };
 Img.displayName = "ModalView.Img";

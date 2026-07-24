@@ -1,7 +1,7 @@
-import { useSlackConnectionStatus } from "..";
 import * as React from "react";
 import { PropsWithChildren, useRef } from "react";
 
+import { useSlackConnectionStatus } from "..";
 import { type ConnectionStatus, slackProviderKey } from "../../core";
 import { useKnockClient } from "../../core";
 

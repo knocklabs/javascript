@@ -1,4 +1,5 @@
 import { GenericData } from "@knocklabs/types";
+import type { URLPattern } from "urlpattern-polyfill";
 
 // i.e. useGuide vs useGuides
 export type SelectQueryLimit = "one" | "all";
@@ -205,8 +206,9 @@ export type GuideSocketEvent =
 // Guide client
 //
 
-export interface KnockGuideStep<TContent = Any>
-  extends GuideStepData<TContent> {
+export interface KnockGuideStep<
+  TContent = Any,
+> extends GuideStepData<TContent> {
   markAsSeen: () => Promise<KnockGuideStep<TContent> | undefined>;
   markAsInteracted: (params?: {
     metadata?: GenericData;
@@ -214,8 +216,7 @@ export interface KnockGuideStep<TContent = Any>
   markAsArchived: () => Promise<KnockGuideStep<TContent> | undefined>;
 }
 
-export interface KnockGuideActivationUrlPattern
-  extends GuideActivationUrlPatternData {
+export interface KnockGuideActivationUrlPattern extends GuideActivationUrlPatternData {
   pattern: URLPattern;
 }
 

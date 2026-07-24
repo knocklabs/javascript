@@ -69,7 +69,6 @@ class Feed {
       );
     }
 
-    this.feedId = feedId;
     this.userFeedId = this.buildUserFeedId();
     this.referenceId = CLIENT_REF_ID_PREFIX + nanoid();
     this.socketManager = socketManager;
