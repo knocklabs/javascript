@@ -1,7 +1,7 @@
-import { useKnockMsTeamsClient } from "..";
 import { TENANT_OBJECT_COLLECTION } from "@knocklabs/client";
 import { useCallback, useMemo } from "react";
 
+import { useKnockMsTeamsClient } from "..";
 import { useKnockClient } from "../../core";
 
 const MS_TEAMS_ADMINCONSENT_URL =

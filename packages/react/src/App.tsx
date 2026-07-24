@@ -1,5 +1,6 @@
-import { Button, ButtonGroup, KnockFeedProvider, KnockProvider } from ".";
 import { FunctionComponent } from "react";
+
+import { Button, ButtonGroup, KnockFeedProvider, KnockProvider } from ".";
 
 // Test out components here by running yarn dev:local in the package
 const App: FunctionComponent = () => {

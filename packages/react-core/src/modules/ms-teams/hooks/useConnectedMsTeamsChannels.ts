@@ -1,9 +1,9 @@
-import { useKnockMsTeamsClient } from "..";
 import { MsTeamsChannelConnection } from "@knocklabs/client";
 import { GenericData } from "@knocklabs/types";
 import { useState } from "react";
 import useSWR from "swr";
 
+import { useKnockMsTeamsClient } from "..";
 import { RecipientObject } from "../../..";
 import { useKnockClient } from "../../core";
 import { useTranslations } from "../../i18n";

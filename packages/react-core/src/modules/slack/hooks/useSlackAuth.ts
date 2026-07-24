@@ -1,7 +1,7 @@
-import { useKnockSlackClient } from "..";
 import { TENANT_OBJECT_COLLECTION } from "@knocklabs/client";
 import { useCallback } from "react";
 
+import { useKnockSlackClient } from "..";
 import { useKnockClient } from "../../core";
 
 const SLACK_AUTHORIZE_URL = "https://slack.com/oauth/v2/authorize";
