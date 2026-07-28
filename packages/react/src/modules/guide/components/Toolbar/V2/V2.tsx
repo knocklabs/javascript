@@ -19,6 +19,7 @@ import React from "react";
 import { KnockButton } from "../KnockButton";
 import { TOOLBAR_Z_INDEX } from "../shared";
 import "../styles.css";
+import { useToolbarStyles } from "../useToolbarStyles";
 
 import { FocusChin } from "./FocusChin";
 import { GuideContextDetails } from "./GuideContextDetails";
@@ -89,6 +90,8 @@ export const V2 = ({ readyToTarget, listenForUpdates }: Props) => {
   const [expandedGuideRowKey, setExpandedGuideRowKey] = React.useState<
     string | undefined
   >();
+
+  useToolbarStyles(Boolean(runConfig?.isVisible));
 
   React.useEffect(() => {
     setExpandedGuideRowKey(undefined);

@@ -18,6 +18,7 @@ export {
   useAuthenticatedKnockClient,
   useAuthPolling,
   useAuthPostMessageListener,
+  useKnockAuthState,
   useKnockClient,
   useStableOptions,
 } from "./modules/core";

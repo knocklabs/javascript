@@ -510,4 +510,32 @@ describe("Slack Client", () => {
       }
     });
   });
+
+  describe("Does nothing when unauthenticated", () => {
+    test("authCheck returns a disconnected shape without calling the API", async () => {
+      const { knock, mockApiClient } = createMockKnock(); // not authenticated
+      const client = new SlackClient(knock);
+
+      const result = await client.authCheck({
+        tenant: "tenant_123",
+        knockChannelId: "channel_123",
+      });
+
+      expect(result).toEqual({ connection: { ok: false } });
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+
+    test("getChannels returns an empty list without calling the API", async () => {
+      const { knock, mockApiClient } = createMockKnock();
+      const client = new SlackClient(knock);
+
+      const result = await client.getChannels({
+        tenant: "tenant_123",
+        knockChannelId: "channel_123",
+      });
+
+      expect(result).toEqual({ slack_channels: [], next_cursor: null });
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+  });
 });

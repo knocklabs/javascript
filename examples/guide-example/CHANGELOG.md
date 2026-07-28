@@ -1,5 +1,52 @@
 # guide-example
 
+## 0.0.86
+
+### Patch Changes
+
+- Updated dependencies [559ddf1]
+  - @knocklabs/react@0.12.1
+
+## 0.0.85
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+  - @knocklabs/client@0.22.0
+  - @knocklabs/react@0.12.0
+
+## 0.0.85-rc.0
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+  - @knocklabs/client@0.22.0-rc.0
+  - @knocklabs/react@0.12.0-rc.0
+
+## 0.0.84
+
+### Patch Changes
+
+- Updated dependencies [3d7a041]
+  - @knocklabs/client@0.21.15
+  - @knocklabs/react@0.11.24
+
+## 0.0.83
+
+### Patch Changes
+
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+  - @knocklabs/react@0.11.23
+
 ## 0.0.82
 
 ### Patch Changes

@@ -251,7 +251,7 @@ describe("KnockGuideClient", () => {
 
       await client.fetch();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({
@@ -323,7 +323,7 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       await client.fetch();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockStore.setState).toHaveBeenCalledWith(expect.any(Function));
 
       // Get the last setState call and execute its function
@@ -400,7 +400,7 @@ describe("KnockGuideClient", () => {
       );
       client.subscribe();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockSocket.channel).toHaveBeenCalledWith(
         `guides:${channelId}`,
         expect.objectContaining({
@@ -593,6 +593,137 @@ describe("KnockGuideClient", () => {
           force_all_guides: true,
         }),
       );
+    });
+  });
+
+  describe("Does nothing when unauthenticated", () => {
+    const unauthGuide = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_123",
+      key: "test_guide",
+      type: "test",
+      semver: "1.0.0",
+      active: true,
+      steps: [],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const unauthStep = {
+      ref: "step_1",
+      schema_key: "test",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+    } as unknown as KnockGuideStep;
+
+    test("fetch returns an error status without calling the API or throwing", async () => {
+      // Regression: the guide client used to throw `failIfNotAuthenticated`,
+      // which crashed host apps that rendered Guides before a user was set.
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.fetch();
+
+      expect(result.status).toBe("error");
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+    });
+
+    test("subscribe no-ops without joining a channel", () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const mockSocket = {
+        channel: vi.fn(),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+
+      expect(mockSocket.channel).not.toHaveBeenCalled();
+    });
+
+    test("markAsSeen no-ops without calling the engagement API", async () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.markAsSeen(unauthGuide, unauthStep);
+
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsInteracted no-ops without calling the engagement API", async () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.markAsInteracted(unauthGuide, unauthStep);
+
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsArchived no-ops without calling the engagement API", async () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.markAsArchived(unauthGuide, unauthStep);
+
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("subscribe re-reads the socket from the api client (E12)", () => {
+    const makeMockSocket = () => ({
+      channel: vi.fn().mockReturnValue({
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      }),
+      isConnected: vi.fn().mockReturnValue(true),
+      connect: vi.fn(),
+    });
+
+    test("uses the current socket after re-authentication, not the one captured at construction", () => {
+      const oldSocket = makeMockSocket();
+      const newSocket = makeMockSocket();
+
+      // The constructor captures the old socket via `knock.client().socket`.
+      mockApiClient.socket = oldSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Simulate a re-authentication that swaps in a new socket on the client.
+      mockApiClient.socket = newSocket as unknown as Socket;
+
+      client.subscribe();
+
+      expect(newSocket.channel).toHaveBeenCalledWith(
+        `guides:${channelId}`,
+        expect.anything(),
+      );
+      expect(oldSocket.channel).not.toHaveBeenCalled();
     });
   });
 
@@ -3686,6 +3817,81 @@ describe("KnockGuideClient", () => {
       expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
     });
 
+    test("shares one history patch across instances and restores only when the last is cleaned up", () => {
+      const originalPushState = vi.fn();
+      const originalReplaceState = vi.fn();
+
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        history: {
+          pushState: originalPushState,
+          replaceState: originalReplaceState,
+        },
+      });
+
+      const windowWithHistory = window as unknown as {
+        history: { pushState: unknown; replaceState: unknown };
+      };
+
+      // Two guide clients patch the same window (as happens across a remount:
+      // the new client is constructed while the old one is still tearing down).
+      const clientA = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+      const clientB = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+
+      // History is patched (not the originals) while either client is active.
+      expect(windowWithHistory.history.pushState).not.toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).not.toBe(
+        originalReplaceState,
+      );
+
+      // Cleaning up one client must NOT restore the originals — the other still
+      // needs location tracking (the pre-fix per-instance patch clobbered it).
+      clientA.cleanup();
+      expect(windowWithHistory.history.pushState).not.toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).not.toBe(
+        originalReplaceState,
+      );
+
+      // Cleaning up the last client restores the originals exactly.
+      clientB.cleanup();
+      expect(windowWithHistory.history.pushState).toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
+    });
+
+    test("fires a location change when the patched history.pushState is called", () => {
+      const originalPushState = vi.fn();
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        location: { href: "https://example.com/next" },
+        history: { pushState: originalPushState, replaceState: vi.fn() },
+      });
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+      const setLocationSpy = vi.spyOn(client, "setLocation");
+
+      // Calling the patched pushState runs the original and schedules a check.
+      window.history.pushState(null, "", "/next");
+      expect(originalPushState).toHaveBeenCalled();
+
+      // The location check runs on the next tick.
+      vi.advanceTimersByTime(1);
+      expect(setLocationSpy).toHaveBeenCalledWith("https://example.com/next");
+    });
   });
 
   describe("private methods", () => {
@@ -3912,7 +4118,7 @@ describe("KnockGuideClient", () => {
 
       await client.fetch({ filters: { type: "tooltip" } });
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({

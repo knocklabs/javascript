@@ -747,4 +747,18 @@ describe("MessageClient", () => {
       );
     });
   });
+
+  describe("Does nothing when unauthenticated", () => {
+    test("batchUpdateStatuses returns an empty array without calling the API", async () => {
+      const { knock, mockApiClient } = createMockKnock(); // not authenticated
+
+      const result = await knock.messages.batchUpdateStatuses(
+        ["message_123", "message_456"],
+        "seen",
+      );
+
+      expect(result).toEqual([]);
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+    });
+  });
 });

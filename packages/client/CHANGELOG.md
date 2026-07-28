@@ -1,5 +1,55 @@
 # Changelog
 
+## 0.22.0
+
+### Minor Changes
+
+- e8567eb: Make the client do nothing (instead of throwing or making requests) when there's no signed-in user, and add tools to manage sign-in state.
+
+  - New `Knock.logout()` clears the user and disconnects everything: the websocket, the token-refresh timer, and the page-visibility listener.
+  - New `knock.authStatus` (`"authenticated"` or `"unauthenticated"`) and a subscribable `knock.authStore` to check or react to whether a user is signed in.
+  - With no signed-in user, these now do nothing instead of throwing or calling the API:
+    - Feed `markAs*` / `markAll*` / `fetchNextPage` (they also skip the optimistic UI update).
+    - Guides `fetch` / `subscribe` and the step actions. These previously threw, which could crash the app when Guides rendered before a user was set.
+    - Slack/MS Teams `authCheck` (returns "not connected"), `getChannels` / `getTeams` (return empty), and `messages.batchUpdateStatuses` (returns `[]`).
+  - Fixes two Guide bugs: real-time updates broke after a re-login (a stale socket reference), and the `history` patch used for location tracking broke when a Guide provider remounted.
+
+## 0.22.0-rc.0
+
+### Minor Changes
+
+- d2f7948: Make the client do nothing (instead of throwing or making requests) when there's no signed-in user, and add tools to manage sign-in state.
+
+  - New `Knock.logout()` clears the user and disconnects everything: the websocket, the token-refresh timer, and the page-visibility listener.
+  - New `knock.authStatus` (`"authenticated"` or `"unauthenticated"`) and a subscribable `knock.authStore` to check or react to whether a user is signed in.
+  - With no signed-in user, these now do nothing instead of throwing or calling the API:
+    - Feed `markAs*` / `markAll*` / `fetchNextPage` (they also skip the optimistic UI update).
+    - Guides `fetch` / `subscribe` and the step actions. These previously threw, which could crash the app when Guides rendered before a user was set.
+    - Slack/MS Teams `authCheck` (returns "not connected"), `getChannels` / `getTeams` (return empty), and `messages.batchUpdateStatuses` (returns `[]`).
+  - Fixes two Guide bugs: real-time updates broke after a re-login (a stale socket reference), and the `history` patch used for location tracking broke when a Guide provider remounted.
+
+## 0.21.15
+
+### Patch Changes
+
+- 3d7a041: fix(KNO-13857): reduce websocket reconnect load when connections can't recover
+
+  The Phoenix socket now escalates its reconnect backoff toward a 10-minute cap (previously a fixed 30s cap that Phoenix reset on every successful open), so a client that can never reconnect — for example after an API key rotation leaves stale credentials that get rejected on every upgrade — settles into a slow retry cadence instead of a tight loop. Backoff escalation persists through brief "connect then immediately drop" cycles and resets once a connection stays up for 30s.
+
+  Additionally:
+
+  - `teardown()` now always disconnects the socket (even mid-reconnect), so a reauth that replaces the client can't leak a socket that keeps retrying with stale credentials.
+  - Hidden background tabs now stop retrying: a socket that is mid-reconnect when the page is hidden is disconnected, not just connected ones, and resumes when the page becomes visible again.
+  - Reconnects promptly on the browser `online` event so recovery after a real network drop doesn't wait out the (now longer) backoff.
+
+## 0.21.14
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 3dd0aa8: Remove the `jwt-decode` dependency in favor of an internal JWT payload decoder.
+- b6c9be4: Replace the internal axios transport with native fetch and remove axios dependencies.
+
 ## 0.21.13
 
 ### Patch Changes

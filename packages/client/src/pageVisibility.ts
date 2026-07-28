@@ -12,16 +12,27 @@ const DEFAULT_DISCONNECT_DELAY_MS = 30_000;
  */
 export class PageVisibilityManager {
   private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private wasConnected = false;
+  private shouldReconnectOnVisible = false;
+  private socketWasActive = false;
 
   constructor(
     private socket: Socket,
     private disconnectDelayMs: number = DEFAULT_DISCONNECT_DELAY_MS,
   ) {
+    // Track whether the socket has ever attempted to connect so we only park
+    // (and later resume) sockets the consumer actually activated. Both
+    // callbacks fire only after connect() has been called at least once.
+    this.socket.onOpen(this.markActive);
+    this.socket.onClose(this.markActive);
+
     if (typeof document !== "undefined") {
       document.addEventListener("visibilitychange", this.onVisibilityChange);
     }
   }
+
+  private markActive = () => {
+    this.socketWasActive = true;
+  };
 
   private onVisibilityChange = () => {
     if (document.hidden) {
@@ -37,8 +48,12 @@ export class PageVisibilityManager {
     this.disconnectTimer = setTimeout(() => {
       this.disconnectTimer = null;
 
-      if (this.socket.isConnected()) {
-        this.wasConnected = true;
+      // Disconnect even when the socket is mid-reconnect rather than fully
+      // connected: a socket retrying against, say, a rejected credential would
+      // otherwise keep looping in a hidden background tab. disconnect() also
+      // cancels Phoenix's pending reconnect timer.
+      if (this.socketWasActive) {
+        this.shouldReconnectOnVisible = true;
         this.socket.disconnect();
       }
     }, this.disconnectDelayMs);
@@ -47,8 +62,8 @@ export class PageVisibilityManager {
   private reconnect() {
     this.clearTimer();
 
-    if (this.wasConnected) {
-      this.wasConnected = false;
+    if (this.shouldReconnectOnVisible) {
+      this.shouldReconnectOnVisible = false;
       this.socket.connect();
     }
   }

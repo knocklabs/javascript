@@ -154,7 +154,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         {!requestInFlight && noItems && EmptyComponent}
       </div>
 
-      {settings?.features.branding_required && (
+      {settings?.features?.branding_required && (
         <div className="rnf-notification-feed__knock-branding">
           <a href={poweredByKnockUrl} target="_blank">
             {t("poweredBy") || "Powered by Knock"}

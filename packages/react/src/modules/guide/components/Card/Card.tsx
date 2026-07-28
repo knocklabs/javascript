@@ -1,7 +1,7 @@
 import { ColorMode, useGuide } from "@knocklabs/react-core";
-import clsx from "clsx";
 import React from "react";
 
+import { cx } from "../../../core/cx";
 import { isValidHttpUrl, maybeNavigateToUrlWithDelay } from "../helpers";
 import {
   ButtonContent,
@@ -20,7 +20,7 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card", className)} {...props}>
+    <div className={cx("knock-guide-card", className)} {...props}>
       {children}
     </div>
   );
@@ -31,7 +31,7 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__message", className)} {...props}>
+    <div className={cx("knock-guide-card__message", className)} {...props}>
       {children}
     </div>
   );
@@ -42,7 +42,7 @@ const Header: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__header", className)} {...props}>
+    <div className={cx("knock-guide-card__header", className)} {...props}>
       {children}
     </div>
   );
@@ -53,7 +53,7 @@ const Headline: React.FC<
   { headline: string } & React.ComponentPropsWithRef<"div">
 > = ({ headline, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__headline", className)} {...props}>
+    <div className={cx("knock-guide-card__headline", className)} {...props}>
       {headline}
     </div>
   );
@@ -64,7 +64,7 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__title", className)} {...props}>
+    <div className={cx("knock-guide-card__title", className)} {...props}>
       {title}
     </div>
   );
@@ -78,7 +78,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <div
-      className={clsx("knock-guide-card__body", className)}
+      className={cx("knock-guide-card__body", className)}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -91,7 +91,7 @@ const Img: React.FC<
 > = ({ children, className, alt, ...props }) => {
   return (
     <img
-      className={clsx("knock-guide-card__img", className)}
+      className={cx("knock-guide-card__img", className)}
       alt={alt || ""}
       {...props}
     >
@@ -105,7 +105,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-card__actions", className)} {...props}>
+    <div className={cx("knock-guide-card__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -116,7 +116,7 @@ const PrimaryButton: React.FC<
   ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <button className={clsx("knock-guide-card__action", className)} {...props}>
+    <button className={cx("knock-guide-card__action", className)} {...props}>
       {text}
     </button>
   );
@@ -128,7 +128,7 @@ const SecondaryButton: React.FC<
 > = ({ text, action, className, ...props }) => {
   return (
     <button
-      className={clsx(
+      className={cx(
         "knock-guide-card__action knock-guide-card__action--secondary",
         className,
       )}
@@ -145,7 +145,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button className={clsx("knock-guide-card__close", className)} {...props}>
+    <button className={cx("knock-guide-card__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"

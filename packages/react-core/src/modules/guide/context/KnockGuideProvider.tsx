@@ -18,6 +18,26 @@ export const KnockGuideContext = React.createContext<
 
 export type KnockGuideProviderProps = {
   channelId: string;
+  /**
+   * Whether the targeting parameters for guide selection are loaded and ready.
+   * When `true`, the provider fetches guides and subscribes to real-time updates.
+   *
+   * This is independent of authentication. Effective guide activity requires
+   * **both** an authenticated user (i.e. a `KnockProvider` with a user and
+   * `enabled` not set to `false`) **and** `readyToTarget`:
+   *
+   * | `enabled` (auth) | `readyToTarget` | Guides fetch/subscribe? |
+   * | ---------------- | --------------- | ----------------------- |
+   * | `false`          | `false`         | No                      |
+   * | `false`          | `true`          | No (client no-ops)      |
+   * | `true`           | `false`         | No                      |
+   * | `true`           | `true`          | Yes                     |
+   *
+   * `readyToTarget` means "my targeting params are loaded"; auth means "there is
+   * a user". When there is no user, the underlying guide client fetches/subscribes
+   * are safe no-ops (they neither throw nor hit the network), so it is fine to
+   * render `KnockGuideProvider` with `readyToTarget` while unauthenticated.
+   */
   readyToTarget: boolean;
   listenForUpdates?: boolean;
   colorMode?: ColorMode;

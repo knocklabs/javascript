@@ -43,6 +43,7 @@ export const KnockMsTeamsProvider: React.FC<
   return (
     <MsTeamsProviderStateContext.Provider
       key={msTeamsProviderKey({
+        userId: knock.userId,
         knockMsTeamsChannelId,
         tenantId,
         connectionStatus,

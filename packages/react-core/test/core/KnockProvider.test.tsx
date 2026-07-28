@@ -331,4 +331,79 @@ describe("KnockProvider", () => {
       );
     });
   });
+
+  describe("enabled prop", () => {
+    test("renders children but does not authenticate when enabled is false", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">API Key: {knock.apiKey}</div>;
+      };
+
+      const { getByTestId } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John Doe" }}
+          enabled={false}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      // Children still render...
+      expect(getByTestId("consumer-msg")).toHaveTextContent(
+        "API Key: test_api_key",
+      );
+      // ...but no identify (or any user request) fires while disabled.
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "PUT",
+          url: "/v1/users/test_user_id",
+        }),
+      );
+    });
+
+    test("authenticates once enabled flips to true", () => {
+      const TestConsumer = () => {
+        const knock = useKnockClient();
+        return <div data-testid="consumer-msg">User Id: {knock.userId}</div>;
+      };
+
+      const { rerender } = render(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John Doe" }}
+          enabled={false}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "PUT",
+          url: "/v1/users/test_user_id",
+        }),
+      );
+
+      mockApiClient.makeRequest.mockClear();
+
+      rerender(
+        <KnockProvider
+          apiKey="test_api_key"
+          user={{ id: "test_user_id", name: "John Doe" }}
+          enabled={true}
+        >
+          <TestConsumer />
+        </KnockProvider>,
+      );
+
+      expect(mockApiClient.makeRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "PUT",
+          url: "/v1/users/test_user_id",
+          data: { name: "John Doe" },
+        }),
+      );
+    });
+  });
 });

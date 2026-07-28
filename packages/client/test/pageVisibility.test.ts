@@ -5,15 +5,30 @@ import type { Socket } from "phoenix";
 
 import { PageVisibilityManager } from "../src/pageVisibility";
 
+type MockSocket = Socket & {
+  isConnected: ReturnType<typeof vi.fn>;
+  connect: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+};
+
 function createMockSocket() {
-  return {
+  const openCallbacks: Array<() => void> = [];
+  const closeCallbacks: Array<() => void> = [];
+
+  const socket = {
     isConnected: vi.fn(() => true),
     connect: vi.fn(),
     disconnect: vi.fn(),
-  } as unknown as Socket & {
-    isConnected: ReturnType<typeof vi.fn>;
-    connect: ReturnType<typeof vi.fn>;
-    disconnect: ReturnType<typeof vi.fn>;
+    onOpen: vi.fn((cb: () => void) => openCallbacks.push(cb)),
+    onClose: vi.fn((cb: () => void) => closeCallbacks.push(cb)),
+  } as unknown as MockSocket;
+
+  return {
+    socket,
+    // Simulates the socket successfully opening a connection.
+    fireOpen: () => openCallbacks.forEach((cb) => cb()),
+    // Simulates the socket's connection closing (e.g. a failed/dropped attempt).
+    fireClose: () => closeCallbacks.forEach((cb) => cb()),
   };
 }
 
@@ -36,8 +51,9 @@ describe("PageVisibilityManager", () => {
   });
 
   test("disconnects the socket after the delay when page becomes hidden", () => {
-    const socket = createMockSocket();
+    const { socket, fireOpen } = createMockSocket();
     const manager = new PageVisibilityManager(socket);
+    fireOpen();
 
     simulateVisibilityChange(true);
 
@@ -49,8 +65,9 @@ describe("PageVisibilityManager", () => {
   });
 
   test("reconnects the socket when page becomes visible after a disconnect", () => {
-    const socket = createMockSocket();
+    const { socket, fireOpen } = createMockSocket();
     const manager = new PageVisibilityManager(socket);
+    fireOpen();
 
     simulateVisibilityChange(true);
     vi.advanceTimersByTime(30_000);
@@ -61,9 +78,31 @@ describe("PageVisibilityManager", () => {
     manager.teardown();
   });
 
-  test("cancels the pending disconnect if the page becomes visible before the delay", () => {
-    const socket = createMockSocket();
+  test("parks and resumes a socket that is mid-reconnect (not connected) while hidden", () => {
+    const { socket, fireClose } = createMockSocket();
+    // Socket is retrying, so it is not currently connected.
+    socket.isConnected.mockReturnValue(false);
     const manager = new PageVisibilityManager(socket);
+    // A failed/closed attempt still marks the socket as active.
+    fireClose();
+
+    simulateVisibilityChange(true);
+    vi.advanceTimersByTime(30_000);
+
+    // The retrying socket is parked despite never being "connected", which
+    // stops the reconnect loop from running in a hidden background tab.
+    expect(socket.disconnect).toHaveBeenCalledOnce();
+
+    simulateVisibilityChange(false);
+    expect(socket.connect).toHaveBeenCalledOnce();
+
+    manager.teardown();
+  });
+
+  test("cancels the pending disconnect if the page becomes visible before the delay", () => {
+    const { socket, fireOpen } = createMockSocket();
+    const manager = new PageVisibilityManager(socket);
+    fireOpen();
 
     simulateVisibilityChange(true);
     vi.advanceTimersByTime(15_000);
@@ -77,10 +116,11 @@ describe("PageVisibilityManager", () => {
     manager.teardown();
   });
 
-  test("does not reconnect if the socket was not connected when hidden", () => {
-    const socket = createMockSocket();
+  test("does not park or reconnect a socket that was never activated", () => {
+    const { socket } = createMockSocket();
     socket.isConnected.mockReturnValue(false);
     const manager = new PageVisibilityManager(socket);
+    // No fireOpen/fireClose: the consumer never opened a connection.
 
     simulateVisibilityChange(true);
     vi.advanceTimersByTime(30_000);
@@ -94,8 +134,9 @@ describe("PageVisibilityManager", () => {
   });
 
   test("respects a custom disconnect delay", () => {
-    const socket = createMockSocket();
+    const { socket, fireOpen } = createMockSocket();
     const manager = new PageVisibilityManager(socket, 5_000);
+    fireOpen();
 
     simulateVisibilityChange(true);
 
@@ -109,8 +150,9 @@ describe("PageVisibilityManager", () => {
   });
 
   test("teardown removes the event listener and clears pending timers", () => {
-    const socket = createMockSocket();
+    const { socket, fireOpen } = createMockSocket();
     const manager = new PageVisibilityManager(socket);
+    fireOpen();
 
     simulateVisibilityChange(true);
     manager.teardown();

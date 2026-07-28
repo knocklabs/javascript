@@ -211,41 +211,6 @@ export const setupBrowserEnvironment = () => {
   };
 };
 
-// Simple axios mock for API testing
-export const createAxiosMock = () => {
-  const mockAxios = vi.fn();
-
-  // Default successful response
-  mockAxios.mockResolvedValue({
-    status: 200,
-    data: { success: true },
-  });
-
-  // Helper methods for common scenarios
-  const mockSuccess = (data: unknown, status = 200) => {
-    mockAxios.mockResolvedValue({ status, data });
-  };
-
-  const mockError = (status: number, message = "Error") => {
-    mockAxios.mockResolvedValue({
-      status,
-      data: { error: message },
-    });
-  };
-
-  const mockFailure = (error: Error) => {
-    mockAxios.mockRejectedValue(error);
-  };
-
-  return {
-    axios: mockAxios,
-    mockSuccess,
-    mockError,
-    mockFailure,
-    reset: () => mockAxios.mockClear(),
-  };
-};
-
 // Simple WebSocket mock
 export const createWebSocketMock = () => {
   const mockWebSocket = {
@@ -310,23 +275,6 @@ export const createEventEmitterMock = () => ({
   emit: vi.fn(),
   removeAllListeners: vi.fn(),
 });
-
-// Module-level mocks for common dependencies
-export const mockAxios = () => {
-  vi.mock("axios", () => ({
-    default: {
-      create: vi.fn(() => createAxiosMock().axios),
-    },
-  }));
-};
-
-export const mockAxiosRetry = () => {
-  vi.mock("axios-retry", () => ({
-    default: vi.fn(),
-    isNetworkError: vi.fn().mockReturnValue(false),
-    exponentialDelay: vi.fn().mockReturnValue(1000),
-  }));
-};
 
 export const mockJwtDecode = () => {
   vi.mock("jwt-decode", () => ({

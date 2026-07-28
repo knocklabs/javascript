@@ -79,8 +79,22 @@ const mockKnockClient = {
   },
 };
 
+// Controllable signed-in user id so a test can simulate an in-place user switch
+// (same Knock instance re-authenticated as a different user).
+let mockUserId: string | undefined = "user_1";
+
 vi.mock("@knocklabs/react-core", () => ({
   useKnockClient: () => mockKnockClient,
+  // Derive auth state from the same `isAuthenticated` mock so tests only have to
+  // toggle it in one place; `mockUserId` lets a test change the signed-in user
+  // while staying authenticated.
+  useKnockAuthState: () => ({
+    status: mockKnockClient.isAuthenticated()
+      ? "authenticated"
+      : "unauthenticated",
+    userId: mockKnockClient.isAuthenticated() ? mockUserId : undefined,
+    userToken: undefined,
+  }),
 }));
 
 describe("KnockExpoPushNotificationProvider", () => {
@@ -156,6 +170,64 @@ describe("KnockExpoPushNotificationProvider", () => {
     );
 
     expect(getByTestId("test-child")).toBeInTheDocument();
+  });
+
+  test("defers auto-registration and the OS prompt while unauthenticated", async () => {
+    mockKnockClient.isAuthenticated.mockReturnValue(false);
+    mockRegisterPushTokenToChannel.mockClear();
+    mockNotifications.getExpoPushTokenAsync.mockClear();
+
+    try {
+      const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+      const { getByTestId } = render(
+        <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      expect(getByTestId("test-child")).toBeInTheDocument();
+
+      // The auto-register effect must no-op: no channel registration and,
+      // crucially, no OS permission/token prompt for a logged-out user.
+      await waitFor(() => {
+        expect(getByTestId("test-child")).toBeInTheDocument();
+      });
+      expect(mockRegisterPushTokenToChannel).not.toHaveBeenCalled();
+      expect(mockNotifications.getExpoPushTokenAsync).not.toHaveBeenCalled();
+    } finally {
+      mockKnockClient.isAuthenticated.mockReturnValue(true);
+    }
+  });
+
+  test("skips the message-status update for a notification received while unauthenticated", () => {
+    mockKnockClient.isAuthenticated.mockReturnValue(false);
+    mockKnockClient.messages.updateStatus.mockClear();
+    mockNotifications.addNotificationReceivedListener.mockClear();
+
+    try {
+      const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+      render(
+        <KnockExpoPushNotificationProvider knockExpoChannelId="test-channel-id">
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      // Fire the received-notification handler the provider registered, with a
+      // Knock notification (it has a knock_message_id).
+      const receivedHandler =
+        mockNotifications.addNotificationReceivedListener.mock.calls.at(-1)?.[0];
+      expect(receivedHandler).toBeDefined();
+      receivedHandler({
+        request: { content: { data: { knock_message_id: "msg_1" } } },
+      });
+
+      // The status update is skipped because no user is signed in.
+      expect(mockKnockClient.messages.updateStatus).not.toHaveBeenCalled();
+    } finally {
+      mockKnockClient.isAuthenticated.mockReturnValue(true);
+    }
   });
 
   test("useExpoPushNotifications provides context values", () => {
@@ -601,5 +673,51 @@ describe("KnockExpoPushNotificationProvider", () => {
 
     // Should still only be called once
     expect(getTokenSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test("re-registers the push token when the authenticated user changes in place", async () => {
+    const NotificationsMock = await import("expo-notifications");
+    const getTokenSpy = vi.mocked(NotificationsMock.getExpoPushTokenAsync);
+    getTokenSpy.mockClear();
+    getTokenSpy.mockResolvedValue({ data: "test-token" });
+    mockRegisterPushTokenToChannel.mockClear();
+
+    const TestChild = () => <div data-testid="test-child">Test Child</div>;
+
+    try {
+      const { rerender } = render(
+        <KnockExpoPushNotificationProvider
+          knockExpoChannelId="test-channel-id"
+          autoRegister={true}
+        >
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      // Registers once for the initial user.
+      await waitFor(() => {
+        expect(mockRegisterPushTokenToChannel).toHaveBeenCalledTimes(1);
+      });
+
+      // Switch to a different user in place: same Knock instance, still
+      // authenticated, only the signed-in userId changes. `isAuthenticated`
+      // never flips, so the userId dependency is what drives re-registration.
+      mockUserId = "user_2";
+      rerender(
+        <KnockExpoPushNotificationProvider
+          knockExpoChannelId="test-channel-id"
+          autoRegister={true}
+        >
+          <TestChild />
+        </KnockExpoPushNotificationProvider>,
+      );
+
+      // The device token must be registered again for the new user.
+      await waitFor(() => {
+        expect(mockRegisterPushTokenToChannel).toHaveBeenCalledTimes(2);
+      });
+    } finally {
+      mockUserId = "user_1";
+    }
   });
 });

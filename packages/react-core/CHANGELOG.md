@@ -1,5 +1,95 @@
 # Changelog
 
+## 0.14.0
+
+### Minor Changes
+
+- e8567eb: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- e8567eb: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+  - @knocklabs/client@0.22.0
+
+## 0.14.0-rc.0
+
+### Minor Changes
+
+- d2f7948: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- d2f7948: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+  - @knocklabs/client@0.22.0-rc.0
+
+## 0.13.16
+
+### Patch Changes
+
+- Updated dependencies [3d7a041]
+  - @knocklabs/client@0.21.15
+
+## 0.13.15
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 70e7669: Handle missing `features` in feed settings responses to prevent crashes on partial API responses.
+- 3dd0aa8: Remove the `fast-deep-equal` dependency in favor of an internal `deepEqual` util.
+- b6c9be4: Keep Slack and MS Teams connection-status detection working with the new fetch-based `@knocklabs/client` transport by reading the HTTP response status instead of the previous axios-specific error `code`. The exported `AuthCheckResult` type no longer includes `code` and now exposes `response.status`.
+- Updated dependencies [dd1b724]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+
 ## 0.13.14
 
 ### Patch Changes

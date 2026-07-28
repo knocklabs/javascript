@@ -26,6 +26,25 @@ export type KnockProviderProps = {
   i18n?: I18nContent;
   logLevel?: LogLevel;
   branch?: string;
+  /**
+   * When `false`, render children but keep the Knock client idle: no identify
+   * call, no API requests, and no websocket. Set it to `true` and it connects
+   * like a login; set it back to `false` and it disconnects like a logout.
+   * Defaults to `true`.
+   *
+   * Use this to wait for a complete identity (for example, a user token that
+   * loads asynchronously) instead of conditionally mounting `KnockProvider`:
+   *
+   * ```tsx
+   * <KnockProvider
+   *   apiKey={apiKey}
+   *   user={{ id: userId }}
+   *   userToken={userToken}
+   *   enabled={Boolean(userId && userToken)}
+   * >
+   * ```
+   */
+  enabled?: boolean;
 } & (
   | {
       /**
@@ -66,6 +85,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   i18n,
   identificationStrategy,
   branch,
+  enabled,
   ...props
 }) => {
   const userIdOrUserWithProperties = props?.user || props?.userId;
@@ -79,6 +99,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       logLevel,
       identificationStrategy,
       branch,
+      enabled,
     }),
     [
       host,
@@ -87,6 +108,7 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       logLevel,
       identificationStrategy,
       branch,
+      enabled,
     ],
   );
 

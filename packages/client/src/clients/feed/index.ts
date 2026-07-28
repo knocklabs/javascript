@@ -30,6 +30,11 @@ class FeedClient {
     this.feedInstances = this.feedInstances.filter((f) => f !== feed);
   }
 
+  /** Whether this client currently manages any feed instances. */
+  hasInstances() {
+    return this.feedInstances.length > 0;
+  }
+
   teardownInstances() {
     for (const feed of this.feedInstances) {
       feed.teardown();

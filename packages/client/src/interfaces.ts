@@ -1,6 +1,6 @@
 import { GenericData } from "@knocklabs/types";
-import { JwtPayload } from "jwt-decode";
 
+import { JwtPayload } from "./jwt";
 import Knock from "./knock";
 
 export type LogLevel = "debug";
@@ -58,6 +58,24 @@ export interface AuthenticateOptions {
   onUserTokenExpiring?: UserTokenExpiringCallback;
   timeBeforeExpirationInMs?: number;
   identificationStrategy?: "inline" | "skip";
+}
+
+/**
+ * Whether a `Knock` instance currently has a signed-in user. When
+ * `unauthenticated`, the instance stays idle (no requests, no websocket) until
+ * `authenticate` is called.
+ */
+export type KnockAuthStatus = "authenticated" | "unauthenticated";
+
+/**
+ * The shape of the subscribable auth-state store exposed on `knock.authStore`.
+ * Subsystems and React hooks can subscribe to this to react to auth transitions
+ * (login / logout / user switch) without polling `isAuthenticated()`.
+ */
+export interface KnockAuthState {
+  status: KnockAuthStatus;
+  userId: UserId;
+  userToken: string | undefined;
 }
 
 export interface BulkOperation {
