@@ -5063,12 +5063,12 @@ __metadata:
     vite-plugin-no-bundle: "npm:^4.0.0"
     vitest: "npm:^3.2.4"
   peerDependencies:
-    expo: "*"
+    expo: ">=54"
     expo-constants: "*"
     expo-device: "*"
     expo-notifications: "*"
     react: "*"
-    react-native: "*"
+    react-native: ">=0.81"
     react-native-gesture-handler: ">=2.0.0"
   languageName: unknown
   linkType: soft
@@ -5187,7 +5187,7 @@ __metadata:
     vite-plugin-no-bundle: "npm:^4.0.0"
   peerDependencies:
     react: "*"
-    react-native: "*"
+    react-native: ">=0.81"
     react-native-gesture-handler: ">=2.0.0"
   languageName: unknown
   linkType: soft
