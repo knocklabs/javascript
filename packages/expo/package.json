@@ -44,7 +44,7 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
-    "expo": ">=54",
+    "expo": "*",
     "expo-constants": "*",
     "expo-device": "*",
     "expo-notifications": "*",

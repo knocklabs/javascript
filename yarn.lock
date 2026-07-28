@@ -5063,7 +5063,7 @@ __metadata:
     vite-plugin-no-bundle: "npm:^4.0.0"
     vitest: "npm:^3.2.4"
   peerDependencies:
-    expo: ">=54"
+    expo: "*"
     expo-constants: "*"
     expo-device: "*"
     expo-notifications: "*"
