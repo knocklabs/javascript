@@ -43,13 +43,13 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*",
+    "react-native": ">=0.81",
     "react-native-gesture-handler": ">=2.0.0"
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
     "@knocklabs/react-core": "workspace:^",
-    "react-native-get-random-values": "^1.11.0",
+    "react-native-get-random-values": "^2.0.0",
     "react-native-render-html": "^6.3.4",
     "react-native-svg": "~15.15.3"
   },
