@@ -69,8 +69,9 @@ export default defineConfig(({ mode }) => {
           },
           entryFileNames: (chunkInfo) => {
             // Chunks from `?inline` CSS imports carry the compiled style
-            // string as code, so they must not be named like the empty .css
-            // proxy chunks that get deleted and stripped below.
+            // string as code, so they need a name that sets them apart from
+            // the empty .css proxy chunks. Vite drops those proxy chunks from
+            // the bundle itself, so nothing here has to delete them.
             if (chunkInfo.facadeModuleId?.endsWith("?inline")) {
               return `[name].inline.${CJS ? "js" : "mjs"}`;
             }
