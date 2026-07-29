@@ -39,7 +39,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knocklabs/javascript.git"
+    "url": "git+https://github.com/knocklabs/javascript.git",
+    "directory": "packages/react-core"
   },
   "bugs": {
     "url": "https://github.com/knocklabs/javascript/issues"

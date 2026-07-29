@@ -2,6 +2,11 @@
   "name": "@knocklabs/typescript-config",
   "version": "0.0.2",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knocklabs/javascript.git",
+    "directory": "packages/typescript-config"
+  },
   "publishConfig": {
     "access": "public"
   }

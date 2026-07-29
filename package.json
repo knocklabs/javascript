@@ -24,11 +24,12 @@
     "test:integration:runner": "cd ./integration && yarn test:integration && cd ..",
     "type:check": "turbo type:check",
     "release:version": "yarn changeset version && yarn install --mode=update-lockfile",
-    "release:publish": "yarn build:packages && yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish --tag \"$NPM_CONFIG_TAG\" && yarn changeset tag",
+    "release:publish": "yarn workspaces foreach -Rpt --no-private --from '@knocklabs/*' npm publish --access public --tolerate-republish --provenance --tag \"$NPM_CONFIG_TAG\"",
+    "release:configure-trust": "node scripts/configure-trusted-publishers.mjs",
     "postinstall": "manypkg check"
   },
   "prettier": "@knocklabs/prettier-config",
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.17.1",
   "workspaces": [
     "examples/*",
     "packages/*",
