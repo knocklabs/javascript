@@ -84,12 +84,24 @@ export default defineConfig(({ mode }) => {
           {
             // Move index.css to root of dist. `assetFileNames` can't do this
             // itself, since rolldown rejects patterns that escape the outDir.
-            name: "move-index-css-to-dist-root",
+            //
+            // Also strip Vite's internal hash-update marker. Vite appends
+            // `/*$vite$:1*/` in finalizeCss() and strips it again at the end
+            // of the same generateBundle hook, but the stylesheet is added to
+            // the bundle via emitFile() within that hook, so it misses the
+            // strip and the marker leaks into the published file.
+            name: "finalize-index-css",
             writeBundle() {
+              const marker = /\/\*\$vite\$:\d+\*\//g;
               const from = path.resolve(__dirname, "dist/esm/index.css");
               const to = path.resolve(__dirname, "dist/index.css");
               if (fs.existsSync(from)) {
-                fs.renameSync(from, to);
+                fs.writeFileSync(to, fs.readFileSync(from, "utf8").replace(marker, ""));
+                fs.unlinkSync(from);
+              }
+              const cjs = path.resolve(__dirname, "dist/cjs/index.css");
+              if (fs.existsSync(cjs)) {
+                fs.writeFileSync(cjs, fs.readFileSync(cjs, "utf8").replace(marker, ""));
               }
             },
           },
