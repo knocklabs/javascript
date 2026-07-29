@@ -11,8 +11,7 @@ import type {
  * Context type for the Expo push notification provider.
  * Extends the base push notification context with Expo-specific functionality.
  */
-export interface KnockExpoPushNotificationContextType
-  extends KnockPushNotificationContextType {
+export interface KnockExpoPushNotificationContextType extends KnockPushNotificationContextType {
   /** The Expo push token, or null if not yet registered */
   expoPushToken: string | null;
 

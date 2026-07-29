@@ -1,0 +1,17 @@
+{
+  "printWidth": 80,
+  "trailingComma": "all",
+  "singleQuote": false,
+  "tabWidth": 2,
+  "sortImports": {
+    "internalPattern": ["@/"],
+    "ignoreCase": false,
+    "newlinesBetween": true,
+    "groups": [
+      ["value-builtin", "value-external", "type-import"],
+      ["value-internal", "type-internal"],
+      ["value-parent", "type-parent"],
+      ["value-sibling", "value-index", "type-sibling", "type-index"]
+    ]
+  }
+}

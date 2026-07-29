@@ -13,6 +13,8 @@ const sharedConfig = defineConfig({
         "*.d.ts",
         "**/dist/**",
         "**/node_modules/**",
+        // Dev-only playground (yarn dev:local), not part of the shipped package
+        "**/src/App.tsx",
         // Ignore config packages
         "packages/eslint-config",
         "packages/prettier-config",

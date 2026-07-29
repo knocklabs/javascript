@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Socket } from "phoenix";
 
 import { exponentialBackoffFullJitter } from "./helpers";

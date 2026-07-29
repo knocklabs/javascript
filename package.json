@@ -61,8 +61,11 @@
     "@knocklabs/typescript-config": "workspace:^",
     "@manypkg/cli": "^0.25.0",
     "@vitest/coverage-v8": "^3.2.4",
+    "oxfmt": "0.60.0",
+    "oxlint": "1.75.0",
     "prettier": "^3.5.3",
     "turbo": "^2.9.16",
+    "typescript-7": "npm:typescript@7.0.2",
     "vitest": "^3.2.4"
   },
   "engines": {

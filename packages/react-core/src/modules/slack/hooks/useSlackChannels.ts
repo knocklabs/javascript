@@ -1,8 +1,8 @@
-import { SlackChannelQueryOptions, useKnockSlackClient } from "..";
 import { GetSlackChannelsResponse, SlackChannel } from "@knocklabs/client";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 
+import { SlackChannelQueryOptions, useKnockSlackClient } from "..";
 import { useKnockClient } from "../../core";
 
 const MAX_COUNT = 1000;

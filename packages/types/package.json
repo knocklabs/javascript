@@ -6,13 +6,12 @@
   "license": "MIT",
   "types": "./src/index.d.ts",
   "scripts": {
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type:check": "tsc --noEmit",
-    "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
-    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check"
+    "lint": "oxlint --max-warnings=0",
+    "type:check": "node ../../node_modules/typescript-7/bin/tsc --noEmit",
+    "format": "oxfmt \"src/**/*.{ts,tsx,js}\"",
+    "format:check": "oxfmt --check \"src/**/*.{ts,tsx,js}\""
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
     "typescript": "^5.8.3"
   },
   "publishConfig": {

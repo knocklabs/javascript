@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { Card } from "../../src/modules/guide/components/Card/Card";
+import { Card, CardView } from "../../src/modules/guide/components/Card/Card";
 
 vi.mock("@knocklabs/react-core", async () => {
   const actual = await vi.importActual("@knocklabs/react-core");
@@ -29,5 +29,15 @@ describe("Card", () => {
     const { getByText } = render(<Card />);
     expect(getByText("Heads up!")).toBeInTheDocument();
     expect(getByText("Quick Tip")).toBeInTheDocument();
+  });
+
+  test("CardView.Img renders a void img with no children", () => {
+    const { getByAltText } = render(
+      <CardView.Img src="https://example.com/image.png" alt="Example image" />,
+    );
+    const img = getByAltText("Example image");
+    expect(img.tagName).toBe("IMG");
+    expect(img).toHaveClass("knock-guide-card__img");
+    expect(img).toBeEmptyDOMElement();
   });
 });
