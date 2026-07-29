@@ -276,10 +276,11 @@ export const createEventEmitterMock = () => ({
   removeAllListeners: vi.fn(),
 });
 
-export const mockJwtDecode = () => {
-  vi.mock("jwt-decode", () => ({
-    jwtDecode: vi.fn().mockReturnValue({
-      exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-    }),
-  }));
-};
+// `vi.mock` is hoisted to the top of the module regardless of where it's
+// written, so it lives at the top level here rather than inside a helper that
+// only looked like it had to be called.
+vi.mock("jwt-decode", () => ({
+  jwtDecode: vi.fn().mockReturnValue({
+    exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+  }),
+}));

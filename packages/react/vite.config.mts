@@ -1,9 +1,9 @@
 /// <reference types="vitest" />
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
+import fs from "fs";
 import { createRequire } from "module";
 import path from "path";
-import execute from "rollup-plugin-execute";
 import preserveDirectives from "rollup-preserve-directives";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
 import dts from "vite-plugin-dts";
@@ -26,12 +26,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
-      react({
-        jsxRuntime: "classic",
-        babel: {
-          plugins: ["react-require"],
-        },
-      }),
+      react(),
       dts({
         outDir: "dist/types",
       }),
@@ -60,13 +55,13 @@ export default defineConfig(({ mode }) => {
         // External peer dependency packages that should not be bundled
         external: [ "react", "react-dom", "next", /^next\/.*/, "@tanstack/react-router" ],
         output: {
-          interop: "compat",
           globals: {
             react: "React",
           },
           assetFileNames: (assetInfo) => {
-            // Rename styles to index.css
-            if (assetInfo.name === "style.css") {
+            // Rename styles to index.css. Rolldown names the stylesheet after
+            // the lib entry rather than "style.css", so match on the extension.
+            if (assetInfo.name?.endsWith(".css")) {
               return "index.css";
             }
             return assetInfo.name;
@@ -82,15 +77,18 @@ export default defineConfig(({ mode }) => {
           },
         },
         plugins: [
-          execute([
-            // Move index.css to root of dist
-            `mv dist/esm/index.css dist/index.css`,
-            // Delete extra .css.js files
-            `find ./dist -name "*.css.js" -delete`,
-            `find ./dist -name "*.css.js.map" -delete`,
-            `find ./dist -name "*.css.mjs" -delete`,
-            `find ./dist -name "*.css.mjs.map" -delete`,
-          ]),
+          {
+            // Move index.css to root of dist. `assetFileNames` can't do this
+            // itself, since rolldown rejects patterns that escape the outDir.
+            name: "move-index-css-to-dist-root",
+            writeBundle() {
+              const from = path.resolve(__dirname, "dist/esm/index.css");
+              const to = path.resolve(__dirname, "dist/index.css");
+              if (fs.existsSync(from)) {
+                fs.renameSync(from, to);
+              }
+            },
+          },
           // Remove css imports
           {
             name: "remove-css-imports",

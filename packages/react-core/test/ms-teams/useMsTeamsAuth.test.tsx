@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type UseMsTeamsAuth from "../../src/modules/ms-teams/hooks/useMsTeamsAuth";
-import { mockMsTeamsContext, mockTranslations } from "../test-utils/mocks";
+import { mockMsTeamsContext } from "../test-utils/mocks";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-branch";
 
@@ -19,7 +19,6 @@ mockMsTeamsContext({
   setConnectionStatus: mockSetConnectionStatus,
   setActionLabel: mockSetActionLabel,
 });
-mockTranslations();
 
 const mockMsTeamsClient = {
   revokeAccessToken: vi.fn(),

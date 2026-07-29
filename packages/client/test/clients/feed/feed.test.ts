@@ -858,7 +858,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         const _feed = new Feed(
@@ -913,7 +915,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         const feedItem = createUnreadFeedItem();
@@ -958,7 +962,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         // Create a feedItem with circular reference to trigger JSON error
@@ -1006,7 +1012,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         // Mock fetch response for when broadcast message triggers refetch

@@ -2,7 +2,7 @@ import KnockClient, { type MsTeamsChannelConnection } from "@knocklabs/client";
 import { act, renderHook } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { mockMsTeamsContext, mockTranslations } from "../test-utils/mocks";
+import { mockMsTeamsContext } from "../test-utils/mocks";
 
 // ----------------------------------------------------------------------------------
 // Shared mocks
@@ -53,7 +53,6 @@ vi.mock("swr", () =>
 
 // Apply shared mocks _before_ loading the hook to ensure context is mocked first
 mockMsTeamsContext();
-mockTranslations();
 
 let useConnectedMsTeamsChannels: typeof import("../../src/modules/ms-teams/hooks/useConnectedMsTeamsChannels").default;
 

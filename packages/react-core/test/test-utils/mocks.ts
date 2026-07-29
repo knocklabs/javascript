@@ -80,12 +80,14 @@ export const mockMsTeamsContext = (
 /**
  * Simple translation mock so tests can rely on t(key) => key without importing
  * real language bundles.
+ *
+ * `vi.mock` is hoisted to the top of the module, so this applies to every test
+ * file importing these helpers — it used to be wrapped in an exported function
+ * that callers had to invoke, which misrepresented when it actually ran.
  */
-export const mockTranslations = () => {
-  vi.mock("../../src/modules/i18n", () => ({
-    useTranslations: () => ({ t: (k: string) => k }),
-  }));
-};
+vi.mock("../../src/modules/i18n", () => ({
+  useTranslations: () => ({ t: (k: string) => k }),
+}));
 
 // ---------------------------------------------------------------------------
 // Internal: manage a shared overrides object to satisfy Vitest hoisting.

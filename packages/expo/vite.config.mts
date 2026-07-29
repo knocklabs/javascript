@@ -43,7 +43,6 @@ export default defineConfig(({ mode }) => {
           "expo-notifications",
         ],
         output: {
-          interop: "compat",
           format: formats[0],
           globals: {
             react: "React",

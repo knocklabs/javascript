@@ -17,12 +17,7 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
-      react({
-        jsxRuntime: "classic",
-        babel: {
-          plugins: ["react-require"],
-        },
-      }),
+      react(),
       noBundlePlugin({ root: "./src" }),
       codecovVitePlugin({
         enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
@@ -43,7 +38,6 @@ export default defineConfig(({ mode }) => {
         // External packages that should not be bundled
         external: ["react"],
         output: {
-          interop: "compat",
           globals: {
             react: "React",
           },

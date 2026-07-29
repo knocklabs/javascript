@@ -42,7 +42,6 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         output: {
-          interop: "compat",
           entryFileNames: () => {
             return `[name].${CJS ? "js" : "mjs"}`;
           },
