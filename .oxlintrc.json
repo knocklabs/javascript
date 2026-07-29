@@ -23,7 +23,16 @@
     "**/dist/**",
     "**/build/**",
     "**/coverage/**",
-    "examples/**",
+    "**/.next/**",
+    "**/.expo/**",
     "integration/**"
+  ],
+  "overrides": [
+    {
+      "files": ["examples/**"],
+      "rules": {
+        "react-hooks/exhaustive-deps": "off"
+      }
+    }
   ]
 }

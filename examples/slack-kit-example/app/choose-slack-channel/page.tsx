@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { useState } from "react";
 
 import FetchUserIdForm from "../components/fetch-user-id-form";
 import SlackChannelWrapper from "../components/slack-channel-wrapper";
 import { getAppDetails } from "../lib/app-details";
 
 export default async function Page() {
-  const { collection, objectId, userId } = getAppDetails();
+  const { collection, objectId } = getAppDetails();
 
   return (
     <>

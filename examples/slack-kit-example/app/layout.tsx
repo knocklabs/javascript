@@ -31,7 +31,7 @@ async function MyApp({ children }: { children: React.ReactElement }) {
 
   return (
     <>
-      <html>
+      <html lang="en">
         <body className="px-12 py-6">
           <h1 className="text-2xl font-bold mb-6">SlackKit Demo App</h1>
           <Providers userToken={userToken} knockUserId={userId} tenant={tenant}>

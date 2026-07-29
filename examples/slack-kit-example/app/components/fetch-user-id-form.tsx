@@ -17,7 +17,7 @@ export default function FetchUserIdForm() {
     try {
       const result = await fetchUserId(email);
       setUserData(result);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch user data. Please try again.");
     }
   };

@@ -49,7 +49,7 @@ yarn format
 - **Package manager**: Yarn 4.1.0
 - **Testing**: Vitest
 - **Releases**: Changesets for versioning
-- **Linting & formatting**: `packages/*` use the oxc toolchain — oxlint (`.oxlintrc.json`) and oxfmt (`.oxfmtrc.json`), configured at the repo root and auto-discovered per package. Example apps still run ESLint/Prettier.
+- **Linting & formatting**: the whole repo (packages and examples) uses the oxc toolchain — oxlint (`.oxlintrc.json`) and oxfmt (`.oxfmtrc.json`), configured at the repo root and auto-discovered per workspace. Next example apps set `eslint.ignoreDuringBuilds` since linting runs via oxlint, not `next build`.
 - **Type-checking**: `packages/*` type-check with TypeScript 7, installed as the `typescript-7` alias (`npm:typescript@7.0.2`); TypeScript 5.x is retained for builds (`vite-plugin-dts`).
 
 ## Adding Dependencies
