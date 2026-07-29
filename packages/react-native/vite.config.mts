@@ -35,9 +35,6 @@ export default defineConfig(({ mode }) => {
         // External packages that should not be bundled into your library.
         external: ["react", "react-native"],
         output: {
-          // Rolldown defaults `strict` to "auto", which respects source-level
-          // directives. TS/ESM sources never write one, so CJS output would
-          // ship sloppy-mode. Rollup defaulted this to true.
           strict: true,
           format: formats[0],
           globals: {

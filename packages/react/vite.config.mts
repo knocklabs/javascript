@@ -55,9 +55,6 @@ export default defineConfig(({ mode }) => {
         // External peer dependency packages that should not be bundled
         external: [ "react", "react-dom", "next", /^next\/.*/, "@tanstack/react-router" ],
         output: {
-          // Rolldown defaults `strict` to "auto", which respects source-level
-          // directives. TS/ESM sources never write one, so CJS output would
-          // ship sloppy-mode. Rollup defaulted this to true.
           strict: true,
           globals: {
             react: "React",
