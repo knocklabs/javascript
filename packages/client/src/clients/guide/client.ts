@@ -28,7 +28,6 @@ import {
   GroupStage,
   GuideAddedEvent,
   GuideData,
-  GuideEngagementEventBaseParams,
   GuideGroupAddedEvent,
   GuideGroupUpdatedEvent,
   GuideRemovedEvent,
@@ -37,6 +36,9 @@ import {
   GuideUpdatedEvent,
   KnockGuide,
   KnockGuideStep,
+  MarkAsArchivedParams,
+  MarkAsInteractedParams,
+  MarkAsSeenParams,
   MarkGuideAsResponse,
   QueryFilterParams,
   QueryStatus,
@@ -1020,7 +1022,16 @@ export class KnockGuideClient {
       data: this.targetParams.data,
     };
 
-    this.sendEngagementEvent("seen", params);
+    void this.knock.user
+      .markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>("seen", params)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as seen: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
@@ -1060,7 +1071,19 @@ export class KnockGuideClient {
       metadata,
     };
 
-    this.sendEngagementEvent("interacted", params);
+    void this.knock.user
+      .markGuideStepAs<
+        MarkAsInteractedParams,
+        MarkGuideAsResponse
+      >("interacted", params)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as interacted: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
@@ -1092,10 +1115,19 @@ export class KnockGuideClient {
 
     const params = this.buildEngagementEventBaseParams(guide, updatedStep);
 
-    this.sendEngagementEvent("archived", {
-      ...params,
-      unthrottled: guide.bypass_global_group_limit,
-    });
+    void this.knock.user
+      .markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>("archived", {
+        ...params,
+        unthrottled: guide.bypass_global_group_limit,
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as archived: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
@@ -1122,22 +1154,6 @@ export class KnockGuideClient {
 
   private shouldSkipEngagementApi(): boolean {
     return !!this.store.state.debug?.skipEngagementTracking;
-  }
-
-  private sendEngagementEvent<P extends GuideEngagementEventBaseParams>(
-    status: "seen" | "interacted" | "archived",
-    params: P,
-  ) {
-    void this.knock.user
-      .markGuideStepAs<P, MarkGuideAsResponse>(status, params)
-      .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error);
-
-        this.knock.log(
-          `[Guide] Failed to mark guide step as ${status}: ${message}`,
-          true,
-        );
-      });
   }
 
   //
