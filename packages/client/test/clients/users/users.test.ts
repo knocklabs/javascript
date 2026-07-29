@@ -993,5 +993,43 @@ describe("User Client", () => {
         }),
       ).rejects.toThrow("Guide step not found");
     });
+
+    test("preserves the original API error and its response details", async () => {
+      const { knock, mockApiClient } = getTestSetup();
+      const responseBody = {
+        error: "Invalid guide engagement",
+        field: "guide_step_ref",
+      };
+      const apiError = Object.assign(
+        new Error("Request failed with status code 400"),
+        {
+          name: "ApiRequestError",
+          response: {
+            status: 400,
+            data: responseBody,
+          },
+        },
+      );
+
+      mockApiClient.makeRequest.mockResolvedValue({
+        statusCode: "error",
+        status: 400,
+        error: apiError,
+        body: responseBody,
+      });
+
+      const request = knock.user.markGuideStepAs("interacted", {
+        guide_key: "onboarding_guide",
+        guide_id: "guide_456",
+        guide_step_ref: "step_1",
+        channel_id: "channel_456",
+      });
+
+      await expect(request).rejects.toBe(apiError);
+      expect(apiError.response).toEqual({
+        status: 400,
+        data: responseBody,
+      });
+    });
   });
 });

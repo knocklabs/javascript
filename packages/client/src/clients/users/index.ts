@@ -153,7 +153,8 @@ class UserClient {
 
   private handleResponse<T>(response: ApiResponse) {
     if (response.statusCode === "error") {
-      throw new Error(response.error || response.body);
+      const error = response.error || response.body;
+      throw error instanceof Error ? error : new Error(error);
     }
 
     return response.body as T;
