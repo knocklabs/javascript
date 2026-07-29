@@ -42,6 +42,10 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         output: {
+          // Rolldown defaults `strict` to "auto", which respects source-level
+          // directives. TS/ESM sources never write one, so CJS output would
+          // ship sloppy-mode. Rollup defaulted this to true.
+          strict: true,
           entryFileNames: () => {
             return `[name].${CJS ? "js" : "mjs"}`;
           },
