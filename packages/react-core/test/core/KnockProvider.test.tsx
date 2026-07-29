@@ -12,7 +12,9 @@ const { knock, mockApiClient } = createMockKnock("test_api_key");
 
 // Mock the Knock client constructor to return our mock instance
 vi.mock("@knocklabs/client", () => ({
-  default: vi.fn().mockImplementation(() => knock),
+  default: vi.fn().mockImplementation(function () {
+    return knock;
+  }),
 }));
 
 // Mock API responses

@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
         // External packages that should not be bundled into your library.
         external: ["react", "react-native"],
         output: {
-          interop: "compat",
+          strict: true,
           format: formats[0],
           globals: {
             react: "React",

@@ -3,6 +3,7 @@
   "description": "A set of React components to build notification experiences powered by Knock",
   "author": "@knocklabs",
   "version": "0.14.0",
+  "sideEffects": false,
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
@@ -45,7 +46,7 @@
     "url": "https://github.com/knocklabs/javascript/issues"
   },
   "peerDependencies": {
-    "react": "^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {
     "@knocklabs/client": "workspace:^",
@@ -61,8 +62,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.59.4",
     "@typescript-eslint/parser": "^8.59.4",
-    "@vitejs/plugin-react": "^4.5.1",
-    "babel-plugin-react-require": "^4.0.3",
+    "@vitejs/plugin-react": "^6.0.4",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.2",
@@ -70,11 +70,10 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "rimraf": "^6.0.1",
-    "rollup-plugin-execute": "^1.1.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.19",
+    "vite": "^8.1.5",
     "vite-plugin-dts": "^4.5.0",
     "vite-plugin-no-bundle": "^4.0.0",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.10"
   }
 }

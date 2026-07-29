@@ -56,7 +56,9 @@ const mockStore = {
 };
 
 vi.mock("@tanstack/store", () => ({
-  Store: vi.fn(() => mockStore),
+  Store: vi.fn(function () {
+    return mockStore;
+  }),
 }));
 
 // Mock phoenix

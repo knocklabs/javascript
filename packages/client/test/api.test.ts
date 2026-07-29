@@ -33,22 +33,27 @@ const skipRetryDelays = (apiClient: ApiClient) => {
     .mockResolvedValue(undefined);
 };
 
+// `ApiClient` calls `new Socket(...)`, and vitest 4 only lets a mock stand in
+// as a constructor when its implementation is a `function` (or class), not an
+// arrow function.
 const { createSocketMock } = vi.hoisted(() => ({
-  createSocketMock: () => ({
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-    isConnected: vi.fn().mockReturnValue(false),
-    onOpen: vi.fn(),
-    onClose: vi.fn(),
-    onError: vi.fn(),
-    channel: vi.fn().mockReturnValue({
-      join: vi.fn(),
-      leave: vi.fn(),
-      push: vi.fn(),
-      on: vi.fn(),
-      off: vi.fn(),
-    }),
-  }),
+  createSocketMock: function () {
+    return {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      isConnected: vi.fn().mockReturnValue(false),
+      onOpen: vi.fn(),
+      onClose: vi.fn(),
+      onError: vi.fn(),
+      channel: vi.fn().mockReturnValue({
+        join: vi.fn(),
+        leave: vi.fn(),
+        push: vi.fn(),
+        on: vi.fn(),
+        off: vi.fn(),
+      }),
+    };
+  },
 }));
 
 vi.mock("phoenix", () => ({
