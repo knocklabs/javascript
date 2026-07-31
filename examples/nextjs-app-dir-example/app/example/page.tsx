@@ -112,12 +112,7 @@ export default function Example() {
               <Stack justifyContent="space-between" alignItems="center">
                 <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon
-                      aria-hidden={true}
-                      alt="GitHub"
-                      icon={Github}
-                      color="gray"
-                    />
+                    <Icon aria-hidden={true} icon={Github} color="gray" />
                     <Text as="span" color="gray">
                       Github repo
                     </Text>
@@ -125,12 +120,7 @@ export default function Example() {
                 </a>
                 <a href="https://docs.knock.app/in-app-ui/react/overview">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon
-                      aria-hidden={true}
-                      alt="GitHub"
-                      icon={FileCode}
-                      color="gray"
-                    />
+                    <Icon aria-hidden={true} icon={FileCode} color="gray" />
                     <Text as="span" color="gray">
                       Documentation
                     </Text>
