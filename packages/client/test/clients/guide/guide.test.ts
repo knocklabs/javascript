@@ -903,6 +903,125 @@ describe("KnockGuideClient", () => {
       });
     });
 
+    test.each([
+      {
+        status: "seen",
+        timestamp: "seen_at",
+        engage: (
+          client: KnockGuideClient,
+          guide: KnockGuide,
+          step: KnockGuideStep,
+        ) => client.markAsSeen(guide, step),
+      },
+      {
+        status: "interacted",
+        timestamp: "interacted_at",
+        engage: (
+          client: KnockGuideClient,
+          guide: KnockGuide,
+          step: KnockGuideStep,
+        ) => client.markAsInteracted(guide, step),
+      },
+      {
+        status: "archived",
+        timestamp: "archived_at",
+        engage: (
+          client: KnockGuideClient,
+          guide: KnockGuide,
+          step: KnockGuideStep,
+        ) => client.markAsArchived(guide, step),
+      },
+    ] as const)(
+      "handles rejected $status requests after applying the optimistic update",
+      async ({ status, timestamp, engage }) => {
+        const error = new Error(`${status} request failed`);
+        vi.mocked(mockKnock.user.markGuideStepAs).mockRejectedValueOnce(error);
+
+        const freshStep = {
+          ...mockStep,
+          message: {
+            ...mockStep.message,
+            seen_at: null,
+            read_at: null,
+            interacted_at: null,
+            archived_at: null,
+          },
+        } as KnockGuideStep;
+        const freshGuide = {
+          ...mockGuide,
+          steps: [freshStep],
+          getStep: vi.fn().mockReturnValue(freshStep),
+        } as KnockGuide;
+        const stateWithGuides = {
+          guideGroups: [mockDefaultGroup],
+          guideGroupDisplayLogs: {},
+          guides: { [freshGuide.key]: freshGuide },
+          ineligibleGuides: {},
+          previewGuides: {},
+          queries: {},
+          location: undefined,
+          counter: 0,
+          debug: { forcedGuideKey: null, previewSessionId: null },
+        };
+        mockStore.state = stateWithGuides;
+        mockStore.getState.mockReturnValue(stateWithGuides);
+
+        const result = await engage(
+          new KnockGuideClient(mockKnock, channelId),
+          freshGuide,
+          freshStep,
+        );
+        await Promise.resolve();
+
+        expect(result?.message[timestamp]).toEqual(expect.any(String));
+        expect(mockKnock.log).toHaveBeenCalledWith(
+          `[Guide] Failed to mark guide step as ${status}: ${error.message}`,
+          true,
+        );
+      },
+    );
+
+    test("does not wait for the engagement request before resolving", async () => {
+      const pendingRequest = new Promise<never>(() => {});
+      vi.mocked(mockKnock.user.markGuideStepAs).mockReturnValueOnce(
+        pendingRequest,
+      );
+
+      const freshStep = {
+        ...mockStep,
+        message: {
+          ...mockStep.message,
+          interacted_at: null,
+          read_at: null,
+        },
+      } as KnockGuideStep;
+      const freshGuide = {
+        ...mockGuide,
+        steps: [freshStep],
+        getStep: vi.fn().mockReturnValue(freshStep),
+      } as KnockGuide;
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshGuide.key]: freshGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await new KnockGuideClient(
+        mockKnock,
+        channelId,
+      ).markAsInteracted(freshGuide, freshStep);
+
+      expect(result?.message.interacted_at).toEqual(expect.any(String));
+    });
+
     test("marks guide step as archived with bypass_global_group_limit true", async () => {
       // Create a fresh mock step for this test
       const freshMockStep = {

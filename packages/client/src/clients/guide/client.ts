@@ -1022,10 +1022,16 @@ export class KnockGuideClient {
       data: this.targetParams.data,
     };
 
-    this.knock.user.markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>(
-      "seen",
-      params,
-    );
+    void this.knock.user
+      .markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>("seen", params)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as seen: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
@@ -1065,10 +1071,19 @@ export class KnockGuideClient {
       metadata,
     };
 
-    this.knock.user.markGuideStepAs<
-      MarkAsInteractedParams,
-      MarkGuideAsResponse
-    >("interacted", params);
+    void this.knock.user
+      .markGuideStepAs<
+        MarkAsInteractedParams,
+        MarkGuideAsResponse
+      >("interacted", params)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as interacted: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
@@ -1100,13 +1115,19 @@ export class KnockGuideClient {
 
     const params = this.buildEngagementEventBaseParams(guide, updatedStep);
 
-    this.knock.user.markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>(
-      "archived",
-      {
+    void this.knock.user
+      .markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>("archived", {
         ...params,
         unthrottled: guide.bypass_global_group_limit,
-      },
-    );
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as archived: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
