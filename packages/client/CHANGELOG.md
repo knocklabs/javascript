@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.1
+
+### Patch Changes
+
+- 9b5f244: fix(KNO-14505): prevent guide engagement API failures from becoming unhandled promise rejections
+
+  Guide seen, interacted, and archived events continue to update local state optimistically while failed background requests are caught and logged.
+
 ## 0.22.0
 
 ### Minor Changes

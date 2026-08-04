@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.13.1
+
+### Patch Changes
+
+- eb174b2: chore(deps): bump @telegraph/layout from 0.6.0 to 0.6.1 in the telegraph-packages group
+- 9b5f244: fix(KNO-14505): prevent guide engagement API failures from becoming unhandled promise rejections
+
+  Guide seen, interacted, and archived events continue to update local state optimistically while failed background requests are caught and logged.
+
+- 9dddaf7: chore(deps): bump the telegraph-packages group to the latest minor releases
+- Updated dependencies [9b5f244]
+  - @knocklabs/client@0.22.1
+  - @knocklabs/react-core@0.15.1
+
 ## 0.13.0
 
 ### Minor Changes
