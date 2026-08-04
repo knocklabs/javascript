@@ -4653,7 +4653,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-config-turbo: "npm:2.10.4"
-    eslint-plugin-only-warn: "npm:^1.1.0"
+    eslint-plugin-only-warn: "npm:^1.2.1"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
@@ -11935,10 +11935,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-only-warn@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "eslint-plugin-only-warn@npm:1.1.0"
-  checksum: 10c0/72dfc947aa944321dfa63938f2e8bb91e7fda68f988837a8accf4551534ed04bf71957a46d00a4ddc43de5fe31055da12365b2c53c6ee6508f2ba203cd2cfa27
+"eslint-plugin-only-warn@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "eslint-plugin-only-warn@npm:1.2.1"
+  checksum: 10c0/4eacc41105b57fdf27f873c7395b3fdaf80d4c8a8c2217d9dd7ce25bd09c8ffc24895080efabf65109113bc80e1ba0cad33ab6819e4e4965781bdf3e968a9de5
   languageName: node
   linkType: hard
 
