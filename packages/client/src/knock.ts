@@ -22,6 +22,14 @@ import { jwtDecode } from "./jwt";
 
 const DEFAULT_HOST = "https://api.knock.app";
 
+/**
+ * Floor for the token-expiration timer. `exp - timeBeforeExpirationInMs - now`
+ * is negative whenever we authenticate with a token that is already inside the
+ * refresh window, and `setTimeout` treats a negative delay as `0`, so without a
+ * floor the refresh runs on the next tick.
+ */
+const MIN_TOKEN_EXPIRATION_DELAY_MS = 1_000;
+
 class Knock {
   public host: string;
   private apiClient: ApiClient | null = null;
@@ -289,33 +297,99 @@ class Knock {
     const nowMs = Date.now();
 
     // Expiration is in the future
-    if (expiresAtMs && expiresAtMs > nowMs) {
-      // Check how long until the token should be regenerated
-      // | ----------------- | ----------------------- |
-      // ^ now               ^ expiration offset       ^ expires at
-      const msInFuture = expiresAtMs - timeBeforeExpirationInMs - nowMs;
+    if (!expiresAtMs || expiresAtMs <= nowMs) return;
 
-      const timerId = setTimeout(async () => {
-        const newToken = await callbackFn(this.userToken as string, decoded);
-
-        // If we were torn down (logout/unmount) or re-authenticated while the
-        // callback was awaiting, the timer reference will have changed (or been
-        // cleared). Bail so we don't resurrect a logged-out instance by
-        // re-authenticating and re-opening connections.
-        if (this.tokenExpirationTimer !== timerId) {
-          return;
-        }
-
-        // Reauthenticate which will handle reinitializing sockets
-        if (typeof newToken === "string") {
-          this.authenticate(this.userId!, newToken, {
-            onUserTokenExpiring: callbackFn,
-            timeBeforeExpirationInMs: timeBeforeExpirationInMs,
-          });
-        }
-      }, msInFuture);
-      this.tokenExpirationTimer = timerId;
+    // Only ever keep one refresh timer per instance. `authenticate()` can be
+    // called repeatedly with unchanged credentials (a React effect re-running,
+    // for example), which does not tear down, so replacing the reference
+    // without clearing the old timer leaves it live: it still wakes up and
+    // calls the app's refresh callback before failing the identity check below.
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer);
+      this.tokenExpirationTimer = null;
     }
+
+    // Check how long until the token should be regenerated
+    // | ----------------- | ----------------------- |
+    // ^ now               ^ expiration offset       ^ expires at
+    //
+    // Floored: a token that is already inside the refresh window produces a
+    // negative delay, which `setTimeout` runs on the next tick.
+    const msInFuture = Math.max(
+      expiresAtMs - timeBeforeExpirationInMs - nowMs,
+      MIN_TOKEN_EXPIRATION_DELAY_MS,
+    );
+
+    const timerId = setTimeout(async () => {
+      const newToken = await callbackFn(this.userToken as string, decoded);
+
+      // If we were torn down (logout/unmount) or re-authenticated while the
+      // callback was awaiting, the timer reference will have changed (or been
+      // cleared). Bail so we don't resurrect a logged-out instance by
+      // re-authenticating and re-opening connections.
+      if (this.tokenExpirationTimer !== timerId) {
+        return;
+      }
+
+      if (typeof newToken !== "string") {
+        return;
+      }
+
+      // A refresh that does not push the expiration further out cannot be
+      // rescheduled sanely: re-authenticating would schedule another immediate
+      // refresh, and since changed credentials tear down and rebuild the API
+      // client, the instance would spin — hammering the app's token endpoint,
+      // re-identifying the user, and reconnecting the socket every round trip
+      // until the page is closed. Stop instead and let the caller notice.
+      if (
+        !this.refreshMakesProgress(
+          newToken,
+          expiresAtMs,
+          timeBeforeExpirationInMs,
+        )
+      ) {
+        this.log(
+          "Refreshed user token expires too soon to schedule another refresh; not re-authenticating",
+          true,
+        );
+        return;
+      }
+
+      // Reauthenticate which will handle reinitializing sockets
+      this.authenticate(this.userId!, newToken, {
+        onUserTokenExpiring: callbackFn,
+        timeBeforeExpirationInMs: timeBeforeExpirationInMs,
+      });
+    }, msInFuture);
+    this.tokenExpirationTimer = timerId;
+  }
+
+  /**
+   * Whether re-authenticating with `newToken` would buy real time: it has to
+   * expire later than the token it replaces, and late enough that the next
+   * refresh timer is a genuine wait rather than another immediate refresh.
+   *
+   * Tokens we cannot read an expiration from are treated as progress, leaving
+   * the behaviour to `authenticate()` as before — an unreadable or `exp`-less
+   * token schedules nothing, so it cannot spin.
+   */
+  private refreshMakesProgress(
+    newToken: string,
+    previousExpiresAtMs: number,
+    timeBeforeExpirationInMs: number,
+  ): boolean {
+    let nextExpiresAtMs: number;
+
+    try {
+      nextExpiresAtMs = (jwtDecode(newToken).exp ?? 0) * 1000;
+    } catch {
+      return true;
+    }
+
+    if (!nextExpiresAtMs) return true;
+    if (nextExpiresAtMs <= previousExpiresAtMs) return false;
+
+    return nextExpiresAtMs - timeBeforeExpirationInMs - Date.now() > 0;
   }
 
   /**
