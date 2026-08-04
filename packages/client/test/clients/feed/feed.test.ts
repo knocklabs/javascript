@@ -429,6 +429,7 @@ describe("Feed", () => {
             engagement_status: undefined,
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: undefined,
           },
         });
         expect(result).toEqual(bulkResponse);
@@ -466,6 +467,7 @@ describe("Feed", () => {
             engagement_status: undefined,
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: undefined,
           },
         });
         expect(result).toEqual(bulkResponse);
@@ -503,6 +505,7 @@ describe("Feed", () => {
             engagement_status: undefined,
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: undefined,
           },
         });
         expect(result).toEqual(bulkResponse);
@@ -1162,6 +1165,7 @@ describe("Feed", () => {
             archived: "exclude",
             has_tenant: true,
             tenant: "tenant-123",
+            trigger_data: { type: "comment", priority: 1 },
           },
           undefined,
         );
@@ -1177,6 +1181,7 @@ describe("Feed", () => {
             archived: "exclude",
             has_tenant: true,
             tenants: ["tenant-123"],
+            trigger_data: '{"type":"comment","priority":1}',
           },
         });
       } finally {
@@ -1199,6 +1204,7 @@ describe("Feed", () => {
           {
             status: "all", // Should not be included in options
             archived: "include",
+            trigger_data: { type: "mention" },
           },
           undefined,
         );
@@ -1214,6 +1220,7 @@ describe("Feed", () => {
             archived: "include",
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: '{"type":"mention"}',
           },
         });
       } finally {
