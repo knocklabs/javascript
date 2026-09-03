@@ -663,6 +663,97 @@ describe("Knock Client", () => {
       expect(authenticateSpy).not.toHaveBeenCalled();
       expect(knock.isAuthenticated()).toBe(false);
     });
+
+    test("floors the refresh delay for a token already inside the expiration window", async () => {
+      const knock = new Knock("pk_test_12345");
+      const onUserTokenExpiring = vi.fn().mockResolvedValue("token_new");
+
+      // 5s of life left, but we refresh 30s before expiry: the unfloored delay
+      // is -25s, which `setTimeout` would run on the next tick.
+      vi.mocked(jwtDecode).mockReturnValueOnce({
+        exp: Math.floor((Date.now() + 5000) / 1000),
+      });
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 30000,
+      });
+
+      await vi.advanceTimersByTimeAsync(0);
+      expect(onUserTokenExpiring).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not re-authenticate when the refreshed token expires no later than the current one", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+      const onUserTokenExpiring = vi.fn().mockResolvedValue("token_same_exp");
+
+      const exp = Math.floor((Date.now() + 60000) / 1000);
+      vi.mocked(jwtDecode)
+        .mockReturnValueOnce({ exp }) // the token we authenticate with
+        .mockReturnValueOnce({ exp }); // the refreshed token: no progress
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      });
+      authenticateSpy.mockClear();
+
+      await vi.advanceTimersByTimeAsync(50000);
+
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+      expect(authenticateSpy).not.toHaveBeenCalled();
+    });
+
+    // A refreshed token that is itself inside the refresh window would schedule
+    // another refresh immediately. Re-authenticating on it spins: token endpoint
+    // flood, one identify and one socket reconnect per iteration, and 429s.
+    test("does not spin when the refreshed token is also inside the expiration window", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+      const onUserTokenExpiring = vi
+        .fn()
+        .mockResolvedValue("token_also_near_expiry");
+
+      vi.mocked(jwtDecode)
+        // Authenticated with a token that has 5s of life left.
+        .mockReturnValueOnce({ exp: Math.floor((Date.now() + 5000) / 1000) })
+        // The refresh returns a later token, but still inside the 30s window.
+        .mockReturnValueOnce({ exp: Math.floor((Date.now() + 10000) / 1000) });
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 30000,
+      });
+      authenticateSpy.mockClear();
+
+      await vi.advanceTimersByTimeAsync(60000);
+
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+      expect(authenticateSpy).not.toHaveBeenCalled();
+    });
+
+    test("keeps a single refresh timer when re-authenticating with unchanged credentials", async () => {
+      const knock = new Knock("pk_test_12345");
+      const onUserTokenExpiring = vi.fn().mockResolvedValue("token_new");
+
+      const options = {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      };
+
+      // Same credentials twice: no teardown runs, so the first timer has to be
+      // cleared explicitly or it stays live alongside the second.
+      knock.authenticate("user_123", "token_abc", options);
+      knock.authenticate("user_123", "token_abc", options);
+
+      await vi.advanceTimersByTimeAsync(60000);
+
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("Authentication with reinitialize", () => {
