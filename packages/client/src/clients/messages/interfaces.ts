@@ -63,6 +63,7 @@ export type BulkUpdateMessagesInChannelProperties = {
     archived?: "exclude" | "include" | "only";
     has_tenant?: boolean;
     tenants?: string[];
+    trigger_data?: string;
   };
 };
 
