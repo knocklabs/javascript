@@ -8,6 +8,7 @@ import {
   useTranslations,
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
+import { Icon } from "@telegraph/icon";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { Hash, Lock } from "lucide-react";
@@ -148,6 +149,25 @@ export const SlackChannelCombobox: FunctionComponent<
     [currentConnectedChannels],
   );
 
+  // An option's accessible name is derived from its children, and ours are
+  // elements (an icon beside the name), so the combobox falls back to the raw
+  // channel id. Name the trigger ourselves rather than flattening the option
+  // to a bare string, which would cost the icon.
+  const triggerLabel = useMemo(() => {
+    const namesById = new Map(
+      slackChannels.map((channel) => [channel.id, channel.name]),
+    );
+    const connectedNames = comboboxValue
+      .map((channelId) => namesById.get(channelId))
+      .filter((name): name is string => !!name);
+
+    // Falling back to the placeholder matches what the combobox would have
+    // named the trigger on its own. It has to stay a string: the trigger
+    // spreads our props over its own `aria-label`, so undefined would leave
+    // the trigger unnamed rather than deferring.
+    return connectedNames.join(", ") || searchPlaceholder || "";
+  }, [slackChannels, comboboxValue, searchPlaceholder]);
+
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
       <SlackAddChannelInput
@@ -192,7 +212,7 @@ export const SlackChannelCombobox: FunctionComponent<
           false
         }
       >
-        <Combobox.Trigger />
+        <Combobox.Trigger aria-label={triggerLabel} />
         <Combobox.Content>
           <Combobox.Search
             label={t("slackSearchChannels")}
@@ -200,21 +220,16 @@ export const SlackChannelCombobox: FunctionComponent<
           />
           <Combobox.Options maxHeight="36">
             {slackChannels.map((channel) => (
-              // `label` has to be a string: the combobox derives both the
-              // option's and the trigger's accessible name from it, and falls
-              // back to `value` (the raw channel id) for anything else. That
-              // rules out passing the icon as children, since children lose to
-              // `label`. The leading slot is taken by the selection check, so
-              // the channel type sits in the trailing slot instead.
-              <Combobox.Option
-                key={channel.id}
-                value={channel.id}
-                label={channel.name}
-                trailingIcon={{
-                  icon: channel.is_private ? Lock : Hash,
-                  "aria-hidden": true,
-                }}
-              />
+              <Combobox.Option key={channel.id} value={channel.id}>
+                <Stack align="center" gap="1">
+                  <Icon
+                    icon={channel.is_private ? Lock : Hash}
+                    size="0"
+                    aria-hidden
+                  />
+                  {channel.name}
+                </Stack>
+              </Combobox.Option>
             ))}
           </Combobox.Options>
           <Combobox.Empty />

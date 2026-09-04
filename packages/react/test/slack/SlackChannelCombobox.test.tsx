@@ -46,11 +46,9 @@ describe("SlackChannelCombobox", () => {
 
     renderCombobox();
 
-    // Each option renders an icon beside the channel name, so its children are
-    // elements rather than a string. @telegraph/combobox resolves an option's
-    // accessible label from `label || children || value` and falls back to
-    // `value` for non-string labels, so without an explicit `label` prop the
-    // trigger announces the raw Slack channel id.
+    // Options render an icon beside the channel name, so their children are
+    // elements and the combobox falls back to naming the trigger after the raw
+    // channel id. The component passes its own `aria-label` instead.
     expect(screen.getByRole("combobox")).toHaveAccessibleName("general");
   });
 
@@ -91,9 +89,9 @@ describe("SlackChannelCombobox", () => {
 
     const option = await screen.findByRole("option", { name: "general" });
 
-    // An option's children lose to its `label`, so the icon has to come
-    // through an icon slot. Each option renders two: the selection check and
-    // the hash/lock that says whether the channel is private.
+    // Two icons per option: the selection check, and the hash/lock that says
+    // whether the channel is private. The second one is the reason the option
+    // keeps element children instead of a bare string label.
     expect(option.querySelectorAll("[data-tgph-icon-svg]")).toHaveLength(2);
   });
 
