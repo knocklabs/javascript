@@ -4,20 +4,16 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MsTeamsChannelInTeamCombobox } from "../../src/modules/ms-teams/components/MsTeamsChannelCombobox/MsTeamsChannelInTeamCombobox";
 import { MsTeamsTeamCombobox } from "../../src/modules/ms-teams/components/MsTeamsChannelCombobox/MsTeamsTeamCombobox";
 
-// `sortByDisplayName` sorts in place, so hand each render its own array rather
-// than sharing one across tests.
-const buildTeams = () => [
+const teams = [
   { id: "team_1", displayName: "Engineering" },
   { id: "team_2", displayName: "Design" },
 ];
 
-const buildChannels = () => [
+const channels = [
   { id: "channel_1", displayName: "General" },
   { id: "channel_2", displayName: "Releases" },
 ];
 
-let teams = buildTeams();
-let channels = buildChannels();
 let connectedChannels: Array<{
   ms_teams_team_id?: string;
   ms_teams_channel_id?: string;
@@ -41,8 +37,6 @@ vi.mock("@knocklabs/react-core", async () => {
 const recipientObject = { objectId: "object_123", collection: "projects" };
 
 beforeEach(() => {
-  teams = buildTeams();
-  channels = buildChannels();
   connectedChannels = [];
 });
 
@@ -52,7 +46,7 @@ describe("MsTeamsTeamCombobox", () => {
   test("trigger announces the selected team by display name", () => {
     render(
       <MsTeamsTeamCombobox
-        team={teams.find((team) => team.id === "team_1")!}
+        team={teams[0]!}
         onTeamChange={vi.fn()}
         getChannelCount={() => 0}
       />,
@@ -64,7 +58,7 @@ describe("MsTeamsTeamCombobox", () => {
   test("trigger includes the connected channel count", () => {
     render(
       <MsTeamsTeamCombobox
-        team={teams.find((team) => team.id === "team_1")!}
+        team={teams[0]!}
         onTeamChange={vi.fn()}
         getChannelCount={() => 2}
       />,
