@@ -8,7 +8,6 @@ import {
   useTranslations,
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
-import { Icon } from "@telegraph/icon";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
 import { Hash, Lock } from "lucide-react";
@@ -201,22 +200,21 @@ export const SlackChannelCombobox: FunctionComponent<
           />
           <Combobox.Options maxHeight="36">
             {slackChannels.map((channel) => (
+              // `label` has to be a string: the combobox derives both the
+              // option's and the trigger's accessible name from it, and falls
+              // back to `value` (the raw channel id) for anything else. That
+              // rules out passing the icon as children, since children lose to
+              // `label`. The leading slot is taken by the selection check, so
+              // the channel type sits in the trailing slot instead.
               <Combobox.Option
                 key={channel.id}
                 value={channel.id}
-                // Without this, the option's label falls back to its element
-                // children, and the trigger announces the raw channel id.
                 label={channel.name}
-              >
-                <Stack align="center" gap="1">
-                  <Icon
-                    icon={channel.is_private ? Lock : Hash}
-                    size="0"
-                    aria-hidden
-                  />
-                  {channel.name}
-                </Stack>
-              </Combobox.Option>
+                trailingIcon={{
+                  icon: channel.is_private ? Lock : Hash,
+                  "aria-hidden": true,
+                }}
+              />
             ))}
           </Combobox.Options>
           <Combobox.Empty />

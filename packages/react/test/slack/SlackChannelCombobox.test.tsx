@@ -82,6 +82,21 @@ describe("SlackChannelCombobox", () => {
     expect(screen.getByRole("combobox")).toHaveAccessibleName("general");
   });
 
+  test("each option still shows its channel-type icon", async () => {
+    connectedChannels = [];
+
+    renderCombobox();
+
+    fireEvent.click(screen.getByRole("combobox"));
+
+    const option = await screen.findByRole("option", { name: "general" });
+
+    // An option's children lose to its `label`, so the icon has to come
+    // through an icon slot. Each option renders two: the selection check and
+    // the hash/lock that says whether the channel is private.
+    expect(option.querySelectorAll("[data-tgph-icon-svg]")).toHaveLength(2);
+  });
+
   test("selecting an option connects that channel", async () => {
     connectedChannels = [];
 
