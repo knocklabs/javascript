@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.2
+
+### Patch Changes
+
+- e7f7a4f: Scope bulk feed status updates to the feed's trigger data filters.
+- 696cbac: Upgrade Phoenix to 1.8.9 to address CVE-2026-56812.
+- 90a95d1: Stop the user-token refresh from spinning. The expiry timer is no longer scheduled with a negative delay when the client authenticates with a token that is already inside the refresh window, orphaned timers are cleared instead of left live, and a refresh whose token expires too soon to schedule another wait no longer re-authenticates (which would tear down and rebuild the API client and socket on every round trip).
+
 ## 0.22.1
 
 ### Patch Changes
