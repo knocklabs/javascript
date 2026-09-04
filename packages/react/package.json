@@ -79,7 +79,7 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@telegraph/button": ">=0.8.0",
-    "@telegraph/combobox": ">=0.5.0",
+    "@telegraph/combobox": "^0.6.0",
     "@telegraph/icon": ">=0.6.0",
     "@telegraph/layout": ">=0.6.1",
     "@telegraph/segmented-control": ">=0.4.0",

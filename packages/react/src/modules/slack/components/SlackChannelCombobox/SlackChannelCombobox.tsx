@@ -142,7 +142,10 @@ export const SlackChannelCombobox: FunctionComponent<
   ]);
 
   const comboboxValue = useMemo(
-    () => currentConnectedChannels.map((connection) => connection.channel_id),
+    () =>
+      currentConnectedChannels
+        .map((connection) => connection.channel_id)
+        .filter((channelId): channelId is string => !!channelId),
     [currentConnectedChannels],
   );
 
@@ -198,7 +201,13 @@ export const SlackChannelCombobox: FunctionComponent<
           />
           <Combobox.Options maxHeight="36">
             {slackChannels.map((channel) => (
-              <Combobox.Option key={channel.id} value={channel.id}>
+              <Combobox.Option
+                key={channel.id}
+                value={channel.id}
+                // Without this, the option's label falls back to its element
+                // children, and the trigger announces the raw channel id.
+                label={channel.name}
+              >
                 <Stack align="center" gap="1">
                   <Icon
                     icon={channel.is_private ? Lock : Hash}
