@@ -111,7 +111,11 @@ describe("MsTeamsChannelInTeamCombobox", () => {
       />,
     );
 
+    // The accessible name alone cannot catch this: an id with no matching
+    // option resolves to undefined and drops out of the name. It does render a
+    // tag though, so assert on that.
     expect(screen.getByRole("combobox")).toHaveAccessibleName("General");
+    expect(screen.queryByText("channel_from_team_2")).not.toBeInTheDocument();
   });
 
   test("shows the placeholder when no channels are connected", () => {

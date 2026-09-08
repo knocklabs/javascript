@@ -77,7 +77,11 @@ describe("SlackChannelCombobox", () => {
 
     renderCombobox();
 
+    // The accessible name alone cannot catch this: an id with no matching
+    // option contributes nothing to the name. It does render a tag though, so
+    // assert on that.
     expect(screen.getByRole("combobox")).toHaveAccessibleName("general");
+    expect(screen.queryByText("C0NOPE")).not.toBeInTheDocument();
   });
 
   test("each option still shows its channel-type icon", async () => {
