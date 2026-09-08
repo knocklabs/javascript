@@ -8,7 +8,8 @@ const slackChannels = [
   { id: "C0456DEF", name: "engineering", is_private: true },
 ];
 
-let connectedChannels: Array<{ channel_id?: string }> = [];
+let connectedChannels: Array<{ channel_id?: string }> | undefined = [];
+let connectionStatus = "connected";
 const updateConnectedChannels = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@knocklabs/react-core", async () => {
@@ -16,10 +17,7 @@ vi.mock("@knocklabs/react-core", async () => {
   return {
     ...actual,
     useTranslations: () => ({ t: (k: string) => k }),
-    useKnockSlackClient: () => ({
-      connectionStatus: "connected",
-      errorLabel: null,
-    }),
+    useKnockSlackClient: () => ({ connectionStatus, errorLabel: null }),
     useSlackChannels: () => ({ data: slackChannels, isLoading: false }),
     useConnectedSlackChannels: () => ({
       data: connectedChannels,
@@ -38,6 +36,7 @@ const renderCombobox = () =>
 describe("SlackChannelCombobox", () => {
   beforeEach(() => {
     connectedChannels = [];
+    connectionStatus = "connected";
     updateConnectedChannels.mockClear();
   });
 
@@ -114,5 +113,38 @@ describe("SlackChannelCombobox", () => {
         { channel_id: "C0123ABC" },
       ]),
     );
+  });
+
+  test("renders before the connected channels have loaded", () => {
+    connectedChannels = undefined;
+
+    renderCombobox();
+
+    expect(screen.getByRole("combobox")).toHaveAccessibleName(
+      "slackSearchbarNoChannelsConnected",
+    );
+  });
+
+  test("ignores a connection that carries no channel id", () => {
+    connectedChannels = [{ channel_id: "C0123ABC" }, {}];
+
+    renderCombobox();
+
+    expect(screen.getByRole("combobox")).toHaveAccessibleName("general");
+  });
+
+  test("stays disabled when the connection errored with no label to show", () => {
+    // Nothing is connected and `errorLabel` is null, so both the names and the
+    // placeholder the trigger falls back to are empty. It still has to be
+    // handed a string, since undefined would blank the label the trigger
+    // derives for itself.
+    connectionStatus = "error";
+    connectedChannels = [];
+
+    renderCombobox();
+
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toBeDisabled();
+    expect(trigger).toHaveAttribute("aria-label", "");
   });
 });
