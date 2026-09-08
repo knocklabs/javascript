@@ -62,21 +62,22 @@ export const SlackChannelCombobox: FunctionComponent<
     updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ slackChannelsRecipientObject });
 
-  const currentConnectedChannels = useMemo<SlackChannelConnection[]>(() => {
-    // Used to make sure we're only showing currently available channels to select from.
-    // There are cases where a channel is "connected" in Knock, but it wouldn't be
-    // posting to it if the channel is private and the Slackbot doesn't belong to it,
-    // so the channel won't show up here and it won't be posted to.
-    const slackChannelsMap = new Map(
-      slackChannels.map((channel) => [channel.id, channel]),
-    );
+  const slackChannelsById = useMemo(
+    () => new Map(slackChannels.map((channel) => [channel.id, channel])),
+    [slackChannels],
+  );
 
-    return (
-      connectedChannels?.filter((connectedChannel) => {
-        return slackChannelsMap.has(connectedChannel.channel_id || "");
-      }) || []
-    );
-  }, [connectedChannels, slackChannels]);
+  const currentConnectedChannels = useMemo<SlackChannelConnection[]>(
+    () =>
+      // Used to make sure we're only showing currently available channels to select from.
+      // There are cases where a channel is "connected" in Knock, but it wouldn't be
+      // posting to it if the channel is private and the Slackbot doesn't belong to it,
+      // so the channel won't show up here and it won't be posted to.
+      connectedChannels?.filter((connectedChannel) =>
+        slackChannelsById.has(connectedChannel.channel_id || ""),
+      ) || [],
+    [connectedChannels, slackChannelsById],
+  );
 
   const inErrorState = useMemo(
     () =>
@@ -154,11 +155,8 @@ export const SlackChannelCombobox: FunctionComponent<
   // channel id. Name the trigger ourselves rather than flattening the option
   // to a bare string, which would cost the icon.
   const triggerLabel = useMemo(() => {
-    const namesById = new Map(
-      slackChannels.map((channel) => [channel.id, channel.name]),
-    );
     const connectedNames = comboboxValue
-      .map((channelId) => namesById.get(channelId))
+      .map((channelId) => slackChannelsById.get(channelId)?.name)
       .filter((name): name is string => !!name);
 
     // Falling back to the placeholder matches what the combobox would have
@@ -166,7 +164,7 @@ export const SlackChannelCombobox: FunctionComponent<
     // spreads our props over its own `aria-label`, so undefined would leave
     // the trigger unnamed rather than deferring.
     return connectedNames.join(", ") || searchPlaceholder || "";
-  }, [slackChannels, comboboxValue, searchPlaceholder]);
+  }, [slackChannelsById, comboboxValue, searchPlaceholder]);
 
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
