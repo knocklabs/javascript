@@ -4666,7 +4666,7 @@ __metadata:
     "@expo/log-box": "npm:~56.0.12"
     "@expo/vector-icons": "npm:^15.0.2"
     "@knocklabs/expo": "workspace:^"
-    "@types/react": "npm:^19.2.17"
+    "@types/react": "npm:^19.2.18"
     eslint: "npm:^8.56.0"
     eslint-config-expo: "npm:~56.0.4"
     eslint-import-resolver-typescript: "npm:^4.4.4"
@@ -4687,8 +4687,8 @@ __metadata:
     expo-symbols: "npm:~56.0.5"
     expo-system-ui: "npm:~56.0.5"
     expo-web-browser: "npm:~56.0.5"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     react-native: "npm:^0.85.3"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-reanimated: "npm:~4.3.1"
@@ -4711,7 +4711,7 @@ __metadata:
     "@knocklabs/react-native": "workspace:^"
     "@testing-library/jest-dom": "npm:^6.8.0"
     "@testing-library/react": "npm:^16.3.2"
-    "@types/react": "npm:^19.2.17"
+    "@types/react": "npm:^19.2.18"
     "@types/react-native-htmlview": "npm:^0.16.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.4"
     "@typescript-eslint/parser": "npm:^8.59.4"
@@ -4724,7 +4724,7 @@ __metadata:
     expo-device: "npm:~56.0.4"
     expo-notifications: "npm:~56.0.14"
     jsdom: "npm:^29.1.0"
-    react: "npm:^19.2.7"
+    react: "npm:^19.2.8"
     react-native: "npm:^0.85.3"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-render-html: "npm:^6.3.4"
@@ -4804,8 +4804,8 @@ __metadata:
     "@tanstack/react-store": "npm:^0.7.3"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.2"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.4"
     "@typescript-eslint/parser": "npm:^8.59.4"
     "@vitejs/plugin-react": "npm:^6.0.4"
@@ -4814,8 +4814,8 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.5.2"
     jsdom: "npm:^29.1.0"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     rimraf: "npm:^6.1.3"
     swr: "npm:^2.4.1"
     typescript: "npm:^5.8.3"
@@ -4835,7 +4835,7 @@ __metadata:
     "@codecov/vite-plugin": "npm:^2.0.1"
     "@knocklabs/client": "workspace:^"
     "@knocklabs/react-core": "workspace:^"
-    "@types/react": "npm:^19.2.17"
+    "@types/react": "npm:^19.2.18"
     "@types/react-native-get-random-values": "npm:^1"
     "@types/react-native-htmlview": "npm:^0.16.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.4"
@@ -4844,8 +4844,8 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.5.2"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     react-native: "npm:^0.85.3"
     react-native-gesture-handler: "npm:~2.30.0"
     react-native-get-random-values: "npm:^2.0.0"
@@ -4889,8 +4889,8 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.2"
     "@types/eslint-plugin-jsx-a11y": "npm:^6"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.4"
     "@typescript-eslint/parser": "npm:^8.59.4"
     "@vitejs/plugin-react": "npm:^6.0.4"
@@ -4901,8 +4901,8 @@ __metadata:
     jsdom: "npm:^29.1.0"
     lucide-react: "npm:^0.544.0"
     next: "npm:15.3.6"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     rimraf: "npm:^6.1.3"
     rollup-preserve-directives: "npm:^1.1.3"
     typescript: "npm:^5.8.3"
@@ -7754,12 +7754,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.2.3":
-  version: 19.2.3
-  resolution: "@types/react-dom@npm:19.2.3"
+"@types/react-dom@npm:^19.2.5":
+  version: 19.2.5
+  resolution: "@types/react-dom@npm:19.2.5"
   peerDependencies:
     "@types/react": ^19.2.0
-  checksum: 10c0/b486ebe0f4e2fb35e2e108df1d8fc0927ca5d6002d5771e8a739de11239fe62d0e207c50886185253c99eb9dedfeeb956ea7429e5ba17f6693c7acb4c02f8cd1
+  checksum: 10c0/7a59467b043debf392d109daa1ba672e791f20ce6f24ae81fb54715f890f8119d24967e61e3644b6307428603b695b7d59e69eaf531bd1963a74a6cb462f5f49
   languageName: node
   linkType: hard
 
@@ -7789,12 +7789,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.2.17":
-  version: 19.2.17
-  resolution: "@types/react@npm:19.2.17"
+"@types/react@npm:^19.2.18":
+  version: 19.2.18
+  resolution: "@types/react@npm:19.2.18"
   dependencies:
     csstype: "npm:^3.2.2"
-  checksum: 10c0/bc2c4af96b3e480604424de70d5ebda90c5f4b485df471858c0bc2d7d70364b606ec3c4d8579f94f01aa0c6c0591f56bcf14cba5689f5eea4b74250ccdc3a232
+  checksum: 10c0/d04216172b4b4362b310017c210dfbe019fb4f4e7dffd0313e70b3acb3051d5c3e76e7e84e3cf4c6a3c824993ffadfe3949e589a6398a09d4200e7670e2962de
   languageName: node
   linkType: hard
 
@@ -10413,8 +10413,8 @@ __metadata:
     "@vitejs/plugin-react-swc": "npm:^4.3.0"
     jsdom: "npm:^29.1.0"
     prettier: "npm:^3.5.3"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     vite: "npm:^8.1.5"
     vitest: "npm:^4.1.10"
   languageName: unknown
@@ -13540,15 +13540,15 @@ __metadata:
     "@eslint/js": "npm:^9.9.0"
     "@knocklabs/client": "workspace:^"
     "@knocklabs/react": "workspace:^"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     "@vitejs/plugin-react": "npm:^6.0.4"
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.5.2"
     globals: "npm:^16.0.0"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     react-router: "npm:^7.6.3"
     typescript: "npm:^5.8.3"
     typescript-eslint: "npm:^8.61.0"
@@ -16235,14 +16235,14 @@ __metadata:
     "@knocklabs/react": "npm:0.13.2"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.3"
     next: "npm:15.3.6"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
@@ -16494,16 +16494,16 @@ __metadata:
     "@telegraph/typography": "npm:^0.5.2"
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^24"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     framer-motion: "npm:^12.38.0"
     next: "npm:next@15.3.6"
     next-seo: "npm:^6.8.0"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     react-icons: "npm:^5.4.0"
     sonner: "npm:^2.0.7"
     swr: "npm:^2.4.1"
@@ -16535,15 +16535,15 @@ __metadata:
     "@telegraph/typography": "npm:^0.5.2"
     "@types/eslint": "npm:^8.44.7"
     "@types/node": "npm:^24"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     "@types/uuid": "npm:^10.0.0"
     eslint: "npm:^8.56.0"
     framer-motion: "npm:^12.38.0"
     next: "npm:15.3.6"
     next-seo: "npm:^6.8.0"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     react-icons: "npm:^5.4.0"
     sonner: "npm:^2.0.7"
     swr: "npm:^2.4.1"
@@ -17564,14 +17564,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.2.7":
-  version: 19.2.7
-  resolution: "react-dom@npm:19.2.7"
+"react-dom@npm:^19.2.8":
+  version: 19.2.8
+  resolution: "react-dom@npm:19.2.8"
   dependencies:
     scheduler: "npm:^0.27.0"
   peerDependencies:
-    react: ^19.2.7
-  checksum: 10c0/970ff600f6e80d47d39e2f226f12f226173b3cba3382efc97c5f0cd663de9af38c7a4c11c213fb936094faeac83060d660247accaa96b752180d5b951b9cfecb
+    react: ^19.2.8
+  checksum: 10c0/41ba2247b76f687fcfe5bbc99f514d6b851d8c8041c2f5ded36ed05bd7fdc5208cacbac9de51e3e6633e77f96f44cec9f0d4a5a55184dba4e00738f224439134
   languageName: node
   linkType: hard
 
@@ -17982,10 +17982,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.2.7":
-  version: 19.2.7
-  resolution: "react@npm:19.2.7"
-  checksum: 10c0/0bd0e2f1bbd4ba97561c6597bf8a5fec05e6476fe61e165c1065598d16668efc6715205599c94d3ddd49d36cb0f21cbf1b9bcc18ee840b805ce222c3e8d558ac
+"react@npm:^19.2.8":
+  version: 19.2.8
+  resolution: "react@npm:19.2.8"
+  checksum: 10c0/5f86bdb56426652fd6d989d30a6f2e603c057272c47c9ca3a3fbe190a3a39ee9ccce937d63cfc039717abed1b8891d6a499134bc35311acc07eafdacd86537cd
   languageName: node
   linkType: hard
 
@@ -19052,14 +19052,14 @@ __metadata:
     "@knocklabs/react": "npm:0.13.2"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/node": "npm:^24"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.3"
     next: "npm:15.3.6"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
@@ -19072,15 +19072,15 @@ __metadata:
     "@knocklabs/react": "npm:0.13.2"
     "@tailwindcss/postcss": "npm:^4.3.0"
     "@types/node": "npm:^24"
-    "@types/react": "npm:^19.2.17"
-    "@types/react-dom": "npm:^19.2.3"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.5"
     eslint: "npm:^8.56.0"
     eslint-config-next: "npm:15.4.6"
     jsonwebtoken: "npm:^9.0.3"
     next: "npm:15.3.6"
     postcss: "npm:^8"
-    react: "npm:^19.2.7"
-    react-dom: "npm:^19.2.7"
+    react: "npm:^19.2.8"
+    react-dom: "npm:^19.2.8"
     tailwindcss: "npm:^4.2.2"
     typescript: "npm:^5.8.3"
   languageName: unknown
