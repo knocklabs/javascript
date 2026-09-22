@@ -23,7 +23,7 @@
     "@telegraph/textarea": "^0.4.1",
     "@telegraph/tokens": "^0.2.2",
     "@telegraph/typography": "^0.5.2",
-    "framer-motion": "^12.38.0",
+    "framer-motion": "^13.3.0",
     "next": "npm:next@15.3.6",
     "next-seo": "^6.8.0",
     "react": "^19.2.7",
