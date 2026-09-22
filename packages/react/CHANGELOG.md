@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.13.3
+
+### Patch Changes
+
+- 62205a1: Stop `sortByDisplayName` from reordering the array it is given
+
+  The MS Teams comboboxes sorted their teams and channels in place. `useMsTeamsChannels` returns a reference straight into SWR's cache, so rendering `MsTeamsChannelInTeamCombobox` reordered the cached array for every other reader of that key, including apps calling the hook themselves. The helper now copies before sorting, matching its Slack counterpart.
+
+- 62205a1: Pin every `@telegraph/*` dependency to a caret range at its latest release
+
+  These were open `>=` ranges, so an install resolved to whatever was newest on npm rather than a version this package had been built against. In practice that already meant `@telegraph/combobox` 0.6.0, a rewrite onto Base UI, so the three comboboxes are now tested and pinned against it rather than receiving it by accident.
+
+  `@telegraph/select` was a second route to the same problem: it sat on 0.1.0, which pins `@telegraph/combobox` at 0.5.0, so consumers received two copies of the combobox. Moving it to 0.2.0 leaves one.
+
+- 62205a1: Name the Slack channel combobox trigger without changing what it renders
+
+  The trigger announced the raw Slack channel id, because an option's accessible name is derived from its children and these render an icon beside the name. The component now passes its own `aria-label`, which the trigger spreads over the one it derives, so the channel icon and the layout stay exactly as they were.
+
 ## 0.13.2
 
 ### Patch Changes
