@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.3
+
+### Patch Changes
+
+- 1bbf12e: chore(deps): bump swr from 2.4.1 to 2.5.1
+
 ## 0.15.2
 
 ### Patch Changes
