@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.16.0
+
+### Minor Changes
+
+- 33f3365: Skip quarters in feed timestamp formatting: timestamps for dates 3-12 months old now show "X months ago" instead of "X quarters ago". Added optional `formatTimestamp` prop to `NotificationCell` and `NotificationFeed` for custom timestamp formatting.
+
+### Patch Changes
+
+- 1bbf12e: chore(deps): bump swr from 2.4.1 to 2.5.1
+
 ## 0.15.2
 
 ### Patch Changes
