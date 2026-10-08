@@ -1,5 +1,6 @@
 import Knock, { FeedClientOptions } from "@knocklabs/client";
-import { differenceInMonths, intlFormatDistance, parseISO } from "date-fns";
+import { differenceInSeconds, intlFormatDistance, parseISO } from "date-fns";
+import { secondsInQuarter, secondsInYear } from "date-fns/constants";
 import { ReactNode } from "react";
 
 import { BadgeCountType } from "./types";
@@ -47,14 +48,14 @@ export function formatTimestamp(
   try {
     const parsedTs = parseISO(ts);
     const now = new Date();
-    const monthsDiff = Math.abs(differenceInMonths(parsedTs, now));
+    const elapsedSeconds = Math.abs(differenceInSeconds(parsedTs, now));
 
-    // Skip the "quarter" unit for dates between 3 and 12 months old.
-    // date-fns uses quarters for ~91 days to ~1 year, which reads oddly
-    // ("2 quarters ago"). Force months for this range instead.
-    // Note: We use <= 12 (not < 12) because date-fns has a bug where dates
-    // exactly 12 months old may show "4 quarters ago" instead of "last year".
-    const unit = monthsDiff >= 3 && monthsDiff <= 12 ? "month" : undefined;
+    // Mirrors the elapsed-seconds range in which date-fns would pick
+    // "quarter", so every would-be quarter result is shown in months.
+    const unit =
+      elapsedSeconds >= secondsInQuarter && elapsedSeconds < secondsInYear
+        ? "month"
+        : undefined;
 
     const formatted = intlFormatDistance(parsedTs, now, {
       locale: options.locale,

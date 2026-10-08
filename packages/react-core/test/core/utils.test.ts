@@ -130,6 +130,20 @@ describe("formatTimestamp", () => {
     expect(formatTimestamp(elevenMonthsAgo.toISOString())).toBe("11 months ago");
   });
 
+  test("it uses months when under 3 calendar months but past date-fns's quarter threshold", () => {
+    vi.setSystemTime(new Date("2026-10-31T11:00:00Z"));
+
+    expect(formatTimestamp("2026-07-31T12:00:00Z")).toBe("3 months ago");
+  });
+
+  test("it uses months when over 12 calendar months but under date-fns's year threshold", () => {
+    vi.setSystemTime(new Date("2026-10-08T12:00:00Z"));
+
+    // 365 days and a few hours is still under date-fns's secondsInYear
+    // (365.2425 days), where it would otherwise pick "4 quarters ago".
+    expect(formatTimestamp("2025-10-08T08:00:00Z")).toBe("12 months ago");
+  });
+
   test("it allows automatic unit selection for dates less than 3 months old", () => {
     // Set a fixed date: Oct 8, 2026 at noon
     const now = new Date(2026, 9, 8, 12, 0, 0);
