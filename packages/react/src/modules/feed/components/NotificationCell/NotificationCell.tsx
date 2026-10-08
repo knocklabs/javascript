@@ -7,9 +7,9 @@ import {
   TextContentBlock,
 } from "@knocklabs/client";
 import {
+  type TimestampFormatter,
   formatTimestamp as defaultFormatTimestamp,
   renderNodeOrFallback,
-  type TimestampFormatter,
   useKnockFeed,
   useTranslations,
 } from "@knocklabs/react-core";
