@@ -21,6 +21,8 @@ export {
   feedProviderKey,
   slackProviderKey,
   msTeamsProviderKey,
+  type FormatTimestampOptions,
+  type TimestampFormatter,
 } from "./utils";
 export {
   type BadgeCountType,

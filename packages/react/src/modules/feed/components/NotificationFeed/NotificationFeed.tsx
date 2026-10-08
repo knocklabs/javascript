@@ -2,6 +2,7 @@ import { FeedItem, NetworkStatus, isRequestInFlight } from "@knocklabs/client";
 import {
   ColorMode,
   FilterStatus,
+  type TimestampFormatter,
   useFeedSettings,
   useKnockFeed,
   useTranslations,
@@ -30,6 +31,7 @@ export type RenderItemProps<T = GenericData> = {
   item: FeedItem<T>;
   onItemClick?: NotificationCellProps["onItemClick"];
   onButtonClick?: NotificationCellProps["onButtonClick"];
+  formatTimestamp?: TimestampFormatter;
 };
 
 export type RenderItem = (props: RenderItemProps) => ReactNode;
@@ -53,6 +55,8 @@ export interface NotificationFeedProps {
   onMarkAllAsReadClick?: (e: React.MouseEvent, unreadItems: FeedItem[]) => void;
   initialFilterStatus?: FilterStatus;
   renderLoading?: RenderLoading;
+  // Custom timestamp formatter. If not provided, uses the default formatTimestamp.
+  formatTimestamp?: TimestampFormatter;
 }
 
 const defaultRenderItem = (props: RenderItemProps) => (
@@ -86,6 +90,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   header,
   renderHeader = defaultRenderHeader,
   renderLoading = defaultRenderLoading,
+  formatTimestamp,
 }) => {
   const [status, setStatus] = useState(initialFilterStatus);
   const { feedClient, useFeedStore, colorMode } = useKnockFeed();
@@ -144,6 +149,7 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
                 item,
                 onItemClick: onNotificationClick,
                 onButtonClick: onNotificationButtonClick,
+                formatTimestamp,
               }),
             )}
         </div>

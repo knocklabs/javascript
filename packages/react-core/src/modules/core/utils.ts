@@ -1,5 +1,6 @@
 import Knock, { FeedClientOptions } from "@knocklabs/client";
-import { intlFormatDistance, parseISO } from "date-fns";
+import { differenceInSeconds, intlFormatDistance, parseISO } from "date-fns";
+import { secondsInQuarter, secondsInYear } from "date-fns/constants";
 import { ReactNode } from "react";
 
 import { BadgeCountType } from "./types";
@@ -24,18 +25,41 @@ export function getBadgeAriaLabel(
   return `${count} ${qualifier}${noun}`;
 }
 
-type FormatTimestampOptions = {
+export type FormatTimestampOptions = {
   locale?: string | string[];
 };
 
+export type TimestampFormatter = (
+  ts: string,
+  options?: FormatTimestampOptions,
+) => string;
+
+/**
+ * Formats a timestamp as a human-readable relative time string.
+ *
+ * By default, this function skips the "quarter" unit for dates between 3 and 12
+ * months old, using "X months ago" instead of "X quarters ago" for better
+ * readability. For all other date ranges, the unit is chosen automatically.
+ */
 export function formatTimestamp(
   ts: string,
   options: FormatTimestampOptions = {},
-) {
+): string {
   try {
     const parsedTs = parseISO(ts);
-    const formatted = intlFormatDistance(parsedTs, new Date(), {
+    const now = new Date();
+    const elapsedSeconds = Math.abs(differenceInSeconds(parsedTs, now));
+
+    // Mirrors the elapsed-seconds range in which date-fns would pick
+    // "quarter", so every would-be quarter result is shown in months.
+    const unit =
+      elapsedSeconds >= secondsInQuarter && elapsedSeconds < secondsInYear
+        ? "month"
+        : undefined;
+
+    const formatted = intlFormatDistance(parsedTs, now, {
       locale: options.locale,
+      unit,
     });
 
     return formatted;

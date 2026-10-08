@@ -7,7 +7,8 @@ import {
   TextContentBlock,
 } from "@knocklabs/client";
 import {
-  formatTimestamp,
+  type TimestampFormatter,
+  formatTimestamp as defaultFormatTimestamp,
   renderNodeOrFallback,
   useKnockFeed,
   useTranslations,
@@ -29,6 +30,8 @@ export interface NotificationCellProps {
   avatar?: ReactNode;
   children?: ReactNode;
   archiveButton?: ReactNode;
+  // Custom timestamp formatter. If not provided, uses the default formatTimestamp.
+  formatTimestamp?: TimestampFormatter;
 }
 
 type BlockByName = {
@@ -46,7 +49,15 @@ export const NotificationCell = React.forwardRef<
   NotificationCellProps
 >(
   (
-    { item, onItemClick, onButtonClick, avatar, children, archiveButton },
+    {
+      item,
+      onItemClick,
+      onButtonClick,
+      avatar,
+      children,
+      archiveButton,
+      formatTimestamp = defaultFormatTimestamp,
+    },
     ref,
   ) => {
     const { feedClient, colorMode } = useKnockFeed();
