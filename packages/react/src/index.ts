@@ -66,6 +66,7 @@ export {
 export {
   type BadgeCountType,
   FilterStatus,
+  type FormatTimestampOptions,
   KnockProvider,
   feedProviderKey,
   formatBadgeCount,
@@ -74,6 +75,7 @@ export {
   msTeamsProviderKey,
   renderNodeOrFallback,
   slackProviderKey,
+  type TimestampFormatter,
   toSentenceCase,
   type ColorMode,
   type KnockProviderProps,
