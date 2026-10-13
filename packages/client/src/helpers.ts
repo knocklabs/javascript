@@ -49,9 +49,9 @@ export type CachedFetch<Args extends unknown[], T> = {
    * Returns the cached value if still valid, otherwise calls `fetchFunc` with the same args and
    * caches the result.
    */
-  fetch: (...args: Args) => Promise<T>;
+  get: (...args: Args) => Promise<T>;
   /**
-   * Drops any cached value so the next `fetch` call fetches again.
+   * Drops any cached value so the next `get` call fetches again.
    */
   invalidate: () => void;
 };
@@ -68,11 +68,8 @@ export function cacheUntilExpired<
 >(fetchFunc: (...args: Args) => Promise<T>): CachedFetch<Args, T> {
   let cached: T | null = null;
 
-  const fetch = async (...args: Args) => {
-    if (
-      cached &&
-      cached.expiresAt - CACHE_EXPIRY_PADDING_MS > Date.now()
-    ) {
+  const get = async (...args: Args) => {
+    if (cached && cached.expiresAt - CACHE_EXPIRY_PADDING_MS > Date.now()) {
       return cached;
     }
     const value = await fetchFunc(...args);
@@ -84,5 +81,5 @@ export function cacheUntilExpired<
     cached = null;
   };
 
-  return { fetch, invalidate };
+  return { get, invalidate };
 }
