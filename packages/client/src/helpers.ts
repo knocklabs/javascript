@@ -43,3 +43,46 @@ export function exponentialBackoffFullJitter(
   const jitterRange = exponentialDelay - minDelayMs;
   return minDelayMs + Math.floor(Math.random() * jitterRange);
 }
+
+export type CachedFetch<Args extends unknown[], T> = {
+  /**
+   * Returns the cached value if still valid, otherwise calls `fetchFunc` with the same args and
+   * caches the result.
+   */
+  fetch: (...args: Args) => Promise<T>;
+  /**
+   * Drops any cached value so the next `fetch` call fetches again.
+   */
+  invalidate: () => void;
+};
+
+export const CACHE_EXPIRY_PADDING_MS = 5_000;
+
+/**
+ * Wraps `fetchFunc` so its result is cached until `expiresAt` (epoch ms), minus
+ * `CACHE_EXPIRY_PADDING_MS`.
+ */
+export function cacheUntilExpired<
+  Args extends unknown[],
+  T extends { expiresAt: number },
+>(fetchFunc: (...args: Args) => Promise<T>): CachedFetch<Args, T> {
+  let cached: T | null = null;
+
+  const fetch = async (...args: Args) => {
+    if (
+      cached &&
+      cached.expiresAt - CACHE_EXPIRY_PADDING_MS > Date.now()
+    ) {
+      return cached;
+    }
+    const value = await fetchFunc(...args);
+    cached = value;
+    return value;
+  };
+
+  const invalidate = () => {
+    cached = null;
+  };
+
+  return { fetch, invalidate };
+}
