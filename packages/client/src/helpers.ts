@@ -6,6 +6,16 @@ export function isValidUuid(uuid: string) {
 }
 
 /**
+ * Returns the query string for a given URL, minus the leading `"?"` character. When the URL has no
+ * query string, returns the empty string.
+ * @param url a valid string URL. For example, `"https://example.com/test?hello=world"`.
+ */
+export function getQueryString(url: string): string {
+  const idx = url.indexOf("?");
+  return idx === -1 ? "" : url.slice(idx + 1);
+}
+
+/**
  * Exponential backoff with full jitter and a minimum delay floor.
  *
  * - Uses exponential growth capped at maxDelayMs
