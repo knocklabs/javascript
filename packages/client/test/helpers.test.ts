@@ -4,6 +4,7 @@ import {
   CACHE_EXPIRY_PADDING_MS,
   cacheUntilExpired,
   exponentialBackoffFullJitter,
+  getQueryString,
   isValidUuid,
 } from "../src/helpers";
 
@@ -116,6 +117,22 @@ describe("Helper Functions", () => {
       const helpers = await import("../src/helpers.js");
       expect(helpers).toBeDefined();
       expect(helpers.isValidUuid).toBe(isValidUuid);
+    });
+  });
+
+  describe("getQueryString", () => {
+    test("returns everything after the first '?'", () => {
+      expect(getQueryString("https://example.com/test?hello=world")).toBe(
+        "hello=world",
+      );
+    });
+
+    test("returns the empty string when there is no '?'", () => {
+      expect(getQueryString("https://example.com/test")).toBe("");
+    });
+
+    test("returns the empty string when the '?' is the last character", () => {
+      expect(getQueryString("https://example.com/test?")).toBe("");
     });
   });
 
