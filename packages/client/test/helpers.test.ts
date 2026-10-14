@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
+  appendQueryString,
   CACHE_EXPIRY_PADDING_MS,
   cacheUntilExpired,
   exponentialBackoffFullJitter,
@@ -133,6 +134,38 @@ describe("Helper Functions", () => {
 
     test("returns the empty string when the '?' is the last character", () => {
       expect(getQueryString("https://example.com/test?")).toBe("");
+    });
+  });
+
+  describe("appendQueryString", () => {
+    test("appends the query string to a URL with no existing query string", () => {
+      expect(appendQueryString("https://example.com/test", "a=1")).toBe(
+        "https://example.com/test?a=1",
+      );
+    });
+
+    test("appends the query string with '&' when the URL already has one", () => {
+      expect(
+        appendQueryString("https://example.com/test?a=1", "b=2"),
+      ).toBe("https://example.com/test?a=1&b=2");
+    });
+
+    test("returns the URL unchanged when the query string is empty", () => {
+      expect(appendQueryString("https://example.com/test", "")).toBe(
+        "https://example.com/test",
+      );
+    });
+
+    test("returns the URL unchanged when the query string is empty, even if the URL already has one", () => {
+      expect(appendQueryString("https://example.com/test?a=1", "")).toBe(
+        "https://example.com/test?a=1",
+      );
+    });
+
+    test("does not dedupe keys shared between the URL and the query string", () => {
+      expect(
+        appendQueryString("https://example.com/test?a=1", "a=2"),
+      ).toBe("https://example.com/test?a=1&a=2");
     });
   });
 

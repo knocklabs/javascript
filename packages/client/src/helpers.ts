@@ -16,6 +16,17 @@ export function getQueryString(url: string): string {
 }
 
 /**
+ * Appends a query string to a given URL. Note that this does not dedupe query params.
+ * @param url a valid string URL.
+ * @param queryString a query string, minus any leading `"?"` character.
+ */
+export function appendQueryString(url: string, queryString: string): string {
+  return queryString
+    ? `${url}${url.includes("?") ? "&" : "?"}${queryString}`
+    : url;
+}
+
+/**
  * Exponential backoff with full jitter and a minimum delay floor.
  *
  * - Uses exponential growth capped at maxDelayMs
