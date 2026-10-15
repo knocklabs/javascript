@@ -52,6 +52,7 @@ export function createGatewayTransport(
   baseTransport: TransportConstructor,
   { fetchConnectUrl, onConnectUrlInvalid }: GatewayTransportOptions,
 ): TransportConstructor {
+  // Use a named class, since Phoenix logs using the class name
   return class GatewayTransport implements WebSocketLike {
     binaryType: BinaryType = "blob";
     timeout?: number;
