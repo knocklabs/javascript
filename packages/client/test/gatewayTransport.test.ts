@@ -345,7 +345,7 @@ describe("createGatewayTransport", () => {
 
     // Simulate Phoenix closing the socket while the inner transport is still
     // connecting: the inner's own close() fires an unclean close event.
-    inner.close = vi.fn<WebSocketLike["close"]>((code, reason) => {
+    inner.close.mockImplementation((code, reason) => {
       inner.readyState = SOCKET_STATES.closed;
       inner.onclose?.({
         code: code ?? 1006,
@@ -360,7 +360,9 @@ describe("createGatewayTransport", () => {
   });
 
   test("omitting onConnectUrlInvalid does not throw when the url is invalid", async () => {
-    const NoCallbackTransport = createGatewayTransport(MockTransport, { fetchConnectUrl });
+    const NoCallbackTransport = createGatewayTransport(MockTransport, {
+      fetchConnectUrl,
+    });
     new NoCallbackTransport(PHOENIX_URL, PROTOCOLS);
     await flushStart();
     const inner = getMockTransportInstance();
