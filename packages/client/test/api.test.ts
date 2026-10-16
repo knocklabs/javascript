@@ -292,11 +292,7 @@ describe("API Client", () => {
 
   describe("Error Handling", () => {
     test("returns a helpful error when fetch is unavailable", async () => {
-      const originalFetch = globalThis.fetch;
-      Object.defineProperty(globalThis, "fetch", {
-        configurable: true,
-        value: undefined,
-      });
+      vi.stubGlobal("fetch", undefined);
 
       const consoleSpy = vi
         .spyOn(console, "error")
@@ -319,10 +315,6 @@ describe("API Client", () => {
           "Fetch is not available in this environment. Please provide a native fetch implementation.",
         );
       } finally {
-        Object.defineProperty(globalThis, "fetch", {
-          configurable: true,
-          value: originalFetch,
-        });
         consoleSpy.mockRestore();
       }
     });
