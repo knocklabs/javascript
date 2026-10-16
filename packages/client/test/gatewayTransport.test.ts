@@ -227,6 +227,39 @@ describe("createGatewayTransport", () => {
     expect(onclose).toHaveBeenCalledTimes(1);
   });
 
+  test("close() while the fetch is pending ignores a rejection caused by the abort", async () => {
+    fetchConnectUrl.mockImplementationOnce(
+      (signal) =>
+        new Promise<GatewayConnectResult>((_resolve, reject) => {
+          signal.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError")),
+          );
+        }),
+    );
+
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    const onerror = vi.fn();
+    const onclose = vi.fn();
+    gatewayTransport.onerror = onerror;
+    gatewayTransport.onclose = onclose;
+
+    await flushStart();
+
+    gatewayTransport.close();
+
+    // Run timers to trigger the rejection
+    await vi.runAllTimersAsync();
+
+    expect(onerror).not.toHaveBeenCalled();
+    expect(onclose).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ code: 1000, reason: "", wasClean: true }),
+    );
+    expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closed);
+
+    // No inner transport was instantiated, as the fetch was aborted
+    expect(MockTransport.constructionCount).toBe(0);
+  });
+
   test("close() called immediately after construction emits a clean close without fetching", async () => {
     const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
 
