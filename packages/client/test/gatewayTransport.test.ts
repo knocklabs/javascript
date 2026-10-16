@@ -293,6 +293,43 @@ describe("createGatewayTransport", () => {
     expect(inner.close).toHaveBeenCalledWith(1000, "bye");
   });
 
+  test("close() called again before the inner transport's close event fires is a no-op", async () => {
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    await flushStart();
+    const inner = getMockTransportInstance();
+    inner.open();
+
+    const onclose = vi.fn();
+    gatewayTransport.onclose = onclose;
+
+    // Like a native WebSocket, emit the close event asynchronously after close() is called
+    inner.close.mockImplementation((code, reason) => {
+      inner.readyState = SOCKET_STATES.closing;
+      setTimeout(() => {
+        inner.readyState = SOCKET_STATES.closed;
+        inner.onclose?.({
+          code: code ?? 1000,
+          reason: reason ?? "",
+          wasClean: true,
+        } as CloseEvent);
+      }, 0);
+    });
+
+    gatewayTransport.close(1000, "bye");
+    gatewayTransport.close(1000, "bye again");
+
+    expect(inner.close).toHaveBeenCalledExactlyOnceWith(1000, "bye");
+    expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closing);
+    expect(onclose).not.toHaveBeenCalled();
+
+    await vi.runAllTimersAsync();
+
+    expect(onclose).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ code: 1000, reason: "bye", wasClean: true }),
+    );
+    expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closed);
+  });
+
   test("fetchConnectUrl rejecting fails the connection without creating an inner transport", async () => {
     const error = new Error("network down");
     fetchConnectUrl.mockRejectedValueOnce(error);
