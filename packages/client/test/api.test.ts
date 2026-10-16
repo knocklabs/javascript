@@ -6,8 +6,6 @@ import ApiClient from "../src/api";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
-type GlobalWithWindow = Record<string, unknown>;
-
 const createJsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -96,6 +94,7 @@ describe("API Client", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   describe("Client Initialization", () => {
@@ -123,8 +122,7 @@ describe("API Client", () => {
     });
 
     test("initializes WebSocket in browser environment", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {} as Window;
+      vi.stubGlobal("window", {});
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -133,13 +131,10 @@ describe("API Client", () => {
       });
 
       expect(apiClient.socket).toBeDefined();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("skips WebSocket in server environment", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = undefined;
+      vi.stubGlobal("window", undefined);
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -148,13 +143,10 @@ describe("API Client", () => {
       });
 
       expect(apiClient.socket).toBeUndefined();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("creates PageVisibilityManager by default in browser environment", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {} as Window;
+      vi.stubGlobal("window", {});
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -165,13 +157,10 @@ describe("API Client", () => {
       expect(
         (apiClient as unknown as Record<string, unknown>)["pageVisibility"],
       ).toBeDefined();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("skips PageVisibilityManager when disconnectOnPageHidden is false", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {} as Window;
+      vi.stubGlobal("window", {});
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -183,8 +172,6 @@ describe("API Client", () => {
       expect(
         (apiClient as unknown as Record<string, unknown>)["pageVisibility"],
       ).toBeUndefined();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
   });
 
@@ -660,8 +647,7 @@ describe("API Client", () => {
 
   describe("Socket Connection Management", () => {
     test("provides socket interface in browser environment", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -670,13 +656,10 @@ describe("API Client", () => {
       });
 
       expect(apiClient.socket).toBeDefined();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("configures socket with reconnectAfterMs and rejoinAfterMs", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       vi.mocked(Socket).mockClear();
 
@@ -692,13 +675,10 @@ describe("API Client", () => {
       >;
       expect(typeof socketOpts.reconnectAfterMs).toBe("function");
       expect(typeof socketOpts.rejoinAfterMs).toBe("function");
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("reconnectAfterMs returns values within expected bounds", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       vi.mocked(Socket).mockClear();
 
@@ -727,13 +707,10 @@ describe("API Client", () => {
         expect(delay).toBeGreaterThanOrEqual(250);
         expect(delay).toBeLessThanOrEqual(600_000);
       }
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("reconnectAfterMs escalates as connections keep failing", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       vi.mocked(Socket).mockClear();
 
@@ -773,13 +750,10 @@ describe("API Client", () => {
       );
       expect(escalatedMax).toBeGreaterThan(30_000);
       expect(escalatedMax).toBeLessThanOrEqual(600_000);
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("a connection that stays up long enough resets the escalation", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       const nowSpy = vi.spyOn(Date, "now").mockReturnValue(0);
       vi.mocked(Socket).mockClear();
@@ -818,12 +792,10 @@ describe("API Client", () => {
       expect(resetMax).toBeLessThanOrEqual(1000);
 
       nowSpy.mockRestore();
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("clean closes do not escalate the reconnect backoff", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       vi.mocked(Socket).mockClear();
 
@@ -853,13 +825,10 @@ describe("API Client", () => {
         ...Array.from({ length: 200 }, () => reconnectAfterMs(1)),
       );
       expect(max).toBeLessThanOrEqual(1000);
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("rejoinAfterMs returns values within expected bounds", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       vi.mocked(Socket).mockClear();
 
@@ -888,13 +857,10 @@ describe("API Client", () => {
         expect(delay).toBeGreaterThanOrEqual(250);
         expect(delay).toBeLessThanOrEqual(60_000);
       }
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("gracefully handles missing WebSocket in server environment", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = undefined;
+      vi.stubGlobal("window", undefined);
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -903,13 +869,10 @@ describe("API Client", () => {
       });
 
       expect(apiClient.socket).toBeUndefined();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("teardown disconnects the socket even when it is not connected", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      (global as GlobalWithWindow).window = {};
+      vi.stubGlobal("window", {});
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -927,18 +890,15 @@ describe("API Client", () => {
       // timer is cancelled and it doesn't keep looping after the client is torn
       // down.
       expect(socket.disconnect).toHaveBeenCalledOnce();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("reconnects a single time when connectivity returns via the online event", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
       const addEventListener = vi.fn();
       const removeEventListener = vi.fn();
-      (global as GlobalWithWindow).window = {
+      vi.stubGlobal("window", {
         addEventListener,
         removeEventListener,
-      };
+      });
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -975,17 +935,14 @@ describe("API Client", () => {
       // Teardown unregisters the listener.
       apiClient.teardown();
       expect(removeEventListener).toHaveBeenCalledWith("online", onlineHandler);
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("does not revive a cleanly (deliberately) disconnected socket on the online event", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
       const addEventListener = vi.fn();
-      (global as GlobalWithWindow).window = {
+      vi.stubGlobal("window", {
         addEventListener,
         removeEventListener: vi.fn(),
-      };
+      });
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -1008,17 +965,14 @@ describe("API Client", () => {
       onlineHandler();
       expect(socket.disconnect).not.toHaveBeenCalled();
       expect(socket.connect).not.toHaveBeenCalled();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("online event is a no-op when there is no socket", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
       const addEventListener = vi.fn();
-      (global as GlobalWithWindow).window = {
+      vi.stubGlobal("window", {
         addEventListener,
         removeEventListener: vi.fn(),
-      };
+      });
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -1038,17 +992,14 @@ describe("API Client", () => {
       expect(() => onlineHandler()).not.toThrow();
       expect(socket.disconnect).not.toHaveBeenCalled();
       expect(socket.connect).not.toHaveBeenCalled();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("online event does not reconnect an already-connected socket", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
       const addEventListener = vi.fn();
-      (global as GlobalWithWindow).window = {
+      vi.stubGlobal("window", {
         addEventListener,
         removeEventListener: vi.fn(),
-      };
+      });
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -1068,20 +1019,16 @@ describe("API Client", () => {
 
       onlineHandler();
       expect(socket.disconnect).not.toHaveBeenCalled();
-
-      (global as GlobalWithWindow).window = originalWindow;
     });
 
     test("online event does not reconnect while the page is hidden", () => {
-      const originalWindow = (global as GlobalWithWindow).window;
-      const originalDocument = (global as GlobalWithWindow).document;
       const addEventListener = vi.fn();
-      (global as GlobalWithWindow).window = {
+      vi.stubGlobal("window", {
         addEventListener,
         removeEventListener: vi.fn(),
-      };
+      });
       // A hidden page: PageVisibilityManager owns the reconnect lifecycle here.
-      (global as GlobalWithWindow).document = { hidden: true };
+      vi.stubGlobal("document", { hidden: true });
 
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
@@ -1100,9 +1047,6 @@ describe("API Client", () => {
 
       onlineHandler();
       expect(socket.disconnect).not.toHaveBeenCalled();
-
-      (global as GlobalWithWindow).window = originalWindow;
-      (global as GlobalWithWindow).document = originalDocument;
     });
   });
 });
