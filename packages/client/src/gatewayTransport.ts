@@ -55,7 +55,7 @@ export function createGatewayTransport(
   // Use a named class, since Phoenix logs using the class name
   return class GatewayTransport implements WebSocketLike {
     binaryType: BinaryType = "blob";
-    timeout?: number;
+
     onopen: ((event: Event) => void) | null = null;
     onclose: ((event: CloseEvent) => void) | null = null;
     onmessage: ((event: MessageEvent) => void) | null = null;
