@@ -354,6 +354,10 @@ describe("createGatewayTransport", () => {
 
     // No inner transport was instantiated, as the fetch failed
     expect(MockTransport.constructionCount).toBe(0);
+
+    // Closing the failed gateway transport does not trigger another onclose event
+    gatewayTransport.close();
+    expect(onclose).toHaveBeenCalledTimes(1);
   });
 
   test("connection fails when the base transport cannot be instantiated", async () => {
@@ -385,6 +389,29 @@ describe("createGatewayTransport", () => {
       }),
     );
     expect(transport.readyState).toBe(SOCKET_STATES.closed);
+
+    // Closing the failed gateway transport does not trigger another onclose event
+    transport.close();
+    expect(onclose).toHaveBeenCalledTimes(1);
+  });
+
+  test("close() after the inner transport has closed on its own is a no-op", async () => {
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    await flushStart();
+    const inner = getMockTransportInstance();
+
+    const onclose = vi.fn();
+    gatewayTransport.onclose = onclose;
+
+    inner.open();
+    inner.serverClose(1006, false);
+
+    expect(onclose).toHaveBeenCalledTimes(1);
+
+    gatewayTransport.close();
+
+    expect(inner.close).not.toHaveBeenCalled();
+    expect(onclose).toHaveBeenCalledTimes(1);
   });
 
   test("onConnectUrlInvalid fires when the inner transport closes before ever opening", async () => {
