@@ -197,6 +197,9 @@ export function createGatewayTransport(
       try {
         this.inner = this.initBaseTransport(connectUrl);
       } catch (error) {
+        // The base transport's constructor threw an exception. We never even attempted a
+        // connection, so onclose won't fire. The connect URL must be invalid.
+        onConnectUrlInvalid?.();
         this.fail(error);
       }
     }
