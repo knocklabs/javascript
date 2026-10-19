@@ -45,7 +45,7 @@ yarn format
 ## Key Conventions
 
 - **Monorepo**: Uses Yarn workspaces + Turborepo
-- **Node version**: 22.17.0 (see `engines` in package.json)
+- **Node version**: 24.13.0 (see `engines` in package.json)
 - **Package manager**: Yarn 4.1.0
 - **Testing**: Vitest
 - **Releases**: Changesets for versioning
