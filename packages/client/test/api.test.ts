@@ -1505,5 +1505,90 @@ describe("API Client", () => {
       });
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
+
+    test("aborts the in-flight connect request when closed before it resolves, and does not cache the aborted result", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // Mimics real fetch: rejects with an AbortError once the request's
+      // signal is aborted, rather than ever resolving on its own.
+      const fetchMock = vi.fn().mockImplementation(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            const abortError = new DOMException(
+              "The operation was aborted.",
+              "AbortError",
+            );
+            const signal = init?.signal;
+            if (signal?.aborted) {
+              reject(abortError);
+              return;
+            }
+            signal?.addEventListener("abort", () => reject(abortError));
+          }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const transport = new GatewayTransport(PHOENIX_URL);
+        const onClose = vi.fn();
+        const onError = vi.fn();
+        transport.onclose = onClose;
+        transport.onerror = onError;
+
+        // Wait for the HTTP request to actually be in flight before closing.
+        await vi.waitFor(() => {
+          expect(fetchMock).toHaveBeenCalledTimes(1);
+        });
+
+        transport.close();
+
+        await vi.waitFor(() => {
+          expect(onClose).toHaveBeenCalledTimes(1);
+        });
+
+        // The abort signal propagated all the way through the cache,
+        // fetchSocketConnectUrl, and makeRequest/buildRequestInit, down to
+        // the real fetch call.
+        const requestInit = fetchMock.mock.calls[0]![1] as RequestInit;
+        expect(requestInit.signal?.aborted).toBe(true);
+
+        // The abort is expected (our own close), so makeRequest's error
+        // logging is skipped rather than logging a spurious error.
+        expect(consoleSpy).not.toHaveBeenCalled();
+
+        // The close was clean and happened before any WebSocket existed.
+        expect(MockWebSocket).not.toHaveBeenCalled();
+        expect(onError).not.toHaveBeenCalled();
+
+        const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
+        expect(closeEvent.wasClean).toBe(true);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+
+      // The aborted fetch's result isn't cached, so a later connection
+      // attempt fetches again rather than reusing a cached value.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+      });
+    });
   });
 });
