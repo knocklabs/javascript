@@ -1403,5 +1403,107 @@ describe("API Client", () => {
       const [secondUrl] = MockWebSocket.mock.calls[1]!;
       expect(secondUrl).not.toBe(firstUrl);
     });
+
+    test("keeps the cached connect URL when a connection opens and later drops", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockResolvedValue(
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // The connection opens successfully and only later drops uncleanly.
+      // Unlike a close that arrives before `onopen`, this isn't evidence the
+      // signed URL itself was bad, so the cache should survive it.
+      const ws = MockWebSocket.mock.results[0]!.value;
+      ws.onopen();
+      ws.onclose({ wasClean: false });
+
+      // A second connection reuses the cached URL instead of refetching.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not invalidate the cache when Phoenix closes a still-connecting socket", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockResolvedValue(
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const transport = new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // The mock WebSocket's `close` doesn't emit a close event on its own
+      // the way a real one would, so wire it to do so here.
+      const ws = MockWebSocket.mock.results[0]!.value;
+      ws.close.mockImplementation(() => {
+        ws.onclose({ code: 1000, wasClean: false });
+      });
+
+      // Phoenix tears the transport down (e.g. the caller disconnected)
+      // while the socket is still connecting, before it ever opened. This is
+      // a deliberate close, not a rejected signed URL, so it shouldn't
+      // invalidate the cache.
+      transport.close();
+
+      // A second connection reuses the cached URL instead of refetching.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
   });
 });
