@@ -16,7 +16,10 @@ export interface WebSocketLike {
   close(code?: number, reason?: string): void;
 }
 
-export type TransportConstructor = new (url: string, protocols?: string | string[]) => WebSocketLike;
+export type TransportConstructor = new (
+  url: string,
+  protocols?: string | string[],
+) => WebSocketLike;
 
 export type GatewayConnectResult = {
   signedUrl: string;
@@ -41,7 +44,12 @@ export type GatewayTransportOptions = {
  * `WebSocket`.
  * @see {@link https://github.com/phoenixframework/phoenix/blob/1bae3a639f84cd97ccb6b984a8ef4fcdc7aa48ae/assets/js/phoenix/constants.js#L5}
  */
-export const SOCKET_STATES = { connecting: 0, open: 1, closing: 2, closed: 3 } as const;
+export const SOCKET_STATES = {
+  connecting: 0,
+  open: 1,
+  closing: 2,
+  closed: 3,
+} as const;
 
 // WebSocket close event status codes.
 // See https://www.rfc-editor.org/info/rfc6455/#section-7.4.1
@@ -95,7 +103,9 @@ export function createGatewayTransport(
       if (!this.inner) {
         // Phoenix only sends when a connection is open, so prevent calls to send before a
         // connection is established.
-        throw new Error("GatewayTransport: cannot send before the connection is open");
+        throw new Error(
+          "GatewayTransport: cannot send before the connection is open",
+        );
       }
       this.inner.send(data);
     }
@@ -143,7 +153,10 @@ export function createGatewayTransport(
         return;
       }
 
-      const connectUrl = appendQueryString(result.signedUrl, this.unsignedQueryString)
+      const connectUrl = appendQueryString(
+        result.signedUrl,
+        this.unsignedQueryString,
+      );
 
       try {
         this.inner = this.initBaseTransport(connectUrl);
