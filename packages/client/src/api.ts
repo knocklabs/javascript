@@ -1,8 +1,8 @@
 import { Socket } from "phoenix";
 
 import {
-  GatewayConnectResult,
   createGatewayTransport,
+  fetchSocketConnectUrl,
 } from "./gatewayTransport";
 import { cacheUntilExpired, exponentialBackoffFullJitter } from "./helpers";
 import { PageVisibilityManager } from "./pageVisibility";
@@ -130,7 +130,7 @@ class ApiClient {
       // Connect sockets via the WebSocket gateway API endpoint, which returns a signed ws:// or
       // wss:// connect URL. This signed URL is cached and used to reconnect until it expires.
       const connectUrlCache = cacheUntilExpired((signal: AbortSignal) =>
-        this.fetchSocketConnectUrl(signal),
+        fetchSocketConnectUrl(this, signal),
       );
       const transport = createGatewayTransport(WebSocket, {
         fetchConnectUrl: connectUrlCache.get,
@@ -269,38 +269,6 @@ class ApiClient {
         error: e,
       };
     }
-  }
-
-  // Requests a signed WebSocket URL from the WebSocket gateway API endpoint. Rejects on any HTTP
-  // error or malformed body so the transport treats it like a failed connection attempt.
-  private async fetchSocketConnectUrl(
-    signal: AbortSignal,
-  ): Promise<GatewayConnectResult> {
-    const result = await this.makeRequest({
-      method: "POST",
-      url: "/v1/sockets/connect",
-      signal,
-    });
-
-    if (result.statusCode !== "ok") {
-      throw (
-        result.error ??
-        new Error(`Socket connect request failed with status ${result.status}`)
-      );
-    }
-
-    const body = result.body as
-      | Partial<{ url: string; expires_at: string }>
-      | undefined;
-
-    const expiresAt =
-      typeof body?.expires_at === "string" ? Date.parse(body.expires_at) : NaN;
-
-    if (typeof body?.url !== "string" || !body.url || Number.isNaN(expiresAt)) {
-      throw new Error("Invalid socket connect response");
-    }
-
-    return { signedUrl: body.url, expiresAt };
   }
 
   private async requestWithRetries(req: ApiRequestConfig) {
