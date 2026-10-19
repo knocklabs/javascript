@@ -210,6 +210,7 @@ describe("createGatewayTransport", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   test("fetches the connect URL, then constructs the base transport with merged URL and protocols", async () => {
@@ -522,6 +523,21 @@ describe("createGatewayTransport", () => {
 
     expect(inner.close).not.toHaveBeenCalled();
     expect(onclose).toHaveBeenCalledTimes(1);
+  });
+
+  test("onclose is called with plain object event when CloseEvent is unsupported", () => {
+    vi.stubGlobal("CloseEvent", undefined);
+
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    const onclose = vi.fn();
+    gatewayTransport.onclose = onclose;
+
+    gatewayTransport.close();
+
+    expect(onclose).toHaveBeenCalledTimes(1);
+    const event = onclose.mock.calls[0]?.[0];
+    expect(Object.getPrototypeOf(event)).toBe(Object.prototype);
+    expect(event).toEqual({ code: 1000, reason: "", wasClean: true });
   });
 
   test("onConnectUrlInvalid fires when the inner transport closes before ever opening", async () => {
