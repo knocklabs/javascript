@@ -1,6 +1,10 @@
 import { Socket } from "phoenix";
 
-import { exponentialBackoffFullJitter } from "./helpers";
+import {
+  GatewayConnectResult,
+  createGatewayTransport,
+} from "./gatewayTransport";
+import { cacheUntilExpired, exponentialBackoffFullJitter } from "./helpers";
 import { PageVisibilityManager } from "./pageVisibility";
 
 // Ceiling for socket reconnect backoff. This is intentionally much larger than
@@ -123,7 +127,18 @@ class ApiClient {
     });
 
     if (typeof window !== "undefined" && typeof WebSocket !== "undefined") {
+      // Connect sockets via the WebSocket gateway API endpoint, which returns a signed ws:// or
+      // wss:// connect URL. This signed URL is cached and used to reconnect until it expires.
+      const connectUrlCache = cacheUntilExpired((signal: AbortSignal) =>
+        this.fetchSocketConnectUrl(signal),
+      );
+      const transport = createGatewayTransport(WebSocket, {
+        fetchConnectUrl: connectUrlCache.get,
+        onConnectUrlInvalid: connectUrlCache.invalidate,
+      });
+
       this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
+        transport: transport,
         params: {
           user_token: this.userToken,
           api_key: this.apiKey,
@@ -240,7 +255,11 @@ class ApiClient {
         status: result.status,
       };
     } catch (e: unknown) {
-      console.error(e);
+      // Aborted requests are deliberate (e.g. the socket transport cancelling a gateway fetch on
+      // disconnect), so we should skip logging them
+      if (!req.signal?.aborted) {
+        console.error(e);
+      }
       const response = (e as ErrorWithResponse)?.response;
 
       return {
@@ -250,6 +269,38 @@ class ApiClient {
         error: e,
       };
     }
+  }
+
+  // Requests a signed WebSocket URL from the WebSocket gateway API endpoint. Rejects on any HTTP
+  // error or malformed body so the transport treats it like a failed connection attempt.
+  private async fetchSocketConnectUrl(
+    signal: AbortSignal,
+  ): Promise<GatewayConnectResult> {
+    const result = await this.makeRequest({
+      method: "POST",
+      url: "/v1/sockets/connect",
+      signal,
+    });
+
+    if (result.statusCode !== "ok") {
+      throw (
+        result.error ??
+        new Error(`Socket connect request failed with status ${result.status}`)
+      );
+    }
+
+    const body = result.body as
+      | Partial<{ url: string; expires_at: string }>
+      | undefined;
+
+    const expiresAt =
+      typeof body?.expires_at === "string" ? Date.parse(body.expires_at) : NaN;
+
+    if (typeof body?.url !== "string" || !body.url || Number.isNaN(expiresAt)) {
+      throw new Error("Invalid socket connect response");
+    }
+
+    return { signedUrl: body.url, expiresAt };
   }
 
   private async requestWithRetries(req: ApiRequestConfig) {
