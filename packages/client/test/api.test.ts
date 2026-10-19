@@ -734,6 +734,27 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeDefined();
     });
 
+    test("configures socket with the gateway transport", () => {
+      vi.stubGlobal("window", {});
+
+      vi.mocked(Socket).mockClear();
+
+      new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      expect(typeof socketOpts.transport).toBe("function");
+      expect((socketOpts.transport as NewableFunction).name).toBe(
+        "GatewayTransport",
+      );
+    });
+
     test("configures socket with reconnectAfterMs and rejoinAfterMs", () => {
       vi.stubGlobal("window", {});
 
