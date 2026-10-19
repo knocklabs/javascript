@@ -116,7 +116,7 @@ class ApiClient {
       "X-Knock-Branch": this.branch,
     });
 
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && typeof WebSocket !== "undefined") {
       this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
         params: {
           user_token: this.userToken,

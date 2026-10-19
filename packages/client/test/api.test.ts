@@ -121,7 +121,7 @@ describe("API Client", () => {
       );
     });
 
-    test("initializes WebSocket in browser environment", () => {
+    test("initializes socket in browser environment", () => {
       vi.stubGlobal("window", {});
 
       const apiClient = new ApiClient({
@@ -133,7 +133,7 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeDefined();
     });
 
-    test("skips WebSocket in server environment", () => {
+    test("skips socket in server environment", () => {
       vi.stubGlobal("window", undefined);
 
       const apiClient = new ApiClient({
@@ -143,6 +143,21 @@ describe("API Client", () => {
       });
 
       expect(apiClient.socket).toBeUndefined();
+      expect(Socket).not.toHaveBeenCalled();
+    });
+
+    test("skips socket when WebSocket transport is unavailable", () => {
+      vi.stubGlobal("window", {});
+      vi.stubGlobal("WebSocket", undefined);
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      expect(apiClient.socket).toBeUndefined();
+      expect(Socket).not.toHaveBeenCalled();
     });
 
     test("creates PageVisibilityManager by default in browser environment", () => {
@@ -296,7 +311,7 @@ describe("API Client", () => {
 
       const consoleSpy = vi
         .spyOn(console, "error")
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
       try {
         const apiClient = new ApiClient({
           host: "https://api.knock.app",
@@ -322,7 +337,7 @@ describe("API Client", () => {
     test("handles network errors gracefully", async () => {
       const consoleSpy = vi
         .spyOn(console, "error")
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
       try {
         const networkError = new TypeError("Failed to fetch");
         const apiClient = new ApiClient({
@@ -411,7 +426,7 @@ describe("API Client", () => {
 
       const consoleSpy = vi
         .spyOn(console, "error")
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
       try {
         const response = await apiClient.makeRequest({
           method: "GET",
@@ -468,7 +483,7 @@ describe("API Client", () => {
 
       const consoleSpy = vi
         .spyOn(console, "error")
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
       try {
         const response = await apiClient.makeRequest({
           method: "GET",
