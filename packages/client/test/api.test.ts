@@ -1180,14 +1180,28 @@ describe("API Client", () => {
       onlineHandler();
       expect(socket.disconnect).not.toHaveBeenCalled();
     });
+  });
 
-    test("establishes a WebSocket connection via the gateway transport", async () => {
-      const MockWebSocket = createWebSocketMock();
+  describe("WebSocket Connection via Gateway", () => {
+    const MockWebSocket = createWebSocketMock();
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.resetAllMocks();
+
+      vi.mocked(Socket).mockImplementation(
+        createSocketMock as unknown as () => Socket,
+      );
 
       vi.stubGlobal("window", {});
       vi.stubGlobal("WebSocket", MockWebSocket);
-      vi.mocked(Socket).mockClear();
+    });
 
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    test("establishes a WebSocket connection via the gateway transport", async () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
         apiKey: "pk_test_12345",
@@ -1239,6 +1253,65 @@ describe("API Client", () => {
 
       // No fetch should occur, as the previously fetched connect URL has not expired yet
       expect(MockWebSocket).toHaveBeenNthCalledWith(2, expectedUrl, undefined);
+    });
+
+    test("caches the signed WebSocket connect URL until it expires", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const CACHE_TTL_MS = 60_000;
+      const startDate = new Date(2024, 0, 1, 0, 0, 0);
+      vi.setSystemTime(startDate);
+
+      // Each fetch returns a signed URL that expires `CACHE_TTL_MS` from
+      // whatever the (mocked) system time is at the time of the call.
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockImplementation(() =>
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + CACHE_TTL_MS).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // The first connection fetches a signed connect URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // A second connection, made before the cached URL expires, reuses it
+      // rather than fetching again.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // Advance the system clock past the cached URL's expiry.
+      vi.setSystemTime(new Date(startDate.getTime() + CACHE_TTL_MS + 1));
+
+      // A third connection, made after expiry, fetches a fresh signed URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(3);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
     });
   });
 });
