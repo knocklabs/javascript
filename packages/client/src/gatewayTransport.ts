@@ -1,3 +1,4 @@
+import type ApiClient from "./api";
 import { appendQueryString, getQueryString } from "./helpers";
 
 /**
@@ -55,6 +56,41 @@ export const SOCKET_STATES = {
 // See https://www.rfc-editor.org/info/rfc6455/#section-7.4.1
 const CLOSE_CODE_NORMAL = 1000;
 const CLOSE_CODE_ABNORMAL = 1006;
+
+/**
+ * Requests a signed WebSocket URL from the WebSocket gateway API endpoint. Rejects on any HTTP
+ * error or malformed body so the transport treats it like a failed connection attempt.
+ */
+export async function fetchSocketConnectUrl(
+  apiClient: ApiClient,
+  signal: AbortSignal,
+): Promise<GatewayConnectResult> {
+  const result = await apiClient.makeRequest({
+    method: "POST",
+    url: "/v1/sockets/connect",
+    signal,
+  });
+
+  if (result.statusCode !== "ok") {
+    throw (
+      result.error ??
+      new Error(`Socket connect request failed with status ${result.status}`)
+    );
+  }
+
+  const body = result.body as
+    | Partial<{ url: string; expires_at: string }>
+    | undefined;
+
+  const expiresAt =
+    typeof body?.expires_at === "string" ? Date.parse(body.expires_at) : NaN;
+
+  if (typeof body?.url !== "string" || !body.url || Number.isNaN(expiresAt)) {
+    throw new Error("Invalid socket connect response");
+  }
+
+  return { signedUrl: body.url, expiresAt };
+}
 
 export function createGatewayTransport(
   baseTransport: TransportConstructor,
