@@ -1245,14 +1245,7 @@ describe("API Client", () => {
       // Each underlying WebSocket is constructed with the signed URL merged
       // with the original unsigned query params.
       const expectedUrl = `${signedUrl}&vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456`;
-      expect(MockWebSocket).toHaveBeenNthCalledWith(1, expectedUrl, undefined);
-
-      // Call GatewayTransport again to set up a new connection
-      new GatewayTransport(PHOENIX_URL);
-      await vi.waitFor(() => { expect(MockWebSocket).toHaveBeenCalledTimes(2) });
-
-      // No fetch should occur, as the previously fetched connect URL has not expired yet
-      expect(MockWebSocket).toHaveBeenNthCalledWith(2, expectedUrl, undefined);
+      expect(MockWebSocket).toHaveBeenLastCalledWith(expectedUrl, undefined);
     });
 
     test("caches the signed WebSocket connect URL until it expires", async () => {
