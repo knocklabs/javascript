@@ -8,12 +8,14 @@ import {
   vi,
 } from "vitest";
 
+import type ApiClient from "../src/api";
 import {
   GatewayConnectResult,
   SOCKET_STATES,
   TransportConstructor,
   WebSocketLike,
   createGatewayTransport,
+  fetchSocketConnectUrl,
 } from "../src/gatewayTransport";
 
 class MockTransport implements WebSocketLike {
@@ -76,7 +78,111 @@ const MERGED_URL = `${SIGNED_URL}&user_token=ut&api_key=pk&branch_slug=null&vsn=
 const PROTOCOLS = ["soap", "wamp"];
 
 describe("fetchSocketConnectUrl", () => {
-  // TODO
+  const makeRequest = vi.fn();
+  const apiClient = { makeRequest } as unknown as ApiClient;
+  const abortController = new AbortController();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("returns valid signed URL and expiration", async () => {
+    const expiresAt = "2024-01-01T00:00:00.000Z";
+
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: SIGNED_URL, expires_at: expiresAt },
+    });
+
+    const result = await fetchSocketConnectUrl(
+      apiClient,
+      abortController.signal,
+    );
+
+    expect(makeRequest).toHaveBeenCalledWith({
+      method: "POST",
+      url: "/v1/sockets/connect",
+      signal: abortController.signal,
+    });
+    expect(result).toEqual({
+      signedUrl: SIGNED_URL,
+      expiresAt: Date.parse(expiresAt),
+    });
+  });
+
+  test("throws an error when the request fails", async () => {
+    const error = new Error("network down");
+
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "error",
+      status: 0,
+      error,
+    });
+
+    await expect(
+      fetchSocketConnectUrl(apiClient, abortController.signal),
+    ).rejects.toBe(error);
+  });
+
+  test("throws an error when response status is not ok", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "error",
+      status: 500,
+    });
+
+    await expect(
+      fetchSocketConnectUrl(apiClient, abortController.signal),
+    ).rejects.toThrow("Socket connect request failed with status 500");
+  });
+
+  test("throws an error when expiration is not a string", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: SIGNED_URL, expires_at: 12345 },
+    });
+
+    await expect(
+      fetchSocketConnectUrl(apiClient, abortController.signal),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
+
+  test("throws an error when expiration is not a valid date", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: SIGNED_URL, expires_at: "not-a-date" },
+    });
+
+    await expect(
+      fetchSocketConnectUrl(apiClient, abortController.signal),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
+
+  test("throws an error when URL is missing from response", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { expires_at: "2024-01-01T00:00:00.000Z" },
+    });
+
+    await expect(
+      fetchSocketConnectUrl(apiClient, abortController.signal),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
+
+  test("throws an error when URL is not a string", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: 12345, expires_at: "2024-01-01T00:00:00.000Z" },
+    });
+
+    await expect(
+      fetchSocketConnectUrl(apiClient, abortController.signal),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
 });
 
 describe("createGatewayTransport", () => {
