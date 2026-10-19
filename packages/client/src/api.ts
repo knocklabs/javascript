@@ -255,11 +255,7 @@ class ApiClient {
         status: result.status,
       };
     } catch (e: unknown) {
-      // Aborted requests are deliberate (e.g. the socket transport cancelling a gateway fetch on
-      // disconnect), so we should skip logging them
-      if (!req.signal?.aborted) {
-        console.error(e);
-      }
+      console.error(e);
       const response = (e as ErrorWithResponse)?.response;
 
       return {
