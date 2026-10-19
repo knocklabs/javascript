@@ -361,6 +361,38 @@ describe("API Client", () => {
       }
     });
 
+    test("skips logging request errors when the signal was aborted", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const apiClient = new ApiClient({
+          host: "https://api.knock.app",
+          apiKey: "pk_test_12345",
+          userToken: undefined,
+        });
+        const controller = new AbortController();
+        controller.abort();
+        const abortError = new DOMException(
+          "The operation was aborted.",
+          "AbortError",
+        );
+        setFetchMock(apiClient, vi.fn().mockRejectedValue(abortError));
+
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+          signal: controller.signal,
+        });
+
+        expect(response.statusCode).toBe("error");
+        expect(response.error).toBe(abortError);
+        expect(consoleSpy).not.toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
     test("handles API error responses with response metadata", async () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
