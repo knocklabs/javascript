@@ -1313,5 +1313,47 @@ describe("API Client", () => {
       });
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
+
+    test("skips establishing a WebSocket connection when a signed URL fetch fails", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // A plain `Error` (no `.response`) isn't retryable, so this fails on
+      // the first attempt rather than after exhausting retries.
+      const fetchError = new Error("network down");
+      const fetchMock = vi.fn().mockRejectedValue(fetchError);
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const transport = new GatewayTransport(PHOENIX_URL);
+      const onClose = vi.fn();
+      transport.onclose = onClose;
+
+      // The transport reports the failure via `onclose`, since it never
+      // got far enough to open a connection.
+      await vi.waitFor(() => {
+        expect(onClose).toHaveBeenCalledTimes(1);
+      });
+
+      // No WebSocket is ever constructed, since the connect URL fetch
+      // failed before a connection could be attempted.
+      expect(MockWebSocket).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
+      expect(closeEvent.wasClean).toBe(false);
+    });
   });
 });
