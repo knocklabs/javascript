@@ -75,6 +75,10 @@ const SIGNED_URL = "wss://ws1.knock-dev.app/ws/v1/websocket?auth_token=jwt";
 const MERGED_URL = `${SIGNED_URL}&user_token=ut&api_key=pk&branch_slug=null&vsn=2.0.0`;
 const PROTOCOLS = ["soap", "wamp"];
 
+describe("fetchSocketConnectUrl", () => {
+  // TODO
+});
+
 describe("createGatewayTransport", () => {
   const fetchConnectUrl = vi.fn<
     (signal: AbortSignal) => Promise<GatewayConnectResult>
