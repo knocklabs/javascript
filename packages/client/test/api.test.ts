@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import packageJson from "../package.json";
 import ApiClient from "../src/api";
+import type { TransportConstructor } from "../src/gatewayTransport";
+
+import { createWebSocketMock } from "./test-utils/mocks";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
@@ -1176,6 +1179,66 @@ describe("API Client", () => {
 
       onlineHandler();
       expect(socket.disconnect).not.toHaveBeenCalled();
+    });
+
+    test("establishes a WebSocket connection via the gateway transport", async () => {
+      const MockWebSocket = createWebSocketMock();
+
+      vi.stubGlobal("window", {});
+      vi.stubGlobal("WebSocket", MockWebSocket);
+      vi.mocked(Socket).mockClear();
+
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // The gateway's signed connect URL, as returned by `POST /v1/sockets/connect`
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockResolvedValue(
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      // The URL Phoenix would hand the transport, carrying the unsigned params
+      // (vsn, api_key, user_token) that the gateway's signed URL lacks.
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // Call GatewayTransport directly to simulate Phoenix's socket establishing a connection
+      new GatewayTransport(PHOENIX_URL);
+
+      await vi.waitFor(() => { expect(MockWebSocket).toHaveBeenCalledTimes(1); });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledWith(
+        "https://api.knock.app/v1/sockets/connect",
+        expect.objectContaining({ method: "POST" }),
+      );
+
+      // Each underlying WebSocket is constructed with the signed URL merged
+      // with the original unsigned query params.
+      const expectedUrl = `${signedUrl}&vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456`;
+      expect(MockWebSocket).toHaveBeenNthCalledWith(1, expectedUrl, undefined);
+
+      // Call GatewayTransport again to set up a new connection
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => { expect(MockWebSocket).toHaveBeenCalledTimes(2) });
+
+      // No fetch should occur, as the previously fetched connect URL has not expired yet
+      expect(MockWebSocket).toHaveBeenNthCalledWith(2, expectedUrl, undefined);
     });
   });
 });
