@@ -1348,5 +1348,60 @@ describe("API Client", () => {
       const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
       expect(closeEvent.wasClean).toBe(false);
     });
+
+    test("invalidates the cached connect URL when the gateway rejects it, so the next connection refetches", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // Each fetch returns a signed URL with a distinct token, so the two
+      // connections' URLs can be told apart, and an expiry far enough out
+      // that the cache wouldn't naturally expire between them.
+      let fetchCount = 0;
+      const fetchMock = vi.fn().mockImplementation(() => {
+        fetchCount += 1;
+        return createJsonResponse({
+          url: `wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token-${fetchCount}`,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        });
+      });
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // The first connection fetches a signed URL and connects.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // The underlying WebSocket closes before ever opening (`onopen` is
+      // never called), which looks like the signed URL is invalid
+      const ws = MockWebSocket.mock.results[0]!.value;
+      ws.onclose({ code: 1006, wasClean: false });
+
+      // A second connection, made while the cached URL would otherwise still
+      // be unexpired, refetches rather than reusing the invalidated URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      const [firstUrl] = MockWebSocket.mock.calls[0]!;
+      const [secondUrl] = MockWebSocket.mock.calls[1]!;
+      expect(secondUrl).not.toBe(firstUrl);
+    });
   });
 });
