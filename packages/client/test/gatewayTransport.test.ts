@@ -504,6 +504,8 @@ describe("createGatewayTransport", () => {
     // Closing the failed gateway transport does not trigger another onclose event
     transport.close();
     expect(onclose).toHaveBeenCalledTimes(1);
+
+    expect(onConnectUrlInvalid).toHaveBeenCalledTimes(1);
   });
 
   test("close() after the inner transport has closed on its own is a no-op", async () => {
