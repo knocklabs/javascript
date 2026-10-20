@@ -104,6 +104,7 @@ describe("fetchSocketConnectUrl", () => {
       method: "POST",
       url: "/v1/sockets/connect",
       signal: abortController.signal,
+      maxRetries: 0,
     });
     expect(result).toEqual({
       signedUrl: SIGNED_URL,
