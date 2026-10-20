@@ -471,6 +471,29 @@ describe("createGatewayTransport", () => {
     expect(onclose).toHaveBeenCalledTimes(1);
   });
 
+  test("close() called from onerror during a failed fetch emits a single clean close", async () => {
+    const error = new Error("network down");
+    fetchConnectUrl.mockRejectedValueOnce(error);
+
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    const onerror = vi.fn(() => gatewayTransport.close());
+    const onclose = vi.fn();
+    gatewayTransport.onerror = onerror;
+    gatewayTransport.onclose = onclose;
+
+    await flushStart();
+
+    expect(onerror).toHaveBeenCalledWith(error);
+
+    expect(onclose).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ code: 1000, reason: "", wasClean: true }),
+    );
+    expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closed);
+
+    // No inner transport was instantiated, as the fetch failed
+    expect(MockTransport.constructionCount).toBe(0);
+  });
+
   test("connection fails when the base transport cannot be instantiated", async () => {
     const error = new Error("Failed to instantiate base transport");
     class ThrowingTransport {
