@@ -73,7 +73,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "expo": "~56.0.5",
     "expo-constants": "~56.0.16",
-    "expo-device": "~56.0.4",
+    "expo-device": "~58.0.5",
     "expo-notifications": "~56.0.14",
     "jsdom": "^29.1.0",
     "react": "^19.3.0",

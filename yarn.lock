@@ -4675,7 +4675,7 @@ __metadata:
     expo: "npm:~56.0.5"
     expo-blur: "npm:~56.0.3"
     expo-constants: "npm:~56.0.16"
-    expo-device: "npm:~56.0.4"
+    expo-device: "npm:~58.0.5"
     expo-font: "npm:~56.0.5"
     expo-haptics: "npm:~56.0.3"
     expo-image: "npm:~56.0.9"
@@ -4721,7 +4721,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.5.2"
     expo: "npm:~56.0.5"
     expo-constants: "npm:~56.0.16"
-    expo-device: "npm:~56.0.4"
+    expo-device: "npm:~58.0.5"
     expo-notifications: "npm:~56.0.14"
     jsdom: "npm:^29.1.0"
     react: "npm:^19.3.0"
@@ -12329,14 +12329,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-device@npm:~56.0.4":
-  version: 56.0.4
-  resolution: "expo-device@npm:56.0.4"
+"expo-device@npm:~58.0.5":
+  version: 58.0.5
+  resolution: "expo-device@npm:58.0.5"
   dependencies:
     ua-parser-js: "npm:^0.7.33"
   peerDependencies:
     expo: "*"
-  checksum: 10c0/8be987ecf46b8fc07f4f1cdb48869fb2c4823402a78faf055fa3fd0fbff25975db7dbca446189944126c0a512cd64d58e7ae67c428cc95cd1629411737fd5012
+  checksum: 10c0/387e9ea5624202e86f57232452f691509ff357069452a4ba59f9d54e153ec1510455f1118221b77c41b99165b45e2b669f0c75e9322702c12a1599341f2cf3a6
   languageName: node
   linkType: hard
 
