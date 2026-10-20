@@ -586,6 +586,75 @@ describe("API Client", () => {
       expect(response.statusCode).toBe("error");
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
+
+    test("does not retry when maxRetries is 0", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          createJsonResponse({ error: "Server Error" }, 500),
+        )
+        .mockResolvedValue(createJsonResponse({ success: true }));
+      setFetchMock(apiClient, fetchMock);
+      skipRetryDelays(apiClient);
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+          maxRetries: 0,
+        });
+
+        expect(response.statusCode).toBe("error");
+        expect(response.status).toBe(500);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
+    test("retries up to maxRetries times when overridden", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+      // Return a fresh Response per call, like a real fetch — a Response body
+      // can only be consumed once, so each retry must get its own.
+      const fetchMock = vi
+        .fn()
+        .mockImplementation(() =>
+          createJsonResponse({ error: "Server Error" }, 500),
+        );
+      setFetchMock(apiClient, fetchMock);
+      skipRetryDelays(apiClient);
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const response = await apiClient.makeRequest({
+          method: "GET",
+          url: "/test",
+          maxRetries: 1,
+        });
+
+        expect(response.statusCode).toBe("error");
+        expect(response.status).toBe(500);
+
+        // The initial attempt plus one retry
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
   });
 
   describe("Request Configuration", () => {
