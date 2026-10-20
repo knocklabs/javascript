@@ -234,6 +234,8 @@ export function createGatewayTransport(
     }
 
     private emitClose(code: number, reason: string, wasClean: boolean): void {
+      // Check this.settled to prevent triggering onclose more than once. For example, this could
+      // occur if the transport is closed manually inside of an onerror callback.
       if (this.settled) {
         return;
       }
