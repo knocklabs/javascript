@@ -1317,6 +1317,54 @@ describe("API Client", () => {
       expect(closeEvent.wasClean).toBe(false);
     });
 
+    test("does not retry a retryable signed URL fetch failure, leaving retries to Phoenix", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // A 5xx is normally retried by `makeRequest`, but the gateway transport's fetch sets
+      // maxRetries to 0 so that each Phoenix connection attempt makes a single request.
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(createJsonResponse({ error: "Server Error" }, 503));
+      setFetchMock(apiClient, fetchMock);
+      skipRetryDelays(apiClient);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const transport = new GatewayTransport(PHOENIX_URL);
+        const onClose = vi.fn();
+        transport.onclose = onClose;
+
+        await vi.waitFor(() => {
+          expect(onClose).toHaveBeenCalledTimes(1);
+        });
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(MockWebSocket).not.toHaveBeenCalled();
+
+        // An unclean close is what triggers Phoenix's reconnect backoff
+        const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
+        expect(closeEvent.wasClean).toBe(false);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
     test("invalidates the cached connect URL when the gateway rejects it, so the next connection refetches", async () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",
