@@ -9,7 +9,7 @@ When making a request to the Knock API using `ApiClient`'s `makeRequest` functio
 ```js
 const result = await knock.client().makeRequest({
   method: "GET",
-  url: `/v1/users`,
+  url: "/v1/users",
   maxRetries: 0,
 });
 ```
