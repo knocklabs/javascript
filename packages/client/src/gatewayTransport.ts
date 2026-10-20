@@ -69,6 +69,9 @@ export async function fetchSocketConnectUrl(
     method: "POST",
     url: "/v1/sockets/connect",
     signal,
+    // Set maxRetries to 0, so that the API client's own retry logic is never used. Phoenix
+    // handles retries automatically via the socket's reconnect backoff.
+    maxRetries: 0,
   });
 
   if (result.statusCode !== "ok") {
