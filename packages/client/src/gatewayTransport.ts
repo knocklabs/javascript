@@ -62,10 +62,13 @@ const CLOSE_CODE_ABNORMAL = 1006;
  * Requests a signed WebSocket URL from the WebSocket gateway API endpoint. Rejects on any HTTP
  * error or malformed body so the transport treats it like a failed connection attempt.
  */
-export async function fetchSocketConnectUrl(
-  apiClient: ApiClient,
-  signal: AbortSignal,
-): Promise<GatewayConnectResult> {
+export async function fetchSocketConnectUrl({
+  apiClient,
+  signal,
+}: {
+  apiClient: ApiClient;
+  signal: AbortSignal;
+}): Promise<GatewayConnectResult> {
   const result = await apiClient.makeRequest({
     method: "POST",
     url: "/v1/sockets/connect",

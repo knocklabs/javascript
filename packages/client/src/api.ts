@@ -130,7 +130,7 @@ class ApiClient {
       // Connect sockets via the WebSocket gateway API endpoint, which returns a signed ws:// or
       // wss:// connect URL. This signed URL is cached and used to reconnect until it expires.
       const connectUrlCache = cacheUntilExpired((signal: AbortSignal) =>
-        fetchSocketConnectUrl(this, signal),
+        fetchSocketConnectUrl({ apiClient: this, signal }),
       );
       const transport = createGatewayTransport(WebSocket, {
         fetchConnectUrl: connectUrlCache.get,
