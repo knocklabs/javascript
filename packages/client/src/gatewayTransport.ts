@@ -5,17 +5,18 @@ import { appendQueryString, getQueryString } from "./helpers";
  * The signature that Phoenix expects socket transports to conform to, based on the native browser
  * `WebSocket`. Only fields and methods that Phoenix relies on are included here.
  */
-export interface WebSocketLike {
-  readonly readyState: number;
-  readonly bufferedAmount: number;
-  binaryType: BinaryType;
-  onopen: ((event: Event) => void) | null;
-  onclose: ((event: CloseEvent) => void) | null;
-  onmessage: ((event: MessageEvent) => void) | null;
-  onerror: ((event: Event) => void) | null;
-  send(data: string | ArrayBufferLike | ArrayBufferView | Blob): void;
-  close(code?: number, reason?: string): void;
-}
+export type WebSocketLike = Pick<
+  WebSocket,
+  | "readyState"
+  | "bufferedAmount"
+  | "binaryType"
+  | "onopen"
+  | "onclose"
+  | "onmessage"
+  | "onerror"
+  | "send"
+  | "close"
+>;
 
 export type TransportConstructor = new (
   url: string,
