@@ -95,10 +95,10 @@ describe("fetchSocketConnectUrl", () => {
       body: { url: SIGNED_URL, expires_at: expiresAt },
     });
 
-    const result = await fetchSocketConnectUrl(
+    const result = await fetchSocketConnectUrl({
       apiClient,
-      abortController.signal,
-    );
+      signal: abortController.signal,
+    });
 
     expect(makeRequest).toHaveBeenCalledWith({
       method: "POST",
@@ -122,7 +122,7 @@ describe("fetchSocketConnectUrl", () => {
     });
 
     await expect(
-      fetchSocketConnectUrl(apiClient, abortController.signal),
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toBe(error);
   });
 
@@ -133,7 +133,7 @@ describe("fetchSocketConnectUrl", () => {
     });
 
     await expect(
-      fetchSocketConnectUrl(apiClient, abortController.signal),
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toThrow("Socket connect request failed with status 500");
   });
 
@@ -145,7 +145,7 @@ describe("fetchSocketConnectUrl", () => {
     });
 
     await expect(
-      fetchSocketConnectUrl(apiClient, abortController.signal),
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toThrow("Invalid socket connect response");
   });
 
@@ -157,7 +157,7 @@ describe("fetchSocketConnectUrl", () => {
     });
 
     await expect(
-      fetchSocketConnectUrl(apiClient, abortController.signal),
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toThrow("Invalid socket connect response");
   });
 
@@ -169,7 +169,7 @@ describe("fetchSocketConnectUrl", () => {
     });
 
     await expect(
-      fetchSocketConnectUrl(apiClient, abortController.signal),
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toThrow("Invalid socket connect response");
   });
 
@@ -181,7 +181,7 @@ describe("fetchSocketConnectUrl", () => {
     });
 
     await expect(
-      fetchSocketConnectUrl(apiClient, abortController.signal),
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toThrow("Invalid socket connect response");
   });
 });
