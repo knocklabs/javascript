@@ -30,6 +30,11 @@ export type GatewayConnectResult = {
 
 export type GatewayTransportOptions = {
   /**
+   * The underlying transport constructor. An instance of this transport will be created once a
+   * connect URL has been fetched.
+   */
+  baseTransport: TransportConstructor;
+  /**
    * Resolves the signed WebSocket URL to connect to. Rejects on failure.
    */
   fetchConnectUrl: (signal: AbortSignal) => Promise<GatewayConnectResult>;
@@ -99,10 +104,11 @@ export async function fetchSocketConnectUrl({
   return { signedUrl: body.url, expiresAt };
 }
 
-export function createGatewayTransport(
-  baseTransport: TransportConstructor,
-  { fetchConnectUrl, onConnectUrlInvalid }: GatewayTransportOptions,
-): TransportConstructor {
+export function createGatewayTransport({
+  baseTransport,
+  fetchConnectUrl,
+  onConnectUrlInvalid,
+}: GatewayTransportOptions): TransportConstructor {
   // Use a named class, since Phoenix logs using the class name
   return class GatewayTransport implements WebSocketLike {
     binaryType: BinaryType = "blob";
