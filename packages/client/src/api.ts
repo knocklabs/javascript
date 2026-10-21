@@ -132,7 +132,8 @@ class ApiClient {
       const connectUrlCache = cacheUntilExpired((signal: AbortSignal) =>
         fetchSocketConnectUrl({ apiClient: this, signal }),
       );
-      const transport = createGatewayTransport(WebSocket, {
+      const transport = createGatewayTransport({
+        baseTransport: WebSocket,
         fetchConnectUrl: connectUrlCache.get,
         onConnectUrlInvalid: connectUrlCache.invalidate,
       });

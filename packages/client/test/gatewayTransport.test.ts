@@ -203,7 +203,8 @@ describe("createGatewayTransport", () => {
     MockTransport.instance = null;
     MockTransport.constructionCount = 0;
 
-    GatewayTransport = createGatewayTransport(MockTransport, {
+    GatewayTransport = createGatewayTransport({
+      baseTransport: MockTransport,
       fetchConnectUrl,
       onConnectUrlInvalid,
     });
@@ -502,10 +503,11 @@ describe("createGatewayTransport", () => {
         throw error;
       }
     }
-    const ThrowingGatewayTransport = createGatewayTransport(
-      ThrowingTransport as unknown as TransportConstructor,
-      { fetchConnectUrl, onConnectUrlInvalid },
-    );
+    const ThrowingGatewayTransport = createGatewayTransport({
+      baseTransport: ThrowingTransport as unknown as TransportConstructor,
+      fetchConnectUrl,
+      onConnectUrlInvalid,
+    });
 
     const transport = new ThrowingGatewayTransport(PHOENIX_URL, PROTOCOLS);
     const onerror = vi.fn();
@@ -609,7 +611,8 @@ describe("createGatewayTransport", () => {
   });
 
   test("omitting onConnectUrlInvalid does not throw when the url is invalid", async () => {
-    const NoCallbackTransport = createGatewayTransport(MockTransport, {
+    const NoCallbackTransport = createGatewayTransport({
+      baseTransport: MockTransport,
       fetchConnectUrl,
     });
     new NoCallbackTransport(PHOENIX_URL, PROTOCOLS);
