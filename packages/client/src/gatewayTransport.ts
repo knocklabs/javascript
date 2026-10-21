@@ -125,6 +125,7 @@ export function createGatewayTransport({
     private opened = false;
     private closeRequested = false;
     private settled = false;
+    private readonly timeoutId: ReturnType<typeof setTimeout>;
 
     constructor(
       url: string,
@@ -137,7 +138,7 @@ export function createGatewayTransport({
 
       // Wait for the caller to finish setting up callbacks and properties. This pattern was copied
       // from Phoenix's LongPoll transport.
-      setTimeout(() => this.start(), 0);
+      this.timeoutId = setTimeout(() => this.start(), 0);
     }
 
     get readyState(): number {
@@ -165,6 +166,9 @@ export function createGatewayTransport({
       }
 
       this.closeRequested = true;
+
+      // In case start() has not run yet, clear the timeout used to invoke it in the constructor
+      clearTimeout(this.timeoutId);
 
       if (this.inner) {
         this.inner.close(code, reason);
