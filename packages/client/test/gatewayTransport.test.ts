@@ -86,7 +86,7 @@ describe("fetchSocketConnectUrl", () => {
     vi.clearAllMocks();
   });
 
-  test("returns valid signed URL and expiration", async () => {
+  test("returns valid connect URL and expiration", async () => {
     const expiresAt = "2024-01-01T00:00:00.000Z";
 
     makeRequest.mockResolvedValueOnce({
@@ -112,6 +112,21 @@ describe("fetchSocketConnectUrl", () => {
     });
   });
 
+  test("returns a valid connect URL without expiration", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: SIGNED_URL, expires_at: null },
+    });
+
+    const result = await fetchSocketConnectUrl({
+      apiClient,
+      signal: abortController.signal,
+    });
+
+    expect(result).toEqual({ signedUrl: SIGNED_URL, expiresAt: null });
+  });
+
   test("throws an error when the request fails", async () => {
     const error = new Error("network down");
 
@@ -135,6 +150,18 @@ describe("fetchSocketConnectUrl", () => {
     await expect(
       fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
     ).rejects.toThrow("Socket connect request failed with status 500");
+  });
+
+  test("throws an error when expiration is missing", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: SIGNED_URL },
+    });
+
+    await expect(
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
+    ).rejects.toThrow("Invalid socket connect response");
   });
 
   test("throws an error when expiration is not a string", async () => {

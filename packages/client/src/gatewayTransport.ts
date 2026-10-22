@@ -25,7 +25,7 @@ export type TransportConstructor = new (
 
 export type GatewayConnectResult = {
   signedUrl: string;
-  expiresAt: number;
+  expiresAt: number | null;
 };
 
 export type GatewayTransportOptions = {
@@ -91,13 +91,22 @@ export async function fetchSocketConnectUrl({
   }
 
   const body = result.body as
-    | Partial<{ url: string; expires_at: string }>
+    | Partial<{ url: string; expires_at: string | null }>
     | undefined;
 
-  const expiresAt =
-    typeof body?.expires_at === "string" ? Date.parse(body.expires_at) : NaN;
+  // expires_at may be null, meaning the URL is always valid
+  const expiresAt: number | null =
+    body?.expires_at === null
+      ? null
+      : typeof body?.expires_at === "string"
+        ? Date.parse(body.expires_at)
+        : NaN;
 
-  if (typeof body?.url !== "string" || !body.url || Number.isNaN(expiresAt)) {
+  if (
+    typeof body?.url !== "string" ||
+    !body.url ||
+    (expiresAt !== null && Number.isNaN(expiresAt))
+  ) {
     throw new Error("Invalid socket connect response");
   }
 

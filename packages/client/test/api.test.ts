@@ -1275,6 +1275,53 @@ describe("API Client", () => {
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
+    test("caches a signed WebSocket connect URL with a null expiration indefinitely", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const startDate = new Date(2024, 0, 1, 0, 0, 0);
+      vi.setSystemTime(startDate);
+
+      const fetchMock = vi.fn().mockImplementation(() =>
+        createJsonResponse({
+          url: "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token",
+          expires_at: null,
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // The first connection fetches a signed connect URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // Advance the system clock well past when a normal TTL would expire.
+      vi.setSystemTime(new Date(startDate.getTime() + 60_000 + 1));
+
+      // A second connection, made well after a typical TTL, still reuses
+      // the cached URL since it never expires.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
     test("skips establishing a WebSocket connection when a signed URL fetch fails", async () => {
       const apiClient = new ApiClient({
         host: "https://api.knock.app",

@@ -91,17 +91,22 @@ export const CACHE_EXPIRY_PADDING_MS = 5_000;
 
 /**
  * Wraps `fetchFunc` so its result is cached until `expiresAt` (epoch ms), minus
- * `CACHE_EXPIRY_PADDING_MS`.
+ * `CACHE_EXPIRY_PADDING_MS`. If `expiresAt` is `null`, the value is cached indefinitely or until
+ * the cache is invalidated.
  */
 export function cacheUntilExpired<
   Args extends unknown[],
-  T extends { expiresAt: number },
+  T extends { expiresAt: number | null },
 >(fetchFunc: (...args: Args) => Promise<T>): CachedFetch<Args, T> {
   const store = new Store<T | null>(null);
 
   const get = async (...args: Args) => {
     const cached = store.state;
-    if (cached && cached.expiresAt - CACHE_EXPIRY_PADDING_MS > Date.now()) {
+    if (
+      cached &&
+      (cached.expiresAt === null ||
+        cached.expiresAt - CACHE_EXPIRY_PADDING_MS > Date.now())
+    ) {
       return cached;
     }
     const value = await fetchFunc(...args);

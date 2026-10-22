@@ -349,6 +349,41 @@ describe("Helper Functions", () => {
       expect(second).toEqual({ value: 2, expiresAt: 120_000 });
     });
 
+    test("caches indefinitely when expiresAt is null", async () => {
+      const fetchFunc = vi.fn(async (_testArg: string) => ({
+        value: 1,
+        expiresAt: null,
+      }));
+      const { get } = cacheUntilExpired(fetchFunc);
+
+      const first = await get(TEST_ARG);
+      vi.setSystemTime(60_001);
+      const second = await get(TEST_ARG);
+      vi.setSystemTime(120_001);
+      const third = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(1);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toBe(first);
+      expect(third).toBe(first);
+    });
+
+    test("invalidate forces a refetch when expiresAt is null", async () => {
+      const fetchFunc = vi
+        .fn<(testArg: string) => Promise<{ value: number; expiresAt: null }>>()
+        .mockResolvedValueOnce({ value: 1, expiresAt: null })
+        .mockResolvedValueOnce({ value: 2, expiresAt: null });
+      const { get, invalidate } = cacheUntilExpired(fetchFunc);
+
+      await get(TEST_ARG);
+      invalidate();
+      const second = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(2);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toEqual({ value: 2, expiresAt: null });
+    });
+
     test("a rejected fetchFunc propagates and does not populate the cache", async () => {
       const error = new Error("boom");
       const fetchFunc = vi
