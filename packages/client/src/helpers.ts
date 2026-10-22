@@ -8,6 +8,10 @@ export function isValidUuid(uuid: string) {
 /**
  * Returns the query string for a given URL, minus the leading `"?"` character. When the URL has no
  * query string, returns the empty string.
+ *
+ * This function does not use the `URL` class due to known issues in React Native's implementation
+ * of `URL`.
+ *
  * @param url a valid string URL. For example, `"https://example.com/test?hello=world"`.
  */
 export function getQueryString(url: string): string {
@@ -17,6 +21,10 @@ export function getQueryString(url: string): string {
 
 /**
  * Appends a query string to a given URL. Note that this does not dedupe query params.
+ *
+ * This function does not use the `URL` class due to known issues in React Native's implementation
+ * of `URL`.
+ *
  * @param url a valid string URL.
  * @param queryString a query string, minus any leading `"?"` character.
  */
