@@ -46,7 +46,7 @@ export const createMockKnock = (apiKey = "pk_test_12345") => {
   vi.spyOn(knock, "client").mockReturnValue(
     mockApiClient as unknown as ReturnType<typeof knock.client>,
   );
-  vi.spyOn(knock, "log").mockImplementation(() => {});
+  vi.spyOn(knock, "log").mockImplementation(() => { });
 
   return { knock, mockApiClient };
 };
@@ -212,21 +212,23 @@ export const setupBrowserEnvironment = () => {
 };
 
 // Simple WebSocket mock
-export const createWebSocketMock = () => {
-  const mockWebSocket = {
-    send: vi.fn(),
-    close: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    readyState: 1, // OPEN
-    onopen: null,
-    onclose: null,
-    onmessage: null,
-    onerror: null,
-  };
-
-  return mockWebSocket;
-};
+export const createWebSocketMock = () =>
+  // Vitest 4 only lets a mock stand in as a constructor when its implementation is a `function` (or class), not an arrow function
+  vi.fn(function (url: string, protocols?: string | string[]) {
+    return {
+      url,
+      protocols,
+      readyState: 1, // OPEN
+      bufferedAmount: 0,
+      binaryType: "blob",
+      onopen: null,
+      onclose: null,
+      onmessage: null,
+      onerror: null,
+      send: vi.fn(),
+      close: vi.fn(),
+    };
+  });
 
 // Simple BroadcastChannel mock
 export const createBroadcastChannelMock = () => {

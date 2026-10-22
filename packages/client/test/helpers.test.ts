@@ -1,6 +1,13 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { exponentialBackoffFullJitter, isValidUuid } from "../src/helpers";
+import {
+  appendQueryString,
+  CACHE_EXPIRY_PADDING_MS,
+  cacheUntilExpired,
+  exponentialBackoffFullJitter,
+  getQueryString,
+  isValidUuid,
+} from "../src/helpers";
 
 /**
  * Helper Functions Test Suite
@@ -114,6 +121,54 @@ describe("Helper Functions", () => {
     });
   });
 
+  describe("getQueryString", () => {
+    test("returns everything after the first '?'", () => {
+      expect(getQueryString("https://example.com/test?hello=world")).toBe(
+        "hello=world",
+      );
+    });
+
+    test("returns the empty string when there is no '?'", () => {
+      expect(getQueryString("https://example.com/test")).toBe("");
+    });
+
+    test("returns the empty string when the '?' is the last character", () => {
+      expect(getQueryString("https://example.com/test?")).toBe("");
+    });
+  });
+
+  describe("appendQueryString", () => {
+    test("appends the query string to a URL with no existing query string", () => {
+      expect(appendQueryString("https://example.com/test", "a=1")).toBe(
+        "https://example.com/test?a=1",
+      );
+    });
+
+    test("appends the query string with '&' when the URL already has one", () => {
+      expect(
+        appendQueryString("https://example.com/test?a=1", "b=2"),
+      ).toBe("https://example.com/test?a=1&b=2");
+    });
+
+    test("returns the URL unchanged when the query string is empty", () => {
+      expect(appendQueryString("https://example.com/test", "")).toBe(
+        "https://example.com/test",
+      );
+    });
+
+    test("returns the URL unchanged when the query string is empty, even if the URL already has one", () => {
+      expect(appendQueryString("https://example.com/test?a=1", "")).toBe(
+        "https://example.com/test?a=1",
+      );
+    });
+
+    test("does not dedupe keys shared between the URL and the query string", () => {
+      expect(
+        appendQueryString("https://example.com/test?a=1", "a=2"),
+      ).toBe("https://example.com/test?a=1&a=2");
+    });
+  });
+
   describe("exponentialBackoffFullJitter", () => {
     beforeEach(() => {
       vi.spyOn(Math, "random");
@@ -193,5 +248,123 @@ describe("Helper Functions", () => {
         }),
       ).toBe(250);
     });
-  })
+  });
+
+  describe("cacheUntilExpired", () => {
+    const TEST_ARG = "Hello, world!";
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(0);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    test("first get call invokes fetchFunc with the given argument", async () => {
+      const fetchFunc = vi.fn(async (testArg: string) => ({
+        testArg,
+        expiresAt: 60_000,
+      }));
+      const { get } = cacheUntilExpired(fetchFunc);
+
+      const result = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(1);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(result).toEqual({ testArg: TEST_ARG, expiresAt: 60_000 });
+    });
+
+    test("second call before expiry returns the cached value without refetching", async () => {
+      const fetchFunc = vi.fn(async (_testArg: string) => ({
+        value: 1,
+        expiresAt: 60_000,
+      }));
+      const { get } = cacheUntilExpired(fetchFunc);
+
+      const first = await get(TEST_ARG);
+      const second = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(1);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toBe(first);
+    });
+
+    test("refetches within the expiry padding window and caches the new value", async () => {
+      const fetchFunc = vi
+        .fn<
+          (testArg: string) => Promise<{ value: number; expiresAt: number }>
+        >()
+        .mockResolvedValueOnce({ value: 1, expiresAt: 60_000 })
+        .mockResolvedValueOnce({ value: 2, expiresAt: 120_000 });
+      const { get } = cacheUntilExpired(fetchFunc);
+
+      await get(TEST_ARG);
+      vi.setSystemTime(60_000 - CACHE_EXPIRY_PADDING_MS);
+      const second = await get(TEST_ARG);
+      const third = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(2);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toEqual({ value: 2, expiresAt: 120_000 });
+      expect(third).toBe(second);
+    });
+
+    test("refetches after expiry and caches the new value", async () => {
+      const fetchFunc = vi
+        .fn<
+          (testArg: string) => Promise<{ value: number; expiresAt: number }>
+        >()
+        .mockResolvedValueOnce({ value: 1, expiresAt: 60_000 })
+        .mockResolvedValueOnce({ value: 2, expiresAt: 120_000 });
+      const { get } = cacheUntilExpired(fetchFunc);
+
+      await get(TEST_ARG);
+      vi.setSystemTime(60_001);
+      const second = await get(TEST_ARG);
+      const third = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(2);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toEqual({ value: 2, expiresAt: 120_000 });
+      expect(third).toBe(second);
+    });
+
+    test("invalidate forces the next get call to refetch", async () => {
+      const fetchFunc = vi
+        .fn<
+          (testArg: string) => Promise<{ value: number; expiresAt: number }>
+        >()
+        .mockResolvedValueOnce({ value: 1, expiresAt: 60_000 })
+        .mockResolvedValueOnce({ value: 2, expiresAt: 120_000 });
+      const { get, invalidate } = cacheUntilExpired(fetchFunc);
+
+      await get(TEST_ARG);
+      invalidate();
+      const second = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(2);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toEqual({ value: 2, expiresAt: 120_000 });
+    });
+
+    test("a rejected fetchFunc propagates and does not populate the cache", async () => {
+      const error = new Error("boom");
+      const fetchFunc = vi
+        .fn<
+          (testArg: string) => Promise<{ value: number; expiresAt: number }>
+        >()
+        .mockRejectedValueOnce(error)
+        .mockResolvedValueOnce({ value: 1, expiresAt: 60_000 });
+      const { get } = cacheUntilExpired(fetchFunc);
+
+      await expect(get(TEST_ARG)).rejects.toThrow(error);
+      const second = await get(TEST_ARG);
+
+      expect(fetchFunc).toHaveBeenCalledTimes(2);
+      expect(fetchFunc).toHaveBeenCalledWith(TEST_ARG);
+      expect(second).toEqual({ value: 1, expiresAt: 60_000 });
+    });
+  });
 });
