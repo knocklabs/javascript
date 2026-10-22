@@ -1,3 +1,5 @@
+import { Store } from "@tanstack/store";
+
 const uuidRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
@@ -95,19 +97,20 @@ export function cacheUntilExpired<
   Args extends unknown[],
   T extends { expiresAt: number },
 >(fetchFunc: (...args: Args) => Promise<T>): CachedFetch<Args, T> {
-  let cached: T | null = null;
+  const store = new Store<T | null>(null);
 
   const get = async (...args: Args) => {
+    const cached = store.state;
     if (cached && cached.expiresAt - CACHE_EXPIRY_PADDING_MS > Date.now()) {
       return cached;
     }
     const value = await fetchFunc(...args);
-    cached = value;
+    store.setState(() => value);
     return value;
   };
 
   const invalidate = () => {
-    cached = null;
+    store.setState(() => null);
   };
 
   return { get, invalidate };
