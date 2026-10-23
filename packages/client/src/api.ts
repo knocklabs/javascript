@@ -1,6 +1,10 @@
 import { Socket } from "phoenix";
 
-import { exponentialBackoffFullJitter } from "./helpers";
+import {
+  createGatewayTransport,
+  fetchSocketConnectUrl,
+} from "./gatewayTransport";
+import { cacheUntilExpired, exponentialBackoffFullJitter } from "./helpers";
 import { PageVisibilityManager } from "./pageVisibility";
 
 // Ceiling for socket reconnect backoff. This is intentionally much larger than
@@ -18,6 +22,10 @@ const STABLE_CONNECTION_THRESHOLD_MS = 30_000;
 // already pinned to SOCKET_RECONNECT_MAX_DELAY_MS, so there's no need to keep
 // counting.
 const MAX_UNSTABLE_CONNECTION_COUNT = 15;
+
+// The max number of times a request is retried after a retryable failure,
+// unless overridden by `ApiRequestConfig.maxRetries`.
+const DEFAULT_MAX_REQUEST_RETRIES = 3;
 
 type ApiClientOptions = {
   host: string;
@@ -44,6 +52,8 @@ export type ApiRequestConfig = {
   data?: unknown;
   headers?: HeadersInit;
   signal?: AbortSignal;
+  /** Max number of retries for retryable failures. Set this to 0 to disable retries. */
+  maxRetries?: number;
 };
 
 type FetchClient = (
@@ -117,7 +127,21 @@ class ApiClient {
     });
 
     if (typeof window !== "undefined" && typeof WebSocket !== "undefined") {
+      // Connect sockets via the WebSocket gateway API endpoint, which returns a signed ws:// or
+      // wss:// connect URL. This signed URL is cached and used to reconnect until it expires.
+      const connectUrlCache = cacheUntilExpired((signal: AbortSignal) =>
+        // If this fetch rejects, the error is handled by the gateway transport, and Phoenix
+        // considers it a failed connection attempt
+        fetchSocketConnectUrl({ apiClient: this, signal }),
+      );
+      const transport = createGatewayTransport({
+        baseTransport: WebSocket,
+        fetchConnectUrl: connectUrlCache.get,
+        onConnectUrlInvalid: connectUrlCache.invalidate,
+      });
+
       this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
+        transport: transport,
         params: {
           user_token: this.userToken,
           api_key: this.apiKey,
@@ -249,9 +273,11 @@ class ApiClient {
   private async requestWithRetries(req: ApiRequestConfig) {
     let lastError: unknown;
 
+    const { maxRetries = DEFAULT_MAX_REQUEST_RETRIES } = req;
+
     // Sequential retry loop: each attempt awaits in order and returns early on
     // success or a non-retryable error, so it doesn't reduce to an array method.
-    for (let attempt = 0; attempt <= 3; attempt++) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
       let retryAfterMs = 0;
 
       try {
@@ -279,7 +305,7 @@ class ApiClient {
         }
       }
 
-      if (attempt < 3) {
+      if (attempt < maxRetries) {
         await this.delay(this.getRetryDelay(attempt + 1, retryAfterMs));
       }
     }
