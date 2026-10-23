@@ -1,7 +1,7 @@
 import { ColorMode, useGuide } from "@knocklabs/react-core";
-import clsx from "clsx";
 import React from "react";
 
+import { cx } from "../../../core/cx";
 import { maybeNavigateToUrlWithDelay } from "../helpers";
 import { ButtonContent, TargetButton, TargetButtonWithGuide } from "../types";
 
@@ -13,7 +13,7 @@ const Root: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-banner", className)} {...props}>
+    <div className={cx("knock-guide-banner", className)} {...props}>
       {children}
     </div>
   );
@@ -24,7 +24,7 @@ const Content: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-banner__message", className)} {...props}>
+    <div className={cx("knock-guide-banner__message", className)} {...props}>
       {children}
     </div>
   );
@@ -35,7 +35,7 @@ const Title: React.FC<
   { title: string } & React.ComponentPropsWithRef<"div">
 > = ({ title, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-banner__title", className)} {...props}>
+    <div className={cx("knock-guide-banner__title", className)} {...props}>
       {title}
     </div>
   );
@@ -49,7 +49,7 @@ const Body: React.FC<{ body: string } & React.ComponentPropsWithRef<"div">> = ({
 }) => {
   return (
     <div
-      className={clsx("knock-guide-banner__body", className)}
+      className={cx("knock-guide-banner__body", className)}
       dangerouslySetInnerHTML={{ __html: body }}
       {...props}
     />
@@ -61,7 +61,7 @@ const Actions: React.FC<
   React.PropsWithChildren<React.ComponentPropsWithRef<"div">>
 > = ({ children, className, ...props }) => {
   return (
-    <div className={clsx("knock-guide-banner__actions", className)} {...props}>
+    <div className={cx("knock-guide-banner__actions", className)} {...props}>
       {children}
     </div>
   );
@@ -72,10 +72,7 @@ const PrimaryButton: React.FC<
   ButtonContent & React.ComponentPropsWithRef<"button">
 > = ({ text, action, className, ...props }) => {
   return (
-    <button
-      className={clsx("knock-guide-banner__action", className)}
-      {...props}
-    >
+    <button className={cx("knock-guide-banner__action", className)} {...props}>
       {text}
     </button>
   );
@@ -87,7 +84,7 @@ const SecondaryButton: React.FC<
 > = ({ text, action, className, ...props }) => {
   return (
     <button
-      className={clsx(
+      className={cx(
         "knock-guide-banner__action knock-guide-banner__action--secondary",
         className,
       )}
@@ -104,7 +101,7 @@ const DismissButton: React.FC<React.ComponentPropsWithRef<"button">> = ({
   ...props
 }) => {
   return (
-    <button className={clsx("knock-guide-banner__close", className)} {...props}>
+    <button className={cx("knock-guide-banner__close", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"

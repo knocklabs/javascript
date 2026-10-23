@@ -1,5 +1,386 @@
 # client-example
 
+## 0.3.62
+
+### Patch Changes
+
+- Updated dependencies [e7f7a4f]
+- Updated dependencies [696cbac]
+- Updated dependencies [90a95d1]
+  - @knocklabs/client@0.22.2
+
+## 0.3.61
+
+### Patch Changes
+
+- Updated dependencies [9b5f244]
+  - @knocklabs/client@0.22.1
+
+## 0.3.60
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+  - @knocklabs/client@0.22.0
+
+## 0.3.60-rc.0
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+  - @knocklabs/client@0.22.0-rc.0
+
+## 0.3.59
+
+### Patch Changes
+
+- Updated dependencies [3d7a041]
+  - @knocklabs/client@0.21.15
+
+## 0.3.58
+
+### Patch Changes
+
+- Updated dependencies [dd1b724]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+
+## 0.3.57
+
+### Patch Changes
+
+- Updated dependencies [454f947]
+  - @knocklabs/client@0.21.13
+
+## 0.3.56
+
+### Patch Changes
+
+- Updated dependencies [ffa7bd2]
+  - @knocklabs/client@0.21.12
+
+## 0.3.55
+
+### Patch Changes
+
+- Updated dependencies [a04781b]
+  - @knocklabs/client@0.21.11
+
+## 0.3.54
+
+### Patch Changes
+
+- Updated dependencies [ee35de2]
+  - @knocklabs/client@0.21.10
+
+## 0.3.53
+
+### Patch Changes
+
+- Updated dependencies [e4fe593]
+  - @knocklabs/client@0.21.9
+
+## 0.3.52
+
+### Patch Changes
+
+- Updated dependencies [af81cf2]
+- Updated dependencies [31dffc1]
+- Updated dependencies [2798bbb]
+  - @knocklabs/client@0.21.8
+
+## 0.3.51
+
+### Patch Changes
+
+- Updated dependencies [6d3c9e2]
+  - @knocklabs/client@0.21.7
+
+## 0.3.50
+
+### Patch Changes
+
+- Updated dependencies [afae7ce]
+  - @knocklabs/client@0.21.6
+
+## 0.3.49
+
+### Patch Changes
+
+- Updated dependencies [c5babb3]
+  - @knocklabs/client@0.21.5
+
+## 0.3.48
+
+### Patch Changes
+
+- Updated dependencies [c134f53]
+  - @knocklabs/client@0.21.4
+
+## 0.3.47
+
+### Patch Changes
+
+- Updated dependencies [1ed4f75]
+  - @knocklabs/client@0.21.3
+
+## 0.3.46
+
+### Patch Changes
+
+- Updated dependencies [cb7148b]
+- Updated dependencies [04a8f16]
+- Updated dependencies [b7b3708]
+  - @knocklabs/client@0.21.2
+
+## 0.3.45
+
+### Patch Changes
+
+- Updated dependencies [ddd7981]
+  - @knocklabs/client@0.21.1
+
+## 0.3.44
+
+### Patch Changes
+
+- Updated dependencies [2af3f5e]
+  - @knocklabs/client@0.21.0
+
+## 0.3.43
+
+### Patch Changes
+
+- Updated dependencies [1c486d3]
+  - @knocklabs/client@0.20.4
+
+## 0.3.42
+
+### Patch Changes
+
+- Updated dependencies [cf04e5f]
+  - @knocklabs/client@0.20.3
+
+## 0.3.41
+
+### Patch Changes
+
+- Updated dependencies [09c11a3]
+  - @knocklabs/client@0.20.2
+
+## 0.3.40
+
+### Patch Changes
+
+- Updated dependencies [01d07af]
+  - @knocklabs/client@0.20.1
+
+## 0.3.39
+
+### Patch Changes
+
+- Updated dependencies [2d29ebf]
+  - @knocklabs/client@0.20.0
+
+## 0.3.38
+
+### Patch Changes
+
+- Updated dependencies [a56bf70]
+  - @knocklabs/client@0.19.4
+
+## 0.3.37
+
+### Patch Changes
+
+- Updated dependencies [571abb1]
+  - @knocklabs/client@0.19.3
+
+## 0.3.36
+
+### Patch Changes
+
+- Updated dependencies [1e538b9]
+  - @knocklabs/client@0.19.2
+
+## 0.3.35
+
+### Patch Changes
+
+- Updated dependencies [c4e67da]
+  - @knocklabs/client@0.19.1
+
+## 0.3.34
+
+### Patch Changes
+
+- Updated dependencies [be65601]
+- Updated dependencies [4b888c4]
+  - @knocklabs/client@0.19.0
+
+## 0.3.33
+
+### Patch Changes
+
+- Updated dependencies [56ab8c0]
+  - @knocklabs/client@0.18.7
+
+## 0.3.32
+
+### Patch Changes
+
+- Updated dependencies [49df373]
+  - @knocklabs/client@0.18.6
+
+## 0.3.31
+
+### Patch Changes
+
+- Updated dependencies [bf7677a]
+- Updated dependencies [9eba682]
+  - @knocklabs/client@0.18.5
+
+## 0.3.30
+
+### Patch Changes
+
+- Updated dependencies [c64098e]
+  - @knocklabs/client@0.18.4
+
+## 0.3.29
+
+### Patch Changes
+
+- Updated dependencies [9f0d317]
+  - @knocklabs/client@0.18.3
+
+## 0.3.28
+
+### Patch Changes
+
+- Updated dependencies [1fc802b]
+  - @knocklabs/client@0.18.2
+
+## 0.3.27
+
+### Patch Changes
+
+- Updated dependencies [74366b3]
+  - @knocklabs/client@0.18.1
+
+## 0.3.26
+
+### Patch Changes
+
+- Updated dependencies [5fc0af9]
+  - @knocklabs/client@0.18.0
+
+## 0.3.25
+
+### Patch Changes
+
+- Updated dependencies [23b7057]
+- Updated dependencies [1c24f68]
+  - @knocklabs/client@0.17.2
+
+## 0.3.24
+
+### Patch Changes
+
+- Updated dependencies [5b77f18]
+  - @knocklabs/client@0.17.1
+
+## 0.3.23
+
+### Patch Changes
+
+- Updated dependencies [c761e7c]
+- Updated dependencies [3558784]
+- Updated dependencies [b8b64e4]
+  - @knocklabs/client@0.17.0
+
+## 0.3.22
+
+### Patch Changes
+
+- Updated dependencies [dc84f25]
+  - @knocklabs/client@0.16.5
+
+## 0.3.21
+
+### Patch Changes
+
+- Updated dependencies [49f791b]
+  - @knocklabs/client@0.16.4
+
+## 0.3.20
+
+### Patch Changes
+
+- Updated dependencies [79204f0]
+  - @knocklabs/client@0.16.3
+
+## 0.3.19
+
+### Patch Changes
+
+- Updated dependencies [5a19d82]
+  - @knocklabs/client@0.16.2
+
+## 0.3.18
+
+### Patch Changes
+
+- Updated dependencies [35b5445]
+- Updated dependencies [5d758d7]
+- Updated dependencies [d2fd092]
+  - @knocklabs/client@0.16.1
+
+## 0.3.17
+
+### Patch Changes
+
+- Updated dependencies [48e9c77]
+  - @knocklabs/client@0.16.0
+
+## 0.3.16
+
+### Patch Changes
+
+- Updated dependencies [fb68ce1]
+  - @knocklabs/client@0.15.2
+
+## 0.3.15
+
+### Patch Changes
+
+- Updated dependencies [befd7b9]
+  - @knocklabs/client@0.15.1
+
+## 0.3.14
+
+### Patch Changes
+
+- Updated dependencies [2a0b3e2]
+  - @knocklabs/client@0.15.0
+
+## 0.3.13
+
+### Patch Changes
+
+- Updated dependencies [6539c97]
+  - @knocklabs/client@0.14.11
+
+## 0.3.12
+
+### Patch Changes
+
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+  - @knocklabs/client@0.14.10
+
 ## 0.3.12-canary.2
 
 ### Patch Changes

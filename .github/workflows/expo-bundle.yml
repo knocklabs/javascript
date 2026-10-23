@@ -1,0 +1,45 @@
+name: Expo Bundle Check
+on:
+  pull_request:
+    paths:
+      - "packages/types/**"
+      - "packages/client/**"
+      - "packages/react-core/**"
+      - "packages/react-native/**"
+      - "packages/expo/**"
+      - "examples/expo-example/**"
+      - ".github/workflows/expo-bundle.yml"
+      - "yarn.lock"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    name: Metro bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.x"
+          cache: yarn
+          registry-url: "https://registry.npmjs.org"
+          scope: "@knocklabs"
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Build packages
+        run: yarn build:packages
+      # Exercises the @knocklabs/* module graph under React Native's Metro
+      # resolver (conditional "react-native" exports resolve to source). This
+      # is what catches an upstream client/react-core change that breaks how
+      # the react-native / expo packages bundle. Fully local: no EXPO_TOKEN,
+      # no EAS credits. EXPO_PUBLIC_* vars are optional for bundling.
+      - name: Metro bundle expo example
+        working-directory: examples/expo-example
+        run: yarn expo export --platform android --output-dir "$RUNNER_TEMP/expo-export"

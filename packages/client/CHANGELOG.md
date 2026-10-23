@@ -1,5 +1,428 @@
 # Changelog
 
+## 0.22.2
+
+### Patch Changes
+
+- e7f7a4f: Scope bulk feed status updates to the feed's trigger data filters.
+- 696cbac: Upgrade Phoenix to 1.8.9 to address CVE-2026-56812.
+- 90a95d1: Stop the user-token refresh from spinning. The expiry timer is no longer scheduled with a negative delay when the client authenticates with a token that is already inside the refresh window, orphaned timers are cleared instead of left live, and a refresh whose token expires too soon to schedule another wait no longer re-authenticates (which would tear down and rebuild the API client and socket on every round trip).
+
+## 0.22.1
+
+### Patch Changes
+
+- 9b5f244: fix(KNO-14505): prevent guide engagement API failures from becoming unhandled promise rejections
+
+  Guide seen, interacted, and archived events continue to update local state optimistically while failed background requests are caught and logged.
+
+## 0.22.0
+
+### Minor Changes
+
+- e8567eb: Make the client do nothing (instead of throwing or making requests) when there's no signed-in user, and add tools to manage sign-in state.
+
+  - New `Knock.logout()` clears the user and disconnects everything: the websocket, the token-refresh timer, and the page-visibility listener.
+  - New `knock.authStatus` (`"authenticated"` or `"unauthenticated"`) and a subscribable `knock.authStore` to check or react to whether a user is signed in.
+  - With no signed-in user, these now do nothing instead of throwing or calling the API:
+    - Feed `markAs*` / `markAll*` / `fetchNextPage` (they also skip the optimistic UI update).
+    - Guides `fetch` / `subscribe` and the step actions. These previously threw, which could crash the app when Guides rendered before a user was set.
+    - Slack/MS Teams `authCheck` (returns "not connected"), `getChannels` / `getTeams` (return empty), and `messages.batchUpdateStatuses` (returns `[]`).
+  - Fixes two Guide bugs: real-time updates broke after a re-login (a stale socket reference), and the `history` patch used for location tracking broke when a Guide provider remounted.
+
+## 0.22.0-rc.0
+
+### Minor Changes
+
+- d2f7948: Make the client do nothing (instead of throwing or making requests) when there's no signed-in user, and add tools to manage sign-in state.
+
+  - New `Knock.logout()` clears the user and disconnects everything: the websocket, the token-refresh timer, and the page-visibility listener.
+  - New `knock.authStatus` (`"authenticated"` or `"unauthenticated"`) and a subscribable `knock.authStore` to check or react to whether a user is signed in.
+  - With no signed-in user, these now do nothing instead of throwing or calling the API:
+    - Feed `markAs*` / `markAll*` / `fetchNextPage` (they also skip the optimistic UI update).
+    - Guides `fetch` / `subscribe` and the step actions. These previously threw, which could crash the app when Guides rendered before a user was set.
+    - Slack/MS Teams `authCheck` (returns "not connected"), `getChannels` / `getTeams` (return empty), and `messages.batchUpdateStatuses` (returns `[]`).
+  - Fixes two Guide bugs: real-time updates broke after a re-login (a stale socket reference), and the `history` patch used for location tracking broke when a Guide provider remounted.
+
+## 0.21.15
+
+### Patch Changes
+
+- 3d7a041: fix(KNO-13857): reduce websocket reconnect load when connections can't recover
+
+  The Phoenix socket now escalates its reconnect backoff toward a 10-minute cap (previously a fixed 30s cap that Phoenix reset on every successful open), so a client that can never reconnect — for example after an API key rotation leaves stale credentials that get rejected on every upgrade — settles into a slow retry cadence instead of a tight loop. Backoff escalation persists through brief "connect then immediately drop" cycles and resets once a connection stays up for 30s.
+
+  Additionally:
+
+  - `teardown()` now always disconnects the socket (even mid-reconnect), so a reauth that replaces the client can't leak a socket that keeps retrying with stale credentials.
+  - Hidden background tabs now stop retrying: a socket that is mid-reconnect when the page is hidden is disconnected, not just connected ones, and resumes when the page becomes visible again.
+  - Reconnects promptly on the browser `online` event so recovery after a real network drop doesn't wait out the (now longer) backoff.
+
+## 0.21.14
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 3dd0aa8: Remove the `jwt-decode` dependency in favor of an internal JWT payload decoder.
+- b6c9be4: Replace the internal axios transport with native fetch and remove axios dependencies.
+
+## 0.21.13
+
+### Patch Changes
+
+- 454f947: chore(deps): bump nanoid from 3.3.11 to 3.3.12
+
+## 0.21.12
+
+### Patch Changes
+
+- ffa7bd2: [Guide] Remove guide toolbar v1 support
+
+## 0.21.11
+
+### Patch Changes
+
+- a04781b: [Guides] Rename stage results keys to `byKey` and `byType`
+
+## 0.21.10
+
+### Patch Changes
+
+- ee35de2: [Guides] Only re-subscribe per listenForUpdates when exiting debugging in guide toolbar v2
+
+## 0.21.9
+
+### Patch Changes
+
+- e4fe593: chore(deps): bump phoenix from 1.8.3 to 1.8.5
+
+## 0.21.8
+
+### Patch Changes
+
+- af81cf2: [Guides] Add a Open in dashboard button to guide toolbar v2
+- 31dffc1: [Guides] Use `readyToTarget` to coordinate fetching guides in guide toolbar v2
+- 2798bbb: [Guides] Add reset engagement button in guide toolbar v2
+
+## 0.21.7
+
+### Patch Changes
+
+- 6d3c9e2: pin axios to 1.14.0
+
+## 0.21.6
+
+### Patch Changes
+
+- afae7ce: [guides] Export StepMessageState type definition from guide client types
+
+## 0.21.5
+
+### Patch Changes
+
+- c5babb3: fix: use nanoid/non-secure to avoid unnecessary dependency on crypto
+
+## 0.21.4
+
+### Patch Changes
+
+- c134f53: [guides] read and write toolbar run config via local stroage
+
+## 0.21.3
+
+### Patch Changes
+
+- 1ed4f75: [Guides] Add additional debug settings to guide client, and improvements to the guide toolbar V2
+
+  - Add `focusedGuideKeys` debug setting to pin a target guide during preview
+  - Add `ignoreDisplayInterval` debug setting to ignore throttling during preview
+  - Add `skipEngagementTracking` debug setting to skip sending engagement updates to the API during preview
+  - Add control UIs to the guide toolbar V2 for the newly added debug settings
+  - Add a drag handle to the guide toolbar for drag and drop
+
+## 0.21.2
+
+### Patch Changes
+
+- cb7148b: Add exponential backoff with jitter to Phoenix socket reconnection to prevent thundering herd on outages
+- 04a8f16: Disconnects socket after an initial delay when page visibility is hidden and removes the `auto_manage_socket_connection` and `auto_manage_socket_connection_delay` flags from `FeedClientOptions`.
+- b7b3708: [guides] add guide toolbar v2 poc
+
+## 0.21.1
+
+### Patch Changes
+
+- ddd7981: Improve `FetchFeedOptionsForRequest` type
+
+## 0.21.0
+
+### Minor Changes
+
+- 2af3f5e: Initialize feeds in `"compact"` mode by default
+
+  The feed client can now be initialized with a `mode` option, set to either `"compact"` or `"rich"`. When `mode` is `"compact"`, the following restrictions will apply when the feed is fetched:
+
+  - The `activities` and `total_activities` fields will _not_ be present on feed items
+  - The `data` field will _not_ include nested arrays and objects
+  - The `actors` field will only have up to one actor
+
+  **By default, feeds are initialized in `"compact"` mode. If you need to access `activities`, `total_activities`, the complete `data`, or the complete array of `actors`, you must initialize your feed in `"rich"` mode.**
+
+  If you are using the feed client via `@knocklabs/client` directly:
+
+  ```js
+  const knockFeed = knockClient.feeds.initialize(
+    process.env.KNOCK_FEED_CHANNEL_ID,
+    { mode: "rich" },
+  );
+  ```
+
+  If you are using `<KnockFeedProvider>` via `@knocklabs/react`, `@knocklabs/react-native`, or `@knocklabs/expo`:
+
+  ```tsx
+  <KnockFeedProvider
+    feedId={process.env.KNOCK_FEED_CHANNEL_ID}
+    defaultFeedOptions={{ mode: "rich" }}
+  />
+  ```
+
+  If you are using the `useNotifications` hook via `@knocklabs/react-core`:
+
+  ```js
+  const feedClient = useNotifications(
+    knockClient,
+    process.env.KNOCK_FEED_CHANNEL_ID,
+    { mode: "rich" },
+  );
+  ```
+
+## 0.20.4
+
+### Patch Changes
+
+- 1c486d3: [guides] support search param in guide activation url patterns
+
+## 0.20.3
+
+### Patch Changes
+
+- cf04e5f: [guides] check window properties in browser specific code paths for react native
+
+## 0.20.2
+
+### Patch Changes
+
+- 09c11a3: [guides] fix: KnockGuideStep type definition to return a promise from async methods
+
+## 0.20.1
+
+### Patch Changes
+
+- 01d07af: Fix TypeScript type mismatch in SetPreferencesProperties. All fields (workflows, categories, channel_types, channels) are now optional to match the nullable nature of PreferenceSet returned by getPreferences(). This allows users to pass preference data without type errors and properly supports partial updates.
+
+## 0.20.0
+
+### Minor Changes
+
+- 2d29ebf: [guides] update selectGuides and useGuides to be subject to throttling by default
+
+## 0.19.4
+
+### Patch Changes
+
+- a56bf70: [guide] include a tenant param for all engagement update requests
+
+## 0.19.3
+
+### Patch Changes
+
+- 571abb1: Add `branch` option to `Knock` client
+
+  The `Knock` client now accepts a `branch` option. To use `Knock` with a branch,
+  set the `apiKey` param to your development environment's API key and set the
+  `branch` option to the slug of an existing branch.
+
+  ```js
+  import Knock from "@knocklabs/client";
+
+  const knock = new Knock(process.env.KNOCK_PUBLIC_API_KEY, {
+    branch: "my-branch-slug",
+  });
+  ```
+
+## 0.19.2
+
+### Patch Changes
+
+- 1e538b9: [guide] add a secondary entry point for nextjs specific helpers for guide location detection
+
+## 0.19.1
+
+### Patch Changes
+
+- c4e67da: revert 4b888c4 to remove nextjs helper components and fix module resolution error
+
+## 0.19.0
+
+### Minor Changes
+
+- be65601: - **Added channel-level notification preferences** to client interfaces, types, tests, and the Next.js example.
+  - Update your code to handle the new channels property in `PreferenceSet`, `SetPreferencesProperties`, and `WorkflowPreferenceSetting` if using `@knock/client`.
+
+### Patch Changes
+
+- 4b888c4: [guides] add dedicated nextjs helper components for detecting location changes
+
+## 0.18.7
+
+### Patch Changes
+
+- 56ab8c0: fix: ensure that user.id can be undefined
+
+## 0.18.6
+
+### Patch Changes
+
+- 49df373: update guide as a new object ref when updating its step
+
+## 0.18.5
+
+### Patch Changes
+
+- bf7677a: feat: persist guide debug state in local storage
+- 9eba682: chore: use the new guide engagement update endpoints w/o message_id param
+
+## 0.18.4
+
+### Patch Changes
+
+- c64098e: fix: handle promise rejection when identifying a user inline
+
+## 0.18.3
+
+### Patch Changes
+
+- 9f0d317: fix(KNO-9711) Add step_ref to NotificationSource
+
+  Add optional nullable field corresponding to API spec
+
+## 0.18.2
+
+### Patch Changes
+
+- 1fc802b: fix(feed): optimistically update when unarchiving an item
+
+## 0.18.1
+
+### Patch Changes
+
+- 74366b3: export useStore from react-core to include in use client directive
+
+## 0.18.0
+
+### Minor Changes
+
+- 5fc0af9: feat: adds `identificationStrategy` option for user identification control
+
+## 0.17.2
+
+### Patch Changes
+
+- 23b7057: fix: return preview guides even if no other guides are present
+- 1c24f68: fix: filter out inactive guides in preview mode
+
+## 0.17.1
+
+### Patch Changes
+
+- 5b77f18: fix: return non-published preview guides
+
+## 0.17.0
+
+### Minor Changes
+
+- c761e7c: feat: support live previewing guides content
+- b8b64e4: feat(beta): add support for basic guide debugging
+
+### Patch Changes
+
+- 3558784: add support for activation url rules in guide client
+
+## 0.16.5
+
+### Patch Changes
+
+- dc84f25: chore: limit retries for guide client real time subscription
+
+## 0.16.4
+
+### Patch Changes
+
+- 49f791b: fix: guard against undefined window object in ssr
+
+## 0.16.3
+
+### Patch Changes
+
+- 79204f0: fix: export useGuides hook to react package
+
+## 0.16.2
+
+### Patch Changes
+
+- 5a19d82: fix: knock.users.identify passes data through query params
+
+## 0.16.1
+
+### Patch Changes
+
+- 35b5445: chore(deps): bump axios from 1.10.0 to 1.11.0
+- 5d758d7: fix: fixes refused to set unsafe header "User-Agent"
+- d2fd092: chore(deps-dev): bump @types/jsonwebtoken from 9.0.9 to 9.0.10
+
+## 0.16.0
+
+### Minor Changes
+
+- 48e9c77: - Support guides ordering and throttle settings
+  - Add `useGuides` hook
+
+## 0.15.2
+
+### Patch Changes
+
+- fb68ce1: feat: adds javascript client version to user agent
+
+## 0.15.1
+
+### Patch Changes
+
+- befd7b9: fix: when reseting the feed, real-time notifications stop working
+
+## 0.15.0
+
+### Minor Changes
+
+- 2a0b3e2: Adds support for inline user `identify` calls when authenticating a user via the Knock client.
+  You can now pass a `user` object, for example `{ id: "123" }`, directly to the `authenticate` function.
+  Additional properties can also be included to update the user record, such as `{ id: "123", name: "Knock" }`.
+
+  This update also applies to `KnockProvider`, where you can now pass a `user` prop instead of a `userId` prop to achieve the same behavior.
+
+## 0.14.11
+
+### Patch Changes
+
+- 6539c97: patch fix package contents being built properly
+
+## 0.14.10
+
+### Patch Changes
+
+- e05ad61: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+- e05ad61: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+- e05ad61: feat: Migrates the internal store library from zustand to @tanstack/store. This is a non-breaking change that maintains backwards compatibility with the @knocklabs/client and @knocklabs/react-core packages.
+
 ## 0.14.10-canary.2
 
 ### Patch Changes

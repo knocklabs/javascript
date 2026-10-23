@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 
-import ApiClient from "../../../src/api";
+import type { FetchFeedOptions } from "../../../src";
+
 import Feed from "../../../src/clients/feed/feed";
 import { FeedSocketManager } from "../../../src/clients/feed/socket-manager";
 import { NetworkStatus } from "../../../src/networkStatus";
@@ -83,6 +84,7 @@ describe("Feed", () => {
         );
 
         expect(feed.defaultOptions.archived).toBe("exclude");
+        expect(feed.defaultOptions.mode).toBe("compact");
       } finally {
         cleanup();
       }
@@ -265,6 +267,138 @@ describe("Feed", () => {
     });
   });
 
+  describe("Optimistic Updates", () => {
+    test("marks a single item as archived and correctly removes it from the store", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const originalItem = createUnreadFeedItem();
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: {
+            entries: [originalItem],
+            meta: {
+              total_count: 1,
+              unread_count: 0,
+              unseen_count: 0,
+            },
+            page_info: {
+              before: null,
+              after: null,
+              page_size: 50,
+            },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            archived: "exclude",
+          },
+          undefined,
+        );
+
+        await feed.fetch();
+
+        expect(feed.store.getState().items).toHaveLength(1);
+
+        const feedItem = {
+          ...originalItem,
+          archived_at: new Date().toISOString(),
+        };
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: [feedItem],
+        });
+
+        const result = await feed.markAsArchived(feedItem);
+
+        expect(mockApiClient.makeRequest).toHaveBeenNthCalledWith(2, {
+          method: "POST",
+          url: "/v1/messages/batch/archived",
+          data: { message_ids: [feedItem.id] },
+        });
+        expect(result).toEqual([feedItem]);
+
+        expect(feed.store.getState().items).toHaveLength(0);
+        expect(feed.store.getState().metadata.total_count).toBe(0);
+        expect(feed.store.getState().metadata.unread_count).toBe(0);
+        expect(feed.store.getState().metadata.unseen_count).toBe(0);
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("marks a single item as unarchived and correctly removes it from the store", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const originalItem = createUnreadFeedItem({
+          archived_at: new Date().toISOString(),
+        });
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: {
+            entries: [originalItem],
+            meta: {
+              total_count: 1,
+              unread_count: 0,
+              unseen_count: 0,
+            },
+            page_info: {
+              before: null,
+              after: null,
+              page_size: 50,
+            },
+          },
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          {
+            archived: "only",
+          },
+          undefined,
+        );
+
+        await feed.fetch();
+
+        expect(feed.store.getState().items).toHaveLength(1);
+
+        const feedItem = {
+          ...originalItem,
+          archived_at: null,
+        };
+
+        mockApiClient.makeRequest.mockResolvedValueOnce({
+          statusCode: "ok",
+          body: [feedItem],
+        });
+
+        const result = await feed.markAsUnarchived(feedItem);
+
+        expect(mockApiClient.makeRequest).toHaveBeenNthCalledWith(2, {
+          method: "POST",
+          url: "/v1/messages/batch/unarchived",
+          data: { message_ids: [feedItem.id] },
+        });
+        expect(result).toEqual([feedItem]);
+
+        expect(feed.store.getState().items).toHaveLength(0);
+        expect(feed.store.getState().metadata.total_count).toBe(0);
+        expect(feed.store.getState().metadata.unread_count).toBe(0);
+        expect(feed.store.getState().metadata.unseen_count).toBe(0);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
   describe("Bulk Operations", () => {
     test("marks all items as seen", async () => {
       const { knock, mockApiClient, cleanup } = getTestSetup();
@@ -295,6 +429,7 @@ describe("Feed", () => {
             engagement_status: undefined,
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: undefined,
           },
         });
         expect(result).toEqual(bulkResponse);
@@ -332,6 +467,7 @@ describe("Feed", () => {
             engagement_status: undefined,
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: undefined,
           },
         });
         expect(result).toEqual(bulkResponse);
@@ -369,6 +505,7 @@ describe("Feed", () => {
             engagement_status: undefined,
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: undefined,
           },
         });
         expect(result).toEqual(bulkResponse);
@@ -414,7 +551,7 @@ describe("Feed", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "GET",
           url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
-          params: { archived: "exclude" },
+          params: { archived: "exclude", mode: "compact" },
         });
         expect(result).toBeDefined();
         if (result && "entries" in result) {
@@ -447,10 +584,11 @@ describe("Feed", () => {
           undefined,
         );
 
-        const options = {
+        const options: FetchFeedOptions = {
           page_size: 25,
           source: "workflow_123",
           tenant: "tenant_456",
+          mode: "rich",
         };
 
         await feed.fetch(options);
@@ -463,6 +601,7 @@ describe("Feed", () => {
             page_size: 25,
             source: "workflow_123",
             tenant: "tenant_456",
+            mode: "rich",
           },
         });
       } finally {
@@ -518,6 +657,7 @@ describe("Feed", () => {
           url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
           params: {
             archived: "exclude",
+            mode: "compact",
             after: "cursor_123",
           },
         });
@@ -721,7 +861,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         const _feed = new Feed(
@@ -776,7 +918,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         const feedItem = createUnreadFeedItem();
@@ -821,7 +965,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         // Create a feedItem with circular reference to trigger JSON error
@@ -869,7 +1015,9 @@ describe("Feed", () => {
 
         global.BroadcastChannel = vi
           .fn()
-          .mockImplementation(() => mockBroadcastChannel);
+          .mockImplementation(function () {
+            return mockBroadcastChannel;
+          } as never);
         vi.stubGlobal("self", global);
 
         // Mock fetch response for when broadcast message triggers refetch
@@ -901,189 +1049,6 @@ describe("Feed", () => {
     });
   });
 
-  describe("Visibility Change Handling", () => {
-    test("sets up visibility listeners when auto_manage_socket_connection is enabled", () => {
-      const { knock, cleanup } = getTestSetup();
-
-      try {
-        const mockAddEventListener = vi.fn();
-        global.document = {
-          addEventListener: mockAddEventListener,
-          removeEventListener: vi.fn(),
-          visibilityState: "visible",
-        } as unknown as Document;
-
-        const mockSocketManager = {
-          join: vi.fn().mockReturnValue(vi.fn()),
-          leave: vi.fn(),
-        };
-
-        new Feed(
-          knock,
-          "01234567-89ab-cdef-0123-456789abcdef",
-          { auto_manage_socket_connection: true },
-          mockSocketManager as unknown as FeedSocketManager,
-        );
-
-        expect(mockAddEventListener).toHaveBeenCalledWith(
-          "visibilitychange",
-          expect.any(Function),
-        );
-      } finally {
-        delete (global as unknown as Record<string, unknown>).document;
-        cleanup();
-      }
-    });
-
-    test("handles document visibility change to hidden", async () => {
-      const { knock, cleanup } = getTestSetup();
-
-      try {
-        let visibilityHandler: () => void;
-        const mockAddEventListener = vi.fn((event, handler) => {
-          if (event === "visibilitychange") {
-            visibilityHandler = handler;
-          }
-        });
-        const mockSocket = {
-          disconnect: vi.fn(),
-          isConnected: vi.fn().mockReturnValue(true),
-          connect: vi.fn(),
-        };
-
-        const mockDocument = {
-          addEventListener: mockAddEventListener,
-          removeEventListener: vi.fn(),
-          visibilityState: "visible",
-        };
-        global.document = mockDocument as unknown as Document;
-
-        const mockClient = {
-          socket: mockSocket,
-        };
-
-        vi.spyOn(knock, "client").mockReturnValue(
-          mockClient as unknown as ApiClient,
-        );
-
-        const mockSocketManager = {
-          join: vi.fn().mockReturnValue(vi.fn()),
-          leave: vi.fn(),
-        };
-
-        new Feed(
-          knock,
-          "01234567-89ab-cdef-0123-456789abcdef",
-          {
-            auto_manage_socket_connection: true,
-            auto_manage_socket_connection_delay: 100,
-          },
-          mockSocketManager as unknown as FeedSocketManager,
-        );
-
-        // Simulate visibility change to hidden
-        mockDocument.visibilityState = "hidden";
-        visibilityHandler!();
-
-        // Should set up disconnect timer
-        await new Promise((resolve) => setTimeout(resolve, 150));
-
-        expect(mockSocket.disconnect).toHaveBeenCalled();
-      } finally {
-        delete (global as unknown as Record<string, unknown>).document;
-        cleanup();
-      }
-    });
-
-    test("handles document visibility change to visible", () => {
-      const { knock, cleanup } = getTestSetup();
-
-      try {
-        let visibilityHandler: () => void;
-        const mockAddEventListener = vi.fn((event, handler) => {
-          if (event === "visibilitychange") {
-            visibilityHandler = handler;
-          }
-        });
-        const mockSocket = {
-          disconnect: vi.fn(),
-          isConnected: vi.fn().mockReturnValue(false),
-          connect: vi.fn(),
-        };
-
-        const mockDocument = {
-          addEventListener: mockAddEventListener,
-          removeEventListener: vi.fn(),
-          visibilityState: "hidden",
-        };
-        global.document = mockDocument as unknown as Document;
-
-        const mockClient = {
-          socket: mockSocket,
-        };
-
-        vi.spyOn(knock, "client").mockReturnValue(
-          mockClient as unknown as ApiClient,
-        );
-
-        const mockSocketManager = {
-          join: vi.fn().mockReturnValue(vi.fn()),
-          leave: vi.fn(),
-        };
-
-        new Feed(
-          knock,
-          "01234567-89ab-cdef-0123-456789abcdef",
-          { auto_manage_socket_connection: true },
-          mockSocketManager as unknown as FeedSocketManager,
-        );
-
-        // Simulate visibility change to visible
-        mockDocument.visibilityState = "visible";
-        visibilityHandler!();
-
-        expect(mockSocket.connect).toHaveBeenCalled();
-      } finally {
-        delete (global as unknown as Record<string, unknown>).document;
-        cleanup();
-      }
-    });
-
-    test("tears down visibility listeners on dispose", () => {
-      const { knock, cleanup } = getTestSetup();
-
-      try {
-        const mockRemoveEventListener = vi.fn();
-        global.document = {
-          addEventListener: vi.fn(),
-          removeEventListener: mockRemoveEventListener,
-          visibilityState: "visible",
-        } as unknown as Document;
-
-        const mockSocketManager = {
-          join: vi.fn().mockReturnValue(vi.fn()),
-          leave: vi.fn(),
-        };
-
-        const feed = new Feed(
-          knock,
-          "01234567-89ab-cdef-0123-456789abcdef",
-          { auto_manage_socket_connection: true },
-          mockSocketManager as unknown as FeedSocketManager,
-        );
-
-        feed.dispose();
-
-        expect(mockRemoveEventListener).toHaveBeenCalledWith(
-          "visibilitychange",
-          expect.any(Function),
-        );
-      } finally {
-        delete (global as unknown as Record<string, unknown>).document;
-        cleanup();
-      }
-    });
-  });
 
   describe("Socket Event Handling", () => {
     test("handles new message socket events", async () => {
@@ -1200,6 +1165,7 @@ describe("Feed", () => {
             archived: "exclude",
             has_tenant: true,
             tenant: "tenant-123",
+            trigger_data: { type: "comment", priority: 1 },
           },
           undefined,
         );
@@ -1215,6 +1181,7 @@ describe("Feed", () => {
             archived: "exclude",
             has_tenant: true,
             tenants: ["tenant-123"],
+            trigger_data: '{"type":"comment","priority":1}',
           },
         });
       } finally {
@@ -1237,6 +1204,7 @@ describe("Feed", () => {
           {
             status: "all", // Should not be included in options
             archived: "include",
+            trigger_data: { type: "mention" },
           },
           undefined,
         );
@@ -1252,6 +1220,7 @@ describe("Feed", () => {
             archived: "include",
             has_tenant: undefined,
             tenants: undefined,
+            trigger_data: '{"type":"mention"}',
           },
         });
       } finally {
@@ -1448,6 +1417,153 @@ describe("Feed", () => {
       } finally {
         cleanup();
       }
+    });
+  });
+
+  describe("Feed Mode", () => {
+    test("sets mode query param to rich when initialized in rich mode", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        const mockFeedResponse = {
+          entries: [],
+          meta: { total_count: 0, unread_count: 0, unseen_count: 0 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { mode: "rich" },
+          undefined,
+        );
+
+        await feed.fetch();
+
+        expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
+          method: "GET",
+          url: "/v1/users/user_123/feeds/01234567-89ab-cdef-0123-456789abcdef",
+          params: {
+            archived: "exclude",
+            mode: "rich",
+          },
+        });
+      } finally {
+        cleanup();
+      }
+    });
+
+    test("handles lack of activities and total_activities in compact mode", async () => {
+      const { knock, mockApiClient, cleanup } = getTestSetup();
+
+      try {
+        // Create a compact mode feed item (no activities or total_activities)
+        const compactFeedItem = {
+          __cursor: "cursor_123",
+          id: "msg_123",
+          actors: [],
+          blocks: [],
+          archived_at: null,
+          inserted_at: new Date().toISOString(),
+          read_at: null,
+          seen_at: null,
+          clicked_at: null,
+          interacted_at: null,
+          link_clicked_at: null,
+          source: { key: "workflow", version_id: "v1", categories: [] },
+          tenant: null,
+          total_actors: 1,
+          updated_at: new Date().toISOString(),
+          data: { message: "Hello" },
+        };
+
+        const mockFeedResponse = {
+          entries: [compactFeedItem],
+          meta: { total_count: 1, unread_count: 1, unseen_count: 1 },
+          page_info: { before: null, after: null, page_size: 50 },
+        };
+
+        mockApiClient.makeRequest.mockResolvedValue({
+          statusCode: "ok",
+          body: mockFeedResponse,
+        });
+
+        const feed = new Feed(
+          knock,
+          "01234567-89ab-cdef-0123-456789abcdef",
+          { mode: "compact" },
+          undefined,
+        );
+
+        const result = await feed.fetch();
+
+        expect(result).toBeDefined();
+        expect(result!.data).toEqual(mockFeedResponse);
+      } finally {
+        cleanup();
+      }
+    });
+  });
+
+  describe("Does nothing when unauthenticated", () => {
+    const getUnauthenticatedSetup = () => {
+      const { knock, mockApiClient } = createMockKnock(); // not authenticated
+      const feed = new Feed(
+        knock,
+        "01234567-89ab-cdef-0123-456789abcdef",
+        {},
+        undefined,
+      );
+      return { knock, mockApiClient, feed };
+    };
+
+    const mutations: Array<[string, (feed: Feed) => Promise<unknown>]> = [
+      ["markAsSeen", (f) => f.markAsSeen(createUnreadFeedItem())],
+      ["markAsUnseen", (f) => f.markAsUnseen(createUnreadFeedItem())],
+      ["markAsRead", (f) => f.markAsRead(createUnreadFeedItem())],
+      ["markAsUnread", (f) => f.markAsUnread(createUnreadFeedItem())],
+      ["markAsInteracted", (f) => f.markAsInteracted(createUnreadFeedItem())],
+      ["markAsArchived", (f) => f.markAsArchived(createUnreadFeedItem())],
+      ["markAsUnarchived", (f) => f.markAsUnarchived(createUnreadFeedItem())],
+      ["markAllAsSeen", (f) => f.markAllAsSeen()],
+      ["markAllAsRead", (f) => f.markAllAsRead()],
+      ["markAllAsArchived", (f) => f.markAllAsArchived()],
+      ["markAllReadAsArchived", (f) => f.markAllReadAsArchived()],
+      ["fetchNextPage", (f) => f.fetchNextPage()],
+    ];
+
+    test.each(mutations)(
+      "%s is a no-op that never touches the network",
+      async (_name, invoke) => {
+        const { mockApiClient, feed } = getUnauthenticatedSetup();
+
+        const result = await invoke(feed);
+
+        expect(result).toBeUndefined();
+        expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      },
+    );
+
+    test("skips the optimistic store update, leaving badge counts intact", async () => {
+      const { mockApiClient, feed } = getUnauthenticatedSetup();
+      const item = createUnreadFeedItem();
+
+      // Seed badge counts so we can assert they are not optimistically changed.
+      feed.getState().setMetadata({
+        total_count: 1,
+        unread_count: 1,
+        unseen_count: 1,
+      });
+
+      await feed.markAsSeen(item);
+
+      expect(mockApiClient.makeRequest).not.toHaveBeenCalled();
+      expect(feed.getState().metadata.unseen_count).toBe(1);
     });
   });
 });

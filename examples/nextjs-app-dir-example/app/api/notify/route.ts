@@ -7,7 +7,7 @@ const knockClient = new Knock({
 
 const KNOCK_WORKFLOW = process.env.NEXT_PUBLIC_WORKFLOW_KEY!;
 
-export const POST = async (request) => {
+export const POST = async (request: Request) => {
   const { message, showToast, userId, tenant, templateType } =
     await request.json();
 

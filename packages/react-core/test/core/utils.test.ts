@@ -4,6 +4,7 @@ import {
   feedProviderKey,
   formatBadgeCount,
   formatTimestamp,
+  getBadgeAriaLabel,
   msTeamsProviderKey,
   renderNodeOrFallback,
   slackProviderKey,
@@ -21,6 +22,21 @@ describe("formatBadgeCount", () => {
   test("returns 9+ when count is greater than 9", () => {
     expect(formatBadgeCount(10)).toBe("9+");
     expect(formatBadgeCount(100)).toBe("9+");
+  });
+});
+
+describe("getBadgeAriaLabel", () => {
+  test("uses singular 'notification' when count is 1", () => {
+    expect(getBadgeAriaLabel(1, "unseen")).toBe("1 unseen notification");
+    expect(getBadgeAriaLabel(1, "unread")).toBe("1 unread notification");
+    expect(getBadgeAriaLabel(1, "all")).toBe("1 notification");
+  });
+
+  test("uses plural 'notifications' when count is not 1", () => {
+    expect(getBadgeAriaLabel(0, "unseen")).toBe("0 unseen notifications");
+    expect(getBadgeAriaLabel(3, "unseen")).toBe("3 unseen notifications");
+    expect(getBadgeAriaLabel(5, "unread")).toBe("5 unread notifications");
+    expect(getBadgeAriaLabel(10, "all")).toBe("10 notifications");
   });
 });
 
@@ -90,6 +106,91 @@ describe("formatTimestamp", () => {
         locale,
       }),
     ).toBe("hace 2 semanas");
+  });
+
+  test("it uses months instead of quarters for dates 3-12 months old", () => {
+    // Set a fixed date: Oct 8, 2026 at noon
+    const now = new Date(2026, 9, 8, 12, 0, 0);
+    vi.setSystemTime(now);
+
+    // 3 months ago: should show "3 months ago" instead of "last quarter"
+    const threeMonthsAgo = new Date(2026, 6, 8, 12, 0, 0);
+    expect(formatTimestamp(threeMonthsAgo.toISOString())).toBe("3 months ago");
+
+    // 5 months ago: should show "5 months ago" instead of "2 quarters ago"
+    const fiveMonthsAgo = new Date(2026, 4, 8, 12, 0, 0);
+    expect(formatTimestamp(fiveMonthsAgo.toISOString())).toBe("5 months ago");
+
+    // 9 months ago: should show "9 months ago" instead of "3 quarters ago"
+    const nineMonthsAgo = new Date(2026, 0, 8, 12, 0, 0);
+    expect(formatTimestamp(nineMonthsAgo.toISOString())).toBe("9 months ago");
+
+    // 11 months ago: should show "11 months ago" instead of "4 quarters ago"
+    const elevenMonthsAgo = new Date(2025, 10, 8, 12, 0, 0);
+    expect(formatTimestamp(elevenMonthsAgo.toISOString())).toBe("11 months ago");
+  });
+
+  test("it uses months when under 3 calendar months but past date-fns's quarter threshold", () => {
+    vi.setSystemTime(new Date("2026-10-31T11:00:00Z"));
+
+    expect(formatTimestamp("2026-07-31T12:00:00Z")).toBe("3 months ago");
+  });
+
+  test("it uses months when over 12 calendar months but under date-fns's year threshold", () => {
+    vi.setSystemTime(new Date("2026-10-08T12:00:00Z"));
+
+    // 365 days and a few hours is still under date-fns's secondsInYear
+    // (365.2425 days), where it would otherwise pick "4 quarters ago".
+    expect(formatTimestamp("2025-10-08T08:00:00Z")).toBe("12 months ago");
+  });
+
+  test("it allows automatic unit selection for dates less than 3 months old", () => {
+    // Set a fixed date: Oct 8, 2026 at noon
+    const now = new Date(2026, 9, 8, 12, 0, 0);
+    vi.setSystemTime(now);
+
+    // 2 months ago: should use automatic unit selection ("2 months ago")
+    const twoMonthsAgo = new Date(2026, 7, 8, 12, 0, 0);
+    expect(formatTimestamp(twoMonthsAgo.toISOString())).toBe("2 months ago");
+  });
+
+  test("it uses months for dates exactly 12 months old to avoid quarter bug", () => {
+    // Set a fixed date: Oct 8, 2026 at noon
+    const now = new Date(2026, 9, 8, 12, 0, 0);
+    vi.setSystemTime(now);
+
+    // 12 months ago: should show "12 months ago" (not "4 quarters ago")
+    // Note: date-fns has a bug where this would show "4 quarters ago"
+    // if we didn't force the "month" unit.
+    const twelveMonthsAgo = new Date(2025, 9, 8, 12, 0, 0);
+    expect(formatTimestamp(twelveMonthsAgo.toISOString())).toBe("12 months ago");
+  });
+
+  test("it allows automatic unit selection for dates 13+ months old", () => {
+    // Set a fixed date: Oct 8, 2026 at noon
+    const now = new Date(2026, 9, 8, 12, 0, 0);
+    vi.setSystemTime(now);
+
+    // 13 months ago: should use automatic unit selection ("last year")
+    const thirteenMonthsAgo = new Date(2025, 8, 8, 12, 0, 0);
+    expect(formatTimestamp(thirteenMonthsAgo.toISOString())).toBe("last year");
+
+    // 2 years ago: should show "2 years ago"
+    const twoYearsAgo = new Date(2024, 9, 8, 12, 0, 0);
+    expect(formatTimestamp(twoYearsAgo.toISOString())).toBe("2 years ago");
+  });
+
+  test("it uses months instead of quarters in spanish", () => {
+    const locale = "es";
+    // Set a fixed date: Oct 8, 2026 at noon
+    const now = new Date(2026, 9, 8, 12, 0, 0);
+    vi.setSystemTime(now);
+
+    // 5 months ago in Spanish
+    const fiveMonthsAgo = new Date(2026, 4, 8, 12, 0, 0);
+    expect(formatTimestamp(fiveMonthsAgo.toISOString(), { locale })).toBe(
+      "hace 5 meses",
+    );
   });
 });
 

@@ -1,17 +1,42 @@
 import {
   Banner,
   Card,
-  Modal,
+  CardView,
   KnockGuideProvider,
   KnockProvider,
+  Modal,
+  useGuide,
 } from "@knocklabs/react";
 import "@knocklabs/react/dist/index.css";
-import { useState } from "react";
-import { Routes, Route, Link } from 'react-router';
+import { useEffect, useState } from "react";
+import { Link, Route, Routes } from "react-router";
+
+interface ChangelogCardContent {
+  headline: string;
+  title: string;
+  body: string;
+}
+
+const ChangelogCard = () => {
+  const { guide, step } = useGuide<ChangelogCardContent>({ type: "changelog-card" });
+
+  useEffect(() => {
+    if (step) step.markAsSeen();
+  }, [step]);
+
+  if (!guide || !step) return null;
+
+  return (
+    <CardView.Default
+      content={step.content}
+      onDismiss={() => step.markAsArchived()}
+    />
+  );
+};
 
 const Navigation = () => {
   return (
-    <nav style={{ display: "flex", gap: "12px", }}>
+    <nav style={{ display: "flex", gap: "12px" }}>
       <Link to="/">Home</Link>
       <Link to="/produce">Produce</Link>
       <Link to="/meat">Meat</Link>
@@ -31,7 +56,7 @@ function App() {
   return (
     <KnockProvider
       apiKey={import.meta.env.VITE_KNOCK_API_KEY!}
-      userId={import.meta.env.VITE_KNOCK_USER_ID!}
+      user={{ id: import.meta.env.VITE_KNOCK_USER_ID! }}
       host={import.meta.env.VITE_KNOCK_HOST}
       logLevel="debug"
     >
@@ -40,6 +65,7 @@ function App() {
         readyToTarget={true}
         listenForUpdates={true}
         colorMode={colorMode}
+        toolbar="v2"
       >
         <div style={{ padding: "1rem 2rem" }}>
           <h1>Knock In-App Guide Example</h1>
@@ -47,7 +73,7 @@ function App() {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              height: "20px"
+              height: "20px",
             }}
           >
             <Navigation />
@@ -66,15 +92,26 @@ function App() {
           <Card />
           <div style={{ marginTop: "20px" }} />
           <Modal />
+          <div style={{ marginTop: "20px" }} />
+          <ChangelogCard />
 
           <Routes>
             <Route index element={<Page title="home" />} />
             <Route path="/produce" element={<Page title="Produce" />} />
             <Route path="/meat" element={<Page title="Meat" />} />
-            <Route path="/seafood" element={<Page title="Seatfood" />} />
-            <Route path="/dairy/butter" element={<Page title="Dairy &gt; Butter" />} />
-            <Route path="/dairy/cheese" element={<Page title="Dairy &gt; Cheese" />} />
-            <Route path="/dairy/eggs" element={<Page title="Dairy &gt; Eggs" />} />
+            <Route path="/seafood" element={<Page title="Seafood" />} />
+            <Route
+              path="/dairy/butter"
+              element={<Page title="Dairy &gt; Butter" />}
+            />
+            <Route
+              path="/dairy/cheese"
+              element={<Page title="Dairy &gt; Cheese" />}
+            />
+            <Route
+              path="/dairy/eggs"
+              element={<Page title="Dairy &gt; Eggs" />}
+            />
           </Routes>
         </div>
       </KnockGuideProvider>

@@ -1,287 +1,289 @@
 import { Message, MessageEngagementStatus } from "@knocklabs/client";
-import { useKnockClient } from "@knocklabs/react-core";
+import { useKnockAuthState, useKnockClient } from "@knocklabs/react-core";
 import {
-  type KnockPushNotificationContextType,
   KnockPushNotificationProvider,
   usePushNotifications,
 } from "@knocklabs/react-native";
-import Constants from "expo-constants";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
 import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
-export interface KnockExpoPushNotificationContextType
-  extends KnockPushNotificationContextType {
-  expoPushToken: string | null;
-  registerForPushNotifications: () => Promise<void>;
-  onNotificationReceived: (
-    handler: (notification: Notifications.Notification) => void,
-  ) => void;
-  onNotificationTapped: (
-    handler: (response: Notifications.NotificationResponse) => void,
-  ) => void;
-}
+import {
+  type Notification,
+  type NotificationResponse,
+  getNotificationsModule,
+} from "./getNotificationsModule";
+import type {
+  KnockExpoPushNotificationContextType,
+  KnockExpoPushNotificationProviderProps,
+} from "./types";
+import {
+  DEFAULT_NOTIFICATION_BEHAVIOR,
+  registerForPushNotifications as registerForPushNotificationsUtil,
+  setupDefaultAndroidChannel,
+} from "./utils";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => {
-    return {
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    };
-  },
-});
-
-const defaultNotificationHandler = async (
-  _notification: Notifications.Notification,
-): Promise<Notifications.NotificationBehavior> => {
-  return {
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  };
-};
+// Re-export types for consumers
+export type {
+  KnockExpoPushNotificationContextType,
+  KnockExpoPushNotificationProviderProps,
+} from "./types";
 
 const KnockExpoPushNotificationContext = createContext<
   KnockExpoPushNotificationContextType | undefined
 >(undefined);
 
-export interface KnockExpoPushNotificationProviderProps {
-  knockExpoChannelId: string;
-  customNotificationHandler?: (
-    notification: Notifications.Notification,
-  ) => Promise<Notifications.NotificationBehavior>;
-  children?: React.ReactElement;
-  autoRegister?: boolean;
-}
+/**
+ * Hook to access push notification functionality within a KnockExpoPushNotificationProvider.
+ * @throws Error if used outside of a KnockExpoPushNotificationProvider
+ */
+export function useExpoPushNotifications(): KnockExpoPushNotificationContextType {
+  const context = useContext(KnockExpoPushNotificationContext);
 
-async function requestPushPermissionIfNeeded(): Promise<string> {
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-
-  if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
-    return status;
+  if (context === undefined) {
+    throw new Error(
+      "[Knock] useExpoPushNotifications must be used within a KnockExpoPushNotificationProvider",
+    );
   }
 
-  return existingStatus;
+  return context;
 }
 
-async function getExpoPushToken(): Promise<Notifications.ExpoPushToken | null> {
-  try {
-    if (
-      !Constants.expoConfig ||
-      !Constants.expoConfig.extra ||
-      !Constants.expoConfig.extra.eas
-    ) {
-      console.error(
-        "[Knock] Expo Project ID is not defined in the app configuration.",
-      );
-      return null;
-    }
-    const token = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.expoConfig.extra.eas.projectId,
-    });
-    return token;
-  } catch (error) {
-    console.error("[Knock] Error getting Expo push token:", error);
-    return null;
-  }
-}
-
-async function requestPermissionAndGetPushToken(): Promise<Notifications.ExpoPushToken | null> {
-  // Check for device support
-  if (!Device.isDevice) {
-    console.warn("[Knock] Must use physical device for Push Notifications");
-    return null;
-  }
-
-  const permissionStatus = await requestPushPermissionIfNeeded();
-
-  if (permissionStatus !== "granted") {
-    console.warn("[Knock] Push notification permission not granted");
-    return null;
-  }
-
-  return getExpoPushToken();
-}
-
-const InternalKnockExpoPushNotificationProvider: React.FC<
+/**
+ * Internal provider component that handles all the Expo push notification logic.
+ */
+const InternalExpoPushNotificationProvider: React.FC<
   KnockExpoPushNotificationProviderProps
 > = ({
   knockExpoChannelId,
   customNotificationHandler,
+  setupAndroidNotificationChannel = setupDefaultAndroidChannel,
   children,
   autoRegister = true,
 }) => {
+  const knockClient = useKnockClient();
+  const { status: authStatus, userId } = useKnockAuthState(knockClient);
+  const isAuthenticated = authStatus === "authenticated";
   const { registerPushTokenToChannel, unregisterPushTokenFromChannel } =
     usePushNotifications();
+
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
-  const knockClient = useKnockClient();
 
-  const [notificationReceivedHandler, setNotificationReceivedHandler] =
-    useState<(notification: Notifications.Notification) => void>(
-      () => () => {},
-    );
+  // Use refs for handlers to avoid re-running effects when handlers change
+  const notificationReceivedHandlerRef = useRef<
+    (notification: Notification) => void
+  >(() => {});
 
-  const [notificationTappedHandler, setNotificationTappedHandler] = useState<
-    (response: Notifications.NotificationResponse) => void
-  >(() => () => {});
+  const notificationTappedHandlerRef = useRef<
+    (response: NotificationResponse) => void
+  >(() => {});
 
-  const handleNotificationReceived = useCallback(
-    (handler: (notification: Notifications.Notification) => void) => {
-      setNotificationReceivedHandler(() => handler);
+  /**
+   * Register a handler to be called when a notification is received in the foreground.
+   */
+  const onNotificationReceived = useCallback(
+    (handler: (notification: Notification) => void) => {
+      notificationReceivedHandlerRef.current = handler;
     },
     [],
   );
 
-  const handleNotificationTapped = useCallback(
-    (handler: (response: Notifications.NotificationResponse) => void) => {
-      setNotificationTappedHandler(() => handler);
+  /**
+   * Register a handler to be called when a notification is tapped.
+   */
+  const onNotificationTapped = useCallback(
+    (handler: (response: NotificationResponse) => void) => {
+      notificationTappedHandlerRef.current = handler;
     },
     [],
   );
 
-  const registerForPushNotifications = useCallback(async (): Promise<void> => {
+  /**
+   * Manually trigger push notification registration.
+   * Returns the push token if successful, or null if registration failed.
+   */
+  const registerForPushNotifications = useCallback(async (): Promise<
+    string | null
+  > => {
     try {
-      knockClient.log(`[Knock] Registering for push notifications`);
-      const token = await requestPermissionAndGetPushToken();
-      knockClient.log(`[Knock] Token received: ${token?.data}`);
-      if (token?.data) {
-        knockClient.log(`[Knock] Setting push token: ${token.data}`);
-        setExpoPushToken(token.data);
-      }
-    } catch (error) {
-      console.error(`[Knock] Error registering for push notifications:`, error);
-    }
-  }, [knockClient]);
+      knockClient.log("[Knock] Registering for push notifications");
 
-  const updateKnockMessageStatusFromNotification = useCallback(
+      const token = await registerForPushNotificationsUtil(
+        setupAndroidNotificationChannel,
+      );
+
+      if (token) {
+        knockClient.log(`[Knock] Push token received: ${token}`);
+        setExpoPushToken(token);
+        return token;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("[Knock] Error registering for push notifications:", error);
+      return null;
+    }
+  }, [knockClient, setupAndroidNotificationChannel]);
+
+  /**
+   * Update the Knock message status when a notification is received or interacted with.
+   * Only updates status for notifications that originated from Knock (have a knock_message_id).
+   */
+  const updateMessageStatus = useCallback(
     async (
-      notification: Notifications.Notification,
+      notification: Notification,
       status: MessageEngagementStatus,
-    ): Promise<Message> => {
-      const messageId = notification.request.content.data[
+    ): Promise<Message | void> => {
+      const messageId = notification.request.content.data?.[
         "knock_message_id"
-      ] as string;
+      ] as string | undefined;
+
+      // Skip status update if this isn't a Knock notification
+      // Fixes issue: https://github.com/knocklabs/javascript/issues/589
+      if (!messageId) {
+        knockClient.log(
+          "[Knock] Skipping status update for non-Knock notification",
+        );
+        return;
+      }
+
+      // Skip when there's no authenticated user (e.g. a notification tapped
+      // after logout) — otherwise this fires a messages request with no user.
+      if (!knockClient.isAuthenticated()) {
+        knockClient.log(
+          "[Knock] Skipping status update; user is not authenticated",
+        );
+        return;
+      }
+
       return knockClient.messages.updateStatus(messageId, status);
     },
     [knockClient],
   );
 
+  // Set up the notification handler for foreground notifications
   useEffect(() => {
-    Notifications.setNotificationHandler({
-      handleNotification:
-        customNotificationHandler ?? defaultNotificationHandler,
-    });
+    const NotificationsModule = getNotificationsModule();
+    if (!NotificationsModule) return;
 
-    if (autoRegister) {
-      registerForPushNotifications()
-        .then(() => {
-          if (expoPushToken) {
-            registerPushTokenToChannel(expoPushToken, knockExpoChannelId)
-              .then((_result) => {
-                knockClient.log("[Knock] setChannelData success");
-              })
-              .catch((_error) => {
-                console.error(
-                  "[Knock] Error in setting push token or channel data",
-                  _error,
-                );
-              });
-          }
-        })
-        .catch((_error) => {
-          console.error(
-            "[Knock] Error in setting push token or channel data",
-            _error,
-          );
-        });
+    const handleNotification = customNotificationHandler
+      ? customNotificationHandler
+      : async () => DEFAULT_NOTIFICATION_BEHAVIOR;
+
+    NotificationsModule.setNotificationHandler({ handleNotification });
+  }, [customNotificationHandler]);
+
+  // Auto-register for push notifications once there is an authenticated user.
+  // Gating on auth defers the OS permission prompt (prompting a logged-out user
+  // is hostile) and avoids registering a token against no user. Because
+  // `isAuthenticated` is a dependency, enabling auth later re-runs registration.
+  // `userId` is also a dependency so that an in-place user switch (same Knock
+  // instance re-authenticated as a different user, where `isAuthenticated` never
+  // flips) re-registers the device token against the new user's channel data.
+  useEffect(() => {
+    if (!autoRegister || !isAuthenticated) {
+      return;
     }
 
-    const notificationReceivedSubscription =
-      Notifications.addNotificationReceivedListener((notification) => {
-        knockClient.log(
-          "[Knock] Expo Push Notification received in foreground:",
-        );
-        updateKnockMessageStatusFromNotification(notification, "interacted");
-        notificationReceivedHandler(notification);
-      });
+    let isMounted = true;
 
-    const notificationResponseSubscription =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        knockClient.log("[Knock] Expo Push Notification was interacted with");
-        updateKnockMessageStatusFromNotification(
-          response.notification,
-          "interacted",
-        );
-        notificationTappedHandler(response);
-      });
+    const register = async () => {
+      try {
+        const token = await registerForPushNotifications();
 
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationReceivedSubscription,
-      );
-      Notifications.removeNotificationSubscription(
-        notificationResponseSubscription,
-      );
+        if (token && isMounted) {
+          await registerPushTokenToChannel(token, knockExpoChannelId);
+          knockClient.log("[Knock] Push token registered with Knock channel");
+        }
+      } catch (error) {
+        console.error("[Knock] Error during auto-registration:", error);
+      }
     };
 
-    // TODO: Remove when possible and ensure dependency array is correct
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    register();
+
+    return () => {
+      isMounted = false;
+    };
   }, [
-    registerForPushNotifications,
-    notificationReceivedHandler,
-    notificationTappedHandler,
-    customNotificationHandler,
     autoRegister,
-    expoPushToken,
+    isAuthenticated,
+    userId,
     knockExpoChannelId,
+    registerForPushNotifications,
+    registerPushTokenToChannel,
     knockClient,
   ]);
 
+  // Set up notification listeners for received and tapped notifications
+  useEffect(() => {
+    const NotificationsModule = getNotificationsModule();
+    if (!NotificationsModule) return;
+
+    const receivedSubscription =
+      NotificationsModule.addNotificationReceivedListener((notification) => {
+        knockClient.log("[Knock] Notification received in foreground");
+        updateMessageStatus(notification, "interacted");
+        notificationReceivedHandlerRef.current(notification);
+      });
+
+    const responseSubscription =
+      NotificationsModule.addNotificationResponseReceivedListener(
+        (response) => {
+          knockClient.log("[Knock] Notification was tapped");
+          updateMessageStatus(response.notification, "interacted");
+          notificationTappedHandlerRef.current(response);
+        },
+      );
+
+    return () => {
+      receivedSubscription.remove();
+      responseSubscription.remove();
+    };
+  }, [knockClient, updateMessageStatus]);
+
+  const contextValue: KnockExpoPushNotificationContextType = {
+    expoPushToken,
+    registerForPushNotifications,
+    registerPushTokenToChannel,
+    unregisterPushTokenFromChannel,
+    onNotificationReceived,
+    onNotificationTapped,
+  };
+
   return (
-    <KnockExpoPushNotificationContext.Provider
-      value={{
-        expoPushToken,
-        registerForPushNotifications,
-        registerPushTokenToChannel,
-        unregisterPushTokenFromChannel,
-        onNotificationReceived: handleNotificationReceived,
-        onNotificationTapped: handleNotificationTapped,
-      }}
-    >
+    <KnockExpoPushNotificationContext.Provider value={contextValue}>
       {children}
     </KnockExpoPushNotificationContext.Provider>
   );
 };
 
+/**
+ * Provider component for Expo push notifications with Knock.
+ *
+ * Wraps the internal provider with the base KnockPushNotificationProvider
+ * to provide full push notification functionality.
+ *
+ * @example
+ * ```tsx
+ * <KnockProvider apiKey="your-api-key" userId="user-id">
+ *   <KnockExpoPushNotificationProvider knockExpoChannelId="your-channel-id">
+ *     <App />
+ *   </KnockExpoPushNotificationProvider>
+ * </KnockProvider>
+ * ```
+ */
 export const KnockExpoPushNotificationProvider: React.FC<
   KnockExpoPushNotificationProviderProps
 > = (props) => {
   return (
     <KnockPushNotificationProvider>
-      <InternalKnockExpoPushNotificationProvider {...props} />
+      <InternalExpoPushNotificationProvider {...props} />
     </KnockPushNotificationProvider>
   );
 };
-
-export const useExpoPushNotifications =
-  (): KnockExpoPushNotificationContextType => {
-    const context = useContext(KnockExpoPushNotificationContext);
-    if (context === undefined) {
-      throw new Error(
-        "[Knock] useExpoPushNotifications must be used within a KnockExpoPushNotificationProvider",
-      );
-    }
-    return context;
-  };

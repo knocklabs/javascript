@@ -13,7 +13,7 @@ export default async function Home() {
   return (
     <Box maxW="160" border="px" rounded="3" p="4" mx="auto" mt="8">
       <KnockProvider
-        userId={process.env.NEXT_PUBLIC_KNOCK_USER_ID!}
+        user={{ id: process.env.NEXT_PUBLIC_KNOCK_USER_ID! }}
         apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
         host={process.env.NEXT_PUBLIC_KNOCK_HOST}
       >

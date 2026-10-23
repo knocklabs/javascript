@@ -1,1 +1,5 @@
-export { KnockGuideProvider, KnockGuideContext } from "./KnockGuideProvider";
+export {
+  KnockGuideProvider,
+  KnockGuideContext,
+  type KnockGuideProviderProps,
+} from "./KnockGuideProvider";

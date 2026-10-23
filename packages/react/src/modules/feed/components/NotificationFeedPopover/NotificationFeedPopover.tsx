@@ -43,9 +43,22 @@ export const NotificationFeedPopover: React.FC<
   const { colorMode, feedClient, useFeedStore } = useKnockFeed();
   const store = useFeedStore();
 
-  const { ref: popperRef } = useComponentVisible(isVisible, onClose, {
-    closeOnClickOutside,
-  });
+  const { ref: popperRef } = useComponentVisible(
+    isVisible,
+    (event) => {
+      // If the button is clicked, let that onClick handler handle the close
+      if (
+        event.target instanceof Element &&
+        buttonRef.current?.contains(event.target)
+      ) {
+        return;
+      }
+      onClose(event);
+    },
+    {
+      closeOnClickOutside,
+    },
+  );
 
   useEffect(() => {
     // Whenever the feed is opened, we want to invoke the `onOpen` callback

@@ -64,12 +64,11 @@ export const MsTeamsChannelInTeamCombobox: FunctionComponent<
   const comboboxValue = useMemo(
     () =>
       currentConnections
-        ?.filter(
-          (connection) =>
-            connection.ms_teams_channel_id &&
-            isChannelInThisTeam(connection.ms_teams_channel_id),
-        )
-        .map((connection) => connection.ms_teams_channel_id),
+        ?.map((connection) => connection.ms_teams_channel_id)
+        .filter(
+          (channelId): channelId is string =>
+            !!channelId && isChannelInThisTeam(channelId),
+        ),
     [currentConnections, isChannelInThisTeam],
   );
 

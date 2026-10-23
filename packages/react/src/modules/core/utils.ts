@@ -18,5 +18,11 @@ export const openPopupWindow = (url: string) => {
   // Window features
   const features = `width=${width},height=${height},top=${top},left=${left}`;
 
-  window.open(url, "_blank", features);
+  return window.open(url, "_blank", features);
+};
+
+export const checkForWindow = () => {
+  if (typeof window !== "undefined") {
+    return window;
+  }
 };

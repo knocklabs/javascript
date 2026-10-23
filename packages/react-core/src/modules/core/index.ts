@@ -4,14 +4,28 @@ export {
   type KnockProviderProps,
   type KnockProviderState,
 } from "./context";
-export { useAuthenticatedKnockClient, useStableOptions } from "./hooks";
+export {
+  useAuthenticatedKnockClient,
+  useStableOptions,
+  useKnockAuthState,
+  useAuthPostMessageListener,
+  useAuthPolling,
+} from "./hooks";
 export { FilterStatus, type ColorMode } from "./constants";
 export {
   formatBadgeCount,
+  getBadgeAriaLabel,
   formatTimestamp,
   toSentenceCase,
   renderNodeOrFallback,
   feedProviderKey,
   slackProviderKey,
   msTeamsProviderKey,
+  type FormatTimestampOptions,
+  type TimestampFormatter,
 } from "./utils";
+export {
+  type BadgeCountType,
+  type ConnectionStatus,
+  type AuthCheckResult,
+} from "./types";

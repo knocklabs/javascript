@@ -34,11 +34,6 @@ export interface FeedClientOptions {
   trigger_data?: TriggerData;
   // Optionally enable cross browser feed updates for this feed
   __experimentalCrossBrowserUpdates?: boolean;
-  // Optionally automatically manage socket connections on changes to tab visibility (defaults to `false`)
-  auto_manage_socket_connection?: boolean;
-  // Optionally set the delay amount in milliseconds when automatically disconnecting sockets from inactive tabs (defaults to `2000`)
-  // Requires `auto_manage_socket_connection` to be `true`
-  auto_manage_socket_connection_delay?: number;
   // Optionally scope notifications to a given date range
   inserted_at_date_range?: {
     // Optionally set the start date with a string in ISO 8601 format
@@ -48,6 +43,16 @@ export interface FeedClientOptions {
     // Optionally set whether to be inclusive of the start and end dates
     inclusive?: boolean;
   };
+  /**
+   * The mode to render the feed items in. When `mode` is `compact`:
+   *
+   * - The `activities` and `total_activities` fields will _not_ be present on feed items
+   * - The `data` field will _not_ include nested arrays and objects
+   * - The `actors` field will only have up to one actor
+   *
+   * @default "compact"
+   */
+  mode?: "rich" | "compact";
 }
 
 export type FetchFeedOptions = {
@@ -55,20 +60,29 @@ export type FetchFeedOptions = {
   __fetchSource?: "socket" | "http";
 } & Omit<FeedClientOptions, "__experimentalCrossBrowserUpdates">;
 
-// The final data shape that is sent to the API
-// Should match types here: https://docs.knock.app/reference#get-feed
+/**
+ * The final data shape that is sent to the the list feed items endpoint of the Knock API.
+ *
+ * @see https://docs.knock.app/api-reference/users/feeds/list_items
+ */
 export type FetchFeedOptionsForRequest = Omit<
   FeedClientOptions,
-  "trigger_data"
+  "trigger_data" | "inserted_at_date_range"
 > & {
-  // Formatted trigger data into a string
+  /** The trigger data of the feed items (as a JSON string). */
   trigger_data?: string;
+  /** Limits the results to items inserted after or on the given date. */
+  "inserted_at.gte"?: string;
+  /** Limits the results to items inserted before or on the given date. */
+  "inserted_at.lte"?: string;
+  /** Limits the results to items inserted after the given date. */
+  "inserted_at.gt"?: string;
+  /** Limits the results to items inserted before the given date. */
+  "inserted_at.lt"?: string;
   // Unset options that should not be sent to the API
   __loadingType: undefined;
   __fetchSource: undefined;
   __experimentalCrossBrowserUpdates: undefined;
-  auto_manage_socket_connection: undefined;
-  auto_manage_socket_connection_delay: undefined;
 };
 
 export interface ContentBlockBase {
@@ -107,7 +121,11 @@ export type ContentBlock =
 export interface FeedItem<T = GenericData> {
   __cursor: string;
   id: string;
-  activities: Activity<T>[];
+  /**
+   * List of activities associated with this feed item.
+   * Only present in "rich" mode.
+   */
+  activities?: Activity<T>[];
   actors: Recipient[];
   blocks: ContentBlock[];
   inserted_at: string;
@@ -118,7 +136,11 @@ export interface FeedItem<T = GenericData> {
   interacted_at: string | null;
   link_clicked_at: string | null;
   archived_at: string | null;
-  total_activities: number;
+  /**
+   * Total number of activities related to this feed item.
+   * Only present in "rich" mode.
+   */
+  total_activities?: number;
   total_actors: number;
   data: T | null;
   source: NotificationSource;

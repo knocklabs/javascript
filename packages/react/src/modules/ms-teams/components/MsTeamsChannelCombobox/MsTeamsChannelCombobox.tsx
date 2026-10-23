@@ -5,9 +5,10 @@ import {
   RecipientObject,
   useConnectedMsTeamsChannels,
 } from "@knocklabs/react-core";
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
+import { CornerDownRight } from "lucide-react";
 import { FunctionComponent, useCallback, useState } from "react";
 
 import "../../theme.css";
@@ -61,7 +62,7 @@ const MsTeamsChannelCombobox: FunctionComponent<Props> = ({
         minHeight="8"
         style={{ alignSelf: "start" }}
       >
-        <Icon color="gray" size="1" icon={Lucide.CornerDownRight} aria-hidden />
+        <Icon color="gray" size="1" icon={CornerDownRight} aria-hidden />
         <Text color="gray" size="2" as="div">
           Channels
         </Text>

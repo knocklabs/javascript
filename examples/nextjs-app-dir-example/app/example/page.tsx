@@ -5,16 +5,17 @@ import {
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
 import { Select } from "@telegraph/select";
 import { Heading, Text } from "@telegraph/typography";
+import { FileCode, Github } from "lucide-react";
 import { useCallback, useState } from "react";
 
-import NotificationFeed from "../components/NotificationFeed";
-import NotificationToasts from "../components/NotificationToasts";
-import SendNotificationForm from "../components/SendNotificationForm";
-import useIdentify from "../hooks/useIdentify";
+import NotificationFeed from "@/components/NotificationFeed";
+import NotificationToasts from "@/components/NotificationToasts";
+import SendNotificationForm from "@/components/SendNotificationForm";
+import useIdentify from "@/hooks/useIdentify";
 
 const Tenants = {
   TeamA: "team-a",
@@ -105,18 +106,13 @@ export default function Example() {
             <Box
               marginTop="12"
               borderTopWidth="1"
-              bordertopcolor="gray"
+              borderTopColor="gray-5"
               paddingTop="4"
             >
               <Stack justifyContent="space-between" alignItems="center">
                 <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon
-                      aria-hidden={true}
-                      alt="GitHub"
-                      icon={Lucide.Github}
-                      color="gray"
-                    />
+                    <Icon aria-hidden={true} icon={Github} color="gray" />
                     <Text as="span" color="gray">
                       Github repo
                     </Text>
@@ -124,12 +120,7 @@ export default function Example() {
                 </a>
                 <a href="https://docs.knock.app/in-app-ui/react/overview">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon
-                      aria-hidden={true}
-                      alt="GitHub"
-                      icon={Lucide.FileCode}
-                      color="gray"
-                    />
+                    <Icon aria-hidden={true} icon={FileCode} color="gray" />
                     <Text as="span" color="gray">
                       Documentation
                     </Text>

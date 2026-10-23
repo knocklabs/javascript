@@ -14,6 +14,7 @@ export interface NotificationSource {
   key: string;
   version_id: string;
   categories: string[];
+  step_ref?: string | null;
 }
 
 export type MessageEngagementStatus =
@@ -62,6 +63,7 @@ export type BulkUpdateMessagesInChannelProperties = {
     archived?: "exclude" | "include" | "only";
     has_tenant?: boolean;
     tenants?: string[];
+    trigger_data?: string;
   };
 };
 

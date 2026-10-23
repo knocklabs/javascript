@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import { resolve } from "path";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
 import dts from "vite-plugin-dts";
@@ -16,7 +17,20 @@ export default defineConfig(({ mode }) => {
         outDir: "dist/types",
       }),
       noBundlePlugin({ root: "./src" }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "@knocklabs/client",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
     ],
+    define: {
+      "process.env.CLIENT_PACKAGE_VERSION": JSON.stringify(
+        // TS doesn't like regular imports from package.json with NodeNext,
+        // so we'll just use require() and ignore the type error.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require("./package.json").version,
+      ),
+    },
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",
       sourcemap: true,
@@ -28,7 +42,7 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         output: {
-          interop: "compat",
+          strict: true,
           entryFileNames: () => {
             return `[name].${CJS ? "js" : "mjs"}`;
           },

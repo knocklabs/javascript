@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.7
+
+### Patch Changes
+
+- f62d7b9: chore(deps): bump eslint-config-turbo from 2.5.4 to 2.10.4
+
+## 0.0.6
+
+### Patch Changes
+
+- 6c8c477: chore(deps): bump @typescript-eslint/eslint-plugin from 8.32.1 to 8.59.4 and @typescript-eslint/parser to ^8.59.4
+
 ## 0.0.5
 
 ### Patch Changes

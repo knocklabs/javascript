@@ -1,11 +1,13 @@
 import {
+  getSlackNonceStorageKey,
+  useAuthPolling,
+  useAuthPostMessageListener,
   useKnockClient,
   useKnockSlackClient,
   useSlackAuth,
   useTranslations,
 } from "@knocklabs/react-core";
-import { FunctionComponent, useMemo } from "react";
-import { useEffect } from "react";
+import { FunctionComponent, useCallback, useMemo } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
 import "../../theme.css";
@@ -39,6 +41,9 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     setActionLabel,
     actionLabel,
     errorLabel,
+    tenantId,
+    knockSlackChannelId,
+    popupWindowRef,
   } = useKnockSlackClient();
 
   const useSlackAuthOptions = useMemo(
@@ -55,36 +60,28 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
     useSlackAuthOptions,
   );
 
-  useEffect(() => {
-    const receiveMessage = (event: MessageEvent) => {
-      if (event.origin !== knock.host) {
-        return;
-      }
+  useAuthPostMessageListener({
+    knockHost: knock.host,
+    popupWindowRef,
+    setConnectionStatus,
+    onAuthenticationComplete,
+    nonceStorageKey: getSlackNonceStorageKey(
+      knockSlackChannelId,
+      knock.userId!,
+    ),
+  });
 
-      try {
-        if (event.data === "authComplete") {
-          setConnectionStatus("connected");
-        }
-
-        if (event.data === "authFailed") {
-          setConnectionStatus("error");
-        }
-
-        if (onAuthenticationComplete) {
-          onAuthenticationComplete(event.data);
-        }
-      } catch (_error) {
-        setConnectionStatus("error");
-      }
-    };
-
-    window.addEventListener("message", receiveMessage, false);
-
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      window.removeEventListener("message", receiveMessage);
-    };
-  }, [knock.host, onAuthenticationComplete, setConnectionStatus]);
+  useAuthPolling({
+    popupWindowRef,
+    setConnectionStatus,
+    onAuthenticationComplete,
+    authCheckFn: useCallback(async () => {
+      return knock.slack.authCheck({
+        tenant: tenantId,
+        knockChannelId: knockSlackChannelId,
+      });
+    }, [knock.slack, tenantId, knockSlackChannelId]),
+  });
 
   const disconnectLabel = t("slackDisconnect") || null;
   const reconnectLabel = t("slackReconnect") || null;
@@ -110,7 +107,11 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   if (connectionStatus === "error") {
     return (
       <button
-        onClick={() => openPopupWindow(buildSlackAuthUrl())}
+        onClick={() => {
+          const popup = openPopupWindow(buildSlackAuthUrl());
+          popupWindowRef.current = popup;
+          setConnectionStatus("connecting");
+        }}
         className="rsk-connect__button rsk-connect__button--error"
         onMouseEnter={() => setActionLabel(reconnectLabel)}
         onMouseLeave={() => setActionLabel(null)}
@@ -127,7 +128,11 @@ export const SlackAuthButton: FunctionComponent<SlackAuthButtonProps> = ({
   if (connectionStatus === "disconnected") {
     return (
       <button
-        onClick={() => openPopupWindow(buildSlackAuthUrl())}
+        onClick={() => {
+          const popup = openPopupWindow(buildSlackAuthUrl());
+          popupWindowRef.current = popup;
+          setConnectionStatus("connecting");
+        }}
         className="rsk-connect__button rsk-connect__button--disconnected"
       >
         <SlackIcon height="16px" width="16px" />

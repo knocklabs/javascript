@@ -36,9 +36,14 @@ describe("MsTeamsAuthButton", () => {
       setActionLabel: vi.fn(),
       actionLabel: null,
       errorLabel: null,
+      tenantId: "tenant_123",
+      knockMsTeamsChannelId: "channel_123",
+      popupWindowRef: { current: null },
     };
 
-    const { getByText } = render(<MsTeamsAuthButton msTeamsBotId="bot" />);
+    const { getByText } = render(
+      <MsTeamsAuthButton graphApiClientId="clientId" />,
+    );
 
     const btn = getByText("msTeamsConnect").closest("button") as HTMLElement;
     fireEvent.click(btn);
@@ -51,9 +56,14 @@ describe("MsTeamsAuthButton", () => {
       setActionLabel: vi.fn(),
       actionLabel: null,
       errorLabel: "Error",
+      tenantId: "tenant_123",
+      knockMsTeamsChannelId: "channel_123",
+      popupWindowRef: { current: null },
     };
 
-    const { getByText } = render(<MsTeamsAuthButton msTeamsBotId="bot" />);
+    const { getByText } = render(
+      <MsTeamsAuthButton graphApiClientId="clientId" />,
+    );
 
     expect(getByText("Error")).toBeInTheDocument();
   });

@@ -1,7 +1,16 @@
-export { KnockGuideClient } from "./client";
+export { KnockGuideClient, checkActivatable } from "./client";
+export { checkStateIfThrottled } from "./helpers";
+export type { ToolbarV2RunConfig } from "./helpers";
 export type {
   KnockGuide,
   KnockGuideStep,
+  GuideIneligibilityMarker as KnockGuideIneligibilityMarker,
   TargetParams as KnockGuideTargetParams,
   SelectFilterParams as KnockGuideFilterParams,
-} from "./client";
+  SelectGuideOpts as KnockSelectGuideOpts,
+  SelectGuidesOpts as KnockSelectGuidesOpts,
+  StepMessageState as KnockGuideStepMessageState,
+  StoreState as KnockGuideClientStoreState,
+  GroupStage as KnockGuideClientGroupStage,
+  SelectionResult as KnockGuideSelectionResult,
+} from "./types";

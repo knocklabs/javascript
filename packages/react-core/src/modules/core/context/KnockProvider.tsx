@@ -1,4 +1,8 @@
-import Knock, { AuthenticateOptions, LogLevel } from "@knocklabs/client";
+import Knock, {
+  AuthenticateOptions,
+  LogLevel,
+  UserWithProperties,
+} from "@knocklabs/client";
 import * as React from "react";
 import { PropsWithChildren } from "react";
 
@@ -11,31 +15,81 @@ export interface KnockProviderState {
 
 const KnockContext = React.createContext<KnockProviderState | null>(null);
 
-export interface KnockProviderProps {
+export type KnockProviderProps = {
   // Knock client props
   apiKey: string | undefined;
   host?: string;
-  // Authentication props
-  userId: Knock["userId"];
   userToken?: Knock["userToken"];
   onUserTokenExpiring?: AuthenticateOptions["onUserTokenExpiring"];
   timeBeforeExpirationInMs?: AuthenticateOptions["timeBeforeExpirationInMs"];
   // i18n translations
   i18n?: I18nContent;
   logLevel?: LogLevel;
-}
+  branch?: string;
+  /**
+   * When `false`, render children but keep the Knock client idle: no identify
+   * call, no API requests, and no websocket. Set it to `true` and it connects
+   * like a login; set it back to `false` and it disconnects like a logout.
+   * Defaults to `true`.
+   *
+   * Use this to wait for a complete identity (for example, a user token that
+   * loads asynchronously) instead of conditionally mounting `KnockProvider`:
+   *
+   * ```tsx
+   * <KnockProvider
+   *   apiKey={apiKey}
+   *   user={{ id: userId }}
+   *   userToken={userToken}
+   *   enabled={Boolean(userId && userToken)}
+   * >
+   * ```
+   */
+  enabled?: boolean;
+} & (
+  | {
+      /**
+       * @deprecated The `userId` prop is deprecated and will be removed in a future version.
+       * Please pass the `user` prop instead containing an `id` value.
+       * example:
+       * ```ts
+       * <KnockProvider user={{ id: "user_123" }}></KnockProvider>
+       * ```
+       */
+      userId: Knock["userId"];
+      user?: never;
+      identificationStrategy?: never;
+    }
+  | {
+      user: UserWithProperties;
+      identificationStrategy?: AuthenticateOptions["identificationStrategy"];
+      /**
+       * @deprecated The `userId` prop is deprecated and will be removed in a future version.
+       * Please pass the `user` prop instead containing an `id` value.
+       * example:
+       * ```ts
+       * <KnockProvider user={{ id: "user_123" }}></KnockProvider>
+       * ```
+       */
+      userId?: never;
+    }
+);
 
 export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
   apiKey,
   host,
   logLevel,
-  userId,
   userToken,
   onUserTokenExpiring,
   timeBeforeExpirationInMs,
   children,
   i18n,
+  identificationStrategy,
+  branch,
+  enabled,
+  ...props
 }) => {
+  const userIdOrUserWithProperties = props?.user || props?.userId;
+
   // We memoize the options here so that we don't create a new object on every re-render
   const authenticateOptions = React.useMemo(
     () => ({
@@ -43,13 +97,24 @@ export const KnockProvider: React.FC<PropsWithChildren<KnockProviderProps>> = ({
       onUserTokenExpiring,
       timeBeforeExpirationInMs,
       logLevel,
+      identificationStrategy,
+      branch,
+      enabled,
     }),
-    [host, onUserTokenExpiring, timeBeforeExpirationInMs, logLevel],
+    [
+      host,
+      onUserTokenExpiring,
+      timeBeforeExpirationInMs,
+      logLevel,
+      identificationStrategy,
+      branch,
+      enabled,
+    ],
   );
 
   const knock = useAuthenticatedKnockClient(
     apiKey ?? "",
-    userId,
+    userIdOrUserWithProperties,
     userToken,
     authenticateOptions,
   );

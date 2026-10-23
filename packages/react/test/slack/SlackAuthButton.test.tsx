@@ -32,6 +32,9 @@ describe("SlackAuthButton", () => {
       setActionLabel: vi.fn(),
       actionLabel: null,
       errorLabel: null,
+      tenantId: "tenant_123",
+      knockSlackChannelId: "channel_123",
+      popupWindowRef: { current: null },
     };
 
     const { getByText } = render(<SlackAuthButton slackClientId="cid" />);
@@ -47,6 +50,9 @@ describe("SlackAuthButton", () => {
       setActionLabel: vi.fn(),
       actionLabel: null,
       errorLabel: "Slack Err",
+      tenantId: "tenant_123",
+      knockSlackChannelId: "channel_123",
+      popupWindowRef: { current: null },
     };
 
     const { getByText } = render(<SlackAuthButton slackClientId="cid" />);

@@ -1,10 +1,13 @@
 import { FeedMetadata } from "@knocklabs/client";
-import { formatBadgeCount, useKnockFeed } from "@knocklabs/react-core";
+import {
+  type BadgeCountType,
+  formatBadgeCount,
+  getBadgeAriaLabel,
+  useKnockFeed,
+} from "@knocklabs/react-core";
 import React from "react";
 
 import "./styles.css";
-
-export type BadgeCountType = "unseen" | "unread" | "all";
 
 export type UnseenBadgeProps = {
   badgeCountType?: BadgeCountType;
@@ -13,7 +16,7 @@ export type UnseenBadgeProps = {
 function selectBadgeCount(
   badgeCountType: BadgeCountType,
   metadata: FeedMetadata,
-) {
+): number {
   switch (badgeCountType) {
     case "all":
       return metadata.total_count;
@@ -33,8 +36,12 @@ export const UnseenBadge: React.FC<UnseenBadgeProps> = ({
   );
 
   return badgeCountValue !== 0 ? (
-    <div className="rnf-unseen-badge">
-      <span className="rnf-unseen-badge__count">
+    <div
+      className="rnf-unseen-badge"
+      role="status"
+      aria-label={getBadgeAriaLabel(badgeCountValue, badgeCountType)}
+    >
+      <span className="rnf-unseen-badge__count" aria-hidden="true">
         {formatBadgeCount(badgeCountValue)}
       </span>
     </div>

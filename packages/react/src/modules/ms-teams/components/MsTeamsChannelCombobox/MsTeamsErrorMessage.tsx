@@ -1,5 +1,6 @@
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Text } from "@telegraph/typography";
+import { Info } from "lucide-react";
 import { FunctionComponent } from "react";
 
 interface Props {
@@ -10,7 +11,7 @@ const MsTeamsErrorMessage: FunctionComponent<Props> = ({ message }) => {
   return (
     <div className="rtk-combobox__error">
       <span>
-        <Icon icon={Lucide.Info} color="black" size="1" aria-hidden />
+        <Icon icon={Info} color="black" size="1" aria-hidden />
       </span>
       <Text as="div" color="black" size="1">
         {message}

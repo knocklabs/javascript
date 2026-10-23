@@ -1,11 +1,16 @@
 import { GenericData } from "@knocklabs/types";
-import { JwtPayload } from "jwt-decode";
+
+import { JwtPayload } from "./jwt";
+import Knock from "./knock";
 
 export type LogLevel = "debug";
 
 export interface KnockOptions {
   host?: string;
   logLevel?: LogLevel;
+  branch?: string;
+  /** Automatically disconnect the socket when the page is hidden and reconnect when visible. Defaults to `true`. */
+  disconnectOnPageHidden?: boolean;
 }
 
 export interface KnockObject<T = GenericData> {
@@ -52,6 +57,25 @@ export type UserTokenExpiringCallback = (
 export interface AuthenticateOptions {
   onUserTokenExpiring?: UserTokenExpiringCallback;
   timeBeforeExpirationInMs?: number;
+  identificationStrategy?: "inline" | "skip";
+}
+
+/**
+ * Whether a `Knock` instance currently has a signed-in user. When
+ * `unauthenticated`, the instance stays idle (no requests, no websocket) until
+ * `authenticate` is called.
+ */
+export type KnockAuthStatus = "authenticated" | "unauthenticated";
+
+/**
+ * The shape of the subscribable auth-state store exposed on `knock.authStore`.
+ * Subsystems and React hooks can subscribe to this to react to auth transitions
+ * (login / logout / user switch) without polling `isAuthenticated()`.
+ */
+export interface KnockAuthState {
+  status: KnockAuthStatus;
+  userId: UserId;
+  userToken: string | undefined;
 }
 
 export interface BulkOperation {
@@ -76,3 +100,7 @@ export type RevokeAccessTokenInput = {
   tenant: string;
   knockChannelId: string;
 };
+
+export type UserId = Knock["userId"];
+export type UserWithProperties = { id: UserId } & GenericData;
+export type UserIdOrUserWithProperties = UserId | UserWithProperties;

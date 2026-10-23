@@ -1,0 +1,551 @@
+import {
+  KnockGuide,
+  KnockGuideClientGroupStage,
+  KnockGuideClientStoreState,
+  KnockGuideIneligibilityMarker,
+  KnockGuideSelectionResult,
+  type ToolbarV2RunConfig,
+  checkActivatable,
+  checkStateIfThrottled,
+} from "@knocklabs/client";
+import { useGuideContext, useStore } from "@knocklabs/react-core";
+import * as React from "react";
+
+import { FOCUS_ERRORS } from "./helpers";
+
+const byKey = <T extends { key: string }>(items: T[]) => {
+  return items.reduce((acc, item) => ({ ...acc, [item.key]: item }), {});
+};
+
+/**
+ * This is the main module that will house core logic for the toolbar. It hooks
+ * into the guide client state store, extracts relevant data for debugging, and
+ * transforms it into easily consumable data for the toolbar - namely
+ * "annotating" guides for its various statuses to display.
+ */
+
+// Active: `true` status = good
+type ActiveStatus = {
+  status: boolean;
+};
+
+// Targetable: `true` status = good
+type TargetableStatusTrue = {
+  status: true;
+};
+type TargetableStatusFalse = {
+  status: false;
+  reason: string;
+  message: string;
+};
+type TargetableStatus = TargetableStatusTrue | TargetableStatusFalse;
+
+type ActivatableStatus = {
+  status: boolean;
+};
+
+// Archived: `false` status = good
+type ArchivedStatus = {
+  status: boolean;
+};
+
+// Selectable:
+//  - "returned": Queried and resolved to return the guide from useGuide(s).
+//  - "throttled": Queried and resolved but being throttled, so not yet returned.
+//  - "queried": Queried but not resolved, because there are other higher
+//    priority guides that are ahead of this guide in the query result.
+//  - undefined: Not reachable with any of the given queries and filters.
+type SelectionResultByLimit = {
+  one?: KnockGuideSelectionResult;
+  all?: KnockGuideSelectionResult;
+};
+type SelectionResultByQuery = {
+  byKey?: SelectionResultByLimit;
+  byType?: SelectionResultByLimit;
+};
+type SelectableStatusPresent = {
+  status: "returned" | "throttled" | "queried";
+  query: SelectionResultByQuery;
+};
+type SelectableStatusAbsent = {
+  status: undefined;
+};
+type SelectableStatus = SelectableStatusPresent | SelectableStatusAbsent;
+
+export type AnnotatedStatuses = {
+  // Individual eligibility statuses:
+  active: ActiveStatus;
+  targetable: TargetableStatus;
+  archived: ArchivedStatus;
+  // Individual qualified statuses:
+  activatable: ActivatableStatus;
+  selectable: SelectableStatus;
+};
+
+type GuideAnnotation = AnnotatedStatuses & {
+  // Resolved eligibility based on active, targetable and archived statuses,
+  // which are backend driven evaluation results that are exposed for debugging.
+  isEligible: boolean;
+
+  // Resolved display qualification based on an activatable status, which
+  // informs "when" and "where" an eligible guide can be displayed to user.
+  isQualified: boolean;
+};
+
+export type AnnotatedGuide = KnockGuide & {
+  orderIndex: number;
+  annotation: GuideAnnotation;
+
+  // Legacy fields, typed only to make tsc happy when we prune these out.
+  activation_location_rules?: KnockGuide["activation_url_patterns"];
+  priority?: number;
+};
+
+// Exists and ordered in control but absent in switchboard (therefore not
+// included in the api response), which implies a newly created guide that has
+// never been published to switchboard.
+export type UncommittedGuide = {
+  __typename: "UncommittedGuide";
+  orderIndex: number;
+  key: KnockGuide["key"];
+  active: false;
+  bypass_global_group_limit: false;
+  annotation: {
+    isEligible: false;
+    isQualified: false;
+    active: {
+      status: false;
+    };
+    selectable: {
+      status: undefined;
+    };
+  };
+};
+
+export type InspectionResultOk = {
+  status: "ok";
+  guides: (AnnotatedGuide | UncommittedGuide)[];
+};
+type InspectionResultError = {
+  status: "error";
+  error:
+    | "no_guides_fetched"
+    | "no_guide_group"
+    | "focus_unknown_guide"
+    | "focus_uncommitted_guide"
+    | "focus_unselectable_guide";
+  message: string;
+};
+type InspectionResult = InspectionResultOk | InspectionResultError;
+
+type StoreStateSnapshot = Pick<
+  KnockGuideClientStoreState,
+  | "location"
+  | "guides"
+  | "guideGroups"
+  | "ineligibleGuides"
+  | "debug"
+  | "counter"
+  | "queries"
+> & {
+  throttled: boolean;
+};
+
+const inferSelectByKeyReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+): SelectableStatusPresent["status"] => {
+  const includeThrottled =
+    !!query.byKey?.one?.metadata?.opts?.includeThrottled ||
+    !!query.byKey?.all?.metadata?.opts?.includeThrottled;
+
+  // If unthrottled, then it should always be returned.
+  if (guide.bypass_global_group_limit) {
+    return "returned";
+  }
+
+  // If resolved, expect this guide to be returned unless being throttled.
+  if (guide.key === stage.resolved) {
+    if (snapshot.throttled && !includeThrottled) {
+      return "throttled";
+    }
+    return "returned";
+  }
+
+  // If queried but not resolved, it means this guide is being shadowed by
+  // another guide with higher priority because throttled guides can be
+  // displayed only one at a time.
+  return "queried";
+};
+
+const inferSelectOneByTypeReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+): SelectableStatusPresent["status"] => {
+  const includeThrottled =
+    !!query.byType?.one?.metadata?.opts?.includeThrottled;
+
+  const result = query.byType!.one!;
+  if (result.size === 0) {
+    return "queried";
+  }
+
+  // There may be multiple unthrottled guides of the same type, being queried
+  // by type to return a single guide, for example: useGuide({ type: "card" }).
+  //
+  // So it is possible for an unthrottled guide to be shadowed by another
+  // unthrottled guide of the same type with higher priority, so we need to
+  // look at the query result to determine its return status.
+  if (guide.bypass_global_group_limit) {
+    const guides = [...result.values()];
+    const first = guides[0]!;
+
+    if (guide.key !== first.key) {
+      // Being shadowed by another guide with higher priority.
+      return "queried";
+    }
+    return "returned";
+  }
+
+  // If resolved, expect this guide to be returned unless being throttled.
+  if (guide.key === stage.resolved) {
+    if (snapshot.throttled && !includeThrottled) {
+      return "throttled";
+    }
+    return "returned";
+  }
+
+  // If queried but not resolved, it means this guide is being shadowed by
+  // another guide with higher priority because throttled guides can be
+  // displayed only one at a time.
+  return "queried";
+};
+
+const inferSelectAllByTypeReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+): SelectableStatusPresent["status"] => {
+  const result = query.byType!.all!;
+  if (result.size === 0) {
+    return "queried";
+  }
+
+  const guides = [...result.values()];
+  const first = guides[0]!;
+
+  // Might want to consider moving this up to do once.
+  const guidesByKey: Record<KnockGuide["key"], KnockGuide> = byKey(guides);
+
+  // If includeThrottled given, then expect all selected guides to be returned.
+  const includeThrottled =
+    !!query.byType?.all?.metadata?.opts?.includeThrottled;
+  if (includeThrottled) {
+    return guidesByKey[guide.key] ? "returned" : "queried";
+  }
+
+  // If the first selected guide is unthrottled or resolved, then we should
+  // have at minimum one guide to return, and potentially more based on whether
+  // we are throttling currently and which other guides are unthrottled.
+  if (first.bypass_global_group_limit || first.key === stage.resolved) {
+    if (!guidesByKey[guide.key]) {
+      return "queried";
+    }
+    if (snapshot.throttled) {
+      return guide.bypass_global_group_limit ? "returned" : "throttled";
+    }
+    return "returned";
+  }
+
+  return "queried";
+};
+
+const inferSelectReturnStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage,
+  query: SelectionResultByQuery,
+) => {
+  // Querying by key can only return up to a max of one guide, regardless of
+  // useGuide or useGuides, and should take precedence in status designation.
+  if (query.byKey) {
+    return inferSelectByKeyReturnStatus(guide, snapshot, stage, query);
+  }
+
+  if (query.byType?.all) {
+    return inferSelectAllByTypeReturnStatus(guide, snapshot, stage, query);
+  }
+  if (query.byType?.one) {
+    return inferSelectOneByTypeReturnStatus(guide, snapshot, stage, query);
+  }
+
+  // Should not happen but just for completeness.
+  return undefined;
+};
+
+const toSelectableStatus = (
+  guide: KnockGuide,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage | undefined,
+): SelectableStatus => {
+  if (!stage || stage.status === "open") {
+    return { status: undefined };
+  }
+
+  const query = {
+    byKey: (stage.results.byKey || {})[guide.key],
+    byType: (stage.results.byType || {})[guide.type],
+  };
+
+  const queried = Boolean(query.byKey || query.byType);
+  if (!queried) {
+    // No present query in the current location can select this guide.
+    return { status: undefined };
+  }
+
+  const status = inferSelectReturnStatus(guide, snapshot, stage, query);
+  if (!status) {
+    return { status: undefined };
+  }
+
+  return { status, query };
+};
+
+const toIneligibilityStatus = (
+  guide: KnockGuide,
+  marker?: KnockGuideIneligibilityMarker,
+): Partial<AnnotatedStatuses> => {
+  const statuses: Partial<AnnotatedStatuses> = {};
+
+  if (
+    marker?.reason === "not_in_target_audience" ||
+    marker?.reason === "target_conditions_not_met"
+  ) {
+    statuses.targetable = {
+      status: false,
+      reason: marker.reason,
+      message: marker.message,
+    };
+  }
+
+  if (
+    marker?.reason === "marked_as_archived" ||
+    (guide.steps || []).every((s) => !!s.message.archived_at)
+  ) {
+    statuses.archived = {
+      status: true,
+    };
+  }
+
+  if (marker?.reason === "guide_not_active") {
+    statuses.active = {
+      status: false,
+    };
+  }
+
+  return statuses;
+};
+
+const resolveIsEligible = ({
+  active,
+  targetable,
+  archived,
+}: AnnotatedStatuses) => {
+  if (!active.status) return false;
+  if (!targetable.status) return false;
+  if (archived.status) return false;
+  return true;
+};
+
+export const resolveIsQualified = ({
+  activatable,
+  selectable,
+}: AnnotatedStatuses) => {
+  if (!activatable.status) return false;
+  if (!selectable.status) return false;
+  return true;
+};
+
+const annotateGuide = (
+  guide: KnockGuide,
+  orderIndex: number,
+  snapshot: StoreStateSnapshot,
+  stage: KnockGuideClientGroupStage | undefined,
+): AnnotatedGuide => {
+  const { ineligibleGuides, location } = snapshot;
+  const marker = ineligibleGuides[guide.key];
+  const ineligiblity = toIneligibilityStatus(guide, marker);
+
+  const statuses: AnnotatedStatuses = {
+    // isEligible:
+    active: ineligiblity?.active || { status: true },
+    targetable: ineligiblity?.targetable || { status: true },
+    archived: ineligiblity?.archived || { status: false },
+    // isQualified:
+    activatable: { status: checkActivatable(guide, location) },
+    selectable: toSelectableStatus(guide, snapshot, stage),
+  };
+
+  const annotation: GuideAnnotation = {
+    ...statuses,
+    isEligible: resolveIsEligible(statuses),
+    isQualified: resolveIsQualified(statuses),
+  };
+
+  return {
+    ...guide,
+    orderIndex,
+    annotation,
+  };
+};
+
+const newUncommittedGuide = (key: KnockGuide["key"], orderIndex: number) =>
+  ({
+    __typename: "UncommittedGuide",
+    key,
+    orderIndex,
+    active: false,
+    bypass_global_group_limit: false,
+    annotation: {
+      isEligible: false,
+      isQualified: false,
+      active: {
+        status: false,
+      },
+      selectable: {
+        status: undefined,
+      },
+    },
+  }) as UncommittedGuide;
+
+export const useInspectGuideClientStore = (
+  runConfig: ToolbarV2RunConfig,
+): InspectionResult | undefined => {
+  const { client } = useGuideContext();
+
+  // Extract a snapshot of the client store state for debugging.
+  const snapshot: StoreStateSnapshot = useStore(client.store, (state) => {
+    const throttled = checkStateIfThrottled(state);
+
+    return {
+      location: state.location,
+      guides: state.guides,
+      guideGroups: state.guideGroups,
+      ineligibleGuides: state.ineligibleGuides,
+      debug: state.debug,
+      counter: state.counter,
+      queries: state.queries,
+      throttled,
+    };
+  });
+
+  // Cache of the last settled orderedGuides, used to keep the toolbar stable
+  // while the group stage is transiently cleared or re-opening.
+  const orderedGuidesRef = React.useRef<
+    (AnnotatedGuide | UncommittedGuide)[] | undefined
+  >(undefined);
+
+  // Not in debugging session, so noop.
+  if (!snapshot.debug?.debugging) {
+    return undefined;
+  }
+
+  // No recorded fetch requests, which implies an inflight request loading.
+  const req = Object.entries(snapshot.queries)[0];
+  if (!req || req[1].status === "loading") {
+    return {
+      status: "error",
+      error: "no_guides_fetched",
+      message: "Loading...",
+    };
+  }
+
+  // Should always be a default group so this should never happen.
+  const defaultGroup = snapshot.guideGroups[0];
+  if (!defaultGroup) {
+    return {
+      status: "error",
+      error: "no_guide_group",
+      message: "No guide group found",
+    };
+  }
+
+  const groupStage = client.getStage();
+
+  // The stage is transient while it is undefined (just cleared) or "open"
+  // (new stage with empty results); during these windows the computed
+  // selectable status collapses to undefined for every guide. "closed" and
+  // "patch" both preserve results, so we treat them as settled.
+  const isTransient = !groupStage || groupStage.status === "open";
+
+  // Annotate guides for various eligibility, activation and query statuses
+  // that are useful for debugging purposes. Serve the last settled result
+  // during transient windows to avoid flashing status dots.
+  let orderedGuides: (AnnotatedGuide | UncommittedGuide)[];
+  if (isTransient && orderedGuidesRef.current) {
+    orderedGuides = orderedGuidesRef.current;
+  } else {
+    orderedGuides = defaultGroup.display_sequence.map((guideKey, index) => {
+      const guide = snapshot.guides[guideKey];
+      if (!guide) {
+        return newUncommittedGuide(guideKey, index);
+      }
+      return annotateGuide(guide, index, snapshot, groupStage);
+    });
+
+    if (!isTransient) {
+      orderedGuidesRef.current = orderedGuides;
+    }
+  }
+
+  // Check if the focused guide actually exists and is selectable on the page.
+  const focusedGuideKey = Object.keys(runConfig.focusedGuideKeys || {})[0];
+  if (groupStage?.status === "closed" && focusedGuideKey) {
+    const foundGuide = orderedGuides.find((g) => g.key === focusedGuideKey);
+
+    // No such guide exists for the given focused guide key.
+    if (!foundGuide) {
+      return {
+        status: "error",
+        error: "focus_unknown_guide",
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUnknownGuide.toLowerCase()}.`,
+      };
+    }
+
+    // This guide exists but has never been committed and published, so it is
+    // not present in the API response.
+    if (isUncommittedGuide(foundGuide)) {
+      return {
+        status: "error",
+        error: "focus_uncommitted_guide",
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUncommittedGuide.toLowerCase()}.`,
+      };
+    }
+
+    // This guide exists and is present in the response, but it is not queried
+    // in the current page so it is impossible to force render this guide.
+    if (!foundGuide.annotation.selectable.status) {
+      return {
+        status: "error",
+        error: "focus_unselectable_guide",
+        message: `Unable to display \`${focusedGuideKey}\`, ${FOCUS_ERRORS.focusUnselectableGuide.toLowerCase()}.`,
+      };
+    }
+  }
+
+  return {
+    status: "ok",
+    guides: orderedGuides,
+  };
+};
+
+export const isUncommittedGuide = (input: unknown): input is UncommittedGuide =>
+  typeof input === "object" &&
+  input !== null &&
+  "__typename" in input &&
+  (input as UncommittedGuide).__typename === "UncommittedGuide";

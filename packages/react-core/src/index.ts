@@ -2,16 +2,25 @@ export {
   FilterStatus,
   KnockProvider,
   feedProviderKey,
+  type BadgeCountType,
   formatBadgeCount,
+  type FormatTimestampOptions,
+  getBadgeAriaLabel,
   formatTimestamp,
   msTeamsProviderKey,
   renderNodeOrFallback,
   slackProviderKey,
+  type TimestampFormatter,
   toSentenceCase,
+  type AuthCheckResult,
   type ColorMode,
+  type ConnectionStatus,
   type KnockProviderProps,
   type KnockProviderState,
   useAuthenticatedKnockClient,
+  useAuthPolling,
+  useAuthPostMessageListener,
+  useKnockAuthState,
   useKnockClient,
   useStableOptions,
 } from "./modules/core";
@@ -29,7 +38,10 @@ export {
 export {
   KnockGuideProvider,
   KnockGuideContext,
+  type KnockGuideProviderProps,
   useGuide,
+  useGuides,
+  useGuideContext,
 } from "./modules/guide";
 export {
   type MsTeamsChannelQueryOptions,
@@ -50,6 +62,7 @@ export {
   type KnockSlackProviderProps,
   type KnockSlackProviderState,
   type SlackChannelQueryOptions,
+  getSlackNonceStorageKey,
   useConnectedSlackChannels,
   useKnockSlackClient,
   useSlackAuth,
@@ -66,3 +79,11 @@ export {
   useTranslations,
 } from "./modules/i18n";
 export { type RecipientObject } from "./interfaces";
+
+export { usePreferences } from "./modules/preferences";
+
+// Export the useStore hook from @tanstack/react-store library so that it can
+// be available to be imported into the consumer package, and be part of the
+// same module graph. This potentially helps Next.js App Router to bundle client
+// side components together correctly.
+export { useStore } from "@tanstack/react-store";

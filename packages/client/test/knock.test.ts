@@ -1,13 +1,15 @@
-import { jwtDecode } from "jwt-decode";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import { jwtDecode } from "../src/jwt";
 import Knock from "../src/knock";
 
 import { authenticateKnock, createMockKnock } from "./test-utils/mocks";
 
-// ✅ Mock the named export `jwtDecode` from the "jwt-decode" module.
+const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
+
+// ✅ Mock the named export `jwtDecode` from the internal jwt module.
 // It will always return a decoded token with an `exp` 61 seconds in the future.
-vi.mock("jwt-decode", () => ({
+vi.mock("../src/jwt", () => ({
   jwtDecode: vi.fn(() => ({
     exp: Math.floor(Date.now() / 1000) + 61,
   })),
@@ -46,10 +48,12 @@ describe("Knock Client", () => {
         const knock = new Knock("pk_test_12345", {
           logLevel: "debug",
           host: "https://custom.knock.app",
+          branch: TEST_BRANCH_SLUG,
         });
 
         expect(knock).toBeInstanceOf(Knock);
         expect(knock.apiKey).toBe("pk_test_12345");
+        expect(knock.branch).toBe(TEST_BRANCH_SLUG);
       } finally {
         consoleSpy.mockRestore();
       }
@@ -126,6 +130,210 @@ describe("Knock Client", () => {
       });
 
       expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("user identify is not called", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate("user_123", "token_456");
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Authenticate with user object", () => {
+    test("authenticate with credentials", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate({ id: "user_123" }, "token_456");
+
+      expect(knock.userId).toBe("user_123");
+      expect(knock.userToken).toBe("token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("validates authentication state", () => {
+      const knock = new Knock("pk_test_12345");
+
+      expect(knock.isAuthenticated()).toBe(false);
+
+      knock.authenticate({ id: "user_123" }, "token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("allows operations after authentication", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate({ id: "user_123" }, "token_456");
+
+      expect(() => knock.failIfNotAuthenticated()).not.toThrow();
+    });
+
+    test("handles authentication with options", () => {
+      const knock = new Knock("pk_test_12345");
+      const onUserTokenExpiring = vi.fn();
+
+      knock.authenticate({ id: "user_123" }, "token_456", {
+        onUserTokenExpiring,
+      });
+
+      expect(knock.isAuthenticated()).toBe(true);
+    });
+
+    test("user identify is called", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456");
+
+      expect(identify).toHaveBeenCalledWith({ name: "John Doe" });
+    });
+
+    test("does not identify user when user object does not contain an `id` property", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      // @ts-expect-error - we want to test the error case
+      knock.authenticate({ name: "John Doe" });
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Inline identification strategy", () => {
+    test("defaults to inline identification when no strategy is specified", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate(
+        { id: "user_123", name: "John Doe", email: "john@example.com" },
+        "token_456",
+      );
+
+      expect(identify).toHaveBeenCalledWith({
+        name: "John Doe",
+        email: "john@example.com",
+      });
+    });
+
+    test("performs inline identification when strategy is explicitly set to 'inline'", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate(
+        { id: "user_123", name: "John Doe", email: "john@example.com" },
+        "token_456",
+        {
+          identificationStrategy: "inline",
+        },
+      );
+
+      expect(identify).toHaveBeenCalledWith({
+        name: "John Doe",
+        email: "john@example.com",
+      });
+    });
+
+    test("skips inline identification when strategy is set to 'skip'", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate(
+        { id: "user_123", name: "John Doe", email: "john@example.com" },
+        "token_456",
+        {
+          identificationStrategy: "skip",
+        },
+      );
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+
+    test("does not identify when authenticating with string userId regardless of strategy", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate("user_123", "token_456", {
+        identificationStrategy: "inline",
+      });
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+
+    test("does not identify with string userId when strategy is 'skip'", () => {
+      const knock = new Knock("pk_test_12345");
+      const identify = vi.spyOn(knock.user, "identify");
+
+      knock.authenticate("user_123", "token_456", {
+        identificationStrategy: "skip",
+      });
+
+      expect(identify).not.toHaveBeenCalled();
+    });
+
+    test("logs appropriate message when skipping identification", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      try {
+        const knock = new Knock("pk_test_12345", { logLevel: "debug" });
+        const identify = vi.spyOn(knock.user, "identify");
+
+        knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456", {
+          identificationStrategy: "skip",
+        });
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[Knock] Skipping inline user identification",
+        );
+        expect(identify).not.toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
+    test("logs appropriate message when performing inline identification", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      try {
+        const knock = new Knock("pk_test_12345", { logLevel: "debug" });
+        const identify = vi.spyOn(knock.user, "identify");
+
+        knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456", {
+          identificationStrategy: "inline",
+        });
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[Knock] Identifying user user_123 inline",
+        );
+        expect(identify).toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
+    test("logs error when inline identification fails", async () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      try {
+        const knock = new Knock("pk_test_12345", { logLevel: "debug" });
+        const identify = vi
+          .spyOn(knock.user, "identify")
+          .mockRejectedValue(new Error("The system is down"));
+
+        knock.authenticate({ id: "user_123", name: "John Doe" }, "token_456", {
+          identificationStrategy: "inline",
+        });
+
+        await vi.runAllTimersAsync();
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "[Knock] Error identifying user user_123 inline:\nThe system is down",
+        );
+        expect(identify).toHaveBeenCalled();
+      } finally {
+        consoleSpy.mockRestore();
+      }
     });
   });
 
@@ -417,6 +625,135 @@ describe("Knock Client", () => {
 
       expect(onUserTokenExpiring).not.toHaveBeenCalled();
     });
+
+    test("does not re-authenticate from an in-flight token refresh after logout", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+
+      const futureExp = Math.floor((Date.now() + 60000) / 1000);
+      vi.mocked(jwtDecode).mockReturnValueOnce({ exp: futureExp });
+
+      // A refresh callback we can hold open while the user logs out.
+      let resolveRefresh!: (token: string) => void;
+      const onUserTokenExpiring = vi.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            resolveRefresh = resolve;
+          }),
+      );
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      });
+      authenticateSpy.mockClear();
+
+      // Fire the refresh timer; the callback is now awaiting.
+      await vi.advanceTimersByTimeAsync(50000);
+      expect(onUserTokenExpiring).toHaveBeenCalled();
+
+      // The user logs out while the refresh is still in flight.
+      knock.logout();
+
+      // The refresh resolves with a fresh token.
+      resolveRefresh("token_new");
+      await vi.runAllTimersAsync();
+
+      // It must NOT resurrect the logged-out instance.
+      expect(authenticateSpy).not.toHaveBeenCalled();
+      expect(knock.isAuthenticated()).toBe(false);
+    });
+
+    test("floors the refresh delay for a token already inside the expiration window", async () => {
+      const knock = new Knock("pk_test_12345");
+      const onUserTokenExpiring = vi.fn().mockResolvedValue("token_new");
+
+      // 5s of life left, but we refresh 30s before expiry: the unfloored delay
+      // is -25s, which `setTimeout` would run on the next tick.
+      vi.mocked(jwtDecode).mockReturnValueOnce({
+        exp: Math.floor((Date.now() + 5000) / 1000),
+      });
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 30000,
+      });
+
+      await vi.advanceTimersByTimeAsync(0);
+      expect(onUserTokenExpiring).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not re-authenticate when the refreshed token expires no later than the current one", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+      const onUserTokenExpiring = vi.fn().mockResolvedValue("token_same_exp");
+
+      const exp = Math.floor((Date.now() + 60000) / 1000);
+      vi.mocked(jwtDecode)
+        .mockReturnValueOnce({ exp }) // the token we authenticate with
+        .mockReturnValueOnce({ exp }); // the refreshed token: no progress
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      });
+      authenticateSpy.mockClear();
+
+      await vi.advanceTimersByTimeAsync(50000);
+
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+      expect(authenticateSpy).not.toHaveBeenCalled();
+    });
+
+    // A refreshed token that is itself inside the refresh window would schedule
+    // another refresh immediately. Re-authenticating on it spins: token endpoint
+    // flood, one identify and one socket reconnect per iteration, and 429s.
+    test("does not spin when the refreshed token is also inside the expiration window", async () => {
+      const knock = new Knock("pk_test_12345");
+      const authenticateSpy = vi.spyOn(knock, "authenticate");
+      const onUserTokenExpiring = vi
+        .fn()
+        .mockResolvedValue("token_also_near_expiry");
+
+      vi.mocked(jwtDecode)
+        // Authenticated with a token that has 5s of life left.
+        .mockReturnValueOnce({ exp: Math.floor((Date.now() + 5000) / 1000) })
+        // The refresh returns a later token, but still inside the 30s window.
+        .mockReturnValueOnce({ exp: Math.floor((Date.now() + 10000) / 1000) });
+
+      knock.authenticate("user_123", "token_abc", {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 30000,
+      });
+      authenticateSpy.mockClear();
+
+      await vi.advanceTimersByTimeAsync(60000);
+
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+      expect(authenticateSpy).not.toHaveBeenCalled();
+    });
+
+    test("keeps a single refresh timer when re-authenticating with unchanged credentials", async () => {
+      const knock = new Knock("pk_test_12345");
+      const onUserTokenExpiring = vi.fn().mockResolvedValue("token_new");
+
+      const options = {
+        onUserTokenExpiring,
+        timeBeforeExpirationInMs: 10000,
+      };
+
+      // Same credentials twice: no teardown runs, so the first timer has to be
+      // cleared explicitly or it stays live alongside the second.
+      knock.authenticate("user_123", "token_abc", options);
+      knock.authenticate("user_123", "token_abc", options);
+
+      await vi.advanceTimersByTimeAsync(60000);
+
+      expect(onUserTokenExpiring).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("Authentication with reinitialize", () => {
@@ -504,14 +841,18 @@ describe("Knock Client", () => {
     test("disconnects socket on teardown when connected", () => {
       const knock = new Knock("pk_test_12345");
 
-      // Mock the socket with correct interface
       const mockSocket = {
         isConnected: vi.fn().mockReturnValue(true),
         disconnect: vi.fn(),
       };
 
       const mockApiClient = {
-        socket: mockSocket, // Direct property, not a function
+        socket: mockSocket,
+        teardown: vi.fn(() => {
+          if (mockSocket.isConnected()) {
+            mockSocket.disconnect();
+          }
+        }),
       };
 
       knock["apiClient"] =
@@ -519,14 +860,13 @@ describe("Knock Client", () => {
 
       knock.teardown();
 
-      expect(mockSocket.isConnected).toHaveBeenCalled();
+      expect(mockApiClient.teardown).toHaveBeenCalled();
       expect(mockSocket.disconnect).toHaveBeenCalled();
     });
 
     test("handles teardown when socket is not connected", () => {
       const knock = new Knock("pk_test_12345");
 
-      // Mock the socket as not connected
       const mockSocket = {
         isConnected: vi.fn().mockReturnValue(false),
         disconnect: vi.fn(),
@@ -534,14 +874,18 @@ describe("Knock Client", () => {
 
       const mockApiClient = {
         socket: mockSocket,
+        teardown: vi.fn(() => {
+          if (mockSocket.isConnected()) {
+            mockSocket.disconnect();
+          }
+        }),
       };
 
       knock["apiClient"] =
         mockApiClient as unknown as (typeof knock)["apiClient"];
 
-      // Should not throw an error
       expect(() => knock.teardown()).not.toThrow();
-      expect(mockSocket.isConnected).toHaveBeenCalled();
+      expect(mockApiClient.teardown).toHaveBeenCalled();
       expect(mockSocket.disconnect).not.toHaveBeenCalled();
     });
   });
@@ -562,6 +906,164 @@ describe("Knock Client", () => {
       knock.authenticate("user_123", "token_456");
 
       expect(knock.isAuthenticated(true)).toBe(true);
+    });
+  });
+
+  describe("Auth state store", () => {
+    test("starts unauthenticated", () => {
+      const knock = new Knock("pk_test_12345");
+
+      expect(knock.authStatus).toBe("unauthenticated");
+      expect(knock.authStore.state).toEqual({
+        status: "unauthenticated",
+        userId: undefined,
+        userToken: undefined,
+      });
+    });
+
+    test("transitions to authenticated on authenticate()", () => {
+      const knock = new Knock("pk_test_12345");
+
+      knock.authenticate("user_123", "token_456");
+
+      expect(knock.authStatus).toBe("authenticated");
+      expect(knock.authStore.state).toEqual({
+        status: "authenticated",
+        userId: "user_123",
+        userToken: "token_456",
+      });
+    });
+
+    test("notifies subscribers on login", () => {
+      const knock = new Knock("pk_test_12345");
+      const listener = vi.fn();
+      const unsubscribe = knock.authStore.subscribe(listener);
+
+      knock.authenticate("user_123", "token_456");
+
+      expect(listener).toHaveBeenCalled();
+      expect(knock.authStore.state.status).toBe("authenticated");
+      unsubscribe();
+    });
+
+    test("keeps a stable state reference when re-authenticating with identical credentials", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const stateBefore = knock.authStore.state;
+
+      // Re-authenticating with the same credentials should not churn the store
+      // reference, so React `useStore` selectors don't re-render needlessly.
+      knock.authenticate("user_123", "token_456");
+
+      expect(knock.authStore.state).toBe(stateBefore);
+    });
+
+    test("updates the store userId on a user switch", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+      // Realize the api client so the switch takes the reinitialize path.
+      knock.client();
+
+      knock.authenticate("user_789", "token_456");
+
+      expect(knock.authStatus).toBe("authenticated");
+      expect(knock.authStore.state.userId).toBe("user_789");
+    });
+  });
+
+  describe("Logout", () => {
+    test("clears credentials and marks the instance unauthenticated", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+      expect(knock.isAuthenticated()).toBe(true);
+
+      knock.logout();
+
+      expect(knock.userId).toBeUndefined();
+      expect(knock.userToken).toBeUndefined();
+      expect(knock.isAuthenticated()).toBe(false);
+      expect(knock.authStatus).toBe("unauthenticated");
+    });
+
+    test("tears down feed instances and connections", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const teardownInstancesSpy = vi.spyOn(knock.feeds, "teardownInstances");
+      const teardownSpy = vi.spyOn(knock, "teardown");
+
+      knock.logout();
+
+      expect(teardownInstancesSpy).toHaveBeenCalled();
+      expect(teardownSpy).toHaveBeenCalled();
+    });
+
+    test("clears the token expiration timer", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
+      knock["tokenExpirationTimer"] = setTimeout(() => {}, 1000);
+
+      knock.logout();
+
+      expect(clearTimeoutSpy).toHaveBeenCalled();
+      clearTimeoutSpy.mockRestore();
+    });
+
+    test("drops the api client so a fresh one is created on next use", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const client1 = knock.client();
+      knock.logout();
+      const client2 = knock.client();
+
+      expect(client1).not.toBe(client2);
+    });
+
+    test("notifies auth-state subscribers", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      const listener = vi.fn();
+      const unsubscribe = knock.authStore.subscribe(listener);
+
+      knock.logout();
+
+      expect(listener).toHaveBeenCalled();
+      expect(knock.authStore.state.status).toBe("unauthenticated");
+      unsubscribe();
+    });
+
+    test("is safe to call when never authenticated", () => {
+      const knock = new Knock("pk_test_12345");
+
+      expect(() => knock.logout()).not.toThrow();
+      expect(knock.authStatus).toBe("unauthenticated");
+    });
+  });
+
+  describe("Logout then re-authenticate", () => {
+    test("reinitializes existing feed instances after logout", () => {
+      const knock = new Knock("pk_test_12345");
+      knock.authenticate("user_123", "token_456");
+
+      // Create a feed instance so there is real-time state to rewire.
+      knock.feeds.initialize("01234567-89ab-cdef-0123-456789abcdef");
+      expect(knock.feeds.hasInstances()).toBe(true);
+
+      knock.logout();
+
+      const reinitializeSpy = vi.spyOn(knock.feeds, "reinitializeInstances");
+
+      // Re-authenticating must rewire the surviving feed instances even though
+      // `logout()` dropped the api client.
+      knock.authenticate("user_123", "token_456");
+
+      expect(reinitializeSpy).toHaveBeenCalled();
+      expect(knock.isAuthenticated()).toBe(true);
     });
   });
 });

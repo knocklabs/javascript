@@ -3,10 +3,12 @@ import { GenericData } from "@knocklabs/types";
 import { ApiResponse } from "../../api";
 import { ChannelData, User } from "../../interfaces";
 import Knock from "../../knock";
+import { guidesApiRootPath } from "../guide/client";
 import {
   GuideEngagementEventBaseParams,
-  guidesApiRootPath,
-} from "../guide/client";
+  ResetGuideEngagementParams,
+  ResetGuideEngagementResponse,
+} from "../guide/types";
 import {
   GetPreferencesOptions,
   PreferenceOptions,
@@ -42,7 +44,7 @@ class UserClient {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
       url: `/v1/users/${this.instance.userId}`,
-      params: props,
+      data: props,
     });
 
     return this.handleResponse<User>(result);
@@ -132,11 +134,21 @@ class UserClient {
   ) {
     const result = await this.instance.client().makeRequest({
       method: "PUT",
-      url: `${guidesApiRootPath(this.instance.userId)}/messages/${params.message_id}/${status}`,
+      url: `${guidesApiRootPath(this.instance.userId)}/messages/${status}`,
       data: params,
     });
 
     return this.handleResponse<R>(result);
+  }
+
+  async resetGuideEngagement(params: ResetGuideEngagementParams) {
+    const result = await this.instance.client().makeRequest({
+      method: "PUT",
+      url: `${guidesApiRootPath(this.instance.userId)}/engagements/reset`,
+      data: params,
+    });
+
+    return this.handleResponse<ResetGuideEngagementResponse>(result);
   }
 
   private handleResponse<T>(response: ApiResponse) {

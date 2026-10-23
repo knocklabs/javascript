@@ -26,7 +26,7 @@ Note: you don't have to pre-create the tenant or connections object in Knock for
 
 ### Microsoft Teams notification configuration
 
-- `NEXT_PUBLIC_MS_TEAMS_BOT_ID`: the ID of your Microsoft Teams bot
+- `NEXT_PUBLIC_GRAPH_API_CLIENT_ID`: the client ID of your Microsoft Graph API-enabled application registered with Microsoft Entra. This should match the "Graph API client ID" setting of your Microsoft Teams channel in the Knock dashboard.
 - `NEXT_PUBLIC_KNOCK_MS_TEAMS_CHANNEL_ID`: in the Knock dashboard on the Microsoft Teams channel
 - `NEXT_PUBLIC_REDIRECT_URL`: set this to http://localhost:3000/ if running locally
 

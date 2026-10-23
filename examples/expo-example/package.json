@@ -1,28 +1,63 @@
 {
   "name": "@knocklabs/expo-example",
-  "version": "0.1.35-canary.2",
-  "main": "src/index.ts",
+  "main": "expo-router/entry",
+  "version": "1.1.14",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "format": "prettier \"src/**/*.{js,ts,tsx}\" --write",
-    "format:check": "prettier \"src/**/*.{js,ts,tsx}\" --check"
+    "lint": "expo lint"
   },
   "dependencies": {
+    "@expo/log-box": "~56.0.12",
+    "@expo/vector-icons": "^15.0.2",
     "@knocklabs/expo": "workspace:^",
-    "expo": ">=52.0.35",
-    "expo-constants": ">=17.1.5",
-    "expo-device": ">=7.0.3",
-    "expo-notifications": ">=0.29.13",
-    "expo-status-bar": "~2.0.1",
-    "react": "^18.2.0",
-    "react-native": "^0.73.4"
+    "expo": "~56.0.5",
+    "expo-blur": "~56.0.3",
+    "expo-constants": "~56.0.16",
+    "expo-device": "~56.0.4",
+    "expo-font": "~56.0.5",
+    "expo-haptics": "~56.0.3",
+    "expo-image": "~56.0.9",
+    "expo-linking": "~56.0.12",
+    "expo-notifications": "~56.0.14",
+    "expo-router": "~56.2.7",
+    "expo-splash-screen": "~56.0.7",
+    "expo-status-bar": "~56.0.4",
+    "expo-symbols": "~56.0.5",
+    "expo-system-ui": "~56.0.5",
+    "expo-web-browser": "~56.0.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-native": "^0.85.3",
+    "react-native-gesture-handler": "~2.30.0",
+    "react-native-reanimated": "~4.3.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.25.2",
+    "react-native-web": "~0.21.0",
+    "react-native-webview": "14.0.1",
+    "react-native-worklets": "~0.8.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.0",
+    "@babel/core": "^7.28.0",
+    "@types/react": "^19.3.0",
+    "eslint": "^8.56.0",
+    "eslint-config-expo": "~56.0.4",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.5",
     "typescript": "^5.8.3"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "22.17.0"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "typescript"
+      ]
+    }
+  }
 }

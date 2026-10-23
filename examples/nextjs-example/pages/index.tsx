@@ -3,10 +3,11 @@ import {
   KnockProvider,
   NotificationFeedContainer,
 } from "@knocklabs/react";
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Box, Stack } from "@telegraph/layout";
 import { Select } from "@telegraph/select";
 import { Heading, Text } from "@telegraph/typography";
+import { FileCode, Github } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import NotificationFeed from "../components/NotificationFeed";
@@ -36,12 +37,15 @@ export default function Home() {
     return json.userToken;
   }, [userId]);
 
+  if (!userId) return;
+
   return (
     <KnockProvider
-      userId={userId}
+      user={{ id: userId }}
       userToken={userToken}
       apiKey={process.env.NEXT_PUBLIC_KNOCK_PUBLIC_API_KEY!}
       host={process.env.NEXT_PUBLIC_KNOCK_HOST}
+      branch={process.env.NEXT_PUBLIC_KNOCK_BRANCH}
       onUserTokenExpiring={tokenRefreshHandler}
       timeBeforeExpirationInMs={5000}
       logLevel="debug"
@@ -103,18 +107,13 @@ export default function Home() {
             <Box
               marginTop="12"
               borderTopWidth="1"
-              bordertopcolor="gray"
+              borderTopColor="gray-5"
               paddingTop="4"
             >
               <Stack justifyContent="space-between" alignItems="center">
                 <a href="https://github.com/knocklabs/in-app-notifications-example-nextjs">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon
-                      aria-hidden={true}
-                      alt="GitHub"
-                      icon={Lucide.Github}
-                      color="gray"
-                    />
+                    <Icon aria-hidden={true} icon={Github} color="gray" />
                     <Text as="span" color="gray">
                       Github repo
                     </Text>
@@ -122,12 +121,7 @@ export default function Home() {
                 </a>
                 <a href="https://docs.knock.app/in-app-ui/react/overview">
                   <Stack direction="row" alignItems="center" gap="1">
-                    <Icon
-                      aria-hidden={true}
-                      alt="GitHub"
-                      icon={Lucide.FileCode}
-                      color="gray"
-                    />
+                    <Icon aria-hidden={true} icon={FileCode} color="gray" />
                     <Text as="span" color="gray">
                       Documentation
                     </Text>

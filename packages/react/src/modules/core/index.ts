@@ -7,3 +7,4 @@ export {
 } from "./components/Icons";
 export { Spinner, type SpinnerProps } from "./components/Spinner";
 export { useOnBottomScroll } from "./hooks";
+export { checkForWindow } from "./utils";

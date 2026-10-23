@@ -1,5 +1,829 @@
 # Changelog
 
+## 0.14.0
+
+### Minor Changes
+
+- 33f3365: Skip quarters in feed timestamp formatting: timestamps for dates 3-12 months old now show "X months ago" instead of "X quarters ago". Added optional `formatTimestamp` prop to `NotificationCell` and `NotificationFeed` for custom timestamp formatting.
+
+### Patch Changes
+
+- 62205a1: Stop `sortByDisplayName` from reordering the array it is given
+
+  The MS Teams comboboxes sorted their teams and channels in place. `useMsTeamsChannels` returns a reference straight into SWR's cache, so rendering `MsTeamsChannelInTeamCombobox` reordered the cached array for every other reader of that key, including apps calling the hook themselves. The helper now copies before sorting, matching its Slack counterpart.
+
+- 62205a1: Pin every `@telegraph/*` dependency to a caret range at its latest release
+
+  These were open `>=` ranges, so an install resolved to whatever was newest on npm rather than a version this package had been built against. In practice that already meant `@telegraph/combobox` 0.6.0, a rewrite onto Base UI, so the three comboboxes are now tested and pinned against it rather than receiving it by accident.
+
+  `@telegraph/select` was a second route to the same problem: it sat on 0.1.0, which pins `@telegraph/combobox` at 0.5.0, so consumers received two copies of the combobox. Moving it to 0.2.0 leaves one.
+
+- 62205a1: Name the Slack channel combobox trigger without changing what it renders
+
+  The trigger announced the raw Slack channel id, because an option's accessible name is derived from its children and these render an icon beside the name. The component now passes its own `aria-label`, which the trigger spreads over the one it derives, so the channel icon and the layout stay exactly as they were.
+
+- Updated dependencies [1bbf12e]
+- Updated dependencies [33f3365]
+  - @knocklabs/react-core@0.16.0
+
+## 0.13.2
+
+### Patch Changes
+
+- Updated dependencies [e7f7a4f]
+- Updated dependencies [696cbac]
+- Updated dependencies [90a95d1]
+  - @knocklabs/client@0.22.2
+  - @knocklabs/react-core@0.15.2
+
+## 0.13.1
+
+### Patch Changes
+
+- eb174b2: chore(deps): bump @telegraph/layout from 0.6.0 to 0.6.1 in the telegraph-packages group
+- 9b5f244: fix(KNO-14505): prevent guide engagement API failures from becoming unhandled promise rejections
+
+  Guide seen, interacted, and archived events continue to update local state optimistically while failed background requests are caught and logged.
+
+- 9dddaf7: chore(deps): bump the telegraph-packages group to the latest minor releases
+- Updated dependencies [9b5f244]
+  - @knocklabs/client@0.22.1
+  - @knocklabs/react-core@0.15.1
+
+## 0.13.0
+
+### Minor Changes
+
+- 7e3ee26: Drop React 16 support
+
+  `@knocklabs/react` and `@knocklabs/react-core` now compile with React's
+  automatic JSX runtime, so their published output imports `react/jsx-runtime`.
+  That entry point only exists in React 17 and later, so the `react` and
+  `react-dom` peer ranges narrow from `^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`
+  to `^17.0.0 || ^18.0.0 || ^19.0.0`.
+
+  If you are on React 16, stay on the previous release. Everyone on React 17+ can
+  upgrade with no code changes.
+
+  This comes out of the move to Vite 8, which compiles JSX with oxc before Babel
+  runs, making the previous classic-runtime setup (`jsxRuntime: "classic"` plus
+  `babel-plugin-react-require`) unworkable.
+
+### Patch Changes
+
+- 6bba994: chore(deps): bump the telegraph-packages group with 5 updates
+- Updated dependencies [7e3ee26]
+  - @knocklabs/react-core@0.15.0
+
+## 0.12.1
+
+### Patch Changes
+
+- 559ddf1: fix(KNO-14012): guide toolbar no longer requires importing `@knocklabs/react/dist/index.css`
+
+  The guide toolbar previously rendered unstyled (or with frankenstein styling) unless the consuming app imported `@knocklabs/react/dist/index.css`. Apps that only render custom guide components have no reason to import that stylesheet, so the toolbar broke for them. The toolbar now injects its compiled styles into the document head at runtime when it becomes visible, making it plug and play without an explicit CSS import. When `dist/index.css` is imported anyway, the injected rules are identical duplicates and have no effect.
+
+## 0.12.0
+
+### Minor Changes
+
+- e8567eb: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- e8567eb: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+  - @knocklabs/client@0.22.0
+  - @knocklabs/react-core@0.14.0
+
+## 0.12.0-rc.0
+
+### Minor Changes
+
+- d2f7948: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- d2f7948: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+  - @knocklabs/client@0.22.0-rc.0
+  - @knocklabs/react-core@0.14.0-rc.0
+
+## 0.11.24
+
+### Patch Changes
+
+- Updated dependencies [3d7a041]
+  - @knocklabs/client@0.21.15
+  - @knocklabs/react-core@0.13.16
+
+## 0.11.23
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 70e7669: Handle missing `features` in feed settings responses to prevent crashes on partial API responses.
+- 3dd0aa8: Remove the `clsx` and `lodash.debounce` dependencies. Guide components compose `className` with a small internal `cx` helper, and an internal trailing-edge debounce replaces `lodash.debounce`.
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+  - @knocklabs/react-core@0.13.15
+
+## 0.11.22
+
+### Patch Changes
+
+- Updated dependencies [e6ac8cc]
+- Updated dependencies [454f947]
+- Updated dependencies [abac967]
+  - @knocklabs/react-core@0.13.14
+  - @knocklabs/client@0.21.13
+
+## 0.11.21
+
+### Patch Changes
+
+- 06367bf: chore(deps): bump the telegraph-packages group with 2 updates
+- ffa7bd2: [Guide] Remove guide toolbar v1 support
+- Updated dependencies [ffa7bd2]
+  - @knocklabs/react-core@0.13.13
+  - @knocklabs/client@0.21.12
+
+## 0.11.20
+
+### Patch Changes
+
+- a04781b: [Guides] Rename stage results keys to `byKey` and `byType`
+- Updated dependencies [a04781b]
+  - @knocklabs/client@0.21.11
+  - @knocklabs/react-core@0.13.12
+
+## 0.11.19
+
+### Patch Changes
+
+- e474413: [Guide] Skip re-rendering in transient state in guide toolbar
+- 9d81dc2: [Guide] Add hotkey support for moving focus in guide toolbar
+
+## 0.11.18
+
+### Patch Changes
+
+- c22289c: chore(deps): bump the telegraph-packages group with 5 updates
+
+## 0.11.17
+
+### Patch Changes
+
+- ee35de2: [Guides] Only re-subscribe per listenForUpdates when exiting debugging in guide toolbar v2
+- Updated dependencies [ee35de2]
+  - @knocklabs/react-core@0.13.11
+  - @knocklabs/client@0.21.10
+
+## 0.11.16
+
+### Patch Changes
+
+- 5d54e48: Update `@telegraph/*` dependencies to use `>=current_version` ranges instead of `^` (caret) ranges. This ensures that any version of a `@telegraph/*` package installed by a downstream project will satisfy `@knocklabs/react`'s dependency range, preventing Yarn from installing duplicate copies of Telegraph packages.
+- Updated dependencies [e4fe593]
+  - @knocklabs/client@0.21.9
+  - @knocklabs/react-core@0.13.10
+
+## 0.11.15
+
+### Patch Changes
+
+- 4863fe5: [Slack] Add support for nonce verification in slack auth
+- Updated dependencies [4863fe5]
+  - @knocklabs/react-core@0.13.9
+
+## 0.11.14
+
+### Patch Changes
+
+- d3587a6: chore: update @telegraph packages to latest versions
+- 014eecc: Wire up @telegraph/style-engine PostCSS plugin in the Vite config and remove the manual @import workaround for @telegraph/toggle CSS.
+
+## 0.11.13
+
+### Patch Changes
+
+- af81cf2: [Guides] Add a Open in dashboard button to guide toolbar v2
+- 31dffc1: [Guides] Use `readyToTarget` to coordinate fetching guides in guide toolbar v2
+- 2798bbb: [Guides] Add reset engagement button in guide toolbar v2
+- 474120d: [Guides] Remove local storage persistence of guide toolbar v2 run config
+- 8137b4d: [Guides] Address more polish + feedback items in guide toolbar v2
+- Updated dependencies [af81cf2]
+- Updated dependencies [31dffc1]
+- Updated dependencies [2798bbb]
+  - @knocklabs/client@0.21.8
+  - @knocklabs/react-core@0.13.8
+
+## 0.11.12
+
+### Patch Changes
+
+- 82c646d: [Guides] Improve tooltips in guide toolbar v2 in various places
+- e060fcb: [Guides] Change filter options to (All,Active,Eligible) in guide toolbar v2
+- 6931347: [Guides] Add FocusChin to highlight focus mode w/ dedicated controls
+- 79155de: [guides] handle better errors for focused guide key param in toolbar v2
+- 6f079ff: [Guides] Move the guide toolbar v2 setting UIs into the expandable area
+- e6dc9af: [guides] Add a hotkey to toggle toolbar v2 expanded/collapsed
+- Updated dependencies [6d3c9e2]
+  - @knocklabs/client@0.21.7
+  - @knocklabs/react-core@0.13.7
+
+## 0.11.11
+
+### Patch Changes
+
+- Updated dependencies [afae7ce]
+  - @knocklabs/client@0.21.6
+  - @knocklabs/react-core@0.13.6
+
+## 0.11.10
+
+### Patch Changes
+
+- 4cc5bac: chore(deps): bump the telegraph-packages group with 8 updates
+
+## 0.11.9
+
+### Patch Changes
+
+- 766e5c1: chore(deps): bump the telegraph-packages group with 7 updates
+- Updated dependencies [c5babb3]
+  - @knocklabs/client@0.21.5
+  - @knocklabs/react-core@0.13.5
+
+## 0.11.8
+
+### Patch Changes
+
+- 9e8e3ae: [guides] default to v2 toolbar in KnockGuideProvider
+
+## 0.11.7
+
+### Patch Changes
+
+- 838b1fd: [guides] designs update for guide toolbar v2
+
+## 0.11.6
+
+### Patch Changes
+
+- c134f53: [guides] read and write toolbar run config via local stroage
+- ddb24b4: [guides] add support for focused_guide_key param in toolbar run config
+- Updated dependencies [c134f53]
+  - @knocklabs/client@0.21.4
+  - @knocklabs/react-core@0.13.4
+
+## 0.11.5
+
+### Patch Changes
+
+- 1ed4f75: [Guides] Add additional debug settings to guide client, and improvements to the guide toolbar V2
+
+  - Add `focusedGuideKeys` debug setting to pin a target guide during preview
+  - Add `ignoreDisplayInterval` debug setting to ignore throttling during preview
+  - Add `skipEngagementTracking` debug setting to skip sending engagement updates to the API during preview
+  - Add control UIs to the guide toolbar V2 for the newly added debug settings
+  - Add a drag handle to the guide toolbar for drag and drop
+
+- Updated dependencies [1ed4f75]
+  - @knocklabs/client@0.21.3
+  - @knocklabs/react-core@0.13.3
+
+## 0.11.4
+
+### Patch Changes
+
+- 4dbf94e: chore: upgrade telegraph dependencies to their latest versions
+
+## 0.11.3
+
+### Patch Changes
+
+- f26dffa: fix: add missing @telegraph/select package to @knocklabs/react
+
+## 0.11.2
+
+### Patch Changes
+
+- b7b3708: [guides] add guide toolbar v2 poc
+- Updated dependencies [cb7148b]
+- Updated dependencies [04a8f16]
+- Updated dependencies [b7b3708]
+  - @knocklabs/client@0.21.2
+  - @knocklabs/react-core@0.13.2
+
+## 0.11.1
+
+### Patch Changes
+
+- 7f8bdfe: Add accessible labels to `UnseenBadge` so screen readers announce the count with context (e.g. "3 unseen notifications") instead of just the bare number
+- Updated dependencies [ddd7981]
+- Updated dependencies [7f8bdfe]
+  - @knocklabs/client@0.21.1
+  - @knocklabs/react-core@0.13.1
+
+## 0.11.0
+
+### Minor Changes
+
+- 2af3f5e: Initialize feeds in `"compact"` mode by default
+
+  The feed client can now be initialized with a `mode` option, set to either `"compact"` or `"rich"`. When `mode` is `"compact"`, the following restrictions will apply when the feed is fetched:
+
+  - The `activities` and `total_activities` fields will _not_ be present on feed items
+  - The `data` field will _not_ include nested arrays and objects
+  - The `actors` field will only have up to one actor
+
+  **By default, feeds are initialized in `"compact"` mode. If you need to access `activities`, `total_activities`, the complete `data`, or the complete array of `actors`, you must initialize your feed in `"rich"` mode.**
+
+  If you are using the feed client via `@knocklabs/client` directly:
+
+  ```js
+  const knockFeed = knockClient.feeds.initialize(
+    process.env.KNOCK_FEED_CHANNEL_ID,
+    { mode: "rich" },
+  );
+  ```
+
+  If you are using `<KnockFeedProvider>` via `@knocklabs/react`, `@knocklabs/react-native`, or `@knocklabs/expo`:
+
+  ```tsx
+  <KnockFeedProvider
+    feedId={process.env.KNOCK_FEED_CHANNEL_ID}
+    defaultFeedOptions={{ mode: "rich" }}
+  />
+  ```
+
+  If you are using the `useNotifications` hook via `@knocklabs/react-core`:
+
+  ```js
+  const feedClient = useNotifications(
+    knockClient,
+    process.env.KNOCK_FEED_CHANNEL_ID,
+    { mode: "rich" },
+  );
+  ```
+
+### Patch Changes
+
+- Updated dependencies [2af3f5e]
+  - @knocklabs/client@0.21.0
+  - @knocklabs/react-core@0.13.0
+
+## 0.10.5
+
+### Patch Changes
+
+- Updated dependencies [1c486d3]
+  - @knocklabs/client@0.20.4
+  - @knocklabs/react-core@0.12.5
+
+## 0.10.4
+
+### Patch Changes
+
+- f9aca69: fix: poll to check if OAuth connection succeeded in case popup communication fails during Slack and Microsoft Teams auth flows
+- Updated dependencies [f9aca69]
+  - @knocklabs/react-core@0.12.4
+
+## 0.10.3
+
+### Patch Changes
+
+- Updated dependencies [cf04e5f]
+  - @knocklabs/client@0.20.3
+  - @knocklabs/react-core@0.12.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies [09c11a3]
+  - @knocklabs/client@0.20.2
+  - @knocklabs/react-core@0.12.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [01d07af]
+  - @knocklabs/client@0.20.1
+  - @knocklabs/react-core@0.12.1
+
+## 0.10.0
+
+### Minor Changes
+
+- f0c892f: [guides] update selectGuides and useGuides to be subject to throttling by default
+
+### Patch Changes
+
+- Updated dependencies [2d29ebf]
+  - @knocklabs/react-core@0.12.0
+  - @knocklabs/client@0.20.0
+
+## 0.9.5
+
+### Patch Changes
+
+- Updated dependencies [a56bf70]
+  - @knocklabs/client@0.19.4
+  - @knocklabs/react-core@0.11.4
+
+## 0.9.5
+
+### Patch Changes
+
+- 96cfa22: Update Next.js devDependency from 15.3.3 to 15.3.6
+
+## 0.9.4
+
+### Patch Changes
+
+- f4529cc: Enable use of SlackKit with branches
+
+  The `useSlackAuth` hook exported by `@knocklabs/react-core` has been updated so
+  that it works with branches. You can now use either this hook or the
+  `<SlackAuthButton>` component exported by `@knocklabs/react` to test connecting
+  Slack workspaces to Knock tenants while working on a branch.
+
+- f278892: Enable use of TeamsKit with branches
+
+  The `useMsTeamsAuth` hook exported by `@knocklabs/react-core` has been updated
+  so that it works with branches. You can now use either this hook or the
+  `<MsTeamsAuthButton>` component exported by `@knocklabs/react` to test
+  connecting Microsoft Teams organizations to Knock tenants while working on a
+  branch.
+
+- Updated dependencies [571abb1]
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+- Updated dependencies [571abb1]
+- Updated dependencies [571abb1]
+  - @knocklabs/react-core@0.11.3
+  - @knocklabs/client@0.19.3
+
+## 0.9.3
+
+### Patch Changes
+
+- 79d7608: [guide] add KnockGuideLocationSensor helper component for Tanstack Router
+
+## 0.9.2
+
+### Patch Changes
+
+- 1e538b9: [guide] add a secondary entry point for nextjs specific helpers for guide location detection
+- Updated dependencies [1e538b9]
+  - @knocklabs/client@0.19.2
+  - @knocklabs/react-core@0.11.2
+
+## 0.9.1
+
+### Patch Changes
+
+- c4e67da: revert 4b888c4 to remove nextjs helper components and fix module resolution error
+- Updated dependencies [c4e67da]
+  - @knocklabs/client@0.19.1
+  - @knocklabs/react-core@0.11.1
+
+## 0.9.0
+
+### Minor Changes
+
+- 40d8e8a: Added renderLoading prop to NotificationFeed, allowing for custom loading components
+
+### Patch Changes
+
+- 4b888c4: [guides] add dedicated nextjs helper components for detecting location changes
+- Updated dependencies [be65601]
+- Updated dependencies [4b888c4]
+  - @knocklabs/react-core@0.11.0
+  - @knocklabs/client@0.19.0
+
+## 0.8.11
+
+### Patch Changes
+
+- 3d8df10: fix: utilize telegraph lucide-react instance so versions are synced
+
+## 0.8.10
+
+### Patch Changes
+
+- 7da00f8: chore(deps): bump the telegraph-packages group with 2 updates
+- Updated dependencies [56ab8c0]
+  - @knocklabs/client@0.18.7
+  - @knocklabs/react-core@0.10.7
+
+## 0.8.9
+
+### Patch Changes
+
+- Updated dependencies [49df373]
+  - @knocklabs/client@0.18.6
+  - @knocklabs/react-core@0.10.6
+
+## 0.8.8
+
+### Patch Changes
+
+- bf7677a: feat: persist guide debug state in local storage
+- Updated dependencies [bf7677a]
+- Updated dependencies [9eba682]
+  - @knocklabs/client@0.18.5
+  - @knocklabs/react-core@0.10.5
+
+## 0.8.7
+
+### Patch Changes
+
+- Updated dependencies [c64098e]
+  - @knocklabs/client@0.18.4
+  - @knocklabs/react-core@0.10.4
+
+## 0.8.6
+
+### Patch Changes
+
+- Updated dependencies [9f0d317]
+  - @knocklabs/client@0.18.3
+  - @knocklabs/react-core@0.10.3
+
+## 0.8.5
+
+### Patch Changes
+
+- Updated dependencies [1fc802b]
+  - @knocklabs/client@0.18.2
+  - @knocklabs/react-core@0.10.2
+
+## 0.8.4
+
+### Patch Changes
+
+- 74366b3: export useStore from react-core to include in use client directive
+- Updated dependencies [74366b3]
+  - @knocklabs/react-core@0.10.1
+  - @knocklabs/client@0.18.1
+
+## 0.8.3
+
+### Patch Changes
+
+- Updated dependencies [5fc0af9]
+  - @knocklabs/react-core@0.10.0
+  - @knocklabs/client@0.18.0
+
+## 0.8.2
+
+### Patch Changes
+
+- 00d3f8c: chore(deps): bump the telegraph-packages group with 2 updates
+- Updated dependencies [23b7057]
+- Updated dependencies [1c24f68]
+  - @knocklabs/client@0.17.2
+  - @knocklabs/react-core@0.9.2
+
+## 0.8.1
+
+### Patch Changes
+
+- 5b77f18: fix: increase z-index of guide toolbar
+- Updated dependencies [5b77f18]
+  - @knocklabs/client@0.17.1
+  - @knocklabs/react-core@0.9.1
+
+## 0.8.0
+
+### Minor Changes
+
+- c761e7c: feat: support live previewing guides content
+- b8b64e4: feat(beta): add support for basic guide debugging
+
+### Patch Changes
+
+- 3558784: add support for activation url rules in guide client
+- 7fb9334: chore(deps): bump lucide-react from 0.539.0 to 0.541.0
+- Updated dependencies [c761e7c]
+- Updated dependencies [3558784]
+- Updated dependencies [b8b64e4]
+  - @knocklabs/client@0.17.0
+  - @knocklabs/react-core@0.9.0
+
+## 0.7.34
+
+### Patch Changes
+
+- Updated dependencies [dc84f25]
+  - @knocklabs/client@0.16.5
+  - @knocklabs/react-core@0.8.5
+
+## 0.7.33
+
+### Patch Changes
+
+- Updated dependencies [49f791b]
+  - @knocklabs/client@0.16.4
+  - @knocklabs/react-core@0.8.4
+
+## 0.7.32
+
+### Patch Changes
+
+- aadfd6f: chore(deps): bump the telegraph-packages group with 4 updates
+- 4aa17ab: chore(deps): bump the telegraph-packages group with 2 updates
+
+## 0.7.31
+
+### Patch Changes
+
+- 79204f0: fix: export useGuides hook to react package
+- Updated dependencies [79204f0]
+  - @knocklabs/react-core@0.8.3
+  - @knocklabs/client@0.16.3
+
+## 0.7.30
+
+### Patch Changes
+
+- Updated dependencies [5a19d82]
+  - @knocklabs/client@0.16.2
+  - @knocklabs/react-core@0.8.2
+
+## 0.7.29
+
+### Patch Changes
+
+- Updated dependencies [35b5445]
+- Updated dependencies [5d758d7]
+- Updated dependencies [d2fd092]
+  - @knocklabs/client@0.16.1
+  - @knocklabs/react-core@0.8.1
+
+## 0.7.28
+
+### Patch Changes
+
+- Updated dependencies [48e9c77]
+  - @knocklabs/react-core@0.8.0
+  - @knocklabs/client@0.16.0
+
+## 0.7.27
+
+### Patch Changes
+
+- Updated dependencies [fb68ce1]
+- Updated dependencies [d7e5371]
+  - @knocklabs/client@0.15.2
+  - @knocklabs/react-core@0.7.5
+
+## 0.7.26
+
+### Patch Changes
+
+- 001690a: Rename `msTeamsBotId` prop of `<MsTeamsAuthButton>` component to `graphApiClientId`
+- Updated dependencies [001690a]
+  - @knocklabs/react-core@0.7.4
+
+## 0.7.25
+
+### Patch Changes
+
+- Updated dependencies [c3efcf9]
+- Updated dependencies [befd7b9]
+  - @knocklabs/react-core@0.7.3
+  - @knocklabs/client@0.15.1
+
+## 0.7.24
+
+### Patch Changes
+
+- cbb2aa0: bump telegraph packages to latest
+- a475157: chore(deps): bump the telegraph packages
+
+## 0.7.23
+
+### Patch Changes
+
+- 3703cf6: feat: adds `usePreferences` hook for fetching and updating user preferences in react apps.
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [3703cf6]
+- Updated dependencies [fdc6d82]
+  - @knocklabs/react-core@0.7.2
+
+## 0.7.22
+
+### Patch Changes
+
+- Updated dependencies [aa16c97]
+  - @knocklabs/react-core@0.7.1
+
+## 0.7.21
+
+### Patch Changes
+
+- 60c383c: fix: prevent popover from reopening when clicking notification icon button
+
+## 0.7.20
+
+### Patch Changes
+
+- Updated dependencies [2a0b3e2]
+  - @knocklabs/react-core@0.7.0
+  - @knocklabs/client@0.15.0
+
+## 0.7.19
+
+### Patch Changes
+
+- 325f2ac: chore: upgrade telegraph deps + migrate telegraph icons to updated strategy
+
+  We changed how we import icons from `lucide-react` so that the package is treeshaken properly. This means that when utilizing knock packages, you won't need to worry about having extra `lucide-react` icons in your bundle.
+
+## 0.7.18
+
+### Patch Changes
+
+- ec704d1: upgrade telegraph dependencies to remove legacy vanilla extract style engine
+
+## 0.7.17
+
+### Patch Changes
+
+- Updated dependencies [6539c97]
+  - @knocklabs/client@0.14.11
+  - @knocklabs/react-core@0.6.15
+
+## 0.7.16
+
+### Patch Changes
+
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+  - @knocklabs/react-core@0.6.14
+  - @knocklabs/client@0.14.10
+
 ## 0.7.16-canary.2
 
 ### Patch Changes

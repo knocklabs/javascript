@@ -2,6 +2,7 @@ import { FeedItem, NetworkStatus, isRequestInFlight } from "@knocklabs/client";
 import {
   ColorMode,
   FilterStatus,
+  type TimestampFormatter,
   useFeedSettings,
   useKnockFeed,
   useTranslations,
@@ -30,9 +31,16 @@ export type RenderItemProps<T = GenericData> = {
   item: FeedItem<T>;
   onItemClick?: NotificationCellProps["onItemClick"];
   onButtonClick?: NotificationCellProps["onButtonClick"];
+  formatTimestamp?: TimestampFormatter;
 };
 
 export type RenderItem = (props: RenderItemProps) => ReactNode;
+
+export type RenderLoadingProps = {
+  colorMode: ColorMode;
+};
+
+export type RenderLoading = (props: RenderLoadingProps) => ReactNode;
 
 export interface NotificationFeedProps {
   EmptyComponent?: ReactNode;
@@ -46,6 +54,9 @@ export interface NotificationFeedProps {
   onNotificationButtonClick?: NotificationCellProps["onButtonClick"];
   onMarkAllAsReadClick?: (e: React.MouseEvent, unreadItems: FeedItem[]) => void;
   initialFilterStatus?: FilterStatus;
+  renderLoading?: RenderLoading;
+  // Custom timestamp formatter. If not provided, uses the default formatTimestamp.
+  formatTimestamp?: TimestampFormatter;
 }
 
 const defaultRenderItem = (props: RenderItemProps) => (
@@ -56,7 +67,7 @@ const defaultRenderHeader = (props: NotificationFeedHeaderProps) => (
   <NotificationFeedHeader {...props} />
 );
 
-const LoadingSpinner = ({ colorMode }: { colorMode: ColorMode }) => (
+const defaultRenderLoading = ({ colorMode }: RenderLoadingProps) => (
   <div className="rnf-notification-feed__spinner-container">
     <Spinner
       thickness={3}
@@ -78,6 +89,8 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
   initialFilterStatus = FilterStatus.All,
   header,
   renderHeader = defaultRenderHeader,
+  renderLoading = defaultRenderLoading,
+  formatTimestamp,
 }) => {
   const [status, setStatus] = useState(initialFilterStatus);
   const { feedClient, useFeedStore, colorMode } = useKnockFeed();
@@ -126,9 +139,8 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         })}
 
       <div className="rnf-notification-feed__container" ref={containerRef}>
-        {networkStatus === NetworkStatus.loading && (
-          <LoadingSpinner colorMode={colorMode} />
-        )}
+        {networkStatus === NetworkStatus.loading &&
+          renderLoading({ colorMode })}
 
         <div className="rnf-notification-feed__feed-items-container">
           {networkStatus !== NetworkStatus.loading &&
@@ -137,18 +149,18 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
                 item,
                 onItemClick: onNotificationClick,
                 onButtonClick: onNotificationButtonClick,
+                formatTimestamp,
               }),
             )}
         </div>
 
-        {networkStatus === NetworkStatus.fetchMore && (
-          <LoadingSpinner colorMode={colorMode} />
-        )}
+        {networkStatus === NetworkStatus.fetchMore &&
+          renderLoading({ colorMode })}
 
         {!requestInFlight && noItems && EmptyComponent}
       </div>
 
-      {settings?.features.branding_required && (
+      {settings?.features?.branding_required && (
         <div className="rnf-notification-feed__knock-branding">
           <a href={poweredByKnockUrl} target="_blank">
             {t("poweredBy") || "Powered by Knock"}

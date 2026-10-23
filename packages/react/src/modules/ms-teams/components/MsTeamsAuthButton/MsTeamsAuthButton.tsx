@@ -1,10 +1,12 @@
 import {
+  useAuthPolling,
+  useAuthPostMessageListener,
   useKnockClient,
   useKnockMsTeamsClient,
   useMsTeamsAuth,
   useTranslations,
 } from "@knocklabs/react-core";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, useCallback } from "react";
 
 import { openPopupWindow } from "../../../core/utils";
 import "../../theme.css";
@@ -12,17 +14,33 @@ import { MsTeamsIcon } from "../MsTeamsIcon";
 
 import "./styles.css";
 
-export interface MsTeamsAuthButtonProps {
-  msTeamsBotId: string;
+export type MsTeamsAuthButtonProps = {
   redirectUrl?: string;
   onAuthenticationComplete?: (authenticationResp: string) => void;
-}
+} & (
+  | {
+      /**
+       * The client ID of your Microsoft Graph API-enabled application registered with Microsoft Entra. This should
+       * match the "Graph API client ID" setting of your Microsoft Teams channel in the Knock dashboard.
+       */
+      graphApiClientId: string;
+    }
+  | {
+      /**
+       * @deprecated Use `graphApiClientId` instead. This field will be removed in a future release.
+       */
+      msTeamsBotId: string;
+    }
+);
 
 export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
-  msTeamsBotId,
   redirectUrl,
   onAuthenticationComplete,
+  ...props
 }) => {
+  const graphApiClientId =
+    "graphApiClientId" in props ? props.graphApiClientId : props.msTeamsBotId;
+
   const { t } = useTranslations();
   const knock = useKnockClient();
 
@@ -32,41 +50,34 @@ export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
     setActionLabel,
     actionLabel,
     errorLabel,
+    tenantId,
+    knockMsTeamsChannelId,
+    popupWindowRef,
   } = useKnockMsTeamsClient();
 
   const { buildMsTeamsAuthUrl, disconnectFromMsTeams } = useMsTeamsAuth(
-    msTeamsBotId,
+    graphApiClientId,
     redirectUrl,
   );
 
-  useEffect(() => {
-    const receiveMessage = (event: MessageEvent) => {
-      if (event.origin !== knock.host) {
-        return;
-      }
+  useAuthPostMessageListener({
+    knockHost: knock.host,
+    popupWindowRef,
+    setConnectionStatus,
+    onAuthenticationComplete,
+  });
 
-      try {
-        if (event.data === "authComplete") {
-          setConnectionStatus("connected");
-        }
-
-        if (event.data === "authFailed") {
-          setConnectionStatus("error");
-        }
-
-        onAuthenticationComplete?.(event.data);
-      } catch (_error) {
-        setConnectionStatus("error");
-      }
-    };
-
-    window.addEventListener("message", receiveMessage, false);
-
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      window.removeEventListener("message", receiveMessage);
-    };
-  }, [knock.host, onAuthenticationComplete, setConnectionStatus]);
+  useAuthPolling({
+    popupWindowRef,
+    setConnectionStatus,
+    onAuthenticationComplete,
+    authCheckFn: useCallback(async () => {
+      return knock.msTeams.authCheck({
+        tenant: tenantId,
+        knockChannelId: knockMsTeamsChannelId,
+      });
+    }, [knock.msTeams, tenantId, knockMsTeamsChannelId]),
+  });
 
   const disconnectLabel = t("msTeamsDisconnect") || null;
   const reconnectLabel = t("msTeamsReconnect") || null;
@@ -92,7 +103,11 @@ export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
   if (connectionStatus === "error") {
     return (
       <button
-        onClick={() => openPopupWindow(buildMsTeamsAuthUrl())}
+        onClick={() => {
+          const popup = openPopupWindow(buildMsTeamsAuthUrl());
+          popupWindowRef.current = popup;
+          setConnectionStatus("connecting");
+        }}
         className="rtk-connect__button rtk-connect__button--error"
         onMouseEnter={() => setActionLabel(reconnectLabel)}
         onMouseLeave={() => setActionLabel(null)}
@@ -109,7 +124,11 @@ export const MsTeamsAuthButton: FunctionComponent<MsTeamsAuthButtonProps> = ({
   if (connectionStatus === "disconnected") {
     return (
       <button
-        onClick={() => openPopupWindow(buildMsTeamsAuthUrl())}
+        onClick={() => {
+          const popup = openPopupWindow(buildMsTeamsAuthUrl());
+          popupWindowRef.current = popup;
+          setConnectionStatus("connecting");
+        }}
         className="rtk-connect__button rtk-connect__button--disconnected"
       >
         <MsTeamsIcon height="16px" width="16px" />

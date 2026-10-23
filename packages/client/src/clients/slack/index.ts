@@ -13,6 +13,16 @@ class SlackClient {
   }
 
   async authCheck({ tenant, knockChannelId }: AuthCheckInput) {
+    // Without a user we can't check a tenant's connection. Return a "not
+    // connected" shape (never an error) so status hooks land on "disconnected"
+    // rather than firing a request to `/v1/providers/slack/.../auth_check`.
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[Slack] User is not authenticated, skipping authCheck",
+      );
+      return { connection: { ok: false } };
+    }
+
     const result = await this.instance.client().makeRequest({
       method: "GET",
       url: `/v1/providers/slack/${knockChannelId}/auth_check`,
@@ -31,6 +41,13 @@ class SlackClient {
   async getChannels(
     input: GetSlackChannelsInput,
   ): Promise<GetSlackChannelsResponse> {
+    if (!this.instance.isAuthenticated()) {
+      this.instance.log(
+        "[Slack] User is not authenticated, skipping getChannels",
+      );
+      return { slack_channels: [], next_cursor: null };
+    }
+
     const { knockChannelId, tenant } = input;
     const queryOptions = input.queryOptions || {};
 

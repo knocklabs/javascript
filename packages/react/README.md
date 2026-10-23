@@ -73,6 +73,23 @@ const YourAppLayout = () => {
 };
 ```
 
+## Deferring activity with `enabled`
+
+`KnockProvider` takes an `enabled` prop (default `true`). When it's `false`, the provider still renders its children but the Knock client sits idle: it doesn't identify the user, make any API requests, or open a websocket. Set it back to `true` and it connects like a login; set it to `false` again and it disconnects and clears its data like a logout.
+
+This is the recommended way to gate the provider on a complete identity — for example an enhanced-security user token that loads asynchronously — instead of conditionally mounting `KnockProvider`:
+
+```jsx
+<KnockProvider
+  apiKey={process.env.KNOCK_PUBLIC_API_KEY}
+  user={{ id: userId }}
+  userToken={userToken}
+  enabled={Boolean(userId && userToken)}
+>
+  {/* ... */}
+</KnockProvider>
+```
+
 ## Headless usage
 
 Alternatively, if you don't want to use our components you can render the feed in a headless mode using our hooks:

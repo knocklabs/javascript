@@ -154,7 +154,7 @@ export default function Providers({
     <>
       <KnockProvider
         apiKey={process.env.NEXT_PUBLIC_KNOCK_CLIENT_ID!}
-        userId={knockUserId}
+        user={{ id: knockUserId }}
         host={process.env.NEXT_PUBLIC_KNOCK_API_URL}
         userToken={userToken}
       >

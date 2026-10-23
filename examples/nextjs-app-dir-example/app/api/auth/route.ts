@@ -1,8 +1,8 @@
 import { signUserToken } from "@knocklabs/node/lib/tokenSigner";
 import { v4 as uuidv4 } from "uuid";
 
-export const GET = async (request) => {
-  const { id } = request.query;
+export const GET = async (request: Request) => {
+  const { id } = await request.json();
   const userId = (id as string) || uuidv4();
 
   try {

@@ -102,7 +102,7 @@ describe("User Client", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
           url: "/v1/users/user_123",
-          params: props,
+          data: props,
         });
         expect(result).toEqual(updatedUser);
       });
@@ -137,7 +137,7 @@ describe("User Client", () => {
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
           url: "/v1/users/user_123",
-          params: comprehensiveProps,
+          data: comprehensiveProps,
         });
       });
 
@@ -199,11 +199,19 @@ describe("User Client", () => {
         in_app_feed: true,
         email: false,
       },
+      channels: {
+        "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+        "ce475f4f-261c-43de-8016-143ecc900ea9": false,
+      },
       workflows: {
         onboarding: {
           channel_types: {
             in_app_feed: true,
             email: false,
+          },
+          channels: {
+            "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+            "ce475f4f-261c-43de-8016-143ecc900ea9": false,
           },
         },
       },
@@ -212,6 +220,10 @@ describe("User Client", () => {
           channel_types: {
             in_app_feed: true,
             email: false,
+          },
+          channels: {
+            "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+            "ce475f4f-261c-43de-8016-143ecc900ea9": false,
           },
         },
       },
@@ -286,11 +298,19 @@ describe("User Client", () => {
             in_app_feed: true,
             email: false,
           },
+          channels: {
+            "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+            "ce475f4f-261c-43de-8016-143ecc900ea9": false,
+          },
           workflows: {
             onboarding: {
               channel_types: {
                 in_app_feed: false,
                 email: true,
+              },
+              channels: {
+                "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+                "ce475f4f-261c-43de-8016-143ecc900ea9": false,
               },
             },
           },
@@ -299,6 +319,10 @@ describe("User Client", () => {
               channel_types: {
                 in_app_feed: true,
                 email: false,
+              },
+              channels: {
+                "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+                "ce475f4f-261c-43de-8016-143ecc900ea9": false,
               },
             },
           },
@@ -330,9 +354,17 @@ describe("User Client", () => {
             email: false,
             sms: true,
           },
+          channels: {
+            "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+            "ce475f4f-261c-43de-8016-143ecc900ea9": false,
+          },
           workflows: {
             welcome_series: {
               channel_types: { email: true, sms: false },
+              channels: {
+                "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+                "ce475f4f-261c-43de-8016-143ecc900ea9": false,
+              },
             },
           },
           categories: {
@@ -340,6 +372,10 @@ describe("User Client", () => {
               channel_types: {
                 email: false,
                 sms: true,
+              },
+              channels: {
+                "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+                "ce475f4f-261c-43de-8016-143ecc900ea9": false,
               },
             },
           },
@@ -373,26 +409,54 @@ describe("User Client", () => {
             sms: false,
             push: true,
           },
+          channels: {
+            "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+            "ce475f4f-261c-43de-8016-143ecc900ea9": true,
+            "e645ca6e-d8b3-437f-a260-13d8f7425221": false,
+            "064d651d-2715-4098-aa9b-e912f4d1ca9b": true,
+          },
           workflows: {
             welcome_series: {
               channel_types: { email: true, sms: false },
+              channels: {
+                "ce475f4f-261c-43de-8016-143ecc900ea9": true,
+                "e645ca6e-d8b3-437f-a260-13d8f7425221": false,
+              },
             },
             weekly_digest: {
               channel_types: { email: false, in_app_feed: true },
+              channels: {
+                "ce475f4f-261c-43de-8016-143ecc900ea9": false,
+                "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+              },
             },
             urgent_alerts: {
               channel_types: { sms: true, push: true },
+              channels: {
+                "e645ca6e-d8b3-437f-a260-13d8f7425221": true,
+                "064d651d-2715-4098-aa9b-e912f4d1ca9b": true,
+              },
             },
           },
           categories: {
             marketing: {
               channel_types: { email: false },
+              channels: { "ce475f4f-261c-43de-8016-143ecc900ea9": false },
             },
             updates: {
               channel_types: { in_app_feed: true, email: true },
+              channels: {
+                "f46af07b-fb3b-4d8e-9139-7768725ba27f": true,
+                "ce475f4f-261c-43de-8016-143ecc900ea9": true,
+              },
             },
             security: {
               channel_types: { email: true, sms: true, push: true },
+              channels: {
+                "ce475f4f-261c-43de-8016-143ecc900ea9": true,
+                "e645ca6e-d8b3-437f-a260-13d8f7425221": true,
+                "064d651d-2715-4098-aa9b-e912f4d1ca9b": true,
+              },
             },
           },
         };
@@ -435,6 +499,7 @@ describe("User Client", () => {
           channel_types: { email: true },
           workflows: {},
           categories: {},
+          channels: {},
         };
 
         await expect(
@@ -733,7 +798,6 @@ describe("User Client", () => {
 
         const client = new UserClient(knock);
         const params = {
-          message_id: "message_123",
           channel_id: "channel_123",
           guide_key: "welcome_guide",
           guide_id: "guide_123",
@@ -743,7 +807,7 @@ describe("User Client", () => {
 
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
-          url: "/v1/users/user_123/guides/messages/message_123/seen",
+          url: "/v1/users/user_123/guides/messages/seen",
           data: params,
         });
         expect(result).toEqual(mockResponse);
@@ -766,7 +830,6 @@ describe("User Client", () => {
 
         const client = new UserClient(knock);
         const params = {
-          message_id: "message_456",
           channel_id: "channel_456",
           guide_key: "tutorial_guide",
           guide_id: "guide_456",
@@ -777,7 +840,7 @@ describe("User Client", () => {
 
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
-          url: "/v1/users/user_123/guides/messages/message_456/interacted",
+          url: "/v1/users/user_123/guides/messages/interacted",
           data: params,
         });
         expect(result).toEqual(mockResponse);
@@ -800,7 +863,6 @@ describe("User Client", () => {
 
         const client = new UserClient(knock);
         const params = {
-          message_id: "message_789",
           channel_id: "channel_789",
           guide_key: "advanced_guide",
           guide_id: "guide_789",
@@ -810,7 +872,7 @@ describe("User Client", () => {
 
         expect(mockApiClient.makeRequest).toHaveBeenCalledWith({
           method: "PUT",
-          url: "/v1/users/user_123/guides/messages/message_789/archived",
+          url: "/v1/users/user_123/guides/messages/archived",
           data: params,
         });
         expect(result).toEqual(mockResponse);
@@ -846,7 +908,6 @@ describe("User Client", () => {
 
           await expect(
             client.markGuideStepAs(scenario.status, {
-              message_id: "test_message",
               channel_id: "test_channel",
               guide_key: "test_guide",
               guide_id: "test_guide_id",
@@ -925,7 +986,6 @@ describe("User Client", () => {
 
       await expect(
         knock.user.markGuideStepAs("seen", {
-          message_id: "guide_123",
           guide_key: "onboarding_guide",
           guide_id: "guide_456",
           guide_step_ref: "step_1",

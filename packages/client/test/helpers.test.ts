@@ -1,6 +1,6 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { isValidUuid } from "../src/helpers";
+import { exponentialBackoffFullJitter, isValidUuid } from "../src/helpers";
 
 /**
  * Helper Functions Test Suite
@@ -113,4 +113,85 @@ describe("Helper Functions", () => {
       expect(helpers.isValidUuid).toBe(isValidUuid);
     });
   });
+
+  describe("exponentialBackoffFullJitter", () => {
+    beforeEach(() => {
+      vi.spyOn(Math, "random");
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    test("returns minDelayMs when random is 0", () => {
+      vi.mocked(Math.random).mockReturnValue(0);
+
+      expect(
+        exponentialBackoffFullJitter(1, {
+          baseDelayMs: 1000,
+          maxDelayMs: 30_000,
+        }),
+      ).toBe(250);
+    });
+
+    test("approaches the exponential ceiling when random approaches 1", () => {
+      vi.mocked(Math.random).mockReturnValue(0.999);
+
+      // try 1 ceiling = 1000, result = 250 + floor(0.999 * 750) = 999
+      expect(
+        exponentialBackoffFullJitter(1, {
+          baseDelayMs: 1000,
+          maxDelayMs: 30_000,
+        }),
+      ).toBe(999);
+    });
+
+    test("grows exponentially across successive tries", () => {
+      vi.mocked(Math.random).mockReturnValue(0.999);
+
+      const opts = { baseDelayMs: 1000, maxDelayMs: 60_000 };
+      const results = [1, 2, 3, 4].map((t) =>
+        exponentialBackoffFullJitter(t, opts),
+      );
+
+      // Each result should roughly double the previous
+      for (let i = 1; i < results.length; i++) {
+        expect(results[i]).toBeGreaterThan(results[i - 1]!);
+        expect(results[i]).toBeCloseTo(results[i - 1]! * 2, -2);
+      }
+    });
+
+    test("never exceeds maxDelayMs", () => {
+      vi.mocked(Math.random).mockReturnValue(0.999);
+
+      expect(
+        exponentialBackoffFullJitter(100, {
+          baseDelayMs: 1000,
+          maxDelayMs: 30_000,
+        }),
+      ).toBeLessThanOrEqual(30_000);
+    });
+
+    test("respects a custom minDelayMs", () => {
+      vi.mocked(Math.random).mockReturnValue(0);
+
+      expect(
+        exponentialBackoffFullJitter(1, {
+          baseDelayMs: 1000,
+          maxDelayMs: 30_000,
+          minDelayMs: 500,
+        }),
+      ).toBe(500);
+    });
+
+    test("clamps to minDelayMs when exponential ceiling is below it", () => {
+      // baseDelayMs 100, try 1 → ceiling = 100 < default minDelayMs 250
+      expect(
+        exponentialBackoffFullJitter(1, {
+          baseDelayMs: 100,
+          maxDelayMs: 30_000,
+        }),
+      ).toBe(250);
+    });
+  })
 });

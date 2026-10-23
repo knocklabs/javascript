@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config";
 
 const sharedConfig = defineConfig({
   test: {
+    projects: ["packages/*"],
     coverage: {
       provider: "v8",
       all: true,

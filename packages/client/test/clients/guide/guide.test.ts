@@ -9,15 +9,29 @@ import {
   KnockGuideClient,
   type KnockGuideStep,
 } from "../../../src/clients/guide";
+import {
+  GuideActivationUrlRuleData,
+  GuideGroupData,
+  StoreState,
+} from "../../../src/clients/guide/types";
 import Knock from "../../../src/knock";
 
 // Mock @tanstack/store
 const mockStore = {
-  getState: vi.fn(() => ({
-    guides: [] as unknown[],
-    queries: {},
-    location: undefined,
-  })),
+  getState: vi.fn(
+    () =>
+      ({
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      }) as StoreState,
+  ),
   setState: vi.fn((fn) => {
     if (typeof fn === "function") {
       const currentState = mockStore.state;
@@ -29,14 +43,22 @@ const mockStore = {
     return fn;
   }),
   state: {
-    guides: [] as unknown[],
+    guideGroups: [],
+    guideGroupDisplayLogs: {},
+    guides: {},
+    ineligibleGuides: {},
+    previewGuides: {},
     queries: {},
     location: undefined,
-  },
+    counter: 0,
+    debug: { forcedGuideKey: null, previewSessionId: null },
+  } as StoreState,
 };
 
 vi.mock("@tanstack/store", () => ({
-  Store: vi.fn(() => mockStore),
+  Store: vi.fn(function () {
+    return mockStore;
+  }),
 }));
 
 // Mock phoenix
@@ -50,6 +72,10 @@ const mockWindow = {
   location: { href: "https://example.com" },
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
+  history: {
+    pushState: vi.fn(),
+    replaceState: vi.fn(),
+  },
 };
 
 describe("KnockGuideClient", () => {
@@ -57,6 +83,40 @@ describe("KnockGuideClient", () => {
   let mockKnock: Knock;
 
   beforeEach(() => {
+    // Clear all mocks first
+    vi.clearAllMocks();
+
+    // Reset window to undefined by default
+    vi.stubGlobal("window", undefined);
+    // Replace global timers with mock versions
+    vi.useFakeTimers();
+
+    // Reset store state
+    mockStore.setState.mockClear();
+    mockStore.getState.mockClear();
+    mockStore.getState.mockReturnValue({
+      guideGroups: [],
+      guideGroupDisplayLogs: {},
+      guides: {},
+      ineligibleGuides: {},
+      previewGuides: {},
+      queries: {},
+      location: undefined,
+      counter: 0,
+      debug: { forcedGuideKey: null, previewSessionId: null },
+    });
+    mockStore.state = {
+      guideGroups: [],
+      guideGroupDisplayLogs: {},
+      guides: {},
+      ineligibleGuides: {},
+      previewGuides: {},
+      queries: {},
+      location: undefined,
+      counter: 0,
+      debug: { forcedGuideKey: null, previewSessionId: null },
+    };
+
     mockApiClient = {
       makeRequest: vi.fn().mockResolvedValue({ statusCode: "ok" }),
       socket: undefined,
@@ -77,27 +137,13 @@ describe("KnockGuideClient", () => {
           .fn()
           .mockImplementation(() => Promise.resolve({ entries: [] })),
         markGuideStepAs: vi.fn().mockResolvedValue({ status: "ok" }),
+        resetGuideEngagement: vi.fn().mockResolvedValue({ status: "ok" }),
       },
     } as unknown as Knock;
-
-    vi.clearAllMocks();
-    // Reset window to undefined by default
-    vi.stubGlobal("window", undefined);
-    // Reset store state
-    mockStore.setState.mockClear();
-    mockStore.getState.mockReturnValue({
-      guides: [],
-      queries: {},
-      location: undefined,
-    });
-    mockStore.state = {
-      guides: [],
-      queries: {},
-      location: undefined,
-    };
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -114,9 +160,14 @@ describe("KnockGuideClient", () => {
       expect(client.channelId).toBe(channelId);
       expect(client.targetParams).toEqual({});
       expect(Store).toHaveBeenCalledWith({
-        guides: [],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
       });
     });
 
@@ -134,12 +185,17 @@ describe("KnockGuideClient", () => {
       // Mock window to simulate browser environment
       vi.stubGlobal("window", mockWindow);
 
-      const _client = new KnockGuideClient(mockKnock, channelId);
+      new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
-        guides: [],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: "https://example.com",
+        counter: 0,
       });
     });
 
@@ -148,10 +204,20 @@ describe("KnockGuideClient", () => {
       const _client = new KnockGuideClient(mockKnock, channelId);
 
       expect(Store).toHaveBeenCalledWith({
-        guides: [],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
       });
+    });
+
+    test("starts the counter interval clock and sets the interval id", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      expect(client["counterIntervalId"]).toBeDefined();
     });
   });
 
@@ -164,11 +230,13 @@ describe("KnockGuideClient", () => {
             channel_id: channelId,
             id: "guide_123",
             key: "test_guide",
-            priority: 1,
             type: "test",
             semver: "1.0.0",
+            active: true,
             steps: [],
-            activation_location_rules: [],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
             inserted_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -185,7 +253,7 @@ describe("KnockGuideClient", () => {
 
       await client.fetch();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({
@@ -195,6 +263,61 @@ describe("KnockGuideClient", () => {
       );
     });
 
+    test("stores ineligible_guides from fetch response into the store", async () => {
+      const mockIneligibleGuides = [
+        {
+          __typename: "GuideIneligibilityMarker" as const,
+          key: "guide_123",
+          reason: "marked_as_archived",
+          message: "User has archived this guide already",
+        },
+        {
+          __typename: "GuideIneligibilityMarker" as const,
+          key: "guide_456",
+          reason: "not_in_target_audience",
+          message: "User is not a member of the target audience",
+        },
+      ];
+
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide",
+            channel_id: channelId,
+            id: "guide_789",
+            key: "active_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        guide_groups: [],
+        guide_group_display_logs: {},
+        ineligible_guides: mockIneligibleGuides,
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      await client.fetch();
+
+      expect(client.store.state.ineligibleGuides).toEqual({
+        guide_123: mockIneligibleGuides[0],
+        guide_456: mockIneligibleGuides[1],
+      });
+    });
+
     test("handles fetch errors", async () => {
       const mockError = new Error("Network error");
       vi.mocked(mockKnock.user.getGuides).mockRejectedValueOnce(mockError);
@@ -202,7 +325,7 @@ describe("KnockGuideClient", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
       await client.fetch();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockStore.setState).toHaveBeenCalledWith(expect.any(Function));
 
       // Get the last setState call and execute its function
@@ -211,14 +334,39 @@ describe("KnockGuideClient", () => {
       if (lastCall) {
         const setStateFunction = lastCall[0];
         const newState = setStateFunction({
-          guides: [],
+          guideGroups: [],
+          guideGroupDisplayLogs: {},
+          guides: {},
           queries: {},
           location: undefined,
+          counter: 0,
         });
         expect(newState.queries).toEqual({
           "/v1/users/user_123/guides": { status: "error", error: mockError },
         });
       }
+    });
+
+    test("fetch with force: true bypasses the cache and refetches", async () => {
+      const mockResponse = {
+        entries: [],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValue(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First fetch populates the query cache
+      await client.fetch();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(1);
+
+      // Second fetch without force is a noop (cache hit)
+      await client.fetch();
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(1);
+
+      // Third fetch with force bypasses the cache
+      await client.fetch({ force: true });
+      expect(mockKnock.user.getGuides).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -226,7 +374,11 @@ describe("KnockGuideClient", () => {
     test("subscribes to socket events when socket is available", () => {
       const mockChannel = {
         join: vi.fn().mockReturnValue({
-          receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn(),
+            }),
+          }),
         }),
         on: vi.fn(),
         off: vi.fn(),
@@ -250,7 +402,7 @@ describe("KnockGuideClient", () => {
       );
       client.subscribe();
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockSocket.channel).toHaveBeenCalledWith(
         `guides:${channelId}`,
         expect.objectContaining({
@@ -260,6 +412,123 @@ describe("KnockGuideClient", () => {
         }),
       );
       expect(mockChannel.join).toHaveBeenCalled();
+    });
+
+    test("handles successful channel join", () => {
+      let okCallback: () => void;
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn((event, callback) => {
+            if (event === "ok") {
+              okCallback = callback;
+            }
+            return {
+              receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+            };
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+      client.subscribe();
+
+      // Trigger the ok callback
+      okCallback!();
+
+      expect(mockKnock.log).toHaveBeenCalledWith(
+        "[Guide] Successfully joined channel",
+      );
+    });
+
+    test("unsubscribes after reaching max retry limit", () => {
+      let errorCallback: (resp: { reason: string }) => void;
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn((event, callback) => {
+            if (event === "error") {
+              errorCallback = callback;
+            }
+            return {
+              receive: vi.fn((event, callback) => {
+                if (event === "error") {
+                  errorCallback = callback;
+                }
+                return {
+                  receive: vi.fn((event, callback) => {
+                    if (event === "error") {
+                      errorCallback = callback;
+                    }
+                    return { receive: vi.fn() };
+                  }),
+                };
+              }),
+            };
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      const unsubscribeSpy = vi.spyOn(client, "unsubscribe");
+
+      client.subscribe();
+
+      // Initial fail. The retry count starts at 0 and is incremented on each
+      // error to represent the next retry.
+      errorCallback!({ reason: "auth_error" });
+
+      // First retry fail
+      expect(client["subscribeRetryCount"]).toBe(1);
+      errorCallback!({ reason: "auth_error" });
+
+      // Second retry fail
+      expect(client["subscribeRetryCount"]).toBe(2);
+      errorCallback!({ reason: "auth_error" });
+
+      // Third retry fail
+      expect(client["subscribeRetryCount"]).toBe(3);
+      errorCallback!({ reason: "auth_error" });
+
+      // Check that the max retry limit message was logged
+      expect(mockKnock.log).toHaveBeenCalledWith(
+        "[Guide] Channel join max retry limit reached: 3",
+      );
+
+      expect(unsubscribeSpy).toHaveBeenCalled();
     });
 
     test("unsubscribes from socket events", () => {
@@ -278,40 +547,189 @@ describe("KnockGuideClient", () => {
       expect(mockChannel.off).toHaveBeenCalled();
       expect(mockChannel.leave).toHaveBeenCalled();
     });
+
+    test("subscribe includes force_all_guides when debug state has forcedGuideKey", () => {
+      const mockChannel = {
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({
+              receive: vi.fn(),
+            }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      };
+
+      const mockSocket = {
+        channel: vi.fn().mockReturnValue(mockChannel),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        defaultTargetParams,
+      );
+
+      // Set debug state with forced guide key
+      client.store.state.debug = {
+        forcedGuideKey: "test_guide",
+        previewSessionId: "test-session-id",
+      };
+
+      client.subscribe();
+
+      expect(mockSocket.channel).toHaveBeenCalledWith(
+        `guides:${channelId}`,
+        expect.objectContaining({
+          user_id: mockKnock.userId,
+          data: defaultTargetParams.data,
+          tenant: defaultTargetParams.tenant,
+          force_all_guides: true,
+        }),
+      );
+    });
+  });
+
+  describe("Does nothing when unauthenticated", () => {
+    const unauthGuide = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_123",
+      key: "test_guide",
+      type: "test",
+      semver: "1.0.0",
+      active: true,
+      steps: [],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as KnockGuide;
+
+    const unauthStep = {
+      ref: "step_1",
+      schema_key: "test",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+    } as unknown as KnockGuideStep;
+
+    test("fetch returns an error status without calling the API or throwing", async () => {
+      // Regression: the guide client used to throw `failIfNotAuthenticated`,
+      // which crashed host apps that rendered Guides before a user was set.
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.fetch();
+
+      expect(result.status).toBe("error");
+      expect(mockKnock.user.getGuides).not.toHaveBeenCalled();
+    });
+
+    test("subscribe no-ops without joining a channel", () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const mockSocket = {
+        channel: vi.fn(),
+        isConnected: vi.fn().mockReturnValue(true),
+        connect: vi.fn(),
+      };
+      mockApiClient.socket = mockSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.subscribe();
+
+      expect(mockSocket.channel).not.toHaveBeenCalled();
+    });
+
+    test("markAsSeen no-ops without calling the engagement API", async () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.markAsSeen(unauthGuide, unauthStep);
+
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsInteracted no-ops without calling the engagement API", async () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.markAsInteracted(unauthGuide, unauthStep);
+
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsArchived no-ops without calling the engagement API", async () => {
+      mockKnock.isAuthenticated = vi.fn(() => false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const result = await client.markAsArchived(unauthGuide, unauthStep);
+
+      expect(result).toBeUndefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("subscribe re-reads the socket from the api client (E12)", () => {
+    const makeMockSocket = () => ({
+      channel: vi.fn().mockReturnValue({
+        join: vi.fn().mockReturnValue({
+          receive: vi.fn().mockReturnValue({
+            receive: vi.fn().mockReturnValue({ receive: vi.fn() }),
+          }),
+        }),
+        on: vi.fn(),
+        off: vi.fn(),
+        leave: vi.fn(),
+        state: "closed",
+      }),
+      isConnected: vi.fn().mockReturnValue(true),
+      connect: vi.fn(),
+    });
+
+    test("uses the current socket after re-authentication, not the one captured at construction", () => {
+      const oldSocket = makeMockSocket();
+      const newSocket = makeMockSocket();
+
+      // The constructor captures the old socket via `knock.client().socket`.
+      mockApiClient.socket = oldSocket as unknown as Socket;
+      vi.mocked(mockKnock.client).mockReturnValue(mockApiClient as ApiClient);
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Simulate a re-authentication that swaps in a new socket on the client.
+      mockApiClient.socket = newSocket as unknown as Socket;
+
+      client.subscribe();
+
+      expect(newSocket.channel).toHaveBeenCalledWith(
+        `guides:${channelId}`,
+        expect.anything(),
+      );
+      expect(oldSocket.channel).not.toHaveBeenCalled();
+    });
   });
 
   describe("guide operations", () => {
-    let makeRequestSpy: ReturnType<typeof vi.fn>;
-    let markGuideStepAsSpy: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-      makeRequestSpy = vi.fn().mockResolvedValue({ statusCode: "ok" });
-      markGuideStepAsSpy = vi.fn().mockResolvedValue({ status: "ok" });
-
-      mockApiClient.makeRequest = makeRequestSpy;
-
-      // Mock the knock.user.markGuideStepAs method
-      mockKnock = {
-        ...mockKnock,
-        user: {
-          getGuides: vi
-            .fn()
-            .mockImplementation(() => Promise.resolve({ entries: [] })),
-          markGuideStepAs: markGuideStepAsSpy,
-        },
-      } as unknown as Knock;
-
-      vi.mocked(mockKnock.client).mockReturnValue({
-        ...mockApiClient,
-        makeRequest: makeRequestSpy,
-        host: "https://api.knock.app",
-        apiKey: "test_key",
-        userToken: "test_token",
-        axiosClient: {},
-        canRetryRequest: () => true,
-      } as unknown as ApiClient);
-    });
-
     const mockStep = {
       ref: "step_1",
       schema_key: "test",
@@ -336,31 +754,48 @@ describe("KnockGuideClient", () => {
       channel_id: channelId,
       id: "guide_123",
       key: "test_guide",
-      priority: 1,
       type: "test",
       semver: "1.0.0",
+      active: true,
       steps: [mockStep],
-      activation_location_rules: [],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
       inserted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
     } as unknown as KnockGuide;
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: [mockGuide.key],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
 
     test("marks guide step as seen", async () => {
       const client = new KnockGuideClient(mockKnock, channelId);
 
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
-        guides: [mockGuide],
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
 
       await client.markAsSeen(mockGuide, mockStep);
 
-      expect(markGuideStepAsSpy).toHaveBeenCalledWith("seen", {
-        message_id: "msg_123",
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("seen", {
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
@@ -376,23 +811,67 @@ describe("KnockGuideClient", () => {
 
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
-        guides: [mockGuide],
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
 
       await client.markAsInteracted(mockGuide, mockStep, { action: "clicked" });
 
-      expect(markGuideStepAsSpy).toHaveBeenCalledWith("interacted", {
-        message_id: "msg_123",
-        channel_id: channelId,
-        guide_key: "test_guide",
-        guide_id: "guide_123",
-        guide_step_ref: "step_1",
-        metadata: { action: "clicked" },
-      });
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "interacted",
+        {
+          channel_id: channelId,
+          guide_key: "test_guide",
+          guide_id: "guide_123",
+          guide_step_ref: "step_1",
+          metadata: { action: "clicked" },
+        },
+      );
+    });
+
+    test("marks guide step as interacted and returns new guide object", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      // Store the original guide reference
+      const originalGuideRef = mockStore.state.guides[mockGuide.key];
+
+      await client.markAsInteracted(mockGuide, mockStep, { action: "clicked" });
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+
+      // Verify that the guide object is a new reference (not the same object)
+      // This ensures useStore triggers a re-render
+      expect(newState.guides[mockGuide.key]).not.toBe(originalGuideRef);
     });
 
     test("marks guide step as archived", async () => {
@@ -400,27 +879,837 @@ describe("KnockGuideClient", () => {
 
       // Mock the store to have the guide so setStepMessageAttrs can find it
       const stateWithGuides = {
-        guides: [mockGuide],
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
       mockStore.state = stateWithGuides;
       mockStore.getState.mockReturnValue(stateWithGuides);
 
       await client.markAsArchived(mockGuide, mockStep);
 
-      expect(markGuideStepAsSpy).toHaveBeenCalledWith("archived", {
-        message_id: "msg_123",
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("archived", {
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
         guide_step_ref: "step_1",
+        unthrottled: false,
       });
+    });
+
+    test.each([
+      {
+        status: "seen",
+        timestamp: "seen_at",
+        engage: (
+          client: KnockGuideClient,
+          guide: KnockGuide,
+          step: KnockGuideStep,
+        ) => client.markAsSeen(guide, step),
+      },
+      {
+        status: "interacted",
+        timestamp: "interacted_at",
+        engage: (
+          client: KnockGuideClient,
+          guide: KnockGuide,
+          step: KnockGuideStep,
+        ) => client.markAsInteracted(guide, step),
+      },
+      {
+        status: "archived",
+        timestamp: "archived_at",
+        engage: (
+          client: KnockGuideClient,
+          guide: KnockGuide,
+          step: KnockGuideStep,
+        ) => client.markAsArchived(guide, step),
+      },
+    ] as const)(
+      "handles rejected $status requests after applying the optimistic update",
+      async ({ status, timestamp, engage }) => {
+        const error = new Error(`${status} request failed`);
+        vi.mocked(mockKnock.user.markGuideStepAs).mockRejectedValueOnce(error);
+
+        const freshStep = {
+          ...mockStep,
+          message: {
+            ...mockStep.message,
+            seen_at: null,
+            read_at: null,
+            interacted_at: null,
+            archived_at: null,
+          },
+        } as KnockGuideStep;
+        const freshGuide = {
+          ...mockGuide,
+          steps: [freshStep],
+          getStep: vi.fn().mockReturnValue(freshStep),
+        } as KnockGuide;
+        const stateWithGuides = {
+          guideGroups: [mockDefaultGroup],
+          guideGroupDisplayLogs: {},
+          guides: { [freshGuide.key]: freshGuide },
+          ineligibleGuides: {},
+          previewGuides: {},
+          queries: {},
+          location: undefined,
+          counter: 0,
+          debug: { forcedGuideKey: null, previewSessionId: null },
+        };
+        mockStore.state = stateWithGuides;
+        mockStore.getState.mockReturnValue(stateWithGuides);
+
+        const result = await engage(
+          new KnockGuideClient(mockKnock, channelId),
+          freshGuide,
+          freshStep,
+        );
+        await Promise.resolve();
+
+        expect(result?.message[timestamp]).toEqual(expect.any(String));
+        expect(mockKnock.log).toHaveBeenCalledWith(
+          `[Guide] Failed to mark guide step as ${status}: ${error.message}`,
+          true,
+        );
+      },
+    );
+
+    test("does not wait for the engagement request before resolving", async () => {
+      const pendingRequest = new Promise<never>(() => {});
+      vi.mocked(mockKnock.user.markGuideStepAs).mockReturnValueOnce(
+        pendingRequest,
+      );
+
+      const freshStep = {
+        ...mockStep,
+        message: {
+          ...mockStep.message,
+          interacted_at: null,
+          read_at: null,
+        },
+      } as KnockGuideStep;
+      const freshGuide = {
+        ...mockGuide,
+        steps: [freshStep],
+        getStep: vi.fn().mockReturnValue(freshStep),
+      } as KnockGuide;
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshGuide.key]: freshGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await new KnockGuideClient(
+        mockKnock,
+        channelId,
+      ).markAsInteracted(freshGuide, freshStep);
+
+      expect(result?.message.interacted_at).toEqual(expect.any(String));
+    });
+
+    test("marks guide step as archived with bypass_global_group_limit true", async () => {
+      // Create a fresh mock step for this test
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const unthrottledGuide = {
+        ...mockGuide,
+        bypass_global_group_limit: true,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [unthrottledGuide.key]: unthrottledGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(unthrottledGuide, freshMockStep);
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith("archived", {
+        channel_id: channelId,
+        guide_key: "test_guide",
+        guide_id: "guide_123",
+        guide_step_ref: "step_1",
+        unthrottled: true,
+      });
+    });
+
+    test("updates guideGroupDisplayLogs when archiving throttled guide", async () => {
+      // Create a fresh mock step for this test
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const throttledGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [throttledGuide.key]: throttledGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(throttledGuide, freshMockStep);
+
+      // Check that setState was called with a function that updates guideGroupDisplayLogs
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+      expect(newState.guideGroupDisplayLogs).toHaveProperty("default");
+      expect(newState.guideGroupDisplayLogs.default).toBeTruthy();
+    });
+
+    test("does not update guideGroupDisplayLogs when archiving unthrottled guide", async () => {
+      // Create a fresh mock step for this test
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const unthrottledGuide = {
+        ...mockGuide,
+        bypass_global_group_limit: true,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Mock the store to have the guide so setStepMessageAttrs can find it
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [unthrottledGuide.key]: unthrottledGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(unthrottledGuide, freshMockStep);
+
+      // Check that setState was called with a function that does NOT update guideGroupDisplayLogs
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+      expect(newState.guideGroupDisplayLogs).toEqual({});
+    });
+
+    test("markAsSeen skips API call when skipEngagementTracking is true", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await client.markAsSeen(freshMockGuide, freshMockStep);
+
+      expect(result).toBeDefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsSeen sends API call when skipEngagementTracking is false", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsSeen(freshMockGuide, freshMockStep);
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "seen",
+        expect.any(Object),
+      );
+    });
+
+    test("markAsInteracted skips API call when skipEngagementTracking is true", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await client.markAsInteracted(
+        freshMockGuide,
+        freshMockStep,
+        { action: "clicked" },
+      );
+
+      expect(result).toBeDefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsInteracted sends API call when skipEngagementTracking is false", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsInteracted(freshMockGuide, freshMockStep, {
+        action: "clicked",
+      });
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "interacted",
+        expect.any(Object),
+      );
+    });
+
+    test("markAsArchived skips API call when skipEngagementTracking is true", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const result = await client.markAsArchived(
+        freshMockGuide,
+        freshMockStep,
+      );
+
+      expect(result).toBeDefined();
+      expect(mockKnock.user.markGuideStepAs).not.toHaveBeenCalled();
+    });
+
+    test("markAsArchived sends API call when skipEngagementTracking is false", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const freshMockStep = {
+        ref: "step_1",
+        schema_key: "test",
+        schema_semver: "1.0.0",
+        schema_variant_key: "default",
+        message: {
+          id: "msg_123",
+          seen_at: null,
+          read_at: null,
+          interacted_at: null,
+          archived_at: null,
+          link_clicked_at: null,
+        },
+        content: {},
+        markAsSeen: vi.fn(),
+        markAsInteracted: vi.fn(),
+        markAsArchived: vi.fn(),
+      } as unknown as KnockGuideStep;
+
+      const freshMockGuide = {
+        ...mockGuide,
+        steps: [freshMockStep],
+        getStep: vi.fn().mockReturnValue(freshMockStep),
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [freshMockGuide.key]: freshMockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          skipEngagementTracking: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.markAsArchived(freshMockGuide, freshMockStep);
+
+      expect(mockKnock.user.markGuideStepAs).toHaveBeenCalledWith(
+        "archived",
+        expect.any(Object),
+      );
+    });
+
+    test("resetEngagement calls API and refetches guides", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const engagedGuide = {
+        ...mockGuide,
+        hasEngagement: () => true,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [engagedGuide.key]: engagedGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: { someQuery: { status: "ok" as const } },
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.resetEngagement(engagedGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).toHaveBeenCalledWith({
+        guide_key: "test_guide",
+        tenant: undefined,
+      });
+
+      // Verify fetch was triggered with force to refetch fresh guide state
+      expect(mockKnock.user.getGuides).toHaveBeenCalled();
+    });
+
+    test("resetEngagement noops when no step has engagement timestamps", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      const unengagedGuide = {
+        ...mockGuide,
+        hasEngagement: () => false,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { [unengagedGuide.key]: unengagedGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      await client.resetEngagement(unengagedGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
+    });
+
+    test("resetEngagement noops when guide is not in the store", async () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Store has no guides
+      mockStore.state = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      await client.resetEngagement(mockGuide);
+
+      expect(mockKnock.user.resetGuideEngagement).not.toHaveBeenCalled();
+      expect(mockStore.setState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("hasEngagement", () => {
+    test("returns true when a step has a seen_at timestamp", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide" as const,
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [
+              {
+                ref: "step_1",
+                schema_key: "test",
+                schema_semver: "1.0.0",
+                schema_variant_key: "default",
+                message: {
+                  id: "msg_123",
+                  seen_at: "2026-01-01T00:00:00Z",
+                  read_at: null,
+                  interacted_at: null,
+                  archived_at: null,
+                  link_clicked_at: null,
+                },
+                content: {},
+              },
+            ],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      const guide = client.store.state.guides["test_guide"];
+      expect(guide.hasEngagement()).toBe(true);
+    });
+
+    test("returns false when no steps have engagement timestamps", async () => {
+      const mockResponse = {
+        entries: [
+          {
+            __typename: "Guide" as const,
+            channel_id: channelId,
+            id: "guide_123",
+            key: "test_guide",
+            type: "test",
+            semver: "1.0.0",
+            active: true,
+            steps: [
+              {
+                ref: "step_1",
+                schema_key: "test",
+                schema_semver: "1.0.0",
+                schema_variant_key: "default",
+                message: {
+                  id: "msg_123",
+                  seen_at: null,
+                  read_at: null,
+                  interacted_at: null,
+                  archived_at: null,
+                  link_clicked_at: null,
+                },
+                content: {},
+              },
+            ],
+            activation_url_rules: [],
+            activation_url_patterns: [],
+            bypass_global_group_limit: false,
+            inserted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+
+      vi.mocked(mockKnock.user.getGuides).mockResolvedValueOnce(mockResponse);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      await client.fetch();
+
+      const guide = client.store.state.guides["test_guide"];
+      expect(guide.hasEngagement()).toBe(false);
     });
   });
 
   describe("cleanup", () => {
-    test("removes event listeners and unsubscribes", () => {
+    test("removes event listeners, unsubscribes, and an interval", () => {
       vi.stubGlobal("window", mockWindow);
 
       const client = new KnockGuideClient(
@@ -429,11 +1718,15 @@ describe("KnockGuideClient", () => {
         {},
         { trackLocationFromWindow: true },
       );
+
       const unsubscribeSpy = vi.spyOn(client, "unsubscribe");
+      const clearIntervalSpy = vi.spyOn(global, "clearInterval");
 
       client.cleanup();
 
       expect(unsubscribeSpy).toHaveBeenCalled();
+      expect(clearIntervalSpy).toHaveBeenCalled();
+
       expect(mockWindow.removeEventListener).toHaveBeenCalled();
     });
 
@@ -456,181 +1749,1737 @@ describe("KnockGuideClient", () => {
     });
   });
 
-  describe("select", () => {
-    const mockGuides: KnockGuide[] = [
-      {
-        __typename: "Guide",
-        channel_id: channelId,
-        id: "guide_1",
-        key: "onboarding",
-        priority: 10,
-        type: "tour",
-        semver: "1.0.0",
-        steps: [],
-        activation_location_rules: [
-          {
-            directive: "allow",
-            pathname: "/dashboard",
-            pattern: new URLPattern({ pathname: "/dashboard" }),
-          },
-        ],
-        inserted_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+  describe("selectGuide", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
       },
-      {
-        __typename: "Guide",
-        channel_id: channelId,
-        id: "guide_2",
-        key: "feature_tour",
-        priority: 5,
-        type: "tooltip",
-        semver: "1.0.0",
-        steps: [],
-        activation_location_rules: [
-          {
-            directive: "block",
-            pathname: "/settings",
-            pattern: new URLPattern({ pathname: "/settings" }),
-          },
-        ],
-        inserted_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [
+        {
+          directive: "allow",
+          pathname: "/dashboard",
+          pattern: new URLPattern({ pathname: "/dashboard" }),
+        },
+      ],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "feature_tour",
+      type: "tooltip",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [
+        {
+          directive: "block",
+          pathname: "/settings",
+          pattern: new URLPattern({ pathname: "/settings" }),
+        },
+      ],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideThree = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_3",
+      key: "system_status",
+      type: "banner",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuides = {
+      [mockGuideOne.key]: mockGuideOne,
+      [mockGuideTwo.key]: mockGuideTwo,
+      [mockGuideThree.key]: mockGuideThree,
+    };
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["feature_tour", "onboarding", "system_status"],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
 
     test("selects guides without filters", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client["_selectGuide"](stateWithGuides);
 
-      // When location is undefined, guides are still included (location rules are skipped)
-      expect(result).toHaveLength(2);
+      // Should select the first guide in the display sequence.
+      // When location is undefined, guides are still included (location rules
+      // are skipped).
+      expect(result!.key).toBe("feature_tour");
     });
 
     test("filters guides by key", () => {
       const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
         guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
-        location: undefined, // Change this to undefined to make the test pass
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides, { key: "onboarding" });
+      const result = client["_selectGuide"](stateWithGuides, {
+        key: "onboarding",
+      });
+
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("filters guides by type", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides, {
+        type: "banner",
+      });
+
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by url patterns - allow directive", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour has a block pattern for /settings, so it's allowed on /dashboard
+      // Since feature_tour comes first in display_sequence, it should be selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("filters guides by url patterns - block directive", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: "https://example.com/settings",
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should exclude the guide with block directive for /settings
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by activation_url_rules - allow directive with equal_to", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/dashboard",
+          },
+        ] as GuideActivationUrlRuleData[],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour still has a block pattern for /settings, so it's allowed on /dashboard
+      // Since feature_tour comes first in display_sequence, it should be selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("filters guides by activation_url_rules - allow directive with contains", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "contains",
+            argument: "dash",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour still has a block pattern for /settings, so it's allowed on /dashboard
+      // Since feature_tour comes first in display_sequence, it should be selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("filters guides by activation_url_rules - block directive with equal_to", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideTwo,
+        activation_url_rules: [
+          {
+            directive: "block",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/settings",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/settings",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should exclude the guide with block rule for /settings
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by activation_url_rules - block directive with contains", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideTwo,
+        activation_url_rules: [
+          {
+            directive: "block",
+            variable: "pathname",
+            operator: "contains",
+            argument: "setting",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/user/settings",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should exclude the guide with block rule containing "setting"
+      expect(result!.key).toBe("system_status");
+    });
+
+    test("filters guides by activation_url_rules - mixed allow and block rules (block prevails)", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "contains",
+            argument: "admin",
+          },
+          {
+            directive: "block",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/admin/settings",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/admin/settings",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour has a block pattern for "/settings" which doesn't match "/admin/settings"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("filters guides by activation_url_rules - multiple allow rules (any match allows)", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/home",
+          },
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/dashboard",
+          },
+        ] as GuideActivationUrlRuleData[],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour has a block pattern for "/settings" which doesn't match "/settings/profile"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("filters guides by activation_url_rules - handles leading slash in arguments", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "dashboard", // No leading slash
+          },
+        ] as GuideActivationUrlRuleData[],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour has a block pattern for "/settings" which doesn't match "/dashboard"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("filters guides by activation_url_rules - no match when url rules don't match", () => {
+      const mockGuideWithUrlRules = {
+        ...mockGuideOne,
+        activation_url_rules: [
+          {
+            directive: "allow",
+            variable: "pathname",
+            operator: "equal_to",
+            argument: "/admin",
+          },
+        ] as GuideActivationUrlRuleData[],
+        activation_url_patterns: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideOne.key]: mockGuideWithUrlRules,
+        },
+        queries: {},
+        location: "https://example.com/dashboard",
+        counter: 0,
+        ineligibleGuides: {},
+        previewGuides: {},
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour has a block pattern for "/settings" which doesn't match "/dashboard"
+      // Since it only has block patterns and doesn't match, it defaults to allowed
+      // onboarding is excluded because its url_rules require "/admin" but location is "/dashboard"
+      // feature_tour comes first in display_sequence, so it gets selected
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("handles guides without location when location is undefined", () => {
+      // Create guides without location rules
+      const g1 = {
+        ...mockGuideOne,
+        activation_url_patterns: [],
+        activation_url_rules: [],
+      };
+      const g2 = {
+        ...mockGuideTwo,
+        activation_url_patterns: [],
+        activation_url_rules: [],
+      };
+      const g3 = {
+        ...mockGuideThree,
+        activation_url_patterns: [],
+        activation_url_rules: [],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          [g1.key]: g1,
+          [g2.key]: g2,
+          [g3.key]: g3,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: "https://example.com/settings",
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("opens the group stage on the first select and tracks ordered guides", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      expect(client["stage"]).toBeUndefined();
+
+      const r1 = client.selectGuide(stateWithGuides, { type: "banner" });
+      expect(r1).toBeUndefined();
+
+      const r2 = client.selectGuide(stateWithGuides, { type: "tooltip" });
+      expect(r2).toBeUndefined();
+
+      const r3 = client.selectGuide(stateWithGuides, { type: "card" });
+      expect(r3).toBeUndefined();
+
+      expect(client["stage"]).toMatchObject({
+        status: "open",
+        ordered: ["feature_tour", "onboarding", "system_status"],
+      });
+    });
+
+    test("closing the group stage resolves the prevailing guide and can return on select", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      client["stage"] = {
+        status: "open",
+        ordered: ["feature_tour", "onboarding", "system_status"],
+        results: {},
+        timeoutId: 123,
+      };
+
+      client["closePendingGroupStage"]();
+
+      expect(client["stage"]).toMatchObject({
+        status: "closed",
+        ordered: ["feature_tour", "onboarding", "system_status"],
+        resolved: "feature_tour",
+      });
+
+      const r1 = client.selectGuide(stateWithGuides, { type: "banner" });
+      expect(r1).toBeUndefined();
+
+      // Should return the resolved guide.
+      const r2 = client.selectGuide(stateWithGuides, { type: "tooltip" });
+      expect(r2).toMatchObject({ key: "feature_tour", type: "tooltip" });
+
+      const r3 = client.selectGuide(stateWithGuides, { type: "card" });
+      expect(r3).toBeUndefined();
+    });
+
+    test("patching the group stage allows re-evaluation while keeping the current resolved guide in place", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      client["stage"] = {
+        status: "closed",
+        ordered: ["feature_tour", "onboarding", "system_status"],
+        resolved: "feature_tour",
+        results: {},
+        timeoutId: 123,
+      };
+
+      const mockGuideFour = {
+        __typename: "Guide",
+        channel_id: channelId,
+        id: "guide_4",
+        key: "new_modal",
+        type: "modal",
+        semver: "1.0.0",
+        active: true,
+        steps: [mockStep],
+        activation_url_patterns: [],
+        activation_url_rules: [],
+        bypass_global_group_limit: false,
+        inserted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as unknown as KnockGuide;
+
+      // Add a new guide, then re-evalute.
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_sequence: [
+              "new_modal",
+              "feature_tour",
+              "onboarding",
+              "system_status",
+            ],
+          },
+        ],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideFour.key]: mockGuideFour,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      client["patchClosedGroupStage"]();
+
+      expect(client["stage"]).toMatchObject({
+        status: "patch",
+        ordered: [],
+        resolved: "feature_tour",
+      });
+
+      expect(
+        client.selectGuide(stateWithGuides, { type: "banner" }),
+      ).toBeUndefined();
+
+      // Should return the current resolved guide
+      expect(
+        client.selectGuide(stateWithGuides, { type: "tooltip" }),
+      ).toMatchObject({
+        key: "feature_tour",
+        type: "tooltip",
+      });
+
+      expect(
+        client.selectGuide(stateWithGuides, { type: "card" }),
+      ).toBeUndefined();
+      expect(
+        client.selectGuide(stateWithGuides, { type: "modal" }),
+      ).toBeUndefined();
+
+      client["closePendingGroupStage"]();
+
+      expect(client["stage"]).toMatchObject({
+        status: "closed",
+        ordered: ["new_modal", "feature_tour", "onboarding", "system_status"],
+        resolved: "new_modal",
+        timeoutId: null,
+      });
+
+      expect(
+        client.selectGuide(stateWithGuides, { type: "banner" }),
+      ).toBeUndefined();
+      expect(
+        client.selectGuide(stateWithGuides, { type: "tooltip" }),
+      ).toBeUndefined();
+      expect(
+        client.selectGuide(stateWithGuides, { type: "card" }),
+      ).toBeUndefined();
+
+      // Now renders the newly resolved guide.
+      expect(
+        client.selectGuide(stateWithGuides, { type: "modal" }),
+      ).toMatchObject({
+        key: "new_modal",
+        type: "modal",
+      });
+    });
+
+    test("does not select an archived guide", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            steps: [
+              {
+                ...mockStep,
+                message: {
+                  ...mockStep.message,
+                  archived_at: new Date().toISOString(),
+                },
+              },
+            ],
+          },
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour is the first in the order but archived, so should return
+      // the next one.
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns an archived guide when forced guide key is set", () => {
+      const archivedGuide = {
+        ...mockGuideThree,
+        steps: [
+          {
+            ...mockStep,
+            message: {
+              ...mockStep.message,
+              archived_at: new Date().toISOString(),
+            },
+          },
+        ],
+      };
+
+      const stateWithArchivedGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideThree.key]: archivedGuide,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          // Force the archived guide
+          forcedGuideKey: mockGuideThree.key,
+          session_id: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithArchivedGuide, {
+        key: mockGuideThree.key,
+      });
+
+      // Should return the forced guide even though it's archived
+      expect(result!.key).toBe("system_status");
+      expect(result!.steps[0]!.message.archived_at).toBeTruthy();
+    });
+
+    test("returns preview guide when forced guide key matches and preview guide exists", () => {
+      const previewGuide = {
+        ...mockGuideTwo,
+        type: "preview-type",
+        steps: [
+          {
+            ...mockStep,
+            content: { title: "Preview Content" },
+          },
+        ],
+      };
+
+      const stateWithPreviewGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: undefined as unknown as KnockGuide,
+        },
+        ineligibleGuides: {},
+        previewGuides: {
+          [mockGuideTwo.key]: previewGuide,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          preview_session_id: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithPreviewGuide);
+
+      // Should return the preview guide instead of the regular guide
+      expect(result!.key).toBe("feature_tour");
+      expect(result!.type).toBe("preview-type");
+      expect(result!.steps[0]!.content).toEqual({ title: "Preview Content" });
+
+      // Verify it's the preview guide, not the regular guide
+      expect(result!.type).not.toBe("regular-type");
+    });
+
+    test("doesn't return any guide when filtered by a different key than forced guide", () => {
+      const previewGuide = {
+        ...mockGuideTwo,
+        type: "preview-type",
+        steps: [
+          {
+            ...mockStep,
+            content: { title: "Preview Content" },
+          },
+        ],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {
+          [mockGuideTwo.key]: previewGuide,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          preview_session_id: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides, {
+        key: "onboarding",
+      });
+
+      // When forcedGuideKey is set, only that guide is considered, so filtering
+      // by a different key returns undefined
+      expect(result).toBeUndefined();
+    });
+
+    test("doesn't return any guide when filtered by a different type than forced guide", () => {
+      const previewGuide = {
+        ...mockGuideTwo,
+        type: "preview-type",
+        steps: [
+          {
+            ...mockStep,
+            content: { title: "Preview Content" },
+          },
+        ],
+      };
+
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {
+          [mockGuideTwo.key]: previewGuide,
+        },
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          preview_session_id: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides, {
+        type: "banner",
+      });
+
+      // When forcedGuideKey is set, only that guide is considered, so filtering
+      // by a different type returns undefined
+      expect(result).toBeUndefined();
+    });
+
+    test("returns an archived guide when focusedGuideKeys includes it", () => {
+      const archivedGuide = {
+        ...mockGuideThree,
+        steps: [
+          {
+            ...mockStep,
+            message: {
+              ...mockStep.message,
+              archived_at: new Date().toISOString(),
+            },
+          },
+        ],
+      };
+
+      const stateWithArchivedGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideThree.key]: archivedGuide,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { [mockGuideThree.key]: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithArchivedGuide, {
+        key: mockGuideThree.key,
+      });
+
+      // Should return the focused guide even though it's archived
+      expect(result!.key).toBe("system_status");
+      expect(result!.steps[0]!.message.archived_at).toBeTruthy();
+    });
+
+    test("returns only focused guides when focusedGuideKeys is set", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { [mockGuideTwo.key]: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Should return the focused guide
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("doesn't return a guide not in focusedGuideKeys", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { [mockGuideTwo.key]: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides, {
+        key: mockGuideOne.key,
+      });
+
+      // Guide one is not in focusedGuideKeys, so should not be returned
+      expect(result).toBeUndefined();
+    });
+
+    test("falls through to normal filtering when focusedGuideKeys is empty object", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: {},
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Empty focusedGuideKeys should not filter — normal selection applies
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("does not return a guide inside a throttle window ", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result1 = client["_selectGuide"](stateWithGuides);
+
+      // Even though we have selectable guides to return, we are inside the
+      // configured throttle window, therefore should return nothing.
+      expect(result1).toBeUndefined();
+
+      // Fast forward 10 mins (in ms).
+      vi.advanceTimersByTime(10 * 60 * 1000);
+
+      // We should be outside the configured throttle window, so expect the
+      // first guide in the display queue to be returned.
+      const result2 = client["_selectGuide"](stateWithGuides);
+      expect(result2!.key).toBe("feature_tour");
+    });
+
+    test("can return an unthrottled guide even though inside a throttle window ", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            bypass_global_group_limit: true,
+          },
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("returns a guide with includeThrottled option even inside throttle window", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled, should return undefined (throttled)
+      const result1 = client["_selectGuide"](stateWithGuides, { type: "banner" });
+      expect(result1).toBeUndefined();
+
+      // Reset the group stage for the next test
+      client["clearGroupStage"]();
+
+      // With includeThrottled: true, should return the banner guide
+      const result2 = client["_selectGuide"](stateWithGuides, { type: "banner" }, { includeThrottled: true });
+      expect(result2).toBeDefined();
+      expect(result2!.type).toBe("banner");
+    });
+
+    test("returns a guide inside a throttle window when ignoreDisplayInterval is true", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          ignoreDisplayInterval: true,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // Even though we are inside the configured throttle window,
+      // ignoreDisplayInterval bypasses it.
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("feature_tour");
+    });
+
+    test("does not return a guide inside a throttle window when ignoreDisplayInterval is false", () => {
+      const stateWithGuides = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          debugging: true,
+          ignoreDisplayInterval: false,
+          forcedGuideKey: null,
+          previewSessionId: null,
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      expect(result).toBeUndefined();
+    });
+
+    test("skips ineligible guides during selection", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {
+          feature_tour: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "feature_tour",
+            reason: "target_conditions_not_met" as const,
+            message: "User does not match the targeting conditions",
+          },
+        },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // feature_tour is first in display_sequence but is ineligible,
+      // so it should be skipped and onboarding should be selected next
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("skips all ineligible guides and returns undefined when all are ineligible", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {
+          feature_tour: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "feature_tour",
+            reason: "marked_as_archived" as const,
+            message: "User has archived this guide already",
+          },
+          onboarding: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "onboarding",
+            reason: "marked_as_archived" as const,
+            message: "User has archived this guide already",
+          },
+          system_status: {
+            __typename: "GuideIneligibilityMarker" as const,
+            key: "system_status",
+            reason: "marked_as_archived" as const,
+            message: "User has archived this guide already",
+          },
+        },
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuide"](stateWithGuides);
+
+      // All guides are ineligible, so should return undefined
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("selectGuides", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_patterns: [],
+      activation_url_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "changelog",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_patterns: [],
+      activation_url_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideThree = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_3",
+      key: "system_status",
+      type: "banner",
+      semver: "1.0.0",
+      steps: [mockStep],
+      active: true,
+      activation_url_patterns: [],
+      activation_url_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuides = {
+      [mockGuideOne.key]: mockGuideOne,
+      [mockGuideTwo.key]: mockGuideTwo,
+      [mockGuideThree.key]: mockGuideThree,
+    };
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["changelog", "system_status", "onboarding"],
+      display_interval: 60,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    const stateWithGuides = {
+      guideGroups: [mockDefaultGroup],
+      guideGroupDisplayLogs: {},
+      guides: mockGuides,
+      ineligibleGuides: {},
+      previewGuides: {},
+      queries: {},
+      location: undefined,
+      counter: 0,
+      debug: { forcedGuideKey: null, previewSessionId: null },
+    };
+
+    test("returns all guides without filters", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateWithGuides);
+
+      expect(result).toHaveLength(3);
+      expect(result.map((g) => g.key)).toEqual([
+        "changelog",
+        "system_status",
+        "onboarding",
+      ]);
+    });
+
+    test("filters guides by key", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateWithGuides, {
+        key: "onboarding",
+      });
 
       expect(result).toHaveLength(1);
       expect(result[0]!.key).toBe("onboarding");
     });
 
     test("filters guides by type", () => {
-      const stateWithGuides = {
-        guides: mockGuides,
-        queries: {},
-        location: "/dashboard",
-      };
-
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides, { type: "tooltip" });
+      const result = client["_selectGuides"](stateWithGuides, { type: "card" });
 
-      expect(result).toHaveLength(0); // tooltip guide has blocking rule and doesn't match location
+      expect(result).toHaveLength(2);
+
+      expect(result[0]!.key).toBe("changelog");
+      expect(result[0]!.type).toBe("card");
+
+      expect(result[1]!.key).toBe("onboarding");
+      expect(result[1]!.type).toBe("card");
     });
 
-    test("filters guides by location rules - allow directive", () => {
-      const stateWithGuides = {
-        guides: mockGuides,
-        queries: {},
-        location: "https://example.com/dashboard", // Use full URL format
-      };
-
+    test("returns empty array when no guides match filters", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client["_selectGuides"](stateWithGuides, {
+        type: "nonexistent",
+      });
 
-      // Should include the guide with allow directive for /dashboard
-      const onboardingGuide = result.find((g) => g.key === "onboarding");
-      expect(onboardingGuide).toBeDefined();
-      expect(result).toHaveLength(1);
+      expect(result).toEqual([]);
     });
 
-    test("filters guides by location rules - block directive", () => {
-      const stateWithGuides = {
-        guides: mockGuides,
-        queries: {},
-        location: "/settings",
-      };
-
-      const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
-
-      // Should exclude the guide with block directive for /settings
-      const featureTourGuide = result.find((g) => g.key === "feature_tour");
-      expect(featureTourGuide).toBeUndefined();
-    });
-
-    test("handles guides without location when location is undefined", () => {
-      // Create guides without location rules
-      const guidesWithoutLocationRules: KnockGuide[] = [
-        {
-          __typename: "Guide",
-          channel_id: channelId,
-          id: "guide_1",
-          key: "onboarding",
-          priority: 10,
-          type: "tour",
-          semver: "1.0.0",
-          steps: [],
-          activation_location_rules: [],
-          inserted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+    test("excludes guides where all steps are archived", () => {
+      const stateWithArchivedGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            steps: [
+              {
+                ...mockStep,
+                message: {
+                  ...mockStep.message,
+                  archived_at: new Date().toISOString(),
+                },
+              },
+            ],
+          },
         },
-        {
-          __typename: "Guide",
-          channel_id: channelId,
-          id: "guide_2",
-          key: "feature_tour",
-          priority: 5,
-          type: "tooltip",
-          semver: "1.0.0",
-          steps: [],
-          activation_location_rules: [],
-          inserted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
-
-      const stateWithGuides = {
-        guides: guidesWithoutLocationRules,
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client["_selectGuides"](stateWithArchivedGuide);
 
-      // Should return guides without location rules when location is undefined
+      // Should exclude guides where all steps are archived
       expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["system_status", "onboarding"]);
     });
 
-    test("sorts guides by priority and inserted_at", () => {
-      const stateWithGuides = {
-        guides: mockGuides,
+    test("can return a preview guide when no other guides are available", () => {
+      const stateWithOnlyPreviewGuide = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {},
+        ineligibleGuides: {},
+        previewGuides: {
+          [mockGuideTwo.key]: mockGuideTwo,
+        },
         queries: {},
-        location: "/dashboard", // Location that matches onboarding guide
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          previewSessionId: "test-session-id",
+        },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
-      const result = client.select(stateWithGuides);
+      const result = client["_selectGuides"](stateWithOnlyPreviewGuide, {
+        key: mockGuideTwo.key,
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0]!.key).toBe(mockGuideTwo.key);
+    });
 
-      if (result.length > 1) {
-        expect(result[0]!.priority).toBeGreaterThanOrEqual(result[1]!.priority);
-      }
+    test("returns the target guide even if inactive when forced guide key is set", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: {
+            ...mockGuideTwo,
+            active: false,
+          },
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideTwo.key,
+          previewSessionId: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateWithGuides, {
+        key: mockGuideTwo.key
+      });
+
+      expect(result[0]!.key).toBe(mockGuideTwo.key);
+    });
+
+    test("returns only the forced guide when forced guide key is set", () => {
+      const stateWithGuides = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          forcedGuideKey: mockGuideOne.key,
+          previewSessionId: "test-session-id",
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateWithGuides, {
+        type: "card"
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]!.key).toBe(mockGuideOne.key);
+    });
+
+    test("returns empty array when inside throttle window by default", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateInsideThrottleWindow);
+
+      // All guides have bypass_global_group_limit: false, so all are throttled
+      expect(result).toEqual([]);
+    });
+
+    test("returns only guides with bypass_global_group_limit when inside throttle window", () => {
+      const mockGuideWithBypass = {
+        ...mockGuideTwo,
+        bypass_global_group_limit: true,
+      };
+
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: {
+          ...mockGuides,
+          [mockGuideTwo.key]: mockGuideWithBypass,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](stateInsideThrottleWindow);
+
+      // Only the guide with bypass_global_group_limit: true should be returned
+      expect(result).toHaveLength(1);
+      expect(result[0]!.key).toBe(mockGuideTwo.key);
+      expect(result[0]!.bypass_global_group_limit).toBe(true);
+    });
+
+    test("returns all guides with includeThrottled option even inside throttle window", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(), // Throttle window started now
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      const result = client["_selectGuides"](
+        stateInsideThrottleWindow,
+        {},
+        { includeThrottled: true },
+      );
+
+      // With includeThrottled: true, all guides should be returned
+      expect(result).toHaveLength(3);
+      expect(result.map((g) => g.key)).toEqual([
+        "changelog",
+        "system_status",
+        "onboarding",
+      ]);
+    });
+
+    test("returns all guides when outside throttle window regardless of includeThrottled", () => {
+      // Throttle window started 10 minutes ago with a 5 minute interval
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
+      const stateOutsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: tenMinutesAgo,
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled
+      const result = client["_selectGuides"](stateOutsideThrottleWindow);
+      expect(result).toHaveLength(3);
+    });
+
+    test("returns matched guides with includeThrottled during open stage", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Call selectGuides directly (not _selectGuides which handles the full
+      // open/close cycle). The internal selectGuide call opens a new stage and
+      // returns undefined because the stage is open. With includeThrottled,
+      // selectGuides should still return the matched guides instead of [].
+      const result = client.selectGuides(
+        stateWithGuides,
+        { type: "card" },
+        { includeThrottled: true },
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["changelog", "onboarding"]);
+    });
+
+    test("returns empty array without includeThrottled during open stage", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Without includeThrottled, selectGuides returns [] during the open stage
+      // because the internal selectGuide call returns undefined.
+      const result = client.selectGuides(stateWithGuides, { type: "card" });
+
+      expect(result).toEqual([]);
+    });
+
+    test("returns matched guides with includeThrottled during open stage even when throttled", () => {
+      const stateInsideThrottleWindow = {
+        guideGroups: [
+          {
+            ...mockDefaultGroup,
+            display_interval: 5 * 60, // 5 minutes
+          },
+        ],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: mockGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Even when throttled and in the open stage, includeThrottled should
+      // return all matched guides instead of [].
+      const result = client.selectGuides(
+        stateInsideThrottleWindow,
+        { type: "card" },
+        { includeThrottled: true },
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result.map((g) => g.key)).toEqual(["changelog", "onboarding"]);
     });
   });
 
-  describe("socket event handling", () => {
+  describe("guide socket event handling", () => {
     test("handles guide.added event", () => {
       const client = new KnockGuideClient(mockKnock, channelId);
 
@@ -639,11 +3488,14 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_new",
         key: "new_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
+        bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -657,6 +3509,9 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](addEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+      expect(client.store.state.guides[mockGuideData.key]).toMatchObject({
+        key: "new_guide",
+      });
     });
 
     test("handles guide.updated event with eligible=true", () => {
@@ -667,23 +3522,38 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_existing",
         key: "existing_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
+        bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        getStep() {
+          return this.steps.find((s: KnockGuideStep) => !s.message.archived_at);
+        },
       };
 
       // Set up initial state with existing guide
       mockStore.state = {
-        guides: [existingGuide],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [existingGuide.key]: existingGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
-      const updatedGuide = { ...existingGuide, priority: 10 };
+      const updatedGuide = {
+        ...existingGuide,
+        type: "updated-type",
+      };
       const updateEvent = {
         topic: `guides:${channelId}`,
         event: "guide.updated" as const,
@@ -693,6 +3563,11 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](updateEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+
+      expect(client.store.state.guides[existingGuide.key]).toMatchObject({
+        key: "existing_guide",
+        type: "updated-type",
+      });
     });
 
     test("handles guide.updated event with eligible=false", () => {
@@ -703,20 +3578,32 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_existing",
         key: "existing_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
-        activation_location_rules: [],
+        activation_url_patterns: [],
+        activation_url_rules: [],
+        bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        getStep() {
+          return this.steps.find((s: KnockGuideStep) => !s.message.archived_at);
+        },
       };
 
       // Set up initial state with existing guide
       mockStore.state = {
-        guides: [existingGuide],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [existingGuide.key]: existingGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const updateEvent = {
@@ -728,6 +3615,7 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](updateEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+      expect(client.store.state.guides[existingGuide.key]).toBeUndefined();
     });
 
     test("handles guide.removed event", () => {
@@ -738,20 +3626,32 @@ describe("KnockGuideClient", () => {
         channel_id: channelId,
         id: "guide_existing",
         key: "existing_guide",
-        priority: 1,
         type: "test",
         semver: "1.0.0",
+        active: true,
         steps: [],
-        activation_location_rules: [],
+        activation_url_rules: [],
+        activation_url_patterns: [],
+        bypass_global_group_limit: false,
+        dashboard_url: null,
         inserted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        getStep() {
+          return this.steps.find((s: KnockGuideStep) => !s.message.archived_at);
+        },
       };
 
       // Set up initial state with existing guide
       mockStore.state = {
-        guides: [existingGuide],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [existingGuide.key]: existingGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const removeEvent = {
@@ -763,6 +3663,186 @@ describe("KnockGuideClient", () => {
       client["handleSocketEvent"](removeEvent);
 
       expect(mockStore.setState).toHaveBeenCalled();
+      expect(client.store.state.guides[existingGuide.key]).toBeUndefined();
+    });
+  });
+
+  describe("guide group socket event handling", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "test",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        id: "msg_123",
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "guide_one",
+      type: "banner",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_patterns: [],
+      activation_url_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "guide_two",
+      type: "banner",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_patterns: [],
+      activation_url_rules: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: [mockGuideOne.key, mockGuideTwo.key],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    test("handles guide_group.added event", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      mockStore.state = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: {
+          [mockGuideOne.key]: mockGuideOne,
+          [mockGuideTwo.key]: mockGuideTwo,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const event = {
+        topic: `guides:${channelId}`,
+        event: "guide_group.added" as const,
+        data: {
+          guide_group: {
+            ...mockDefaultGroup,
+            display_sequence: [mockGuideTwo.key, mockGuideOne.key],
+            display_sequence_unthrottled: [mockGuideTwo.key, mockGuideOne.key],
+            display_sequence_throttled: [],
+          },
+        },
+      };
+
+      client["handleSocketEvent"](event);
+
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      const [updatedGroup] = client.store.state.guideGroups;
+
+      expect(updatedGroup).toMatchObject({
+        __typename: "GuideGroup",
+        key: "default",
+        display_sequence: ["guide_two", "guide_one"],
+        display_interval: null,
+      });
+
+      expect(client.store.state.guides["guide_two"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_two",
+        bypass_global_group_limit: true,
+      });
+
+      expect(client.store.state.guides["guide_one"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_one",
+        bypass_global_group_limit: true,
+      });
+    });
+
+    test("handles guide_group.updated event", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      mockStore.state = {
+        guideGroups: [mockDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: {
+          [mockGuideOne.key]: mockGuideOne,
+          [mockGuideTwo.key]: mockGuideTwo,
+        },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const event = {
+        topic: `guides:${channelId}`,
+        event: "guide_group.updated" as const,
+        data: {
+          guide_group: {
+            ...mockDefaultGroup,
+            display_sequence: [mockGuideTwo.key, mockGuideOne.key],
+            display_sequence_unthrottled: [mockGuideTwo.key],
+            display_sequence_throttled: [mockGuideOne.key],
+            display_interval: 3600,
+          },
+        },
+      };
+
+      client["handleSocketEvent"](event);
+
+      expect(mockStore.setState).toHaveBeenCalled();
+
+      const [updatedGroup] = client.store.state.guideGroups;
+
+      expect(updatedGroup).toMatchObject({
+        __typename: "GuideGroup",
+        key: "default",
+        display_sequence: ["guide_two", "guide_one"],
+        display_interval: 3600,
+      });
+
+      expect(client.store.state.guides["guide_two"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_two",
+        bypass_global_group_limit: true,
+      });
+
+      expect(client.store.state.guides["guide_one"]).toMatchObject({
+        __typename: "Guide",
+        key: "guide_one",
+        bypass_global_group_limit: false,
+      });
     });
   });
 
@@ -776,7 +3856,7 @@ describe("KnockGuideClient", () => {
         },
       });
 
-      const _client = new KnockGuideClient(
+      new KnockGuideClient(
         mockKnock,
         channelId,
         {},
@@ -857,6 +3937,82 @@ describe("KnockGuideClient", () => {
       expect(windowWithHistory.history.pushState).toBe(originalPushState);
       expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
     });
+
+    test("shares one history patch across instances and restores only when the last is cleaned up", () => {
+      const originalPushState = vi.fn();
+      const originalReplaceState = vi.fn();
+
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        history: {
+          pushState: originalPushState,
+          replaceState: originalReplaceState,
+        },
+      });
+
+      const windowWithHistory = window as unknown as {
+        history: { pushState: unknown; replaceState: unknown };
+      };
+
+      // Two guide clients patch the same window (as happens across a remount:
+      // the new client is constructed while the old one is still tearing down).
+      const clientA = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+      const clientB = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+
+      // History is patched (not the originals) while either client is active.
+      expect(windowWithHistory.history.pushState).not.toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).not.toBe(
+        originalReplaceState,
+      );
+
+      // Cleaning up one client must NOT restore the originals — the other still
+      // needs location tracking (the pre-fix per-instance patch clobbered it).
+      clientA.cleanup();
+      expect(windowWithHistory.history.pushState).not.toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).not.toBe(
+        originalReplaceState,
+      );
+
+      // Cleaning up the last client restores the originals exactly.
+      clientB.cleanup();
+      expect(windowWithHistory.history.pushState).toBe(originalPushState);
+      expect(windowWithHistory.history.replaceState).toBe(originalReplaceState);
+    });
+
+    test("fires a location change when the patched history.pushState is called", () => {
+      const originalPushState = vi.fn();
+      vi.stubGlobal("window", {
+        ...mockWindow,
+        location: { href: "https://example.com/next" },
+        history: { pushState: originalPushState, replaceState: vi.fn() },
+      });
+
+      const client = new KnockGuideClient(
+        mockKnock,
+        channelId,
+        {},
+        { trackLocationFromWindow: true },
+      );
+      const setLocationSpy = vi.spyOn(client, "setLocation");
+
+      // Calling the patched pushState runs the original and schedules a check.
+      window.history.pushState(null, "", "/next");
+      expect(originalPushState).toHaveBeenCalled();
+
+      // The location check runs on the next tick.
+      vi.advanceTimersByTime(1);
+      expect(setLocationSpy).toHaveBeenCalledWith("https://example.com/next");
+    });
   });
 
   describe("private methods", () => {
@@ -873,6 +4029,112 @@ describe("KnockGuideClient", () => {
         tenant: "test_tenant",
         type: "tooltip",
       });
+    });
+
+    test("setStepMessageAttrs returns guide as new object when step is updated", () => {
+      const mockGuide = {
+        key: "test_guide",
+        steps: [
+          {
+            ref: "step_1",
+            message: { id: "msg_123", seen_at: null },
+          },
+        ],
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Store the original guide reference
+      const originalGuideRef = mockStore.state.guides[mockGuide.key];
+
+      // Update the step message attributes
+      client["setStepMessageAttrs"]("test_guide", "step_1", {
+        seen_at: "2023-01-01T00:00:00Z",
+      });
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+
+      // Verify that the guide object is a new reference (not the same object)
+      expect(newState.guides["test_guide"]).not.toBe(originalGuideRef);
+
+      // Verify that the step message was updated
+      expect(newState.guides["test_guide"]!.steps[0]!.message.seen_at).toBe(
+        "2023-01-01T00:00:00Z",
+      );
+    });
+
+    test("setStepMessageAttrs returns same guide object when step is not found", () => {
+      const mockGuide = {
+        key: "test_guide",
+        steps: [
+          {
+            ref: "step_1",
+            message: { id: "msg_123", seen_at: null },
+          },
+        ],
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      mockStore.state = stateWithGuides;
+      mockStore.getState.mockReturnValue(stateWithGuides);
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Store the original guide reference
+      const originalGuideRef = mockStore.state.guides[mockGuide.key];
+
+      // Try to update a non-existent step
+      client["setStepMessageAttrs"]("test_guide", "non_existent_step", {
+        seen_at: "2023-01-01T00:00:00Z",
+      });
+
+      // Get the setState function and execute it to verify the state changes
+      const setStateCalls = mockStore.setState.mock.calls;
+      const stateUpdateFn = setStateCalls.find(
+        (call) => typeof call[0] === "function",
+      )?.[0];
+
+      const newState = stateUpdateFn(stateWithGuides);
+
+      // Verify that the guide object is the same reference (no update occurred)
+      expect(newState.guides["test_guide"]).toBe(originalGuideRef);
+
+      // Verify that the step message was NOT updated
+      expect(newState.guides["test_guide"]!.steps[0]!.message.seen_at).toBe(
+        null,
+      );
     });
 
     test("buildQueryParams handles missing data and tenant", () => {
@@ -913,7 +4175,6 @@ describe("KnockGuideClient", () => {
       );
 
       expect(result).toEqual({
-        message_id: "msg_123",
         channel_id: channelId,
         guide_key: "test_guide",
         guide_id: "guide_123",
@@ -930,12 +4191,18 @@ describe("KnockGuideClient", () => {
             message: { id: "msg_123", seen_at: null },
           },
         ],
-      };
+      } as unknown as KnockGuide;
 
       mockStore.state = {
-        guides: [mockGuide],
+        guideGroups: [],
+        guideGroupDisplayLogs: {},
+        guides: { [mockGuide.key]: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
         queries: {},
         location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
       };
 
       const client = new KnockGuideClient(mockKnock, channelId);
@@ -972,13 +4239,886 @@ describe("KnockGuideClient", () => {
 
       await client.fetch({ filters: { type: "tooltip" } });
 
-      expect(mockKnock.failIfNotAuthenticated).toHaveBeenCalled();
+      expect(mockKnock.isAuthenticated).toHaveBeenCalled();
       expect(mockKnock.user.getGuides).toHaveBeenCalledWith(
         channelId,
         expect.objectContaining({
           type: "tooltip",
         }),
       );
+    });
+  });
+
+  describe("maybeRecordSelectResult and select query recording", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuideOne = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideTwo = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_2",
+      key: "changelog",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const mockGuideThree = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_3",
+      key: "system_status",
+      type: "banner",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const recordingGuides = {
+      [mockGuideOne.key]: mockGuideOne,
+      [mockGuideTwo.key]: mockGuideTwo,
+      [mockGuideThree.key]: mockGuideThree,
+    };
+
+    const recordingDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["changelog", "onboarding", "system_status"],
+      display_interval: null,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    test("records select result by key when debugging and stage is open", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First call opens stage and records result because debugging is true
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage).toBeDefined();
+      expect(stage!.status).toBe("open");
+      expect(stage!.results.byKey).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]!.one).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]!.one!.metadata).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]!.one!.metadata!.limit).toBe(
+        "one",
+      );
+    });
+
+    test("records select result by type when debugging and stage is open", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Call with type filter triggers recording by type
+      client.selectGuide(stateWithGuides, { type: "card" });
+
+      const stage = client.getStage();
+      expect(stage).toBeDefined();
+      expect(stage!.results.byType).toBeDefined();
+      expect(stage!.results.byType!["card"]).toBeDefined();
+      expect(stage!.results.byType!["card"]!.one).toBeDefined();
+    });
+
+    test("does not record when not debugging", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: undefined,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage!.results).toEqual({});
+    });
+
+    test("does not record without key or type filters", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+      // No filters
+      client.selectGuide(stateWithGuides);
+
+      const stage = client.getStage();
+      expect(stage!.results).toEqual({});
+    });
+
+    test("accumulates results from multiple selectGuide calls", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // First call opens stage and records by key
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+      // Second call records by type (same open stage)
+      client.selectGuide(stateWithGuides, { type: "banner" });
+
+      const stage = client.getStage();
+      expect(stage!.results.byKey!["onboarding"].one).toBeDefined();
+      expect(stage!.results.byType!["banner"].one).toBeDefined();
+    });
+
+    test("selectGuides records result with 'all' limit", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // selectGuides opens stage via internal selectGuide, then records its
+      // own select result with limit "all".
+      client.selectGuides(stateWithGuides, { type: "card" });
+
+      const stage = client.getStage();
+      expect(stage!.results.byType).toBeDefined();
+      expect(stage!.results.byType!["card"]).toBeDefined();
+      expect(stage!.results.byType!["card"]!.all).toBeDefined();
+      expect(stage!.results.byType!["card"]!.all!.metadata!.limit).toBe("all");
+
+      // selectGuides calls selectGuide internally with recordSelectQuery: false,
+      // so the "one" limit should NOT be recorded for the same type filter.
+      expect(stage!.results.byType!["card"]!.one).toBeUndefined();
+    });
+
+    test("does not record when stage is closed", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage
+      client["stage"] = {
+        status: "closed",
+        ordered: ["changelog"],
+        resolved: "changelog",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Call selectGuide on the closed stage; should NOT record
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage!.results).toEqual({});
+    });
+
+    test("records during patch stage status", () => {
+      const stateWithGuides = {
+        guideGroups: [recordingDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: recordingGuides,
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { debugging: true },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage, then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["changelog"],
+        resolved: "changelog",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      // Call selectGuide on the patched stage; SHOULD record
+      client.selectGuide(stateWithGuides, { key: "onboarding" });
+
+      const stage = client.getStage();
+      expect(stage!.results.byKey).toBeDefined();
+      expect(stage!.results.byKey!["onboarding"]).toBeDefined();
+    });
+  });
+
+  describe("throttle behavior in group stage", () => {
+    const mockStep = {
+      ref: "step_1",
+      schema_key: "foo",
+      schema_semver: "1.0.0",
+      schema_variant_key: "default",
+      message: {
+        seen_at: null,
+        read_at: null,
+        interacted_at: null,
+        archived_at: null,
+        link_clicked_at: null,
+      },
+      content: {},
+      markAsSeen: vi.fn(),
+      markAsInteracted: vi.fn(),
+      markAsArchived: vi.fn(),
+    } as unknown as KnockGuideStep;
+
+    const mockGuide = {
+      __typename: "Guide",
+      channel_id: channelId,
+      id: "guide_1",
+      key: "onboarding",
+      type: "card",
+      semver: "1.0.0",
+      active: true,
+      steps: [mockStep],
+      activation_url_rules: [],
+      activation_url_patterns: [],
+      bypass_global_group_limit: false,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      getStep: vi.fn().mockReturnValue(mockStep),
+    } as unknown as KnockGuide;
+
+    const throttleDefaultGroup = {
+      __typename: "GuideGroup",
+      key: "default",
+      display_sequence: ["onboarding"],
+      display_interval: 24 * 60 * 60,
+      inserted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as GuideGroupData;
+
+    test("returns undefined for throttled guide in closed stage", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: undefined,
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage with the guide resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      expect(result).toBeUndefined();
+    });
+
+    test("returns undefined for throttled guide in patch stage", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      expect(result).toBeUndefined();
+    });
+
+    test("returns unthrottled guide in closed stage even when throttled", () => {
+      const unthrottledGuide = {
+        ...mockGuide,
+        bypass_global_group_limit: true,
+      } as unknown as KnockGuide;
+
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: unthrottledGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage with the guide resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Unthrottled guides bypass the throttle check entirely
+      const result = client.selectGuide(stateWithGuides, { key: "onboarding" });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns throttled guide with includeThrottled option in patch stage", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: { forcedGuideKey: null, previewSessionId: null },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      // With includeThrottled, should return the resolved guide
+      const result = client.selectGuide(
+        stateWithGuides,
+        { key: "onboarding" },
+        { includeThrottled: true },
+      );
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in closed stage even when throttled", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage with the guide resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Focused guides bypass throttle in closed stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in patch stage even when throttled", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {
+          default: new Date().toISOString(),
+        },
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage then patch it
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "onboarding",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      // Focused guides bypass throttle in patch stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in patch stage even when not the resolved guide", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage where a DIFFERENT guide was resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "some_other_guide",
+        results: {},
+        timeoutId: null,
+      };
+      client["patchClosedGroupStage"]();
+
+      expect(client.getStage()!.status).toBe("patch");
+
+      // Focused guides bypass the resolved check in patch stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+
+    test("returns focused guide in closed stage even when not the resolved guide", () => {
+      const stateWithGuides = {
+        guideGroups: [throttleDefaultGroup],
+        guideGroupDisplayLogs: {},
+        guides: { onboarding: mockGuide },
+        ineligibleGuides: {},
+        previewGuides: {},
+        queries: {},
+        location: undefined,
+        counter: 0,
+        debug: {
+          focusedGuideKeys: { onboarding: true as const },
+        },
+      };
+
+      const client = new KnockGuideClient(mockKnock, channelId);
+
+      // Set up a closed stage where a DIFFERENT guide was resolved
+      client["stage"] = {
+        status: "closed",
+        ordered: ["onboarding"],
+        resolved: "some_other_guide",
+        results: {},
+        timeoutId: null,
+      };
+
+      // Focused guides bypass the resolved check in closed stage
+      const result = client.selectGuide(stateWithGuides, {
+        key: "onboarding",
+      });
+      expect(result).toBeDefined();
+      expect(result!.key).toBe("onboarding");
+    });
+  });
+
+  describe("setDebug", () => {
+    test("clears group stage before updating store state", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      const clearGroupStageSpy = vi.spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client as any,
+        "clearGroupStage",
+      );
+
+      client.setDebug();
+
+      expect(clearGroupStageSpy).toHaveBeenCalled();
+    });
+
+    test("sets debug state with debugging: true", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.debugging!).toBe(true);
+
+      // calls fetch and subscribe when not already debugging
+      expect(fetchSpy).toHaveBeenCalled();
+      expect(subscribeSpy).toHaveBeenCalled();
+    });
+
+    test("sets debug state with provided options", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() => Promise.resolve({ status: "ok" }));
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug({ forcedGuideKey: "test_guide" });
+
+      expect(client.store.state.debug!.debugging!).toBe(true);
+      expect(client.store.state.debug!.forcedGuideKey!).toBe("test_guide");
+    });
+
+    test("does not call fetch and subscribe when already debugging", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.debugging!).toBe(true);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+
+    test("defaults skipEngagementTracking to true", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.skipEngagementTracking).toBe(true);
+    });
+
+    test("allows overriding skipEngagementTracking to false", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug({ skipEngagementTracking: false });
+
+      expect(client.store.state.debug!.skipEngagementTracking).toBe(false);
+    });
+
+    test("defaults ignoreDisplayInterval to true", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug();
+
+      expect(client.store.state.debug!.ignoreDisplayInterval).toBe(true);
+    });
+
+    test("allows overriding ignoreDisplayInterval to false", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      client.setDebug({ ignoreDisplayInterval: false });
+
+      expect(client.store.state.debug!.ignoreDisplayInterval).toBe(false);
+    });
+
+    test("returns early without setting debug when not authenticated", () => {
+      vi.mocked(mockKnock.isAuthenticated).mockReturnValue(false);
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+
+      client.setDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("unsetDebug", () => {
+    test("clears group stage before updating store state", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      vi.spyOn(client, "fetch").mockImplementation(() =>
+        Promise.resolve({ status: "ok" }),
+      );
+      vi.spyOn(client, "subscribe").mockImplementation(() => {});
+
+      const clearGroupStageSpy = vi.spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client as any,
+        "clearGroupStage",
+      );
+
+      client.unsetDebug();
+
+      expect(clearGroupStageSpy).toHaveBeenCalled();
+    });
+
+    test("sets debug state to undefined", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+
+      // calls fetch when exiting debugging
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+
+    test("does not call fetch and subscribe when was not debugging", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = undefined;
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+
+    test("clears debug state but does not fetch when not authenticated", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: true };
+
+      vi.mocked(mockKnock.isAuthenticated).mockReturnValue(false);
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
+    });
+
+    test("does not call fetch and subscribe when debug exists but debugging is false", () => {
+      const client = new KnockGuideClient(mockKnock, channelId);
+      client.store.state.debug = { debugging: false };
+
+      const fetchSpy = vi
+        .spyOn(client, "fetch")
+        .mockImplementation(() => Promise.resolve({ status: "ok" }));
+      const subscribeSpy = vi
+        .spyOn(client, "subscribe")
+        .mockImplementation(() => {});
+
+      client.unsetDebug();
+
+      expect(client.store.state.debug).toBe(undefined);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(subscribeSpy).not.toHaveBeenCalled();
     });
   });
 });

@@ -5,164 +5,253 @@ import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
 
-const sortGuides = (guides: KnockGuide[]) => {
-  return [...guides].sort(
-    (a, b) =>
-      b.priority - a.priority ||
-      new Date(b.inserted_at).getTime() - new Date(a.inserted_at).getTime(),
-  );
+import {
+  DEFAULT_GROUP_KEY,
+  byKey,
+  checkStateIfThrottled,
+  findDefaultGroup,
+  formatFilters,
+  formatGroupStage,
+  formatState,
+  getToolbarRunConfigFromUrl,
+  mockDefaultGroup,
+  newUrl,
+  predicateUrlPatterns,
+  predicateUrlRules,
+} from "./helpers";
+import {
+  Any,
+  ConstructorOpts,
+  DebugState,
+  GetGuidesQueryParams,
+  GetGuidesResponse,
+  GroupStage,
+  GuideAddedEvent,
+  GuideData,
+  GuideGroupAddedEvent,
+  GuideGroupUpdatedEvent,
+  GuideRemovedEvent,
+  GuideSocketEvent,
+  GuideStepData,
+  GuideUpdatedEvent,
+  KnockGuide,
+  KnockGuideStep,
+  MarkAsArchivedParams,
+  MarkAsInteractedParams,
+  MarkAsSeenParams,
+  MarkGuideAsResponse,
+  QueryFilterParams,
+  QueryStatus,
+  SelectFilterParams,
+  SelectGuideOpts,
+  SelectGuidesOpts,
+  SelectQueryLimit,
+  SelectionResult,
+  StepMessageState,
+  StoreState,
+  TargetParams,
+} from "./types";
+
+// How long to wait until we resolve the guides order and determine the
+// prevailing guide.
+const DEFAULT_ORDER_RESOLUTION_DURATION = 50; // in milliseconds
+
+// How often we should increment the counter to refresh the store state and
+// trigger subscribed callbacks.
+const DEFAULT_COUNTER_INCREMENT_INTERVAL = 30 * 1000; // in milliseconds
+
+// Maximum number of retry attempts for channel subscription
+const SUBSCRIBE_RETRY_LIMIT = 3;
+
+// Return the global window object if defined, so to safely guard against SSR.
+const checkForWindow = () => {
+  if (typeof window !== "undefined") {
+    return window;
+  }
 };
 
-//
-// Guides API (via User client)
-//
+type LocationListener = () => void;
+
+// State for the shared history monkey-patch is stored on the `history` object
+// itself so it is naturally scoped per-window and free of module-level globals.
+type PatchedHistory = History & {
+  __knockGuidePatch?: {
+    listeners: Set<LocationListener>;
+    originalPushState: History["pushState"];
+    originalReplaceState: History["replaceState"];
+  };
+};
+
+// Register a location-change listener, installing a single shared patch of
+// `history.pushState`/`replaceState` for programmatic navigation. This is
+// idempotent across guide client instances: a provider remount (e.g. toggling
+// `enabled`) constructs a new client while the old one is still tearing down, so
+// patching per-instance would nest proxies and clobber the restore. Sharing one
+// patch keyed on the `history` object avoids that entirely.
+const addHistoryLocationListener = (
+  history: PatchedHistory,
+  listener: LocationListener,
+) => {
+  if (!history.__knockGuidePatch) {
+    const listeners = new Set<LocationListener>();
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    // Notify on the next tick so the browser state can settle first.
+    const notify = () =>
+      setTimeout(() => {
+        for (const l of listeners) l();
+      }, 0);
+
+    const wrap = <T extends History["pushState"] | History["replaceState"]>(
+      target: T,
+    ): T =>
+      new Proxy(target, {
+        apply: (fn, thisArg, args) => {
+          const result = Reflect.apply(fn, thisArg, args);
+          notify();
+          return result;
+        },
+      }) as T;
+
+    history.pushState = wrap(originalPushState);
+    history.replaceState = wrap(originalReplaceState);
+    history.__knockGuidePatch = {
+      listeners,
+      originalPushState,
+      originalReplaceState,
+    };
+  }
+
+  history.__knockGuidePatch.listeners.add(listener);
+};
+
+// Remove a location-change listener, restoring the original history methods once
+// the last guide client on this window has gone away.
+const removeHistoryLocationListener = (
+  history: PatchedHistory,
+  listener: LocationListener,
+) => {
+  const patch = history.__knockGuidePatch;
+  if (!patch) return;
+
+  patch.listeners.delete(listener);
+
+  if (patch.listeners.size === 0) {
+    history.pushState = patch.originalPushState;
+    history.replaceState = patch.originalReplaceState;
+    delete history.__knockGuidePatch;
+  }
+};
 
 export const guidesApiRootPath = (userId: string | undefined | null) =>
   `/v1/users/${userId}/guides`;
 
-interface StepMessageState {
-  id: string;
-  seen_at: string | null;
-  read_at: string | null;
-  interacted_at: string | null;
-  archived_at: string | null;
-  link_clicked_at: string | null;
-}
-
-interface GuideStepData {
-  ref: string;
-  schema_key: string;
-  schema_semver: string;
-  schema_variant_key: string;
-  message: StepMessageState;
-  // eslint-disable-next-line
-  content: any;
-}
-
-interface GuideActivationLocationRuleData {
-  directive: "allow" | "block";
-  pathname: string;
-}
-
-interface GuideData {
-  __typename: "Guide";
-  channel_id: string;
-  id: string;
-  key: string;
-  priority: number;
-  type: string;
-  semver: string;
-  steps: GuideStepData[];
-  activation_location_rules: GuideActivationLocationRuleData[];
-  inserted_at: string;
-  updated_at: string;
-}
-
-export interface KnockGuideStep extends GuideStepData {
-  markAsSeen: () => void;
-  markAsInteracted: (params?: { metadata?: GenericData }) => void;
-  markAsArchived: () => void;
-}
-
-interface KnockGuideActivationLocationRule
-  extends GuideActivationLocationRuleData {
-  pattern: URLPattern;
-}
-
-export interface KnockGuide extends GuideData {
-  steps: KnockGuideStep[];
-  activation_location_rules: KnockGuideActivationLocationRule[];
-}
-
-type GetGuidesQueryParams = {
-  data?: string;
-  tenant?: string;
-  type?: string;
+type SelectQueryMetadata = {
+  limit: SelectQueryLimit;
+  opts: SelectGuideOpts;
 };
 
-type GetGuidesResponse = {
-  entries: GuideData[];
+const select = (
+  state: StoreState,
+  filters: SelectFilterParams,
+  metadata: SelectQueryMetadata,
+) => {
+  // A map of selected guides as values, with its order index as keys.
+  const result = new SelectionResult();
+
+  const defaultGroup = findDefaultGroup(state.guideGroups);
+  if (!defaultGroup) return result;
+
+  const displaySequence = defaultGroup.display_sequence;
+  const location = state.location;
+
+  for (const [index, guideKey] of displaySequence.entries()) {
+    const guide = state.previewGuides[guideKey] || state.guides[guideKey];
+    if (!guide) continue;
+
+    const affirmed = predicate(guide, filters, {
+      location,
+      ineligibleGuides: state.ineligibleGuides,
+      debug: state.debug,
+    });
+
+    if (!affirmed) continue;
+
+    result.set(index, guide);
+  }
+
+  result.metadata = { guideGroup: defaultGroup, filters, ...metadata };
+
+  return result;
 };
 
-export type GuideEngagementEventBaseParams = {
-  // Base params required for all engagement update events
-  message_id: string;
-  channel_id: string;
-  guide_key: string;
-  guide_id: string;
-  guide_step_ref: string;
-};
-
-type MarkAsSeenParams = GuideEngagementEventBaseParams & {
-  // Rendered step content seen by the recipient
-  content: GenericData;
-  // Target params
-  data?: GenericData;
-  tenant?: string;
-};
-type MarkAsInteractedParams = GuideEngagementEventBaseParams;
-type MarkAsArchivedParams = GuideEngagementEventBaseParams;
-
-type MarkGuideAsResponse = {
-  status: "ok";
-};
-
-type SocketEventType = "guide.added" | "guide.updated" | "guide.removed";
-
-type SocketEventPayload<E extends SocketEventType, D> = {
-  topic: string;
-  event: E;
-  data: D;
-};
-
-type GuideAddedEvent = SocketEventPayload<
-  "guide.added",
-  { guide: GuideData; eligible: true }
+type PredicateOpts = Pick<
+  StoreState,
+  "location" | "ineligibleGuides" | "debug"
 >;
 
-type GuideUpdatedEvent = SocketEventPayload<
-  "guide.updated",
-  { guide: GuideData; eligible: boolean }
->;
+const predicate = (
+  guide: KnockGuide,
+  filters: SelectFilterParams,
+  { location, ineligibleGuides = {}, debug = {} }: PredicateOpts,
+) => {
+  if (filters.type && filters.type !== guide.type) {
+    return false;
+  }
 
-type GuideRemovedEvent = SocketEventPayload<
-  "guide.removed",
-  { guide: Pick<GuideData, "key"> }
->;
+  if (filters.key && filters.key !== guide.key) {
+    return false;
+  }
 
-type GuideSocketEvent = GuideAddedEvent | GuideUpdatedEvent | GuideRemovedEvent;
+  // If in debug mode with a forced guide key, bypass other filtering and always
+  // return true for that guide only. This should always run AFTER checking the
+  // filters but BEFORE checking archived status and location rules.
+  if (
+    debug.focusedGuideKeys &&
+    Object.keys(debug.focusedGuideKeys).length > 0
+  ) {
+    return !!debug.focusedGuideKeys[guide.key];
+  }
+  if (debug.forcedGuideKey) {
+    return debug.forcedGuideKey === guide.key;
+  }
 
-//
-// Guides client
-//
+  const ineligible = ineligibleGuides[guide.key];
+  if (ineligible) {
+    return false;
+  }
 
-type QueryKey = string;
+  if (!guide.active) {
+    return false;
+  }
 
-type QueryStatus = {
-  status: "loading" | "ok" | "error";
-  error?: Error;
+  if (guide.steps.every((s) => !!s.message.archived_at)) {
+    return false;
+  }
+
+  return checkActivatable(guide, location);
 };
 
-type StoreState = {
-  guides: KnockGuide[];
-  queries: Record<QueryKey, QueryStatus>;
-  location: string | undefined;
-};
+export const checkActivatable = (
+  guide: Pick<KnockGuide, "activation_url_rules" | "activation_url_patterns">,
+  location: string | undefined,
+) => {
+  const url = location ? newUrl(location) : undefined;
 
-type QueryFilterParams = Pick<GetGuidesQueryParams, "type">;
+  const urlRules = guide.activation_url_rules || [];
+  const urlPatterns = guide.activation_url_patterns || [];
 
-export type SelectFilterParams = {
-  key?: string;
-  type?: string;
-};
+  // A guide can have either activation url rules XOR url patterns, but not both.
+  if (url && urlRules.length > 0) {
+    const allowed = predicateUrlRules(url, urlRules);
+    if (!allowed) return false;
+  } else if (url && urlPatterns.length > 0) {
+    const allowed = predicateUrlPatterns(url, urlPatterns);
+    if (!allowed) return false;
+  }
 
-export type TargetParams = {
-  data?: GenericData | undefined;
-  tenant?: string | undefined;
-};
-
-type ConstructorOpts = {
-  trackLocationFromWindow?: boolean;
+  return true;
 };
 
 export class KnockGuideClient {
@@ -172,11 +261,21 @@ export class KnockGuideClient {
   private socket: Socket | undefined;
   private socketChannel: Channel | undefined;
   private socketChannelTopic: string;
-  private socketEventTypes = ["guide.added", "guide.updated", "guide.removed"];
+  private socketEventTypes = [
+    "guide.added",
+    "guide.updated",
+    "guide.removed",
+    "guide_group.added",
+    "guide_group.updated",
+  ];
+  private subscribeRetryCount = 0;
 
-  // Original history methods to monkey patch, or restore in cleanups.
-  private pushStateFn: History["pushState"] | undefined;
-  private replaceStateFn: History["replaceState"] | undefined;
+  // Guides that are competing to render are "staged" first without rendering
+  // and ranked based on its relative order in the group over a duration of time
+  // to resolve and render the prevailing one.
+  private stage: GroupStage | undefined;
+
+  private counterIntervalId: ReturnType<typeof setInterval> | undefined;
 
   constructor(
     readonly knock: Knock,
@@ -184,16 +283,24 @@ export class KnockGuideClient {
     readonly targetParams: TargetParams = {},
     readonly options: ConstructorOpts = {},
   ) {
-    const { trackLocationFromWindow = true } = options;
+    const {
+      trackLocationFromWindow = true,
+      throttleCheckInterval = DEFAULT_COUNTER_INCREMENT_INTERVAL,
+    } = options;
+    const win = checkForWindow();
 
-    const location = trackLocationFromWindow
-      ? window?.location.href
-      : undefined;
+    const location = trackLocationFromWindow ? win?.location?.href : undefined;
 
     this.store = new Store<StoreState>({
-      guides: [],
+      guideGroups: [],
+      guideGroupDisplayLogs: {},
+      guides: {},
+      ineligibleGuides: {},
+      previewGuides: {},
       queries: {},
       location,
+      // Increment to update the state store and trigger re-selection.
+      counter: 0,
     });
 
     // In server environments we might not have a socket connection.
@@ -205,24 +312,67 @@ export class KnockGuideClient {
       this.listenForLocationChangesFromWindow();
     }
 
+    if (throttleCheckInterval) {
+      // Start the counter loop to increment at an interval.
+      this.startCounterInterval(throttleCheckInterval);
+    }
+
     this.knock.log("[Guide] Initialized a guide client");
+  }
+
+  private incrementCounter() {
+    this.knock.log("[Guide] Incrementing the counter");
+    this.store.setState((state) => ({ ...state, counter: state.counter + 1 }));
+  }
+
+  private startCounterInterval(delay: number) {
+    this.counterIntervalId = setInterval(() => {
+      this.knock.log("[Guide] Counter interval tick");
+      if (this.stage && this.stage.status !== "closed") return;
+
+      this.incrementCounter();
+    }, delay);
+  }
+
+  private clearCounterInterval() {
+    if (this.counterIntervalId) {
+      clearInterval(this.counterIntervalId);
+      this.counterIntervalId = undefined;
+    }
   }
 
   cleanup() {
     this.unsubscribe();
-    this.removeEventListeners();
+    this.removeLocationChangeEventListeners();
+    this.clearGroupStage();
+    this.clearCounterInterval();
   }
 
-  async fetch(opts?: { filters?: QueryFilterParams }) {
-    this.knock.failIfNotAuthenticated();
-    this.knock.log("[Guide] Loading all eligible guides");
+  async fetch(opts?: {
+    filters?: QueryFilterParams;
+    force?: boolean;
+  }): Promise<QueryStatus> {
+    this.knock.log("[Guide] .fetch");
+
+    // No user to fetch guides for. Return an error status (without caching it,
+    // so a later authenticated fetch still runs) rather than throwing — guide
+    // components auto-fire this and a throw crashes the host app.
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] User is not authenticated, skipping fetch");
+      return {
+        status: "error",
+        error: new Error(
+          "Not authenticated. Please call `authenticate` first.",
+        ),
+      };
+    }
 
     const queryParams = this.buildQueryParams(opts?.filters);
     const queryKey = this.formatQueryKey(queryParams);
 
-    // If already fetched before, then noop.
+    // If already fetched before, then noop (unless forced).
     const maybeQueryStatus = this.store.state.queries[queryKey];
-    if (maybeQueryStatus) {
+    if (maybeQueryStatus && !opts?.force) {
       return maybeQueryStatus;
     }
 
@@ -234,18 +384,33 @@ export class KnockGuideClient {
 
     let queryStatus: QueryStatus;
     try {
+      this.knock.log("[Guide] Fetching all eligible guides");
       const data = await this.knock.user.getGuides<
         GetGuidesQueryParams,
         GetGuidesResponse
       >(this.channelId, queryParams);
       queryStatus = { status: "ok" };
 
+      const {
+        entries,
+        guide_groups: groups,
+        guide_group_display_logs,
+        ineligible_guides,
+      } = data;
+
+      // Clear group stage if one exists already before (re)setting the store
+      // state.
+      if (this.stage) {
+        this.clearGroupStage();
+      }
+
+      this.knock.log("[Guide] Loading fetched guides");
       this.store.setState((state) => ({
         ...state,
-        // For now assume a single fetch to get all eligible guides. When/if
-        // we implement incremental loads, then this will need to be a merge
-        // and sort operation.
-        guides: data.entries.map((g) => this.localCopy(g)),
+        guideGroups: groups?.length > 0 ? groups : [mockDefaultGroup(entries)],
+        guideGroupDisplayLogs: guide_group_display_logs || {},
+        guides: byKey(entries.map((g) => this.localCopy(g))),
+        ineligibleGuides: byKey(ineligible_guides || []),
         queries: { ...state.queries, [queryKey]: queryStatus },
       }));
     } catch (e) {
@@ -261,8 +426,20 @@ export class KnockGuideClient {
   }
 
   subscribe() {
+    // No user to subscribe for; skip silently rather than throwing (this is
+    // reachable from guide components rendered while unauthenticated).
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] User is not authenticated, skipping subscribe");
+      return;
+    }
+
+    // Re-read the socket from the API client on every subscribe. Re-authenticating
+    // replaces the API client (and therefore its socket), so a socket captured
+    // once in the constructor goes stale and reconnects with old credentials.
+    // Reading it here keeps guide real-time working across re-auth (E12).
+    this.socket = this.knock.client().socket;
     if (!this.socket) return;
-    this.knock.failIfNotAuthenticated();
+
     this.knock.log("[Guide] Subscribing to real time updates");
 
     // Ensure a live socket connection if not yet connected.
@@ -276,7 +453,15 @@ export class KnockGuideClient {
     }
 
     // Join the channel topic and subscribe to supported events.
-    const params = { ...this.targetParams, user_id: this.knock.userId };
+    const debugState = this.store.state.debug;
+    const params = {
+      ...this.targetParams,
+      user_id: this.knock.userId,
+      force_all_guides:
+        debugState?.forcedGuideKey || debugState?.debugging ? true : undefined,
+      preview_session_id: debugState?.previewSessionId || undefined,
+    };
+
     const newChannel = this.socket.channel(this.socketChannelTopic, params);
 
     for (const eventType of this.socketEventTypes) {
@@ -284,11 +469,42 @@ export class KnockGuideClient {
     }
 
     if (["closed", "errored"].includes(newChannel.state)) {
-      newChannel.join();
+      // Reset retry count for new subscription attempt
+      this.subscribeRetryCount = 0;
+
+      newChannel
+        .join()
+        .receive("ok", () => {
+          this.knock.log("[Guide] Successfully joined channel");
+        })
+        .receive("error", (resp) => {
+          this.knock.log(
+            `[Guide] Failed to join channel: ${JSON.stringify(resp)}`,
+          );
+          this.handleChannelJoinError();
+        })
+        .receive("timeout", () => {
+          this.knock.log("[Guide] Channel join timed out");
+          this.handleChannelJoinError();
+        });
     }
 
     // Track the joined channel.
     this.socketChannel = newChannel;
+  }
+
+  private handleChannelJoinError() {
+    // Prevent phx channel from retrying forever in case of either network or
+    // other errors (e.g. auth error, invalid channel etc)
+    if (this.subscribeRetryCount >= SUBSCRIBE_RETRY_LIMIT) {
+      this.knock.log(
+        `[Guide] Channel join max retry limit reached: ${this.subscribeRetryCount}`,
+      );
+      this.unsubscribe();
+      return;
+    }
+
+    this.subscribeRetryCount++;
   }
 
   unsubscribe() {
@@ -308,20 +524,111 @@ export class KnockGuideClient {
   private handleSocketEvent(payload: GuideSocketEvent) {
     const { event, data } = payload;
 
+    // TODO(KNO-11489): Include an ineligible guide in the socket payload too
+    // and process it when handling socket events in real time.
     switch (event) {
       case "guide.added":
-        return this.addGuide(payload);
+        return this.addOrReplaceGuide(payload);
 
       case "guide.updated":
         return data.eligible
-          ? this.replaceOrAddGuide(payload)
+          ? this.addOrReplaceGuide(payload)
           : this.removeGuide(payload);
 
       case "guide.removed":
         return this.removeGuide(payload);
 
+      case "guide_group.added":
+      case "guide_group.updated":
+        return this.addOrReplaceGuideGroup(payload);
+
       default:
         return;
+    }
+  }
+
+  setLocation(href: string, additionalParams: Partial<StoreState> = {}) {
+    this.knock.log(`[Guide] .setLocation (loc=${href})`);
+
+    // Make sure to clear out the stage.
+    this.clearGroupStage();
+
+    this.knock.log("[Guide] Updating the tracked location");
+    this.store.setState((state) => {
+      // Clear preview guides if no longer in preview mode
+      const previewGuides = additionalParams?.debug?.previewSessionId
+        ? state.previewGuides
+        : {};
+
+      return {
+        ...state,
+        ...additionalParams,
+        previewGuides,
+        location: href,
+      };
+    });
+  }
+
+  setDebug(debugOpts?: Omit<DebugState, "debugging">) {
+    this.knock.log("[Guide] .setDebug()");
+
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Not authenticated, cannot start debugging");
+      return;
+    }
+
+    const shouldRefetch = !this.store.state.debug?.debugging;
+
+    // Clear the stage before updating the store state to let the next render
+    // cycle run with a fresh group stage.
+    this.clearGroupStage();
+
+    this.store.setState((state) => ({
+      ...state,
+      debug: {
+        skipEngagementTracking: true,
+        ignoreDisplayInterval: true,
+        focusedGuideKeys: {},
+        ...debugOpts,
+        debugging: true,
+      },
+    }));
+
+    if (shouldRefetch) {
+      this.knock.log(
+        `[Guide] Start debugging, refetching guides and resubscribing to the websocket channel`,
+      );
+      this.fetch({ force: true });
+      // Always subscribe while debugging.
+      this.subscribe();
+    }
+  }
+
+  unsetDebug(opts?: { listenForUpdates?: boolean }) {
+    this.knock.log("[Guide] .unsetDebug()");
+    const shouldRefetch = this.store.state.debug?.debugging;
+
+    // Clear the stage before updating the store state to let the next render
+    // cycle run with a fresh group stage.
+    this.clearGroupStage();
+
+    this.store.setState((state) => ({ ...state, debug: undefined }));
+
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] Not authenticated, will not refetch");
+      return;
+    }
+
+    if (shouldRefetch) {
+      this.knock.log(
+        `[Guide] Stop debugging, refetching guides and resubscribing to the websocket channel`,
+      );
+      this.fetch({ force: true });
+      if (opts?.listenForUpdates) {
+        this.subscribe();
+      } else {
+        this.unsubscribe();
+      }
     }
   }
 
@@ -329,54 +636,354 @@ export class KnockGuideClient {
   // Store selector
   //
 
-  select(state: StoreState, filters: SelectFilterParams = {}) {
-    return state.guides.filter((guide) => {
-      if (filters.type && filters.type !== guide.type) {
-        return false;
-      }
+  selectGuides<C = Any>(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuidesOpts = {},
+  ): KnockGuide<C>[] {
+    this.knock.log(
+      `[Guide] .selectGuides (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
+    );
 
-      if (filters.key && filters.key !== guide.key) {
-        return false;
-      }
-
-      const locationRules = guide.activation_location_rules || [];
-
-      if (locationRules.length > 0 && state.location) {
-        const allowed = locationRules.reduce<boolean | undefined>(
-          (acc, rule) => {
-            // Any matched block rule prevails so no need to evaluate further
-            // as soon as there is one.
-            if (acc === false) return false;
-
-            // At this point we either have a matched allow rule (acc is true),
-            // or no matched rule found yet (acc is undefined).
-
-            switch (rule.directive) {
-              case "allow": {
-                // No need to evaluate more allow rules once we matched one
-                // since any matched allowed rule means allow.
-                if (acc === true) return true;
-
-                const matched = rule.pattern.test(state.location);
-                return matched ? true : undefined;
-              }
-
-              case "block": {
-                // Always test block rules (unless already matched to block)
-                // because they'd prevail over matched allow rules.
-                const matched = rule.pattern.test(state.location);
-                return matched ? false : acc;
-              }
-            }
-          },
-          undefined,
-        );
-
-        if (!allowed) return false;
-      }
-
-      return true;
+    // 1. First, call selectGuide() using the same filters to ensure we have a
+    // group stage open and respect throttling. This isn't the real query, but
+    // rather it's a shortcut ahead of handling the actual query result below.
+    const selectedGuide = this.selectGuide(state, filters, {
+      ...opts,
+      // Don't record this result, not the actual query result we need.
+      recordSelectQuery: false,
     });
+
+    // 2. Now make the actual select query with the provided filters and opts,
+    // and record the result (as needed). By default, we only record the result
+    // while in debugging.
+    const { recordSelectQuery = !!state.debug?.debugging } = opts;
+    const metadata: SelectQueryMetadata = {
+      limit: "all",
+      opts: { ...opts, recordSelectQuery },
+    };
+    const result = select(state, filters, metadata);
+    this.maybeRecordSelectResult(result);
+
+    // 3. Stop if there is not at least one guide to return.
+    if (!selectedGuide && !opts.includeThrottled) {
+      return [];
+    }
+
+    // There should be at least one guide to return here now.
+    const guides = [...result.values()];
+
+    // 4. If throttled, filter out any throttled guides.
+    if (!opts.includeThrottled && checkStateIfThrottled(state)) {
+      const unthrottledGuides = guides.filter(
+        (g) => g.bypass_global_group_limit,
+      );
+      const throttledCount = guides.length - unthrottledGuides.length;
+      this.knock.log(
+        `[Guide] Throttling ${throttledCount} guides from selection, and returning ${unthrottledGuides.length} guides`,
+      );
+
+      return unthrottledGuides;
+    }
+
+    this.knock.log(`[Guide] Returning ${guides.length} guides from selection`);
+    return guides;
+  }
+
+  selectGuide<C = Any>(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuideOpts = {},
+  ): KnockGuide<C> | undefined {
+    this.knock.log(
+      `[Guide] .selectGuide (filters: ${formatFilters(filters)}; state: ${formatState(state)})`,
+    );
+    if (
+      Object.keys(state.guides).length === 0 &&
+      Object.keys(state.previewGuides).length === 0
+    ) {
+      this.knock.log("[Guide] Exiting selection (no guides)");
+      return undefined;
+    }
+
+    // Starting here to the end of this method represents the core logic of how
+    // "group stage" works. It provides a mechanism for 1) figuring out which
+    // guide components are about to render on a page, 2) determining which
+    // among them ranks highest in the configured display sequence, and 3)
+    // returning only the prevailing guide to render at a time.
+    //
+    // Imagine N number of components that use the `useGuide()` hook which
+    // calls this `selectGuide()` method, and the logic works like this:
+    // * The first time this method is called, we don't have an "open" group
+    //   stage, so we open one (this occurs when a new page/route is rendering).
+    //   * While it is open, we record which guide was selected and its order
+    //     index from each call, but we do NOT return any guide to render yet.
+    //   * When a group stage opens, it schedules a timer to close itself. How
+    //     long this timer waits is configurable. Note, `setTimeout` with 0
+    //     delay seems to work well for React apps, where we "yield" to React
+    //     for one render cycle and close the group right after.
+    // * When a group stage closes, we evaluate which guides were selected and
+    //   recorded, then determine the winning guide (i.e. the one with the
+    //   lowest order index value).
+    //   * Then increment the internal counter to trigger a store state update,
+    //     which allows `useGuide()` and `selectGuide()` to re-run. This second
+    //     round of `selectGuide()` calls, occurring when the group stage is
+    //     closed, results in returning the prevailing guide.
+    // * Whenever a user navigates to a new page, we repeat the same process
+    //   above.
+    // * There's a third status called "patch," which is for handling real-time
+    //   updates received from the API. It's similar to the "open" to "closed"
+    //   flow, except we keep the resolved guide in place while we recalculate.
+    //   This is done so that we don't cause flickers or CLS.
+    if (!this.stage) {
+      this.stage = this.openGroupStage(); // Assign here to make tsc happy
+    }
+
+    // Must come AFTER we ensure a group stage exists above, so we can record
+    // select queries. By default, we only record the result while in debugging.
+    const { recordSelectQuery = !!state.debug?.debugging } = opts;
+    const metadata: SelectQueryMetadata = {
+      limit: "one",
+      opts: { ...opts, recordSelectQuery },
+    };
+    const result = select(state, filters, metadata);
+    this.maybeRecordSelectResult(result);
+
+    if (result.size === 0) {
+      this.knock.log("[Guide] Selection found zero result");
+      return undefined;
+    }
+
+    const [index, guide] = [...result][0]!;
+    this.knock.log(
+      `[Guide] Selection found: \`${guide.key}\` (total: ${result.size})`,
+    );
+
+    // If a guide ignores the group limit, then return immediately to render
+    // always.
+    if (guide.bypass_global_group_limit) {
+      this.knock.log(`[Guide] Returning the unthrottled guide: ${guide.key}`);
+      return guide;
+    }
+
+    // If focused while in debug mode, then we want to ignore the guide order
+    // and throttle settings and force render this guide.
+    const focusedInDebug = state.debug?.focusedGuideKeys?.[guide.key];
+
+    const throttled = !opts.includeThrottled && checkStateIfThrottled(state);
+
+    switch (this.stage.status) {
+      case "open": {
+        this.knock.log(`[Guide] Adding to the group stage: ${guide.key}`);
+        this.stage.ordered[index] = guide.key;
+        return undefined;
+      }
+
+      case "patch": {
+        this.knock.log(`[Guide] Patching the group stage: ${guide.key}`);
+        // Refresh the ordered queue in the group stage while continuing to
+        // render the currently resolved guide while in patch window, so that
+        // we can re-resolve when the group stage closes.
+        this.stage.ordered[index] = guide.key;
+
+        if (focusedInDebug) {
+          this.knock.log(
+            `[Guide] Focused to return \`${guide.key}\` (stage: ${formatGroupStage(this.stage)})`,
+          );
+          return guide;
+        }
+
+        if (throttled) {
+          this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
+          return undefined;
+        }
+
+        const ret = this.stage.resolved === guide.key ? guide : undefined;
+        this.knock.log(
+          `[Guide] Returning \`${ret?.key}\` (stage: ${formatGroupStage(this.stage)})`,
+        );
+        return ret;
+      }
+
+      case "closed": {
+        if (focusedInDebug) {
+          this.knock.log(
+            `[Guide] Focused to return \`${guide.key}\` (stage: ${formatGroupStage(this.stage)})`,
+          );
+          return guide;
+        }
+
+        if (throttled) {
+          this.knock.log(`[Guide] Throttling the selected guide: ${guide.key}`);
+          return undefined;
+        }
+
+        const ret = this.stage.resolved === guide.key ? guide : undefined;
+        this.knock.log(
+          `[Guide] Returning \`${ret?.key}\` (stage: ${formatGroupStage(this.stage)})`,
+        );
+        return ret;
+      }
+    }
+  }
+
+  // Record select query results by accumulating them by 1) key or type first,
+  // and then 2) "one" or "all".
+  private maybeRecordSelectResult(result: SelectionResult) {
+    if (!result.metadata) return;
+
+    const { opts, filters, limit } = result.metadata;
+    if (!opts.recordSelectQuery) return;
+    if (!filters.key && !filters.type) return;
+    if (!this.stage || this.stage.status === "closed") return;
+
+    // Deep merge to accumulate the results.
+    const queriedByKey = this.stage.results.byKey || {};
+    if (filters.key) {
+      queriedByKey[filters.key] = {
+        ...(queriedByKey[filters.key] || {}),
+        ...{ [limit]: result },
+      };
+    }
+    const queriedByType = this.stage.results.byType || {};
+    if (filters.type) {
+      queriedByType[filters.type] = {
+        ...(queriedByType[filters.type] || {}),
+        ...{ [limit]: result },
+      };
+    }
+
+    this.stage = {
+      ...this.stage,
+      results: { byKey: queriedByKey, byType: queriedByType },
+    };
+  }
+
+  getStage() {
+    return this.stage;
+  }
+
+  private openGroupStage() {
+    this.knock.log("[Guide] Opening a new group stage");
+
+    const {
+      orderResolutionDuration: delay = DEFAULT_ORDER_RESOLUTION_DURATION,
+    } = this.options;
+
+    const timeoutId = setTimeout(() => {
+      this.closePendingGroupStage();
+      this.incrementCounter();
+    }, delay);
+
+    this.stage = {
+      status: "open",
+      ordered: [],
+      results: {},
+      timeoutId,
+    };
+
+    return this.stage;
+  }
+
+  // Close the current non-closed stage to resolve the prevailing guide up next
+  // for display amongst the ones that have been staged.
+  private closePendingGroupStage() {
+    this.knock.log("[Guide] .closePendingGroupStage");
+    if (!this.stage || this.stage.status === "closed") return;
+
+    // Should have been cleared already since this method should be called as a
+    // callback to a setTimeout, but just to be safe.
+    this.ensureClearTimeout();
+
+    // Resolve to the first non-undefined guide in the stage.
+    const resolved = this.stage.ordered.find((x) => x !== undefined);
+
+    this.knock.log(
+      `[Guide] Closing the current group stage: resolved=${resolved}`,
+    );
+
+    this.stage = {
+      ...this.stage,
+      status: "closed",
+      resolved,
+      timeoutId: null,
+    };
+
+    return this.stage;
+  }
+
+  // Set the current closed stage status to "patch" to allow re-running
+  // selections and re-building a group stage with the latest/updated state,
+  // while keeping the currently resolved guide in place so that it stays
+  // rendered until we are ready to resolve the updated stage and re-render.
+  // Note, must be called ahead of updating the state store.
+  private patchClosedGroupStage() {
+    this.knock.log("[Guide] .patchClosedGroupStage");
+    if (this.stage?.status !== "closed") return;
+
+    const { orderResolutionDuration: delay = 0 } = this.options;
+
+    const timeoutId = setTimeout(() => {
+      this.closePendingGroupStage();
+      this.incrementCounter();
+    }, delay);
+
+    // Just to be safe.
+    this.ensureClearTimeout();
+
+    this.knock.log("[Guide] Patching the current group stage");
+
+    this.stage = {
+      ...this.stage,
+      status: "patch",
+      ordered: [],
+      timeoutId,
+    };
+
+    return this.stage;
+  }
+
+  private clearGroupStage() {
+    this.knock.log("[Guide] .clearGroupStage");
+    if (!this.stage) return;
+
+    this.knock.log("[Guide] Clearing the current group stage");
+    this.ensureClearTimeout();
+    this.stage = undefined;
+  }
+
+  private ensureClearTimeout() {
+    if (this.stage?.timeoutId) {
+      clearTimeout(this.stage.timeoutId);
+    }
+  }
+
+  // Test helpers to open and close the group stage to return the select result
+  // immediately.
+  private _selectGuide(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuideOpts = {},
+  ) {
+    this.openGroupStage();
+
+    this.selectGuide(state, filters, opts);
+    this.closePendingGroupStage();
+
+    return this.selectGuide(state, filters, opts);
+  }
+
+  private _selectGuides(
+    state: StoreState,
+    filters: SelectFilterParams = {},
+    opts: SelectGuidesOpts = {},
+  ) {
+    this.openGroupStage();
+
+    this.selectGuides(state, filters, opts);
+    this.closePendingGroupStage();
+
+    return this.selectGuides(state, filters, opts);
   }
 
   //
@@ -387,6 +994,12 @@ export class KnockGuideClient {
   //
 
   async markAsSeen(guide: GuideData, step: GuideStepData) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log("[Guide] User is not authenticated, skipping markAsSeen");
+      return;
+    }
+    if (step.message.seen_at) return;
+
     this.knock.log(
       `[Guide] Marking as seen (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -396,17 +1009,29 @@ export class KnockGuideClient {
     });
     if (!updatedStep) return;
 
+    if (this.shouldSkipEngagementApi()) {
+      this.knock.log(
+        "[Guide] Skipping engagement API call for markAsSeen (debug mode)",
+      );
+      return updatedStep;
+    }
+
     const params = {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
       content: updatedStep.content,
       data: this.targetParams.data,
-      tenant: this.targetParams.tenant,
     };
 
-    this.knock.user.markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>(
-      "seen",
-      params,
-    );
+    void this.knock.user
+      .markGuideStepAs<MarkAsSeenParams, MarkGuideAsResponse>("seen", params)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as seen: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
@@ -416,8 +1041,15 @@ export class KnockGuideClient {
     step: GuideStepData,
     metadata?: GenericData,
   ) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Guide] User is not authenticated, skipping markAsInteracted",
+      );
+      return;
+    }
+
     this.knock.log(
-      `[Guide] Marking as interacted (Guide key: ${guide.key}, Step ref:${step.ref})`,
+      `[Guide] Marking as interacted (Guide key: ${guide.key}; Step ref:${step.ref})`,
     );
 
     const ts = new Date().toISOString();
@@ -427,20 +1059,44 @@ export class KnockGuideClient {
     });
     if (!updatedStep) return;
 
+    if (this.shouldSkipEngagementApi()) {
+      this.knock.log(
+        "[Guide] Skipping engagement API call for markAsInteracted (debug mode)",
+      );
+      return updatedStep;
+    }
+
     const params = {
       ...this.buildEngagementEventBaseParams(guide, updatedStep),
       metadata,
     };
 
-    this.knock.user.markGuideStepAs<
-      MarkAsInteractedParams,
-      MarkGuideAsResponse
-    >("interacted", params);
+    void this.knock.user
+      .markGuideStepAs<
+        MarkAsInteractedParams,
+        MarkGuideAsResponse
+      >("interacted", params)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as interacted: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
   }
 
   async markAsArchived(guide: GuideData, step: GuideStepData) {
+    if (!this.knock.isAuthenticated()) {
+      this.knock.log(
+        "[Guide] User is not authenticated, skipping markAsArchived",
+      );
+      return;
+    }
+    if (step.message.archived_at) return;
+
     this.knock.log(
       `[Guide] Marking as archived (Guide key: ${guide.key}, Step ref:${step.ref})`,
     );
@@ -450,14 +1106,54 @@ export class KnockGuideClient {
     });
     if (!updatedStep) return;
 
+    if (this.shouldSkipEngagementApi()) {
+      this.knock.log(
+        "[Guide] Skipping engagement API call for markAsArchived (debug mode)",
+      );
+      return updatedStep;
+    }
+
     const params = this.buildEngagementEventBaseParams(guide, updatedStep);
 
-    this.knock.user.markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>(
-      "archived",
-      params,
-    );
+    void this.knock.user
+      .markGuideStepAs<MarkAsArchivedParams, MarkGuideAsResponse>("archived", {
+        ...params,
+        unthrottled: guide.bypass_global_group_limit,
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        this.knock.log(
+          `[Guide] Failed to mark guide step as archived: ${message}`,
+          true,
+        );
+      });
 
     return updatedStep;
+  }
+
+  async resetEngagement(guide: GuideData) {
+    const target = this.store.state.guides[guide.key];
+    if (!target || !target.hasEngagement()) return;
+
+    this.knock.log(`[Guide] Resetting engagement (Guide key: ${guide.key})`);
+
+    // Note: Bypass the skipEngagementTracking debug setting, so that the user
+    // can reset engagement from the toolbar while debugging.
+    const response = await this.knock.user.resetGuideEngagement({
+      guide_key: guide.key,
+      tenant: this.targetParams.tenant,
+    });
+
+    if (response.status !== "ok") return;
+
+    // Await the refetch so the store has fresh guide state (including
+    // ineligibleGuides) then re-cycle the group stage.
+    await this.fetch({ force: true });
+  }
+
+  private shouldSkipEngagementApi(): boolean {
+    return !!this.store.state.debug?.skipEngagementTracking;
   }
 
   //
@@ -469,24 +1165,47 @@ export class KnockGuideClient {
     const self = this;
 
     // Build a local copy with helper methods added.
-    const localGuide = { ...remoteGuide };
+    const localGuide = {
+      ...remoteGuide,
+      // Get the next unarchived step.
+      getStep() {
+        // If debugging this guide, return the first step regardless of archive status
+        if (
+          self.store.state.debug?.forcedGuideKey === this.key ||
+          self.store.state.debug?.focusedGuideKeys?.[this.key]
+        ) {
+          return this.steps[0];
+        }
+
+        return this.steps.find((s) => !s.message.archived_at);
+      },
+      // Check whether any of its steps have an engagement timestamp.
+      hasEngagement() {
+        return this.steps.some(
+          (step) =>
+            step.message.seen_at ||
+            step.message.read_at ||
+            step.message.interacted_at ||
+            step.message.archived_at ||
+            step.message.link_clicked_at,
+        );
+      },
+    } as KnockGuide;
+
+    localGuide.getStep = localGuide.getStep.bind(localGuide);
+    localGuide.hasEngagement = localGuide.hasEngagement.bind(localGuide);
 
     localGuide.steps = remoteGuide.steps.map(({ message, ...rest }) => {
       const localStep = {
         ...rest,
         message: { ...message },
         markAsSeen() {
-          // Send a seen event if it has not been previously seen.
-          if (this.message.seen_at) return;
           return self.markAsSeen(localGuide, this);
         },
         markAsInteracted({ metadata }: { metadata?: GenericData } = {}) {
-          // Always send an interaction event through.
           return self.markAsInteracted(localGuide, this, metadata);
         },
         markAsArchived() {
-          // Send an archived event if it has not been previously archived.
-          if (this.message.archived_at) return;
           return self.markAsArchived(localGuide, this);
         },
       };
@@ -500,20 +1219,32 @@ export class KnockGuideClient {
       return localStep;
     });
 
-    localGuide.activation_location_rules =
-      remoteGuide.activation_location_rules.map((rule) => {
+    localGuide.activation_url_patterns =
+      remoteGuide.activation_url_patterns.map((rule) => {
         return {
           ...rule,
-          pattern: new URLPattern({ pathname: rule.pathname }),
+          pattern: new URLPattern({
+            pathname: rule.pathname ?? undefined,
+            search: rule.search ?? undefined,
+          }),
         };
       });
 
-    return localGuide as KnockGuide;
+    return localGuide;
   }
 
   private buildQueryParams(filterParams: QueryFilterParams = {}) {
     // Combine the target params with the given filter params.
-    const combinedParams = { ...this.targetParams, ...filterParams };
+    const combinedParams: GenericData = {
+      ...this.targetParams,
+      ...filterParams,
+    };
+
+    // Append debug params
+    const debugState = this.store.state.debug;
+    if (debugState?.forcedGuideKey || debugState?.debugging) {
+      combinedParams.force_all_guides = true;
+    }
 
     // Prune out any keys that have an undefined or null value.
     let params = Object.fromEntries(
@@ -551,23 +1282,42 @@ export class KnockGuideClient {
   ) {
     let updatedStep: KnockGuideStep | undefined;
 
+    // If we are marking as archived, clear the group stage so we can render
+    // the next guide in the group.
+    if (attrs.archived_at) {
+      this.clearGroupStage();
+    }
+
     this.store.setState((state) => {
-      const guides = state.guides.map((guide) => {
-        if (guide.key !== guideKey) return guide;
+      let guide = state.guides[guideKey];
+      if (!guide) return state;
 
-        const steps = guide.steps.map((step) => {
-          if (step.ref !== stepRef) return step;
+      const steps = guide.steps.map((step) => {
+        if (step.ref !== stepRef) return step;
 
-          // Mutate in place and maintain the same obj ref so to make it easier
-          // to use in hook deps.
-          step.message = { ...step.message, ...attrs };
-          updatedStep = step;
+        // Mutate in place and maintain the same obj ref so to make it easier
+        // to use in hook deps.
+        step.message = { ...step.message, ...attrs };
+        updatedStep = step;
 
-          return step;
-        });
-        return { ...guide, steps };
+        return step;
       });
-      return { ...state, guides };
+      // If updated, return the guide as a new object so useStore can trigger.
+      guide = updatedStep ? { ...guide, steps } : guide;
+
+      const guides = { ...state.guides, [guide.key]: guide };
+
+      // If the guide is subject to throttled settings and we are marking as
+      // archived, then update the display logs to start a new throttle window.
+      const guideGroupDisplayLogs =
+        attrs.archived_at && !guide.bypass_global_group_limit
+          ? {
+              ...state.guideGroupDisplayLogs,
+              [DEFAULT_GROUP_KEY]: attrs.archived_at,
+            }
+          : state.guideGroupDisplayLogs;
+
+      return { ...state, guides, guideGroupDisplayLogs };
     });
 
     return updatedStep;
@@ -578,91 +1328,99 @@ export class KnockGuideClient {
     step: GuideStepData,
   ) {
     return {
-      message_id: step.message.id,
       channel_id: guide.channel_id,
       guide_key: guide.key,
       guide_id: guide.id,
       guide_step_ref: step.ref,
+      // Can be used for scoping guide messages.
+      tenant: this.targetParams.tenant,
     };
   }
 
-  private addGuide({ data }: GuideAddedEvent) {
+  private addOrReplaceGuide({ data }: GuideAddedEvent | GuideUpdatedEvent) {
+    this.patchClosedGroupStage();
+
     const guide = this.localCopy(data.guide);
 
     this.store.setState((state) => {
-      return { ...state, guides: sortGuides([...state.guides, guide]) };
-    });
-  }
+      const guides = { ...state.guides, [guide.key]: guide };
 
-  private replaceOrAddGuide({ data }: GuideUpdatedEvent) {
-    const guide = this.localCopy(data.guide);
-
-    this.store.setState((state) => {
-      let replaced = false;
-
-      const guides = state.guides.map((g) => {
-        if (g.key !== guide.key) return g;
-        replaced = true;
-        return guide;
-      });
-
-      return {
-        ...state,
-        guides: replaced ? sortGuides(guides) : sortGuides([...guides, guide]),
-      };
+      return { ...state, guides };
     });
   }
 
   private removeGuide({ data }: GuideUpdatedEvent | GuideRemovedEvent) {
+    this.patchClosedGroupStage();
+
     this.store.setState((state) => {
-      const guides = state.guides.filter((g) => g.key !== data.guide.key);
-      return { ...state, guides };
+      const { [data.guide.key]: _, ...rest } = state.guides;
+      return { ...state, guides: rest };
+    });
+  }
+
+  private addOrReplaceGuideGroup({
+    data,
+  }: GuideGroupAddedEvent | GuideGroupUpdatedEvent) {
+    this.patchClosedGroupStage();
+
+    this.store.setState((state) => {
+      // Currently we only support a single default global group, so we can just
+      // update the list with the added/updated group.
+      const guideGroups = [data.guide_group];
+
+      // A guide group event can include lists of unthrottled vs throttled guide
+      // keys which we can use to bulk update the guides in the store already.
+      const unthrottled = data.guide_group.display_sequence_unthrottled || [];
+      const throttled = data.guide_group.display_sequence_throttled || [];
+
+      let guides = state.guides;
+
+      guides = unthrottled.reduce((acc, key) => {
+        if (!acc[key]) return acc;
+        const guide = { ...acc[key], bypass_global_group_limit: true };
+        return { ...acc, [key]: guide };
+      }, guides);
+
+      guides = throttled.reduce((acc, key) => {
+        if (!acc[key]) return acc;
+        const guide = { ...acc[key], bypass_global_group_limit: false };
+        return { ...acc, [key]: guide };
+      }, guides);
+
+      return { ...state, guides, guideGroups };
     });
   }
 
   // Define as an arrow func property to always bind this to the class instance.
   private handleLocationChange = () => {
-    const href = window.location.href;
+    this.knock.log(`[Guide] .handleLocationChange`);
+    const win = checkForWindow();
+    if (!win?.location) return;
+
+    const href = win.location.href;
     if (this.store.state.location === href) return;
 
-    this.knock.log(`[Guide] Handle Location change: ${href}`);
+    this.knock.log(`[Guide] Detected a location change: ${href}`);
 
-    this.store.setState((state) => ({ ...state, location: href }));
+    this.setLocation(href);
   };
 
   private listenForLocationChangesFromWindow() {
-    if (window?.history) {
+    const win = checkForWindow();
+    if (win?.history && win?.addEventListener) {
       // 1. Listen for browser back/forward button clicks.
-      window.addEventListener("popstate", this.handleLocationChange);
+      win.addEventListener("popstate", this.handleLocationChange);
 
       // 2. Listen for hash changes in case it's used for routing.
-      window.addEventListener("hashchange", this.handleLocationChange);
+      win.addEventListener("hashchange", this.handleLocationChange);
 
-      // 3. Monkey-patch history methods to catch programmatic navigation.
-      const pushStateFn = window.history.pushState;
-      const replaceStateFn = window.history.replaceState;
-
-      // Use setTimeout to allow the browser state to potentially settle.
-      window.history.pushState = new Proxy(pushStateFn, {
-        apply: (target, history, args) => {
-          Reflect.apply(target, history, args);
-          setTimeout(() => {
-            this.handleLocationChange();
-          }, 0);
-        },
-      });
-      window.history.replaceState = new Proxy(replaceStateFn, {
-        apply: (target, history, args) => {
-          Reflect.apply(target, history, args);
-          setTimeout(() => {
-            this.handleLocationChange();
-          }, 0);
-        },
-      });
-
-      // 4. Keep refs to the original handlers so we can restore during cleanup.
-      this.pushStateFn = pushStateFn;
-      this.replaceStateFn = replaceStateFn;
+      // 3. Catch programmatic navigation via a shared history patch. This is
+      // idempotent across guide client instances so a remount doesn't nest
+      // patches (see `addHistoryLocationListener`).
+      addHistoryLocationListener(
+        win.history as PatchedHistory,
+        this.handleLocationChange,
+      );
     } else {
       this.knock.log(
         "[Guide] Unable to access the `window.history` object to detect location changes",
@@ -670,17 +1428,20 @@ export class KnockGuideClient {
     }
   }
 
-  private removeEventListeners() {
-    window.removeEventListener("popstate", this.handleLocationChange);
-    window.removeEventListener("hashchange", this.handleLocationChange);
+  removeLocationChangeEventListeners() {
+    const win = checkForWindow();
+    if (!win?.history || !win?.removeEventListener) return;
 
-    if (this.pushStateFn) {
-      window.history.pushState = this.pushStateFn;
-      this.pushStateFn = undefined;
-    }
-    if (this.replaceStateFn) {
-      window.history.replaceState = this.replaceStateFn;
-      this.replaceStateFn = undefined;
-    }
+    win.removeEventListener("popstate", this.handleLocationChange);
+    win.removeEventListener("hashchange", this.handleLocationChange);
+
+    removeHistoryLocationListener(
+      win.history as PatchedHistory,
+      this.handleLocationChange,
+    );
+  }
+
+  static getToolbarRunConfigFromUrl() {
+    return getToolbarRunConfigFromUrl();
   }
 }

@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { LibraryFormats, defineConfig, loadEnv } from "vite";
@@ -16,13 +17,13 @@ export default defineConfig(({ mode }) => {
       dts({
         outDir: "dist/types",
       }),
-      react({
-        jsxRuntime: "classic",
-        babel: {
-          plugins: ["react-require"],
-        },
-      }),
+      react(),
       noBundlePlugin({ root: "./src" }),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "@knocklabs/react-core",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
     ],
     build: {
       outDir: CJS ? "dist/cjs" : "dist/esm",
@@ -37,7 +38,7 @@ export default defineConfig(({ mode }) => {
         // External packages that should not be bundled
         external: ["react"],
         output: {
-          interop: "compat",
+          strict: true,
           globals: {
             react: "React",
           },

@@ -53,7 +53,9 @@ describe("FeedSocketManager", () => {
       unsubscribeFromSocketEvents: vi.fn(),
     } as unknown as Feed;
 
-    vi.mocked(Store).mockImplementation(() => mockStore);
+    vi.mocked(Store).mockImplementation(function () {
+      return mockStore;
+    } as never);
     vi.mocked(mockSocket.channel).mockReturnValue(mockChannel);
 
     socketManager = new FeedSocketManager(mockSocket);

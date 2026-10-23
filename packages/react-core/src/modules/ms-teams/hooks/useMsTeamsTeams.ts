@@ -1,5 +1,5 @@
 import { GetMsTeamsTeamsResponse, MsTeamsTeam } from "@knocklabs/client";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 
 import { useKnockClient } from "../../core";
@@ -20,25 +20,9 @@ type UseMsTeamsTeamsOutput = {
   refetch: () => void;
 };
 
-type QueryKey = [key: string, skiptoken: string] | null;
-
-function getQueryKey(
-  pageIndex: number,
-  previousPageData: GetMsTeamsTeamsResponse,
-): QueryKey {
-  // First page so just pass empty
-  if (pageIndex === 0) {
-    return [QUERY_KEY, ""];
-  }
-
-  // If there's no more data then return an empty next skiptoken
-  if (previousPageData && ["", null].includes(previousPageData.skip_token)) {
-    return null;
-  }
-
-  // Next skiptoken exists so pass it
-  return [QUERY_KEY, previousPageData.skip_token ?? ""];
-}
+type QueryKey =
+  | [key: string, tenantId: string, channelId: string, skiptoken: string]
+  | null;
 
 function useMsTeamsTeams({
   queryOptions = {},
@@ -47,17 +31,61 @@ function useMsTeamsTeams({
   const { knockMsTeamsChannelId, tenantId, connectionStatus } =
     useKnockMsTeamsClient();
 
-  const fetchTeams = (queryKey: QueryKey) =>
-    knock.msTeams.getTeams({
-      knockChannelId: knockMsTeamsChannelId,
-      tenant: tenantId,
-      queryOptions: {
-        $skiptoken: queryKey?.[1],
-        $top: queryOptions?.limitPerPage,
-        $filter: queryOptions?.filter,
-        $select: queryOptions?.select,
-      },
-    });
+  // Track previous tenant/channel/connectionStatus to detect changes and clear cache
+  const prevTenantRef = useRef(tenantId);
+  const prevChannelRef = useRef(knockMsTeamsChannelId);
+  const prevConnectionStatusRef = useRef(connectionStatus);
+
+  // Create a getQueryKey function that includes tenantId and knockMsTeamsChannelId
+  // so that SWR treats different tenants as different cache entries
+  const getQueryKey = useCallback(
+    (
+      pageIndex: number,
+      previousPageData: GetMsTeamsTeamsResponse | null,
+    ): QueryKey => {
+      // Don't fetch if not connected
+      if (connectionStatus !== "connected") {
+        return null;
+      }
+
+      // First page so just pass empty
+      if (pageIndex === 0) {
+        return [QUERY_KEY, tenantId, knockMsTeamsChannelId, ""];
+      }
+
+      // If there's no more data then return an empty next skiptoken
+      if (
+        previousPageData &&
+        ["", null].includes(previousPageData.skip_token)
+      ) {
+        return null;
+      }
+
+      // Next skiptoken exists so pass it
+      return [
+        QUERY_KEY,
+        tenantId,
+        knockMsTeamsChannelId,
+        previousPageData?.skip_token ?? "",
+      ];
+    },
+    [tenantId, knockMsTeamsChannelId, connectionStatus],
+  );
+
+  const fetchTeams = useCallback(
+    (queryKey: QueryKey) =>
+      knock.msTeams.getTeams({
+        knockChannelId: knockMsTeamsChannelId,
+        tenant: tenantId,
+        queryOptions: {
+          $skiptoken: queryKey?.[3],
+          $top: queryOptions?.limitPerPage,
+          $filter: queryOptions?.filter,
+          $select: queryOptions?.select,
+        },
+      }),
+    [knock.msTeams, knockMsTeamsChannelId, tenantId, queryOptions],
+  );
 
   const { data, error, isLoading, isValidating, setSize, mutate } =
     useSWRInfinite<GetMsTeamsTeamsResponse>(getQueryKey, fetchTeams, {
@@ -65,6 +93,28 @@ function useMsTeamsTeams({
       revalidateOnFocus: false,
       revalidateFirstPage: false,
     });
+
+  // Clear cache when tenant, channel, or connection status changes
+  // This ensures that when the user disconnects and reconnects (possibly to a different
+  // MS Teams workspace), or when the access token is revoked, the cached teams are cleared
+  useEffect(() => {
+    const tenantChanged = prevTenantRef.current !== tenantId;
+    const channelChanged = prevChannelRef.current !== knockMsTeamsChannelId;
+    // Detect when connection is re-established (was not connected, now is connected)
+    const wasConnected = prevConnectionStatusRef.current === "connected";
+    const isConnected = connectionStatus === "connected";
+    const connectionReestablished = !wasConnected && isConnected;
+
+    if (tenantChanged || channelChanged || connectionReestablished) {
+      // Reset the SWR state to clear cached data
+      mutate(undefined, { revalidate: false });
+      setSize(0);
+    }
+
+    prevTenantRef.current = tenantId;
+    prevChannelRef.current = knockMsTeamsChannelId;
+    prevConnectionStatusRef.current = connectionStatus;
+  }, [tenantId, knockMsTeamsChannelId, connectionStatus, mutate, setSize]);
 
   const lastPage = data?.at(-1);
   const hasNextPage = lastPage === undefined || !!lastPage.skip_token;

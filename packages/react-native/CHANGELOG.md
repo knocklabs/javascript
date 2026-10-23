@@ -1,5 +1,640 @@
 # Changelog
 
+## 0.11.3
+
+### Patch Changes
+
+- Updated dependencies [1bbf12e]
+- Updated dependencies [33f3365]
+  - @knocklabs/react-core@0.16.0
+
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies [e7f7a4f]
+- Updated dependencies [696cbac]
+- Updated dependencies [90a95d1]
+  - @knocklabs/client@0.22.2
+  - @knocklabs/react-core@0.15.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies [9b5f244]
+  - @knocklabs/client@0.22.1
+  - @knocklabs/react-core@0.15.1
+
+## 0.11.0
+
+### Minor Changes
+
+- e52c4ef: chore(deps): bump react-native-get-random-values from 1.11.0 to 2.0.0
+
+  v2 of the polyfill is new architecture only and requires React Native >= 0.81
+  (Expo SDK >= 54). `@knocklabs/react-native` imports it for its side effects from
+  `src/index.ts`, so that floor now applies to every consumer of the package, and
+  to `@knocklabs/expo` by way of its dependency on `@knocklabs/react-native`.
+
+  The `react-native` peer range on both packages has been narrowed from `*` to
+  `>=0.81`, so installs on unsupported versions surface a peer warning instead of
+  failing at runtime when the native module is missing. Expo SDK 54 is the release
+  that ships React Native 0.81, so the `expo` peer stays at `*` and the
+  `react-native` constraint covers both.
+
+### Patch Changes
+
+- Updated dependencies [7e3ee26]
+  - @knocklabs/react-core@0.15.0
+
+## 0.10.0
+
+### Minor Changes
+
+- e8567eb: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- e8567eb: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+  - @knocklabs/client@0.22.0
+  - @knocklabs/react-core@0.14.0
+
+## 0.10.0-rc.0
+
+### Minor Changes
+
+- d2f7948: Add an `enabled` prop to `KnockProvider` (and an `enabled` option to `useAuthenticatedKnockClient`).
+
+  When `enabled` is `false`, the provider still renders its children but the Knock client sits idle: no identify call, no API requests, no websocket. Set it to `true` and it connects like a login; set it back to `false` and it disconnects and clears its data like a logout. It defaults to `true`, so existing code is unaffected.
+
+  Use this instead of conditionally mounting `KnockProvider`, for example to wait for a user token that loads asynchronously:
+
+  ```tsx
+  <KnockProvider
+    apiKey={apiKey}
+    user={{ id: userId }}
+    userToken={userToken}
+    enabled={Boolean(userId && userToken)}
+  />
+  ```
+
+  Also fixed:
+
+  - `useFeedSettings` no longer calls `GET /v1/users/undefined/feeds/.../settings` when there's no user.
+  - `KnockProvider` now disconnects its client (websocket, token-refresh timer, listener) when it unmounts, instead of leaving them running.
+
+- d2f7948: Add `useKnockAuthState()` and make Slack, MS Teams, and Expo respond to sign-in changes.
+
+  - New `useKnockAuthState(knock)` hook re-renders when the user signs in, signs out, or switches.
+  - Slack and MS Teams connection status now re-checks when the user changes, instead of checking once and sticking with that result.
+  - Expo waits for a signed-in user before registering for push notifications, so logged-out users don't see the OS permission prompt. A notification tapped while logged out no longer tries to update its status.
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+  - @knocklabs/client@0.22.0-rc.0
+  - @knocklabs/react-core@0.14.0-rc.0
+
+## 0.9.9
+
+### Patch Changes
+
+- Updated dependencies [3d7a041]
+  - @knocklabs/client@0.21.15
+  - @knocklabs/react-core@0.13.16
+
+## 0.9.8
+
+### Patch Changes
+
+- dd1b724: Expose `./package.json` in each package's `exports` map. This restores the ability for tooling (bundlers, test mockers such as Storybook/Vitest, and version checks) to resolve the package manifest, which the `exports` field otherwise blocks.
+- 70e7669: Handle missing `features` in feed settings responses to prevent crashes on partial API responses.
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [3dd0aa8]
+- Updated dependencies [b6c9be4]
+- Updated dependencies [b6c9be4]
+  - @knocklabs/client@0.21.14
+  - @knocklabs/react-core@0.13.15
+
+## 0.9.7
+
+### Patch Changes
+
+- Updated dependencies [e6ac8cc]
+- Updated dependencies [454f947]
+- Updated dependencies [abac967]
+  - @knocklabs/react-core@0.13.14
+  - @knocklabs/client@0.21.13
+
+## 0.9.6
+
+### Patch Changes
+
+- Updated dependencies [ffa7bd2]
+  - @knocklabs/react-core@0.13.13
+  - @knocklabs/client@0.21.12
+
+## 0.9.5
+
+### Patch Changes
+
+- Updated dependencies [a04781b]
+  - @knocklabs/client@0.21.11
+  - @knocklabs/react-core@0.13.12
+
+## 0.9.4
+
+### Patch Changes
+
+- Updated dependencies [ee35de2]
+  - @knocklabs/react-core@0.13.11
+  - @knocklabs/client@0.21.10
+
+## 0.9.3
+
+### Patch Changes
+
+- Updated dependencies [e4fe593]
+  - @knocklabs/client@0.21.9
+  - @knocklabs/react-core@0.13.10
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies [4863fe5]
+  - @knocklabs/react-core@0.13.9
+
+## 0.9.1
+
+### Patch Changes
+
+- Updated dependencies [af81cf2]
+- Updated dependencies [31dffc1]
+- Updated dependencies [2798bbb]
+  - @knocklabs/client@0.21.8
+  - @knocklabs/react-core@0.13.8
+
+## 0.9.0
+
+### Minor Changes
+
+- ecbfed1: chore: upgrade expo and react native packages to their latest version, ensure expo go builds on android get the proper warning about deprecated notification support from expo, ensure expo-example app works as expected.
+
+### Patch Changes
+
+- b932f46: Move `react-native-gesture-handler` from dependencies to peer dependencies so consumer apps do not install duplicate native module copies.
+
+## 0.8.7
+
+### Patch Changes
+
+- Updated dependencies [6d3c9e2]
+  - @knocklabs/client@0.21.7
+  - @knocklabs/react-core@0.13.7
+
+## 0.8.6
+
+### Patch Changes
+
+- Updated dependencies [afae7ce]
+  - @knocklabs/client@0.21.6
+  - @knocklabs/react-core@0.13.6
+
+## 0.8.5
+
+### Patch Changes
+
+- Updated dependencies [c5babb3]
+  - @knocklabs/client@0.21.5
+  - @knocklabs/react-core@0.13.5
+
+## 0.8.4
+
+### Patch Changes
+
+- Updated dependencies [c134f53]
+  - @knocklabs/client@0.21.4
+  - @knocklabs/react-core@0.13.4
+
+## 0.8.3
+
+### Patch Changes
+
+- Updated dependencies [1ed4f75]
+  - @knocklabs/client@0.21.3
+  - @knocklabs/react-core@0.13.3
+
+## 0.8.2
+
+### Patch Changes
+
+- Updated dependencies [cb7148b]
+- Updated dependencies [04a8f16]
+- Updated dependencies [b7b3708]
+  - @knocklabs/client@0.21.2
+  - @knocklabs/react-core@0.13.2
+
+## 0.8.1
+
+### Patch Changes
+
+- 7f8bdfe: Add accessible labels to `UnseenBadge` so screen readers announce the count with context (e.g. "3 unseen notifications") instead of just the bare number
+- Updated dependencies [ddd7981]
+- Updated dependencies [7f8bdfe]
+  - @knocklabs/client@0.21.1
+  - @knocklabs/react-core@0.13.1
+
+## 0.8.0
+
+### Minor Changes
+
+- 2af3f5e: Initialize feeds in `"compact"` mode by default
+
+  The feed client can now be initialized with a `mode` option, set to either `"compact"` or `"rich"`. When `mode` is `"compact"`, the following restrictions will apply when the feed is fetched:
+
+  - The `activities` and `total_activities` fields will _not_ be present on feed items
+  - The `data` field will _not_ include nested arrays and objects
+  - The `actors` field will only have up to one actor
+
+  **By default, feeds are initialized in `"compact"` mode. If you need to access `activities`, `total_activities`, the complete `data`, or the complete array of `actors`, you must initialize your feed in `"rich"` mode.**
+
+  If you are using the feed client via `@knocklabs/client` directly:
+
+  ```js
+  const knockFeed = knockClient.feeds.initialize(
+    process.env.KNOCK_FEED_CHANNEL_ID,
+    { mode: "rich" },
+  );
+  ```
+
+  If you are using `<KnockFeedProvider>` via `@knocklabs/react`, `@knocklabs/react-native`, or `@knocklabs/expo`:
+
+  ```tsx
+  <KnockFeedProvider
+    feedId={process.env.KNOCK_FEED_CHANNEL_ID}
+    defaultFeedOptions={{ mode: "rich" }}
+  />
+  ```
+
+  If you are using the `useNotifications` hook via `@knocklabs/react-core`:
+
+  ```js
+  const feedClient = useNotifications(
+    knockClient,
+    process.env.KNOCK_FEED_CHANNEL_ID,
+    { mode: "rich" },
+  );
+  ```
+
+### Patch Changes
+
+- Updated dependencies [2af3f5e]
+  - @knocklabs/client@0.21.0
+  - @knocklabs/react-core@0.13.0
+
+## 0.7.7
+
+### Patch Changes
+
+- Updated dependencies [1c486d3]
+  - @knocklabs/client@0.20.4
+  - @knocklabs/react-core@0.12.5
+
+## 0.7.6
+
+### Patch Changes
+
+- Updated dependencies [f9aca69]
+  - @knocklabs/react-core@0.12.4
+
+## 0.7.5
+
+### Patch Changes
+
+- Updated dependencies [cf04e5f]
+  - @knocklabs/client@0.20.3
+  - @knocklabs/react-core@0.12.3
+
+## 0.7.4
+
+### Patch Changes
+
+- Updated dependencies [09c11a3]
+  - @knocklabs/client@0.20.2
+  - @knocklabs/react-core@0.12.2
+
+## 0.7.3
+
+### Patch Changes
+
+- Updated dependencies [01d07af]
+  - @knocklabs/client@0.20.1
+  - @knocklabs/react-core@0.12.1
+
+## 0.7.2
+
+### Patch Changes
+
+- Updated dependencies [2d29ebf]
+  - @knocklabs/react-core@0.12.0
+  - @knocklabs/client@0.20.0
+
+## 0.7.1
+
+### Patch Changes
+
+- Updated dependencies [a56bf70]
+  - @knocklabs/client@0.19.4
+  - @knocklabs/react-core@0.11.4
+
+## 0.7.0
+
+### Minor Changes
+
+- bac8ced: Migrate push notifications from tokens array to devices array with locale and timezone
+
+### Patch Changes
+
+- Updated dependencies [571abb1]
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+- Updated dependencies [571abb1]
+- Updated dependencies [571abb1]
+  - @knocklabs/react-core@0.11.3
+  - @knocklabs/client@0.19.3
+
+## 0.6.50
+
+### Patch Changes
+
+- Updated dependencies [1e538b9]
+  - @knocklabs/client@0.19.2
+  - @knocklabs/react-core@0.11.2
+
+## 0.6.49
+
+### Patch Changes
+
+- Updated dependencies [c4e67da]
+  - @knocklabs/client@0.19.1
+  - @knocklabs/react-core@0.11.1
+
+## 0.6.48
+
+### Patch Changes
+
+- Updated dependencies [be65601]
+- Updated dependencies [4b888c4]
+  - @knocklabs/react-core@0.11.0
+  - @knocklabs/client@0.19.0
+
+## 0.6.47
+
+### Patch Changes
+
+- Updated dependencies [56ab8c0]
+  - @knocklabs/client@0.18.7
+  - @knocklabs/react-core@0.10.7
+
+## 0.6.46
+
+### Patch Changes
+
+- Updated dependencies [49df373]
+  - @knocklabs/client@0.18.6
+  - @knocklabs/react-core@0.10.6
+
+## 0.6.45
+
+### Patch Changes
+
+- Updated dependencies [bf7677a]
+- Updated dependencies [9eba682]
+  - @knocklabs/client@0.18.5
+  - @knocklabs/react-core@0.10.5
+
+## 0.6.44
+
+### Patch Changes
+
+- Updated dependencies [c64098e]
+  - @knocklabs/client@0.18.4
+  - @knocklabs/react-core@0.10.4
+
+## 0.6.43
+
+### Patch Changes
+
+- Updated dependencies [9f0d317]
+  - @knocklabs/client@0.18.3
+  - @knocklabs/react-core@0.10.3
+
+## 0.6.42
+
+### Patch Changes
+
+- Updated dependencies [1fc802b]
+  - @knocklabs/client@0.18.2
+  - @knocklabs/react-core@0.10.2
+
+## 0.6.41
+
+### Patch Changes
+
+- Updated dependencies [74366b3]
+  - @knocklabs/react-core@0.10.1
+  - @knocklabs/client@0.18.1
+
+## 0.6.40
+
+### Patch Changes
+
+- Updated dependencies [5fc0af9]
+  - @knocklabs/react-core@0.10.0
+  - @knocklabs/client@0.18.0
+
+## 0.6.39
+
+### Patch Changes
+
+- Updated dependencies [23b7057]
+- Updated dependencies [1c24f68]
+  - @knocklabs/client@0.17.2
+  - @knocklabs/react-core@0.9.2
+
+## 0.6.38
+
+### Patch Changes
+
+- Updated dependencies [5b77f18]
+  - @knocklabs/client@0.17.1
+  - @knocklabs/react-core@0.9.1
+
+## 0.6.37
+
+### Patch Changes
+
+- Updated dependencies [c761e7c]
+- Updated dependencies [3558784]
+- Updated dependencies [b8b64e4]
+  - @knocklabs/client@0.17.0
+  - @knocklabs/react-core@0.9.0
+
+## 0.6.36
+
+### Patch Changes
+
+- Updated dependencies [dc84f25]
+  - @knocklabs/client@0.16.5
+  - @knocklabs/react-core@0.8.5
+
+## 0.6.35
+
+### Patch Changes
+
+- Updated dependencies [49f791b]
+  - @knocklabs/client@0.16.4
+  - @knocklabs/react-core@0.8.4
+
+## 0.6.34
+
+### Patch Changes
+
+- Updated dependencies [79204f0]
+  - @knocklabs/react-core@0.8.3
+  - @knocklabs/client@0.16.3
+
+## 0.6.33
+
+### Patch Changes
+
+- Updated dependencies [5a19d82]
+  - @knocklabs/client@0.16.2
+  - @knocklabs/react-core@0.8.2
+
+## 0.6.32
+
+### Patch Changes
+
+- Updated dependencies [35b5445]
+- Updated dependencies [5d758d7]
+- Updated dependencies [d2fd092]
+  - @knocklabs/client@0.16.1
+  - @knocklabs/react-core@0.8.1
+
+## 0.6.31
+
+### Patch Changes
+
+- Updated dependencies [48e9c77]
+  - @knocklabs/react-core@0.8.0
+  - @knocklabs/client@0.16.0
+
+## 0.6.30
+
+### Patch Changes
+
+- Updated dependencies [fb68ce1]
+- Updated dependencies [d7e5371]
+  - @knocklabs/client@0.15.2
+  - @knocklabs/react-core@0.7.5
+
+## 0.6.29
+
+### Patch Changes
+
+- Updated dependencies [001690a]
+  - @knocklabs/react-core@0.7.4
+
+## 0.6.28
+
+### Patch Changes
+
+- Updated dependencies [c3efcf9]
+- Updated dependencies [befd7b9]
+  - @knocklabs/react-core@0.7.3
+  - @knocklabs/client@0.15.1
+
+## 0.6.27
+
+### Patch Changes
+
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [3703cf6]
+- Updated dependencies [fdc6d82]
+  - @knocklabs/react-core@0.7.2
+
+## 0.6.26
+
+### Patch Changes
+
+- Updated dependencies [aa16c97]
+  - @knocklabs/react-core@0.7.1
+
+## 0.6.25
+
+### Patch Changes
+
+- d0b85b3: fix: make token (un)registration methods in KnockPushNotificationProvider awaitable
+
+## 0.6.24
+
+### Patch Changes
+
+- Updated dependencies [2a0b3e2]
+  - @knocklabs/react-core@0.7.0
+  - @knocklabs/client@0.15.0
+
+## 0.6.23
+
+### Patch Changes
+
+- Updated dependencies [6539c97]
+  - @knocklabs/client@0.14.11
+  - @knocklabs/react-core@0.6.15
+
+## 0.6.22
+
+### Patch Changes
+
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+- Updated dependencies [e05ad61]
+  - @knocklabs/react-core@0.6.14
+  - @knocklabs/client@0.14.10
+
 ## 0.6.22-canary.2
 
 ### Patch Changes

@@ -8,9 +8,10 @@ import {
   useTranslations,
 } from "@knocklabs/react-core";
 import { Combobox } from "@telegraph/combobox";
-import { Icon, Lucide } from "@telegraph/icon";
+import { Icon } from "@telegraph/icon";
 import { Stack } from "@telegraph/layout";
 import { Text } from "@telegraph/typography";
+import { Hash, Lock } from "lucide-react";
 import { useMemo } from "react";
 import { FunctionComponent } from "react";
 
@@ -61,21 +62,22 @@ export const SlackChannelCombobox: FunctionComponent<
     updating: connectedChannelsUpdating,
   } = useConnectedSlackChannels({ slackChannelsRecipientObject });
 
-  const currentConnectedChannels = useMemo<SlackChannelConnection[]>(() => {
-    // Used to make sure we're only showing currently available channels to select from.
-    // There are cases where a channel is "connected" in Knock, but it wouldn't be
-    // posting to it if the channel is private and the Slackbot doesn't belong to it,
-    // so the channel won't show up here and it won't be posted to.
-    const slackChannelsMap = new Map(
-      slackChannels.map((channel) => [channel.id, channel]),
-    );
+  const slackChannelsById = useMemo(
+    () => new Map(slackChannels.map((channel) => [channel.id, channel])),
+    [slackChannels],
+  );
 
-    return (
-      connectedChannels?.filter((connectedChannel) => {
-        return slackChannelsMap.has(connectedChannel.channel_id || "");
-      }) || []
-    );
-  }, [connectedChannels, slackChannels]);
+  const currentConnectedChannels = useMemo<SlackChannelConnection[]>(
+    () =>
+      // Used to make sure we're only showing currently available channels to select from.
+      // There are cases where a channel is "connected" in Knock, but it wouldn't be
+      // posting to it if the channel is private and the Slackbot doesn't belong to it,
+      // so the channel won't show up here and it won't be posted to.
+      connectedChannels?.filter((connectedChannel) =>
+        slackChannelsById.has(connectedChannel.channel_id || ""),
+      ) || [],
+    [connectedChannels, slackChannelsById],
+  );
 
   const inErrorState = useMemo(
     () =>
@@ -141,9 +143,28 @@ export const SlackChannelCombobox: FunctionComponent<
   ]);
 
   const comboboxValue = useMemo(
-    () => currentConnectedChannels.map((connection) => connection.channel_id),
+    () =>
+      currentConnectedChannels
+        .map((connection) => connection.channel_id)
+        .filter((channelId): channelId is string => !!channelId),
     [currentConnectedChannels],
   );
+
+  // An option's accessible name is derived from its children, and ours are
+  // elements (an icon beside the name), so the combobox falls back to the raw
+  // channel id. Name the trigger ourselves rather than flattening the option
+  // to a bare string, which would cost the icon.
+  const triggerLabel = useMemo(() => {
+    const connectedNames = comboboxValue
+      .map((channelId) => slackChannelsById.get(channelId)?.name)
+      .filter((name): name is string => !!name);
+
+    // Falling back to the placeholder matches what the combobox would have
+    // named the trigger on its own. It has to stay a string: the trigger
+    // spreads our props over its own `aria-label`, so undefined would leave
+    // the trigger unnamed rather than deferring.
+    return connectedNames.join(", ") || searchPlaceholder || "";
+  }, [slackChannelsById, comboboxValue, searchPlaceholder]);
 
   if (slackChannels.length > MAX_ALLOWED_CHANNELS) {
     return (
@@ -189,7 +210,7 @@ export const SlackChannelCombobox: FunctionComponent<
           false
         }
       >
-        <Combobox.Trigger />
+        <Combobox.Trigger aria-label={triggerLabel} />
         <Combobox.Content>
           <Combobox.Search
             label={t("slackSearchChannels")}
@@ -200,7 +221,7 @@ export const SlackChannelCombobox: FunctionComponent<
               <Combobox.Option key={channel.id} value={channel.id}>
                 <Stack align="center" gap="1">
                   <Icon
-                    icon={channel.is_private ? Lucide.Lock : Lucide.Hash}
+                    icon={channel.is_private ? Lock : Hash}
                     size="0"
                     aria-hidden
                   />

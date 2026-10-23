@@ -1,6 +1,6 @@
 import { GenericData } from "@knocklabs/types";
 import EventEmitter from "eventemitter2";
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 
 import { isValidUuid } from "../../helpers";
 import Knock from "../../knock";
@@ -36,11 +36,10 @@ import {
 import { getFormattedTriggerData, mergeDateRangeParams } from "./utils";
 
 // Default options to apply
-const feedClientDefaults: Pick<FeedClientOptions, "archived"> = {
+const feedClientDefaults: Pick<FeedClientOptions, "archived" | "mode"> = {
   archived: "exclude",
+  mode: "compact",
 };
-
-const DEFAULT_DISCONNECT_DELAY = 2000;
 
 const CLIENT_REF_ID_PREFIX = "client_";
 
@@ -52,10 +51,7 @@ class Feed {
   private userFeedId: string;
   private broadcaster: EventEmitter;
   private broadcastChannel!: BroadcastChannel | null;
-  private disconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private hasSubscribedToRealTimeUpdates: boolean = false;
-  private visibilityChangeHandler: () => void = () => {};
-  private visibilityChangeListenerConnected: boolean = false;
 
   // The raw store instance, used for binding in React and other environments
   public store: FeedStore;
@@ -116,13 +112,6 @@ class Feed {
 
     this.socketManager?.leave(this);
 
-    this.tearDownVisibilityListeners();
-
-    if (this.disconnectTimer) {
-      clearTimeout(this.disconnectTimer);
-      this.disconnectTimer = null;
-    }
-
     if (this.broadcastChannel) {
       this.broadcastChannel.close();
     }
@@ -175,7 +164,25 @@ class Feed {
     return this.store.getState();
   }
 
+  /**
+   * Returns `true` when a user is signed in. When not, logs and returns `false`
+   * so mutation methods can skip early, without touching the store (no
+   * optimistic update) or the network. This matters for actions that fire
+   * automatically, like the popover's `markAllAsSeen` on open or a cell's
+   * `markAsInteracted` on click.
+   */
+  private canMutate(operation: string): boolean {
+    if (this.knock.isAuthenticated()) {
+      return true;
+    }
+
+    this.knock.log(`[Feed] User is not authenticated, skipping ${operation}`);
+    return false;
+  }
+
   async markAsSeen(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsSeen")) return;
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -188,6 +195,8 @@ class Feed {
   }
 
   async markAllAsSeen() {
+    if (!this.canMutate("markAllAsSeen")) return;
+
     // To mark all of the messages as seen we:
     // 1. Optimistically update *everything* we have in the store
     // 2. We decrement the `unseen_count` to zero optimistically
@@ -230,6 +239,8 @@ class Feed {
   }
 
   async markAsUnseen(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsUnseen")) return;
+
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
       "unseen",
@@ -241,6 +252,8 @@ class Feed {
   }
 
   async markAsRead(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsRead")) return;
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -253,6 +266,8 @@ class Feed {
   }
 
   async markAllAsRead() {
+    if (!this.canMutate("markAllAsRead")) return;
+
     // To mark all of the messages as read we:
     // 1. Optimistically update *everything* we have in the store
     // 2. We decrement the `unread_count` to zero optimistically
@@ -295,6 +310,8 @@ class Feed {
   }
 
   async markAsUnread(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsUnread")) return;
+
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
       "unread",
@@ -309,6 +326,8 @@ class Feed {
     itemOrItems: FeedItemOrItems,
     metadata?: Record<string, string>,
   ) {
+    if (!this.canMutate("markAsInteracted")) return;
+
     const now = new Date().toISOString();
     this.optimisticallyPerformStatusUpdate(
       itemOrItems,
@@ -332,6 +351,8 @@ class Feed {
   TODO: how do we handle rollbacks?
   */
   async markAsArchived(itemOrItems: FeedItemOrItems) {
+    if (!this.canMutate("markAsArchived")) return;
+
     const state = this.store.getState();
 
     const shouldOptimisticallyRemoveItems =
@@ -403,6 +424,8 @@ class Feed {
   }
 
   async markAllAsArchived() {
+    if (!this.canMutate("markAllAsArchived")) return;
+
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
@@ -430,6 +453,8 @@ class Feed {
   }
 
   async markAllReadAsArchived() {
+    if (!this.canMutate("markAllReadAsArchived")) return;
+
     // Note: there is the potential for a race condition here because the bulk
     // update is an async method, so if a new message comes in during this window before
     // the update has been processed we'll effectively reset the `unseen_count` to be what it was.
@@ -472,9 +497,48 @@ class Feed {
   }
 
   async markAsUnarchived(itemOrItems: FeedItemOrItems) {
-    this.optimisticallyPerformStatusUpdate(itemOrItems, "unarchived", {
-      archived_at: null,
-    });
+    if (!this.canMutate("markAsUnarchived")) return;
+
+    const state = this.store.getState();
+
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+
+    const itemIds: string[] = items.map((item) => item.id);
+
+    const shouldOptimisticallyRemoveItems =
+      this.defaultOptions.archived === "only";
+
+    if (shouldOptimisticallyRemoveItems) {
+      // If any of the items are unseen or unread, then capture as we'll want to decrement
+      // the counts for these in the metadata we have
+      const unseenCount = items.filter((i) => !i.seen_at).length;
+      const unreadCount = items.filter((i) => !i.read_at).length;
+
+      // Build the new metadata
+      const updatedMetadata = {
+        ...state.metadata,
+        // Ensure that the counts don't ever go below 0 on unarchiving where the client state
+        // gets out of sync with the server state
+        total_count: Math.max(0, state.metadata.total_count - items.length),
+        unseen_count: Math.max(0, state.metadata.unseen_count - unseenCount),
+        unread_count: Math.max(0, state.metadata.unread_count - unreadCount),
+      };
+
+      // Remove the unarchived entries
+      const entriesToSet = state.items.filter(
+        (item) => !itemIds.includes(item.id),
+      );
+
+      state.setResult({
+        entries: entriesToSet,
+        meta: updatedMetadata,
+        page_info: state.pageInfo,
+      });
+    } else {
+      this.optimisticallyPerformStatusUpdate(itemOrItems, "unarchived", {
+        archived_at: null,
+      });
+    }
 
     return this.makeStatusUpdate(itemOrItems, "unarchived");
   }
@@ -515,8 +579,6 @@ class Feed {
       __loadingType: undefined,
       __fetchSource: undefined,
       __experimentalCrossBrowserUpdates: undefined,
-      auto_manage_socket_connection: undefined,
-      auto_manage_socket_connection_delay: undefined,
     };
 
     const result = await this.knock.client().makeRequest({
@@ -571,6 +633,8 @@ class Feed {
   }
 
   async fetchNextPage(options: FetchFeedOptions = {}) {
+    if (!this.canMutate("fetchNextPage")) return;
+
     // Attempts to fetch the next page of results (if we have any)
     const { pageInfo } = this.store.getState();
 
@@ -708,6 +772,7 @@ class Feed {
       tenants: this.defaultOptions.tenant
         ? [this.defaultOptions.tenant]
         : undefined,
+      trigger_data: getFormattedTriggerData(this.defaultOptions),
     };
 
     return await this.knock.messages.bulkUpdateAllStatusesInChannel({
@@ -777,10 +842,6 @@ class Feed {
     // In server environments we might not have a socket connection
     if (!this.socketManager) return;
 
-    if (this.defaultOptions.auto_manage_socket_connection) {
-      this.setUpVisibilityListeners();
-    }
-
     // If we're initializing but they have previously opted to listen to real-time updates
     // then we will automatically reconnect on their behalf
     if (this.hasSubscribedToRealTimeUpdates && this.knock.isAuthenticated()) {
@@ -800,33 +861,6 @@ class Feed {
     }
   }
 
-  /**
-   * Listen for changes to document visibility and automatically disconnect
-   * or reconnect the socket after a delay
-   */
-  private setUpVisibilityListeners() {
-    if (
-      typeof document === "undefined" ||
-      this.visibilityChangeListenerConnected
-    ) {
-      return;
-    }
-
-    this.visibilityChangeHandler = this.handleVisibilityChange.bind(this);
-    this.visibilityChangeListenerConnected = true;
-    document.addEventListener("visibilitychange", this.visibilityChangeHandler);
-  }
-
-  private tearDownVisibilityListeners() {
-    if (typeof document === "undefined") return;
-
-    document.removeEventListener(
-      "visibilitychange",
-      this.visibilityChangeHandler,
-    );
-    this.visibilityChangeListenerConnected = false;
-  }
-
   private emitEvent(
     type:
       | MessageEngagementStatus
@@ -843,34 +877,6 @@ class Feed {
     this.broadcaster.emit(`items:${type}`, { items });
     // Internal events only need `items:`
     this.broadcastOverChannel(`items:${type}`, { items });
-  }
-
-  private handleVisibilityChange() {
-    const disconnectDelay =
-      this.defaultOptions.auto_manage_socket_connection_delay ??
-      DEFAULT_DISCONNECT_DELAY;
-
-    const client = this.knock.client();
-
-    if (document.visibilityState === "hidden") {
-      // When the tab is hidden, clean up the socket connection after a delay
-      this.disconnectTimer = setTimeout(() => {
-        client.socket?.disconnect();
-        this.disconnectTimer = null;
-      }, disconnectDelay);
-    } else if (document.visibilityState === "visible") {
-      // When the tab is visible, clear the disconnect timer if active to cancel disconnecting
-      // This handles cases where the tab is only briefly hidden to avoid unnecessary disconnects
-      if (this.disconnectTimer) {
-        clearTimeout(this.disconnectTimer);
-        this.disconnectTimer = null;
-      }
-
-      // If the socket is not connected, try to reconnect
-      if (!client.socket?.isConnected()) {
-        client.socket?.connect();
-      }
-    }
   }
 }
 

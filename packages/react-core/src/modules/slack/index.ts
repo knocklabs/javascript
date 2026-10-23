@@ -9,6 +9,7 @@ export {
   useSlackChannels,
   useConnectedSlackChannels,
   useSlackAuth,
+  getSlackNonceStorageKey,
 } from "./hooks";
 export {
   type ContainerObject,

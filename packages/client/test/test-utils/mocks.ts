@@ -65,7 +65,6 @@ export const createMockFeed = (
   const { knock, mockApiClient } = createMockKnock();
 
   const defaultOptions: FeedClientOptions = {
-    auto_manage_socket_connection: false,
     ...options,
   };
 
@@ -212,41 +211,6 @@ export const setupBrowserEnvironment = () => {
   };
 };
 
-// Simple axios mock for API testing
-export const createAxiosMock = () => {
-  const mockAxios = vi.fn();
-
-  // Default successful response
-  mockAxios.mockResolvedValue({
-    status: 200,
-    data: { success: true },
-  });
-
-  // Helper methods for common scenarios
-  const mockSuccess = (data: unknown, status = 200) => {
-    mockAxios.mockResolvedValue({ status, data });
-  };
-
-  const mockError = (status: number, message = "Error") => {
-    mockAxios.mockResolvedValue({
-      status,
-      data: { error: message },
-    });
-  };
-
-  const mockFailure = (error: Error) => {
-    mockAxios.mockRejectedValue(error);
-  };
-
-  return {
-    axios: mockAxios,
-    mockSuccess,
-    mockError,
-    mockFailure,
-    reset: () => mockAxios.mockClear(),
-  };
-};
-
 // Simple WebSocket mock
 export const createWebSocketMock = () => {
   const mockWebSocket = {
@@ -312,35 +276,11 @@ export const createEventEmitterMock = () => ({
   removeAllListeners: vi.fn(),
 });
 
-// Simple document mock for browser APIs
-export const createDocumentMock = () => ({
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  visibilityState: "visible",
-  hidden: false,
-});
-
-// Module-level mocks for common dependencies
-export const mockAxios = () => {
-  vi.mock("axios", () => ({
-    default: {
-      create: vi.fn(() => createAxiosMock().axios),
-    },
-  }));
-};
-
-export const mockAxiosRetry = () => {
-  vi.mock("axios-retry", () => ({
-    default: vi.fn(),
-    isNetworkError: vi.fn().mockReturnValue(false),
-    exponentialDelay: vi.fn().mockReturnValue(1000),
-  }));
-};
-
-export const mockJwtDecode = () => {
-  vi.mock("jwt-decode", () => ({
-    jwtDecode: vi.fn().mockReturnValue({
-      exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-    }),
-  }));
-};
+// `vi.mock` is hoisted to the top of the module regardless of where it's
+// written, so it lives at the top level here rather than inside a helper that
+// only looked like it had to be called.
+vi.mock("jwt-decode", () => ({
+  jwtDecode: vi.fn().mockReturnValue({
+    exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+  }),
+}));

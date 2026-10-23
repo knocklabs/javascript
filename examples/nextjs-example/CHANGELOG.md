@@ -1,5 +1,551 @@
 # nextjs-example
 
+## 1.2.42
+
+### Patch Changes
+
+- Updated dependencies [62205a1]
+- Updated dependencies [62205a1]
+- Updated dependencies [62205a1]
+- Updated dependencies [33f3365]
+  - @knocklabs/react@0.14.0
+
+## 1.2.41
+
+### Patch Changes
+
+- @knocklabs/react@0.13.2
+
+## 1.2.40
+
+### Patch Changes
+
+- Updated dependencies [eb174b2]
+- Updated dependencies [9b5f244]
+- Updated dependencies [9dddaf7]
+  - @knocklabs/react@0.13.1
+
+## 1.2.39
+
+### Patch Changes
+
+- Updated dependencies [6bba994]
+- Updated dependencies [7e3ee26]
+  - @knocklabs/react@0.13.0
+
+## 1.2.38
+
+### Patch Changes
+
+- Updated dependencies [559ddf1]
+  - @knocklabs/react@0.12.1
+
+## 1.2.37
+
+### Patch Changes
+
+- Updated dependencies [e8567eb]
+- Updated dependencies [e8567eb]
+  - @knocklabs/react@0.12.0
+
+## 1.2.37-rc.0
+
+### Patch Changes
+
+- Updated dependencies [d2f7948]
+- Updated dependencies [d2f7948]
+  - @knocklabs/react@0.12.0-rc.0
+
+## 1.2.36
+
+### Patch Changes
+
+- @knocklabs/react@0.11.24
+
+## 1.2.35
+
+### Patch Changes
+
+- Updated dependencies [dd1b724]
+- Updated dependencies [70e7669]
+- Updated dependencies [3dd0aa8]
+  - @knocklabs/react@0.11.23
+
+## 1.2.34
+
+### Patch Changes
+
+- @knocklabs/react@0.11.22
+
+## 1.2.33
+
+### Patch Changes
+
+- Updated dependencies [06367bf]
+- Updated dependencies [ffa7bd2]
+  - @knocklabs/react@0.11.21
+
+## 1.2.32
+
+### Patch Changes
+
+- Updated dependencies [a04781b]
+  - @knocklabs/react@0.11.20
+
+## 1.2.31
+
+### Patch Changes
+
+- Updated dependencies [e474413]
+- Updated dependencies [9d81dc2]
+  - @knocklabs/react@0.11.19
+
+## 1.2.30
+
+### Patch Changes
+
+- Updated dependencies [c22289c]
+  - @knocklabs/react@0.11.18
+
+## 1.2.29
+
+### Patch Changes
+
+- Updated dependencies [ee35de2]
+  - @knocklabs/react@0.11.17
+
+## 1.2.28
+
+### Patch Changes
+
+- Updated dependencies [5d54e48]
+  - @knocklabs/react@0.11.16
+
+## 1.2.27
+
+### Patch Changes
+
+- Updated dependencies [4863fe5]
+  - @knocklabs/react@0.11.15
+
+## 1.2.26
+
+### Patch Changes
+
+- d3587a6: chore: update @telegraph packages to latest versions
+- Updated dependencies [d3587a6]
+- Updated dependencies [014eecc]
+  - @knocklabs/react@0.11.14
+
+## 1.2.25
+
+### Patch Changes
+
+- Updated dependencies [af81cf2]
+- Updated dependencies [31dffc1]
+- Updated dependencies [2798bbb]
+- Updated dependencies [474120d]
+- Updated dependencies [8137b4d]
+  - @knocklabs/react@0.11.13
+
+## 1.2.24
+
+### Patch Changes
+
+- Updated dependencies [82c646d]
+- Updated dependencies [e060fcb]
+- Updated dependencies [6931347]
+- Updated dependencies [79155de]
+- Updated dependencies [6f079ff]
+- Updated dependencies [e6dc9af]
+  - @knocklabs/react@0.11.12
+
+## 1.2.23
+
+### Patch Changes
+
+- @knocklabs/react@0.11.11
+
+## 1.2.22
+
+### Patch Changes
+
+- Updated dependencies [4cc5bac]
+  - @knocklabs/react@0.11.10
+
+## 1.2.21
+
+### Patch Changes
+
+- Updated dependencies [766e5c1]
+  - @knocklabs/react@0.11.9
+
+## 1.2.20
+
+### Patch Changes
+
+- Updated dependencies [9e8e3ae]
+  - @knocklabs/react@0.11.8
+
+## 1.2.19
+
+### Patch Changes
+
+- Updated dependencies [838b1fd]
+  - @knocklabs/react@0.11.7
+
+## 1.2.18
+
+### Patch Changes
+
+- Updated dependencies [c134f53]
+- Updated dependencies [ddb24b4]
+  - @knocklabs/react@0.11.6
+
+## 1.2.17
+
+### Patch Changes
+
+- Updated dependencies [1ed4f75]
+  - @knocklabs/react@0.11.5
+
+## 1.2.16
+
+### Patch Changes
+
+- 4dbf94e: chore: upgrade telegraph dependencies to their latest versions
+- Updated dependencies [4dbf94e]
+  - @knocklabs/react@0.11.4
+
+## 1.2.15
+
+### Patch Changes
+
+- Updated dependencies [f26dffa]
+  - @knocklabs/react@0.11.3
+
+## 1.2.14
+
+### Patch Changes
+
+- Updated dependencies [b7b3708]
+  - @knocklabs/react@0.11.2
+
+## 1.2.13
+
+### Patch Changes
+
+- Updated dependencies [7f8bdfe]
+  - @knocklabs/react@0.11.1
+
+## 1.2.12
+
+### Patch Changes
+
+- Updated dependencies [2af3f5e]
+  - @knocklabs/react@0.11.0
+
+## 1.2.11
+
+### Patch Changes
+
+- @knocklabs/react@0.10.5
+
+## 1.2.10
+
+### Patch Changes
+
+- Updated dependencies [f9aca69]
+  - @knocklabs/react@0.10.4
+
+## 1.2.9
+
+### Patch Changes
+
+- @knocklabs/react@0.10.3
+
+## 1.2.8
+
+### Patch Changes
+
+- @knocklabs/react@0.10.2
+
+## 1.2.7
+
+### Patch Changes
+
+- @knocklabs/react@0.10.1
+
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies [f0c892f]
+  - @knocklabs/react@0.10.0
+
+## 1.2.5
+
+### Patch Changes
+
+- @knocklabs/react@0.9.5
+
+## 1.2.5
+
+### Patch Changes
+
+- 96cfa22: Update Next.js from 15.3.3 to 15.3.6
+
+## 1.2.4
+
+### Patch Changes
+
+- 571abb1: Add NEXT_PUBLIC_KNOCK_BRANCH env var for specifying branch
+- Updated dependencies [f4529cc]
+- Updated dependencies [f278892]
+  - @knocklabs/react@0.9.4
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [79d7608]
+  - @knocklabs/react@0.9.3
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [1e538b9]
+  - @knocklabs/react@0.9.2
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [c4e67da]
+  - @knocklabs/react@0.9.1
+
+## 1.2.0
+
+### Minor Changes
+
+- be65601: - **Added channel-level notification preferences** to client interfaces, types, tests, and the Next.js example.
+  - Update your code to handle the new channels property in `PreferenceSet`, `SetPreferencesProperties`, and `WorkflowPreferenceSetting` if using `@knock/client`.
+
+### Patch Changes
+
+- Updated dependencies [4b888c4]
+- Updated dependencies [40d8e8a]
+  - @knocklabs/react@0.9.0
+
+## 1.1.49
+
+### Patch Changes
+
+- Updated dependencies [3d8df10]
+  - @knocklabs/react@0.8.11
+
+## 1.1.48
+
+### Patch Changes
+
+- Updated dependencies [7da00f8]
+  - @knocklabs/react@0.8.10
+
+## 1.1.47
+
+### Patch Changes
+
+- @knocklabs/react@0.8.9
+
+## 1.1.46
+
+### Patch Changes
+
+- Updated dependencies [bf7677a]
+  - @knocklabs/react@0.8.8
+
+## 1.1.45
+
+### Patch Changes
+
+- @knocklabs/react@0.8.7
+
+## 1.1.44
+
+### Patch Changes
+
+- @knocklabs/react@0.8.6
+
+## 1.1.43
+
+### Patch Changes
+
+- @knocklabs/react@0.8.5
+
+## 1.1.42
+
+### Patch Changes
+
+- Updated dependencies [74366b3]
+  - @knocklabs/react@0.8.4
+
+## 1.1.41
+
+### Patch Changes
+
+- @knocklabs/react@0.8.3
+
+## 1.1.40
+
+### Patch Changes
+
+- Updated dependencies [00d3f8c]
+  - @knocklabs/react@0.8.2
+
+## 1.1.39
+
+### Patch Changes
+
+- Updated dependencies [5b77f18]
+  - @knocklabs/react@0.8.1
+
+## 1.1.38
+
+### Patch Changes
+
+- Updated dependencies [c761e7c]
+- Updated dependencies [3558784]
+- Updated dependencies [b8b64e4]
+- Updated dependencies [7fb9334]
+  - @knocklabs/react@0.8.0
+
+## 1.1.37
+
+### Patch Changes
+
+- @knocklabs/react@0.7.34
+
+## 1.1.36
+
+### Patch Changes
+
+- @knocklabs/react@0.7.33
+
+## 1.1.35
+
+### Patch Changes
+
+- Updated dependencies [aadfd6f]
+- Updated dependencies [4aa17ab]
+  - @knocklabs/react@0.7.32
+
+## 1.1.34
+
+### Patch Changes
+
+- Updated dependencies [79204f0]
+  - @knocklabs/react@0.7.31
+
+## 1.1.33
+
+### Patch Changes
+
+- @knocklabs/react@0.7.30
+
+## 1.1.32
+
+### Patch Changes
+
+- @knocklabs/react@0.7.29
+
+## 1.1.31
+
+### Patch Changes
+
+- @knocklabs/react@0.7.28
+
+## 1.1.30
+
+### Patch Changes
+
+- @knocklabs/react@0.7.27
+
+## 1.1.29
+
+### Patch Changes
+
+- Updated dependencies [001690a]
+  - @knocklabs/react@0.7.26
+
+## 1.1.28
+
+### Patch Changes
+
+- @knocklabs/react@0.7.25
+
+## 1.1.27
+
+### Patch Changes
+
+- Updated dependencies [cbb2aa0]
+- Updated dependencies [a475157]
+  - @knocklabs/react@0.7.24
+
+## 1.1.26
+
+### Patch Changes
+
+- fdc6d82: chore(deps): bump the telegraph-packages group across 1 directory with 9 updates
+- Updated dependencies [3703cf6]
+- Updated dependencies [fdc6d82]
+  - @knocklabs/react@0.7.23
+
+## 1.1.25
+
+### Patch Changes
+
+- @knocklabs/react@0.7.22
+
+## 1.1.24
+
+### Patch Changes
+
+- Updated dependencies [60c383c]
+  - @knocklabs/react@0.7.21
+
+## 1.1.23
+
+### Patch Changes
+
+- @knocklabs/react@0.7.20
+
+## 1.1.22
+
+### Patch Changes
+
+- Updated dependencies [325f2ac]
+  - @knocklabs/react@0.7.19
+
+## 1.1.21
+
+### Patch Changes
+
+- Updated dependencies [ec704d1]
+  - @knocklabs/react@0.7.18
+
+## 1.1.20
+
+### Patch Changes
+
+- @knocklabs/react@0.7.17
+
+## 1.1.19
+
+### Patch Changes
+
+- @knocklabs/react@0.7.16
+
 ## 1.1.19-canary.2
 
 ### Patch Changes
