@@ -1,5 +1,11 @@
 # nextjs-example
 
+## 1.2.43-canary.0
+
+### Patch Changes
+
+- @knocklabs/react@0.14.1-canary.0
+
 ## 1.2.42
 
 ### Patch Changes

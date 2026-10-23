@@ -1,5 +1,16 @@
 # @knocklabs/expo
 
+## 0.8.4-canary.0
+
+### Patch Changes
+
+- Updated dependencies [31dc35e]
+- Updated dependencies [6ea98a3]
+- Updated dependencies [31dc35e]
+  - @knocklabs/client@0.23.0-canary.0
+  - @knocklabs/react-core@0.16.1-canary.0
+  - @knocklabs/react-native@0.11.4-canary.0
+
 ## 0.8.3
 
 ### Patch Changes

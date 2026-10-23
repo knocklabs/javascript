@@ -1,6 +1,6 @@
 {
   "name": "client-example",
-  "version": "0.3.62",
+  "version": "0.3.63-canary.0",
   "private": true,
   "type": "module",
   "dependencies": {
