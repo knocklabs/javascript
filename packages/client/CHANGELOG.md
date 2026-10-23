@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.23.0-canary.0
+
+### Minor Changes
+
+- 31dc35e: Connect sockets via WebSocket gateway
+- 31dc35e: Add `maxRetries` option to `ApiRequestConfig`
+
+  When making a request to the Knock API using `ApiClient`'s `makeRequest` function, the `maxRetries` option of `ApiRequestConfig` can now be used to set the maximum number of times the request should be retried when a retryable error occurs. To disable retries altogether, set `maxRetries` to 0.
+
+  ```js
+  const result = await knock.client().makeRequest({
+    method: "GET",
+    url: "/v1/users",
+    maxRetries: 0,
+  });
+  ```
+
+### Patch Changes
+
+- 6ea98a3: Skip socket instantiation when WebSocket transport is unavailable
+
+  Previously, in environments where `window` is defined but `WebSocket` is not supported, `ApiClient` would attempt to set up a socket but always encounter an error. Now, the socket will never be instantiated when `WebSocket` is unavailable.
+
 ## 0.22.2
 
 ### Patch Changes

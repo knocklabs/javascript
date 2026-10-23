@@ -1,5 +1,11 @@
 # slack-kit-example
 
+## 0.4.75-canary.0
+
+### Patch Changes
+
+- @knocklabs/react@0.14.1-canary.0
+
 ## 0.4.74
 
 ### Patch Changes
