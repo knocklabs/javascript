@@ -13,7 +13,7 @@ const { userId, tenant, collection, objectId } = getAppDetails();
 
 const signingKey = process.env.KNOCK_SIGNING_KEY!;
 
-async function MyApp({ children }: { children: React.ReactElement }) {
+async function MyApp({ children }: { children: React.ReactNode }) {
   //Generate a production build in CI/CD even if we're missing the env vars
   const userToken = signingKey
     ? await signUserToken(userId, {
