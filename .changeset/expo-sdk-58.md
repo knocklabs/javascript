@@ -4,4 +4,4 @@
 "@knocklabs/expo-example": minor
 ---
 
-Upgrade to Expo SDK 58 and React Native 0.88. The `react-native-svg` dependency now matches the SDK 58 version (`~15.16.0`), and the example app uses the SDK 58 versions of all Expo and native modules.
+Move the `react-native-svg` dependency to `~15.16.0`, the version Expo SDK 58 ships. The `react-native` and `expo` peer ranges are unchanged. Apps on an older Expo SDK that also depend on `react-native-svg` can end up with two copies of it, so align `react-native-svg` to `~15.16.0` or upgrade to Expo SDK 58 alongside this release.
