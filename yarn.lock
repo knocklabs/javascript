@@ -13356,7 +13356,7 @@ __metadata:
     globals: "npm:^16.0.0"
     react: "npm:^19.3.0"
     react-dom: "npm:^19.3.0"
-    react-router: "npm:^7.18.5"
+    react-router: "npm:^7.6.3"
     typescript: "npm:^5.8.3"
     typescript-eslint: "npm:^8.61.0"
     vite: "npm:^8.1.5"
@@ -17672,7 +17672,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:^7.18.5":
+"react-router@npm:^7.6.3":
   version: 7.18.5
   resolution: "react-router@npm:7.18.5"
   dependencies:
