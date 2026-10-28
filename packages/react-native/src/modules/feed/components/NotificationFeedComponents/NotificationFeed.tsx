@@ -142,10 +142,10 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = ({
         ListEmptyComponent={
           !requestInFlight ? (
             <EmptyNotificationFeed styleOverride={emptyFeedStyle} />
-          ) : null
+          ) : undefined
         }
         ListFooterComponent={
-          networkStatus === NetworkStatus.fetchMore ? renderFooter : null
+          networkStatus === NetworkStatus.fetchMore ? renderFooter : undefined
         }
         refreshControl={
           <RefreshControl
