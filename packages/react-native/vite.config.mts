@@ -43,5 +43,13 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    test: {
+      global: true,
+      environment: "jsdom",
+      setupFiles: "./setupTest.ts",
+      // Render components with react-native-web so tests exercise the real
+      // FlatList behavior in jsdom. Only applies to tests, not the build.
+      alias: [{ find: /^react-native$/, replacement: "react-native-web" }],
+    },
   };
 });
