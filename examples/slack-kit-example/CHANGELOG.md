@@ -1,5 +1,13 @@
 # slack-kit-example
 
+## 0.4.75
+
+### Patch Changes
+
+- a33857b: Upgrade dependencies flagged by Vanta. Direct pins move Next.js to 15.5.28 and jsdom to 30.1.3.
+- Updated dependencies [a33857b]
+  - @knocklabs/react@0.14.1
+
 ## 0.4.74
 
 ### Patch Changes
