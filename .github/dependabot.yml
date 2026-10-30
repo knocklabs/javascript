@@ -23,7 +23,75 @@ updates:
         patterns:
           - "react"
           - "react-dom"
+      # Keep the Expo SDK and the native modules pinned to it on one version
+      # set. The ignore rules below hold back SDK upgrades, so this group only
+      # carries updates within the current SDK.
+      expo:
+        patterns:
+          - "expo"
+          - "expo-*"
+          - "@expo/*"
+          - "eslint-config-expo"
+          - "react-native"
+          - "react-native-gesture-handler"
+          - "react-native-reanimated"
+          - "react-native-safe-area-context"
+          - "react-native-screens"
+          - "react-native-svg"
+          - "react-native-web"
+          - "react-native-webview"
+          - "react-native-worklets"
     ignore:
       # nanoid >3 drops support for cjs
       - dependency-name: "nanoid"
         versions: [">=4.0.0"]
+      # Expo SDK packages use the SDK number as their major version, so a major
+      # bump is an SDK upgrade. Upgrade the SDK by hand so every package moves
+      # together (check with `npx expo install --check`).
+      - dependency-name: "expo"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "expo-*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@expo/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint-config-expo"
+        update-types: ["version-update:semver-major"]
+      # The native modules pinned to the SDK are versioned on their own, and an
+      # SDK-sized jump can be a minor release (react-native 0.85 -> 0.86,
+      # reanimated 4.3 -> 4.7). Ignore minor as well as major.
+      - dependency-name: "react-native"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-gesture-handler"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-reanimated"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-safe-area-context"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-screens"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-svg"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-web"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-webview"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      - dependency-name: "react-native-worklets"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
