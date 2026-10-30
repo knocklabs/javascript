@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.14.1
+
+### Patch Changes
+
+- a33857b: Upgrade dependencies flagged by Vanta. Direct pins move Next.js to 15.5.28 and jsdom to 30.1.3.
+- Updated dependencies [b429cf0]
+- Updated dependencies [a33857b]
+  - @knocklabs/client@0.22.3
+  - @knocklabs/react-core@0.16.1
+
 ## 0.14.0
 
 ### Minor Changes

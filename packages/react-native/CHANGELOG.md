@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.12.0
+
+### Minor Changes
+
+- 1c4a422: Move the `react-native-svg` dependency to `~15.16.0`, the version Expo SDK 58 ships. The `react-native` and `expo` peer ranges are unchanged. Apps on an older Expo SDK that also depend on `react-native-svg` can end up with two copies of it, so align `react-native-svg` to `~15.16.0` or upgrade to Expo SDK 58 alongside this release.
+
+### Patch Changes
+
+- Updated dependencies [b429cf0]
+- Updated dependencies [a33857b]
+  - @knocklabs/client@0.22.3
+  - @knocklabs/react-core@0.16.1
+
 ## 0.11.3
 
 ### Patch Changes
