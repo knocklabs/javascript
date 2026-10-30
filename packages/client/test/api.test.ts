@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import packageJson from "../package.json";
 import ApiClient from "../src/api";
+import type { TransportConstructor } from "../src/gatewayTransport";
+
+import { createWebSocketMock } from "./test-utils/mocks";
 
 const TEST_BRANCH_SLUG = "lorem-ipsum-dolor-branch";
 
@@ -734,6 +737,27 @@ describe("API Client", () => {
       expect(apiClient.socket).toBeDefined();
     });
 
+    test("configures socket with the gateway transport", () => {
+      vi.stubGlobal("window", {});
+
+      vi.mocked(Socket).mockClear();
+
+      new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: undefined,
+      });
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      expect(typeof socketOpts.transport).toBe("function");
+      expect((socketOpts.transport as NewableFunction).name).toBe(
+        "GatewayTransport",
+      );
+    });
+
     test("configures socket with reconnectAfterMs and rejoinAfterMs", () => {
       vi.stubGlobal("window", {});
 
@@ -1123,6 +1147,460 @@ describe("API Client", () => {
 
       onlineHandler();
       expect(socket.disconnect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("WebSocket Connection via Gateway", () => {
+    const MockWebSocket = createWebSocketMock();
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.resetAllMocks();
+
+      vi.mocked(Socket).mockImplementation(
+        createSocketMock as unknown as () => Socket,
+      );
+
+      vi.stubGlobal("window", {});
+      vi.stubGlobal("WebSocket", MockWebSocket);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    test("establishes a WebSocket connection via the gateway transport", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // The gateway's signed connect URL, as returned by `POST /v1/sockets/connect`
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockResolvedValue(
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      // The URL Phoenix would hand the transport, carrying the unsigned params
+      // (vsn, api_key, user_token) that the gateway's signed URL lacks.
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // Call GatewayTransport directly to simulate Phoenix's socket establishing a connection
+      new GatewayTransport(PHOENIX_URL);
+
+      await vi.waitFor(() => { expect(MockWebSocket).toHaveBeenCalledTimes(1); });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledWith(
+        "https://api.knock.app/v1/sockets/connect",
+        expect.objectContaining({ method: "POST" }),
+      );
+
+      // Each underlying WebSocket is constructed with the signed URL merged
+      // with the original unsigned query params.
+      const expectedUrl = `${signedUrl}&vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456`;
+      expect(MockWebSocket).toHaveBeenLastCalledWith(expectedUrl, undefined);
+    });
+
+    test("caches the signed WebSocket connect URL until it expires", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const CACHE_TTL_MS = 60_000;
+      const startDate = new Date(2024, 0, 1, 0, 0, 0);
+      vi.setSystemTime(startDate);
+
+      // Each fetch returns a signed URL that expires `CACHE_TTL_MS` from
+      // whatever the (mocked) system time is at the time of the call.
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockImplementation(() =>
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + CACHE_TTL_MS).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // The first connection fetches a signed connect URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // A second connection, made before the cached URL expires, reuses it
+      // rather than fetching again.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // Advance the system clock past the cached URL's expiry.
+      vi.setSystemTime(new Date(startDate.getTime() + CACHE_TTL_MS + 1));
+
+      // A third connection, made after expiry, fetches a fresh signed URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(3);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    test("skips establishing a WebSocket connection when a signed URL fetch fails", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // A plain `Error` (no `.response`) isn't retryable, so this fails on
+      // the first attempt rather than after exhausting retries.
+      const fetchError = new Error("network down");
+      const fetchMock = vi.fn().mockRejectedValue(fetchError);
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const transport = new GatewayTransport(PHOENIX_URL);
+      const onClose = vi.fn();
+      transport.onclose = onClose;
+
+      // The transport reports the failure via `onclose`, since it never
+      // got far enough to open a connection.
+      await vi.waitFor(() => {
+        expect(onClose).toHaveBeenCalledTimes(1);
+      });
+
+      // No WebSocket is ever constructed, since the connect URL fetch
+      // failed before a connection could be attempted.
+      expect(MockWebSocket).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
+      expect(closeEvent.wasClean).toBe(false);
+    });
+
+    test("does not retry a retryable signed URL fetch failure, leaving retries to Phoenix", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // A 5xx is normally retried by `makeRequest`, but the gateway transport's fetch sets
+      // maxRetries to 0 so that each Phoenix connection attempt makes a single request.
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(createJsonResponse({ error: "Server Error" }, 503));
+      setFetchMock(apiClient, fetchMock);
+      skipRetryDelays(apiClient);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const transport = new GatewayTransport(PHOENIX_URL);
+        const onClose = vi.fn();
+        transport.onclose = onClose;
+
+        await vi.waitFor(() => {
+          expect(onClose).toHaveBeenCalledTimes(1);
+        });
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(MockWebSocket).not.toHaveBeenCalled();
+
+        // An unclean close is what triggers Phoenix's reconnect backoff
+        const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
+        expect(closeEvent.wasClean).toBe(false);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
+    test("invalidates the cached connect URL when the gateway rejects it, so the next connection refetches", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // Each fetch returns a signed URL with a distinct token, so the two
+      // connections' URLs can be told apart, and an expiry far enough out
+      // that the cache wouldn't naturally expire between them.
+      let fetchCount = 0;
+      const fetchMock = vi.fn().mockImplementation(() => {
+        fetchCount += 1;
+        return createJsonResponse({
+          url: `wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token-${fetchCount}`,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        });
+      });
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      // The first connection fetches a signed URL and connects.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // The underlying WebSocket closes before ever opening (`onopen` is
+      // never called), which looks like the signed URL is invalid
+      const ws = MockWebSocket.mock.results[0]!.value;
+      ws.onclose({ code: 1006, wasClean: false });
+
+      // A second connection, made while the cached URL would otherwise still
+      // be unexpired, refetches rather than reusing the invalidated URL.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      const [firstUrl] = MockWebSocket.mock.calls[0]!;
+      const [secondUrl] = MockWebSocket.mock.calls[1]!;
+      expect(secondUrl).not.toBe(firstUrl);
+    });
+
+    test("keeps the cached connect URL when a connection opens and later drops", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockResolvedValue(
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // The connection opens successfully and only later drops uncleanly.
+      // Unlike a close that arrives before `onopen`, this isn't evidence the
+      // signed URL itself was bad, so the cache should survive it.
+      const ws = MockWebSocket.mock.results[0]!.value;
+      ws.onopen();
+      ws.onclose({ wasClean: false });
+
+      // A second connection reuses the cached URL instead of refetching.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not invalidate the cache when Phoenix closes a still-connecting socket", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      const signedUrl =
+        "wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token";
+      const fetchMock = vi.fn().mockResolvedValue(
+        createJsonResponse({
+          url: signedUrl,
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+        }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const transport = new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(1);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // The mock WebSocket's `close` doesn't emit a close event on its own
+      // the way a real one would, so wire it to do so here.
+      const ws = MockWebSocket.mock.results[0]!.value;
+      ws.close.mockImplementation(() => {
+        ws.onclose({ code: 1000, wasClean: false });
+      });
+
+      // Phoenix tears the transport down (e.g. the caller disconnected)
+      // while the socket is still connecting, before it ever opened. This is
+      // a deliberate close, not a rejected signed URL, so it shouldn't
+      // invalidate the cache.
+      transport.close();
+
+      // A second connection reuses the cached URL instead of refetching.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(MockWebSocket).toHaveBeenCalledTimes(2);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    test("aborts the in-flight connect request when closed before it resolves, and does not cache the aborted result", async () => {
+      const apiClient = new ApiClient({
+        host: "https://api.knock.app",
+        apiKey: "pk_test_12345",
+        userToken: "user_token_456",
+        disconnectOnPageHidden: false,
+      });
+
+      // Mimics real fetch: rejects with an AbortError once the request's
+      // signal is aborted, rather than ever resolving on its own.
+      const fetchMock = vi.fn().mockImplementation(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            const abortError = new DOMException(
+              "The operation was aborted.",
+              "AbortError",
+            );
+            const signal = init?.signal;
+            if (signal?.aborted) {
+              reject(abortError);
+              return;
+            }
+            signal?.addEventListener("abort", () => reject(abortError));
+          }),
+      );
+      setFetchMock(apiClient, fetchMock);
+
+      const socketOpts = vi.mocked(Socket).mock.calls[0]![1] as Record<
+        string,
+        unknown
+      >;
+      const GatewayTransport = socketOpts.transport as TransportConstructor;
+
+      const PHOENIX_URL =
+        "wss://api.knock.app/ws/v1/websocket?vsn=2.0.0&api_key=pk_test_12345&user_token=user_token_456";
+
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => { });
+      try {
+        const transport = new GatewayTransport(PHOENIX_URL);
+        const onClose = vi.fn();
+        const onError = vi.fn();
+        transport.onclose = onClose;
+        transport.onerror = onError;
+
+        // Wait for the HTTP request to actually be in flight before closing.
+        await vi.waitFor(() => {
+          expect(fetchMock).toHaveBeenCalledTimes(1);
+        });
+
+        transport.close();
+
+        await vi.waitFor(() => {
+          expect(onClose).toHaveBeenCalledTimes(1);
+        });
+
+        // The abort signal propagated all the way through the cache,
+        // fetchSocketConnectUrl, and makeRequest/buildRequestInit, down to
+        // the real fetch call.
+        const requestInit = fetchMock.mock.calls[0]![1] as RequestInit;
+        expect(requestInit.signal?.aborted).toBe(true);
+
+        // The close was clean and happened before any WebSocket existed.
+        expect(MockWebSocket).not.toHaveBeenCalled();
+        expect(onError).not.toHaveBeenCalled();
+
+        const closeEvent = onClose.mock.calls[0]![0] as CloseEvent;
+        expect(closeEvent.wasClean).toBe(true);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+
+      // The aborted fetch's result isn't cached, so a later connection
+      // attempt fetches again rather than reusing a cached value.
+      new GatewayTransport(PHOENIX_URL);
+      await vi.waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+      });
     });
   });
 });
