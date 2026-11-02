@@ -13,6 +13,7 @@ import {
   GatewayConnectResult,
   SOCKET_STATES,
   TransportConstructor,
+  WEBSOCKET_MODE,
   WebSocketLike,
   createGatewayTransport,
   fetchSocketConnectUrl,
@@ -92,7 +93,7 @@ describe("fetchSocketConnectUrl", () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
-      body: { url: SIGNED_URL, expires_at: expiresAt },
+      body: { url: SIGNED_URL, expires_at: expiresAt, mode: WEBSOCKET_MODE },
     });
 
     const result = await fetchSocketConnectUrl({
@@ -141,7 +142,7 @@ describe("fetchSocketConnectUrl", () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
-      body: { url: SIGNED_URL, expires_at: 12345 },
+      body: { url: SIGNED_URL, expires_at: 12345, mode: WEBSOCKET_MODE },
     });
 
     await expect(
@@ -153,7 +154,7 @@ describe("fetchSocketConnectUrl", () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
-      body: { url: SIGNED_URL, expires_at: "not-a-date" },
+      body: { url: SIGNED_URL, expires_at: "not-a-date", mode: WEBSOCKET_MODE },
     });
 
     await expect(
@@ -165,7 +166,7 @@ describe("fetchSocketConnectUrl", () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
-      body: { expires_at: "2024-01-01T00:00:00.000Z" },
+      body: { expires_at: "2024-01-01T00:00:00.000Z", mode: WEBSOCKET_MODE },
     });
 
     await expect(
@@ -177,7 +178,55 @@ describe("fetchSocketConnectUrl", () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
-      body: { url: 12345, expires_at: "2024-01-01T00:00:00.000Z" },
+      body: {
+        url: 12345,
+        expires_at: "2024-01-01T00:00:00.000Z",
+        mode: WEBSOCKET_MODE,
+      },
+    });
+
+    await expect(
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
+
+  test("throws an error when mode is missing from response", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: { url: SIGNED_URL, expires_at: "2024-01-01T00:00:00.000Z" },
+    });
+
+    await expect(
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
+
+  test("throws an error when mode is an unsupported string", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: {
+        url: SIGNED_URL,
+        expires_at: "2024-01-01T00:00:00.000Z",
+        mode: "longpoll",
+      },
+    });
+
+    await expect(
+      fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
+    ).rejects.toThrow("Invalid socket connect response");
+  });
+
+  test("throws an error when mode is not a string", async () => {
+    makeRequest.mockResolvedValueOnce({
+      statusCode: "ok",
+      status: 200,
+      body: {
+        url: SIGNED_URL,
+        expires_at: "2024-01-01T00:00:00.000Z",
+        mode: 123,
+      },
     });
 
     await expect(
