@@ -66,6 +66,18 @@ const CLOSE_CODE_ABNORMAL = 1006;
 export const WEBSOCKET_MODE = "websocket";
 
 /**
+ * Thrown when the WebSocket gateway API responds with a `mode` unsupported by this client. When
+ * this error occurs, the transport should fail permanently, and Phoenix should not schedule a
+ * reconnection attempt.
+ */
+export class UnsupportedSocketModeError extends Error {
+  constructor(public readonly mode: unknown) {
+    super(`Unsupported socket connect mode: ${mode ?? "unknown"}`);
+    this.name = "UnsupportedSocketModeError";
+  }
+}
+
+/**
  * Requests a signed WebSocket URL from the WebSocket gateway API endpoint. Rejects on any HTTP
  * error or malformed body so the transport treats it like a failed connection attempt.
  */
@@ -99,13 +111,12 @@ export async function fetchSocketConnectUrl({
   const expiresAt =
     typeof body?.expires_at === "string" ? Date.parse(body.expires_at) : NaN;
 
-  if (
-    typeof body?.url !== "string" ||
-    !body.url ||
-    Number.isNaN(expiresAt) ||
-    body?.mode !== WEBSOCKET_MODE
-  ) {
+  if (typeof body?.url !== "string" || !body.url || Number.isNaN(expiresAt)) {
     throw new Error("Invalid socket connect response");
+  }
+
+  if (body?.mode !== WEBSOCKET_MODE) {
+    throw new UnsupportedSocketModeError(body?.mode);
   }
 
   return { signedUrl: body.url, expiresAt };
@@ -203,8 +214,14 @@ export function createGatewayTransport({
           // Ignore this error; the socket was already closed cleanly.
           return;
         }
-        // An unexepected error occurred while fetching
-        this.fail(error);
+        if (error instanceof UnsupportedSocketModeError) {
+          // This mode will never succeed. Fail permanently instead of letting Phoenix schedule an
+          // automatic reconnect.
+          this.failPermanently(error);
+        } else {
+          // An unexepected error occurred while fetching
+          this.fail(error);
+        }
         return;
       }
 
@@ -254,7 +271,15 @@ export function createGatewayTransport({
     private fail(error: unknown): void {
       this.state = SOCKET_STATES.closed;
       this.onerror?.(error);
+      // This close is unclean. Phoenix may attempt to schedule an automatic reconnect.
       this.emitClose(CLOSE_CODE_ABNORMAL, "gateway_connect_failed", false);
+    }
+
+    private failPermanently(error: unknown): void {
+      this.state = SOCKET_STATES.closed;
+      this.onerror?.(error);
+      // Close cleanly with code 1000 so that Phoenix doesn't schedule an automatic reconnect
+      this.emitClose(CLOSE_CODE_NORMAL, "unsupported_socket_mode", true);
     }
 
     private emitClose(code: number, reason: string, wasClean: boolean): void {

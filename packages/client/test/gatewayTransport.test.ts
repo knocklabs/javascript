@@ -13,6 +13,7 @@ import {
   GatewayConnectResult,
   SOCKET_STATES,
   TransportConstructor,
+  UnsupportedSocketModeError,
   WEBSOCKET_MODE,
   WebSocketLike,
   createGatewayTransport,
@@ -190,7 +191,7 @@ describe("fetchSocketConnectUrl", () => {
     ).rejects.toThrow("Invalid socket connect response");
   });
 
-  test("throws an error when mode is missing from response", async () => {
+  test("throws UnsupportedSocketModeError when mode is missing from response", async () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
@@ -199,10 +200,10 @@ describe("fetchSocketConnectUrl", () => {
 
     await expect(
       fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
-    ).rejects.toThrow("Invalid socket connect response");
+    ).rejects.toThrow(new UnsupportedSocketModeError(undefined));
   });
 
-  test("throws an error when mode is an unsupported string", async () => {
+  test("throws UnsupportedSocketModeError when mode is an unsupported string", async () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
@@ -215,10 +216,10 @@ describe("fetchSocketConnectUrl", () => {
 
     await expect(
       fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
-    ).rejects.toThrow("Invalid socket connect response");
+    ).rejects.toThrow(new UnsupportedSocketModeError("longpoll"));
   });
 
-  test("throws an error when mode is not a string", async () => {
+  test("throws UnsupportedSocketModeError when mode is not a string", async () => {
     makeRequest.mockResolvedValueOnce({
       statusCode: "ok",
       status: 200,
@@ -231,7 +232,7 @@ describe("fetchSocketConnectUrl", () => {
 
     await expect(
       fetchSocketConnectUrl({ apiClient, signal: abortController.signal }),
-    ).rejects.toThrow("Invalid socket connect response");
+    ).rejects.toThrow(new UnsupportedSocketModeError(123));
   });
 });
 
@@ -520,6 +521,61 @@ describe("createGatewayTransport", () => {
     // Closing the failed gateway transport does not trigger another onclose event
     gatewayTransport.close();
     expect(onclose).toHaveBeenCalledTimes(1);
+  });
+
+  test("UnsupportedSocketModeError fails permanently without creating an inner transport", async () => {
+    const error = new UnsupportedSocketModeError("longpoll");
+    fetchConnectUrl.mockRejectedValueOnce(error);
+
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    const onerror = vi.fn();
+    const onclose = vi.fn();
+    gatewayTransport.onerror = onerror;
+    gatewayTransport.onclose = onclose;
+
+    await flushStart();
+
+    expect(onerror).toHaveBeenCalledWith(error);
+    expect(onclose).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        code: 1000,
+        reason: "unsupported_socket_mode",
+        wasClean: true,
+      }),
+    );
+    expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closed);
+
+    // No inner transport was instantiated, as the fetch failed
+    expect(MockTransport.constructionCount).toBe(0);
+
+    expect(onConnectUrlInvalid).not.toHaveBeenCalled();
+
+    // Closing the failed gateway transport does not trigger another onclose event
+    gatewayTransport.close();
+    expect(onclose).toHaveBeenCalledTimes(1);
+  });
+
+  test("close() called from onerror during an unsupported mode failure emits a single close", async () => {
+    const error = new UnsupportedSocketModeError("longpoll");
+    fetchConnectUrl.mockRejectedValueOnce(error);
+
+    const gatewayTransport = new GatewayTransport(PHOENIX_URL, PROTOCOLS);
+    const onerror = vi.fn(() => gatewayTransport.close());
+    const onclose = vi.fn();
+    gatewayTransport.onerror = onerror;
+    gatewayTransport.onclose = onclose;
+
+    await flushStart();
+
+    expect(onerror).toHaveBeenCalledWith(error);
+
+    expect(onclose).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ code: 1000, reason: "unsupported_socket_mode", wasClean: true }),
+    );
+    expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closed);
+
+    // No inner transport was instantiated, as the fetch failed
+    expect(MockTransport.constructionCount).toBe(0);
   });
 
   test("close() called from onerror during a failed fetch emits a single clean close", async () => {
