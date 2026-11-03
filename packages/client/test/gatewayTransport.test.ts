@@ -569,8 +569,11 @@ describe("createGatewayTransport", () => {
 
     expect(onerror).toHaveBeenCalledWith(error);
 
+    // close() wins the race against failPermanently's own emitClose: since it runs synchronously
+    // inside onerror before the inner transport exists, it emits its own clean close rather than
+    // the "unsupported_socket_mode" reason.
     expect(onclose).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({ code: 1000, reason: "unsupported_socket_mode", wasClean: true }),
+      expect.objectContaining({ code: 1000, reason: "", wasClean: true }),
     );
     expect(gatewayTransport.readyState).toBe(SOCKET_STATES.closed);
 
