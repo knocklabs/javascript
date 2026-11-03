@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.14.1
+
+### Patch Changes
+
+- ab99037: chore(deps): bump the telegraph-packages group with 9 updates
+- 5159df1: Patch build dependencies flagged by Vanta. `ajv@~8.12.0` now resolves to 8.20.0 and `minimatch@~3.0.3` now resolves to 3.1.5.
+- a33857b: Upgrade dependencies flagged by Vanta. Direct pins move Next.js to 15.5.28 and jsdom to 30.1.3.
+- Updated dependencies [b429cf0]
+- Updated dependencies [5159df1]
+- Updated dependencies [a33857b]
+  - @knocklabs/client@0.22.3
+  - @knocklabs/react-core@0.16.1
+
 ## 0.14.0
 
 ### Minor Changes
