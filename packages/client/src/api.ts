@@ -1,6 +1,10 @@
 import { Socket } from "phoenix";
 
-import { exponentialBackoffFullJitter } from "./helpers";
+import {
+  createGatewayTransport,
+  fetchSocketConnectUrl,
+} from "./gatewayTransport";
+import { cacheUntilExpired, exponentialBackoffFullJitter } from "./helpers";
 import { PageVisibilityManager } from "./pageVisibility";
 
 // Ceiling for socket reconnect backoff. This is intentionally much larger than
@@ -123,7 +127,21 @@ class ApiClient {
     });
 
     if (typeof window !== "undefined" && typeof WebSocket !== "undefined") {
+      // Connect sockets via the WebSocket gateway API endpoint, which returns a signed ws:// or
+      // wss:// connect URL. This signed URL is cached and used to reconnect until it expires.
+      const connectUrlCache = cacheUntilExpired((signal: AbortSignal) =>
+        // If this fetch rejects, the error is handled by the gateway transport, and Phoenix
+        // considers it a failed connection attempt
+        fetchSocketConnectUrl({ apiClient: this, signal }),
+      );
+      const transport = createGatewayTransport({
+        baseTransport: WebSocket,
+        fetchConnectUrl: connectUrlCache.get,
+        onConnectUrlInvalid: connectUrlCache.invalidate,
+      });
+
       this.socket = new Socket(`${this.host.replace("http", "ws")}/ws/v1`, {
+        transport: transport,
         params: {
           user_token: this.userToken,
           api_key: this.apiKey,
