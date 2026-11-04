@@ -3,7 +3,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import packageJson from "../package.json";
 import ApiClient from "../src/api";
-import type { TransportConstructor } from "../src/gatewayTransport";
+import {
+  WEBSOCKET_MODE,
+  type TransportConstructor,
+} from "../src/gatewayTransport";
 
 import { createWebSocketMock } from "./test-utils/mocks";
 
@@ -1184,6 +1187,7 @@ describe("API Client", () => {
         createJsonResponse({
           url: signedUrl,
           expires_at: new Date(Date.now() + 60_000).toISOString(),
+          mode: WEBSOCKET_MODE,
         }),
       );
       setFetchMock(apiClient, fetchMock);
@@ -1236,6 +1240,7 @@ describe("API Client", () => {
         createJsonResponse({
           url: signedUrl,
           expires_at: new Date(Date.now() + CACHE_TTL_MS).toISOString(),
+          mode: WEBSOCKET_MODE,
         }),
       );
       setFetchMock(apiClient, fetchMock);
@@ -1382,6 +1387,7 @@ describe("API Client", () => {
         return createJsonResponse({
           url: `wss://ws1.knock.app/ws/v1/websocket?auth_token=signed-token-${fetchCount}`,
           expires_at: new Date(Date.now() + 60_000).toISOString(),
+          mode: WEBSOCKET_MODE,
         });
       });
       setFetchMock(apiClient, fetchMock);
@@ -1434,6 +1440,7 @@ describe("API Client", () => {
         createJsonResponse({
           url: signedUrl,
           expires_at: new Date(Date.now() + 60_000).toISOString(),
+          mode: WEBSOCKET_MODE,
         }),
       );
       setFetchMock(apiClient, fetchMock);
@@ -1482,6 +1489,7 @@ describe("API Client", () => {
         createJsonResponse({
           url: signedUrl,
           expires_at: new Date(Date.now() + 60_000).toISOString(),
+          mode: WEBSOCKET_MODE,
         }),
       );
       setFetchMock(apiClient, fetchMock);

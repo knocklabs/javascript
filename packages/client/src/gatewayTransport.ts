@@ -63,6 +63,8 @@ export const SOCKET_STATES = {
 const CLOSE_CODE_NORMAL = 1000;
 const CLOSE_CODE_ABNORMAL = 1006;
 
+export const WEBSOCKET_MODE = "websocket";
+
 /**
  * Requests a signed WebSocket URL from the WebSocket gateway API endpoint. Rejects on any HTTP
  * error or malformed body so the transport treats it like a failed connection attempt.
@@ -91,13 +93,18 @@ export async function fetchSocketConnectUrl({
   }
 
   const body = result.body as
-    | Partial<{ url: string; expires_at: string }>
+    | Partial<{ url: string; expires_at: string; mode: string }>
     | undefined;
 
   const expiresAt =
     typeof body?.expires_at === "string" ? Date.parse(body.expires_at) : NaN;
 
-  if (typeof body?.url !== "string" || !body.url || Number.isNaN(expiresAt)) {
+  if (
+    typeof body?.url !== "string" ||
+    !body.url ||
+    Number.isNaN(expiresAt) ||
+    body?.mode !== WEBSOCKET_MODE
+  ) {
     throw new Error("Invalid socket connect response");
   }
 
