@@ -1,5 +1,11 @@
 # @knocklabs/types
 
+## 0.1.6
+
+### Patch Changes
+
+- 609269a: Patch the ajv 6.12.6 copy flagged by Vanta. `ajv@~6.12.6` and `ajv@^6.12.4` now resolve to 6.15.0.
+
 ## 0.1.5
 
 ### Patch Changes
