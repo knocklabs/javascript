@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.23.0
+
+### Minor Changes
+
+- da1b51e: Add `maxRetries` option to `ApiRequestConfig`
+
+  When making a request to the Knock API using `ApiClient`'s `makeRequest` function, the `maxRetries` option of `ApiRequestConfig` can now be used to set the maximum number of times the request should be retried when a retryable error occurs. To disable retries altogether, set `maxRetries` to 0.
+
+  ```js
+  const result = await knock.client().makeRequest({
+    method: "GET",
+    url: "/v1/users",
+    maxRetries: 0,
+  });
+  ```
+
+- f1f215a: Make request to `POST /v1/sockets/connect` before connecting WebSocket
+
+  The Knock API client now makes a request to the `POST /v1/sockets/connect` endpoint of the Knock API before establishing a WebSocket connection. This applies to both feeds and guides, which rely on WebSockets for real-time messages.
+
+### Patch Changes
+
+- 609269a: Patch the ajv 6.12.6 copy flagged by Vanta. `ajv@~6.12.6` and `ajv@^6.12.4` now resolve to 6.15.0.
+- Updated dependencies [609269a]
+  - @knocklabs/types@0.1.6
+
 ## 0.22.3
 
 ### Patch Changes

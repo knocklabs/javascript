@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.13.0
+
+### Minor Changes
+
+- f1f215a: Make request to `POST /v1/sockets/connect` before connecting WebSocket
+
+  The Knock API client now makes a request to the `POST /v1/sockets/connect` endpoint of the Knock API before establishing a WebSocket connection. This applies to both feeds and guides, which rely on WebSockets for real-time messages.
+
+### Patch Changes
+
+- 609269a: Patch the ajv 6.12.6 copy flagged by Vanta. `ajv@~6.12.6` and `ajv@^6.12.4` now resolve to 6.15.0.
+- Updated dependencies [da1b51e]
+- Updated dependencies [f1f215a]
+- Updated dependencies [609269a]
+  - @knocklabs/client@0.23.0
+  - @knocklabs/react-core@0.17.0
+
 ## 0.12.0
 
 ### Minor Changes
