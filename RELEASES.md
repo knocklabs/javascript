@@ -135,6 +135,34 @@ npm install @knocklabs/some-package
 
 ---
 
+## Publishing to npm
+
+Releases publish from [`release.yml`](.github/workflows/release.yml) through npm trusted publishing (OIDC). CI holds no npm token: each run gets a short-lived token from GitHub, and every published version carries a signed provenance statement. Only runs in the `production-release` environment can publish, and that environment only allows `main`, `canary`, and `rc`.
+
+### Setting Up Trusted Publishing
+
+Each package needs a trusted publisher on npm that points at this repo, `release.yml`, and the `production-release` environment. Set them up from your machine:
+
+```bash
+npm install -g npm@latest   # npm trust needs npm 11.15.0+
+npm login                   # your npm account needs 2FA
+yarn release:bootstrap      # all publishable packages, or name specific ones
+```
+
+`npm trust` asks for 2FA once, and its 5-minute skip window covers every package. npm drops a new trusted publisher that doesn't publish within 2 days, so run this while the Version PR that releases the packages is open, and merge it within 2 days. Add `--dry-run` to print the npm commands without running them.
+
+### Adding a New Published Package
+
+npm can't publish the first version of a new package name through trusted publishing. `yarn release:bootstrap` works around this:
+
+1. Create the package under `packages/` with a `repository` field that includes `directory`, and a version above `0.0.0`. Add a changeset for it.
+2. Once the Version PR that releases it is open, run `yarn release:bootstrap @knocklabs/<name>`. It publishes a `0.0.0` placeholder so the name exists, then adds the trusted publisher.
+3. Merge the Version PR within 2 days. The real first version publishes from CI like every other package.
+
+If a release includes a package that isn't on npm yet, `release:publish` fails before it builds anything and names the command to run.
+
+---
+
 ## Safeguards in CI
 
 - `main` is blocked from publishing if `.changeset/pre.json` exists (pre-release guard).
@@ -156,8 +184,8 @@ npx changeset pre exit
 # Apply version bumps and changelog updates
 npx changeset version
 
-# Publish packages (CI will handle this normally)
-npx changeset publish
+# Set up npm trusted publishing (publishing itself only runs in CI)
+yarn release:bootstrap [package...] [--dry-run]
 ```
 
 > `npx changeset version`: Applies all pending changesets, bumps versions, and updates changelogs.

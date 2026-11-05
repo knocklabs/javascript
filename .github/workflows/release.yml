@@ -20,6 +20,14 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    # npm's trusted publisher config does not check the branch, so publishing is
+    # gated on this environment instead. Its deployment branch policy allows only
+    # main, canary, and rc, and each npm trusted publisher requires the same
+    # environment name.
+    environment: production-release
+    permissions:
+      contents: read
+      id-token: write # Yarn authenticates to npm through OIDC and signs provenance
 
     steps:
       # Checkout the repository with full history and tag data so that
@@ -52,7 +60,6 @@ jobs:
       - name: Setup Node.js 20.x
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          registry-url: "https://registry.npmjs.org"
           node-version-file: "package.json"
           cache: "yarn"
 
@@ -113,17 +120,10 @@ jobs:
           [ "$TAG" = "stable" ] && TAG=latest
           echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
 
-      # Configure Yarn to authenticate with the npm registry using a token.
-      - name: Set NPM Auth
-        run: |
-          yarn config set npmRegistryServer "https://registry.npmjs.org"
-          yarn config set npmAlwaysAuth true
-          yarn config set npmAuthToken "$NPM_TOKEN"
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       # Create a versioning PR if changeset files exist, or publish packages
       # to npm if version bump commits have already been merged into the branch.
+      # Publishing authenticates through npm trusted publishing, so no npm token
+      # is configured. Yarn uses `npmAuthToken` ahead of OIDC when one is set.
       - name: Create release PR or publish
         uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1.8.0
         with:
@@ -133,5 +133,3 @@ jobs:
           publish: yarn release:publish
         env:
           GITHUB_TOKEN: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
