@@ -141,7 +141,11 @@ Releases publish from [`release.yml`](.github/workflows/release.yml) through npm
 
 ### Setting Up Trusted Publishing
 
-Each package needs a trusted publisher on npm that points at this repo, `release.yml`, and the `production-release` environment. Set them up from your machine:
+Each package needs a trusted publisher on npm that points at this repo, `release.yml`, and the `production-release` environment.
+
+Before you add any, check that the `production-release` environment (repo Settings → Environments) only allows the `main`, `canary`, and `rc` branches, and that admins can't bypass it. npm doesn't check the branch, so until that policy is in place, any branch that runs `release.yml` in this environment can publish.
+
+Then set up the trusted publishers from your machine:
 
 ```bash
 npm install -g npm@latest   # npm trust needs npm 11.15.0+

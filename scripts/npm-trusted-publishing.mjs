@@ -175,6 +175,8 @@ const addTrustedPublisher = ({ name, dryRun }) => {
       ENVIRONMENT,
       "--allow-publish",
       "--yes",
+      "--registry",
+      REGISTRY,
     ],
     dryRun,
   });
