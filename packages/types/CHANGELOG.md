@@ -1,5 +1,11 @@
 # @knocklabs/types
 
+## 0.1.7
+
+### Patch Changes
+
+- 8968d01: Publish from GitHub Actions through npm trusted publishing (OIDC) with signed provenance, and point each package's `repository` field at its directory in this repo.
+
 ## 0.1.6
 
 ### Patch Changes

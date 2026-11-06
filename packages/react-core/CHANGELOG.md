@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.1
+
+### Patch Changes
+
+- 8968d01: Publish from GitHub Actions through npm trusted publishing (OIDC) with signed provenance, and point each package's `repository` field at its directory in this repo.
+- Updated dependencies [8968d01]
+  - @knocklabs/client@0.23.1
+
 ## 0.17.0
 
 ### Minor Changes
