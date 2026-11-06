@@ -39,6 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22.x"
@@ -52,7 +54,8 @@ jobs:
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@c7b66a9c327a43a8fa7c0158e7f30d6040d2481e # 8.2.1
         with:
-          eas-version: latest
+          # Dependabot can't update this, so bump it by hand.
+          eas-version: 27.1.0
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Build on EAS
         run: cd examples/expo-example && eas build --platform android --profile preview --non-interactive

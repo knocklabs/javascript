@@ -14,13 +14,11 @@ jobs:
         react-version: [18, 19]
     runs-on: ubuntu-latest
     name: React ${{ matrix.react-version }}
-    env:
-      INTEGRATION_KNOCK_PUBLIC_KEY: ${{ secrets.INTEGRATION_KNOCK_PUBLIC_KEY }}
-      INTEGRATION_KNOCK_USER_ID: ${{ secrets.INTEGRATION_KNOCK_USER_ID }}
-      INTEGRATION_KNOCK_FEED_ID: ${{ secrets.INTEGRATION_KNOCK_FEED_ID }}
     steps:
       - name: Checkout Latest
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -29,8 +27,13 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           scope: "@knocklabs"
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --immutable
       - name: Build Packages
         run: yarn build:packages
       - name: Run Integration Tests
-        run: yarn test:integration:react-${{ matrix.react-version }}
+        env:
+          REACT_VERSION: ${{ matrix.react-version }}
+          INTEGRATION_KNOCK_PUBLIC_KEY: ${{ secrets.INTEGRATION_KNOCK_PUBLIC_KEY }}
+          INTEGRATION_KNOCK_USER_ID: ${{ secrets.INTEGRATION_KNOCK_USER_ID }}
+          INTEGRATION_KNOCK_FEED_ID: ${{ secrets.INTEGRATION_KNOCK_FEED_ID }}
+        run: yarn "test:integration:react-$REACT_VERSION"

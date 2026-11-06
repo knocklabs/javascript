@@ -7,6 +7,11 @@ on:
       - canary # Canary (preview) releases
       - rc # Release candidate cycle
 
+# Pushes, release PRs and GitHub releases all use KNOCK_ENG_BOT_GITHUB_TOKEN,
+# so the job token only needs to read the repo.
+permissions:
+  contents: read
+
 concurrency:
   group: publish-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -19,7 +24,8 @@ jobs:
     steps:
       # Checkout the repository with full history and tag data so that
       # Changesets can generate changelogs and tag new releases appropriately.
-      - name: Checkout Repo
+      # The prerelease-exit step pushes with these persisted credentials.
+      - name: Checkout Repo # zizmor: ignore[artipacked]
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-tags: true
@@ -82,8 +88,10 @@ jobs:
       # Prevents accidentally publishing a prerelease with the wrong npm tag.
       - name: Verify pre.json for pre-release branches
         if: steps.release-type.outputs.release-type != 'stable'
+        env:
+          RELEASE_TYPE: ${{ steps.release-type.outputs.release-type }}
         run: |
-          jq -e '.mode=="pre" and .tag=="'${{ steps.release-type.outputs.release-type }}'"' .changeset/pre.json \
+          jq -e --arg tag "$RELEASE_TYPE" '.mode=="pre" and .tag==$tag' .changeset/pre.json \
             || { echo "::error::Incorrect prerelease mode for this branch"; exit 1; }
 
       # Prevent a stable release from being published if the repository
@@ -98,8 +106,10 @@ jobs:
 
       # Export the npm dist-tag based on the release type.
       - name: Export npm dist-tag
+        env:
+          RELEASE_TYPE: ${{ steps.release-type.outputs.release-type }}
         run: |
-          TAG=${{ steps.release-type.outputs.release-type }}
+          TAG=$RELEASE_TYPE
           [ "$TAG" = "stable" ] && TAG=latest
           echo "NPM_CONFIG_TAG=$TAG" >> "$GITHUB_ENV"
 
@@ -108,7 +118,7 @@ jobs:
         run: |
           yarn config set npmRegistryServer "https://registry.npmjs.org"
           yarn config set npmAlwaysAuth true
-          yarn config set npmAuthToken $NPM_TOKEN
+          yarn config set npmAuthToken "$NPM_TOKEN"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 

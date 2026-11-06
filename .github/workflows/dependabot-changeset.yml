@@ -10,15 +10,16 @@ on:
         required: true
         type: string
 
+# The PR lookup, checkout and push all use KNOCK_ENG_BOT_GITHUB_TOKEN, so the
+# job token only needs to read the repo.
 permissions:
-  contents: write
-  pull-requests: read
+  contents: read
 
 jobs:
   changeset:
     name: Add changeset for dependency update
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Get PR metadata
@@ -44,7 +45,8 @@ jobs:
           fi
 
       # Checkout the PR branch for package.json analysis and committing.
-      - name: Checkout PR branch
+      # The final step pushes with these persisted credentials.
+      - name: Checkout PR branch # zizmor: ignore[artipacked]
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ steps.pr.outputs.ref }}
@@ -60,6 +62,7 @@ jobs:
           ref: main
           sparse-checkout: .github/scripts
           path: .trusted
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
