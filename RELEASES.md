@@ -149,7 +149,7 @@ Before you add any, check that the `production-release` environment (repo Settin
 Then set up the trusted publishers from your machine:
 
 ```bash
-npm install -g npm@latest   # npm trust needs npm 11.15.0+
+npm install -g npm@11       # npm trust needs 11.15.0+; npm 12 needs Node 24.15+
 npm login                   # your npm account needs 2FA
 yarn release:bootstrap      # all publishable packages, or name specific ones
 ```

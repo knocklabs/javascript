@@ -113,7 +113,7 @@ const npmSetupProblems = () => {
   if (!isAtLeast({ version, minimum: MIN_NPM_VERSION })) {
     problems.push(
       `npm ${version} is too old for \`npm trust\` (needs ${MIN_NPM_VERSION}+). ` +
-        "Run `npm install -g npm@latest`.",
+        "Run `npm install -g npm@11`.",
     );
   }
   try {
