@@ -1,5 +1,14 @@
 # nextjs-example
 
+## 1.2.45
+
+### Patch Changes
+
+- 329f947: Upgrade Next.js from 15.5.28 to 15.5.29. The November 2026 security release fixes the three medium findings Vanta reports for 15.5.28: AIKIDO-2026-187031, AIKIDO-2026-53139, and AIKIDO-2026-634910.
+- Updated dependencies [8968d01]
+- Updated dependencies [329f947]
+  - @knocklabs/react@0.15.1
+
 ## 1.2.44
 
 ### Patch Changes
