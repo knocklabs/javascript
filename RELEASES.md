@@ -16,6 +16,7 @@ This document outlines how to manage **canary**, **release candidate (RC)**, and
 
 - `canary` is a **long-lived** branch for ongoing integration builds.
 - `rc` is a **temporary branch**, created per release cycle and typically deleted after merging into `main`.
+- Only repo admins can create, delete, or push directly to `rc`, so an admin runs the steps below that `git push origin rc`. Everyone else changes `rc` through a pull request with an approval and passing checks.
 
 ---
 
