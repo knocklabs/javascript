@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.2
+
+### Patch Changes
+
+- 0ec18fd: chore(deps): bump @radix-ui/react-hover-card from 1.1.15 to 1.2.1
+
 ## 0.15.1
 
 ### Patch Changes
