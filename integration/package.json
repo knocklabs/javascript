@@ -3,7 +3,7 @@
   "private": true,
   "prettier": "@knocklabs/prettier-config",
   "engines": {
-    "node": "20.9.0"
+    "node": "26.x"
   },
   "scripts": {
     "test:integration": "vitest run"
