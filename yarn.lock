@@ -4525,7 +4525,7 @@ __metadata:
     "@babel/runtime": "npm:^7.28.6"
     "@codecov/vite-plugin": "npm:^2.0.1"
     "@knocklabs/types": "workspace:^"
-    "@tanstack/store": "npm:^0.7.2"
+    "@tanstack/store": "npm:^0.11.2"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@types/phoenix": "npm:^1.6.7"
     "@typescript-eslint/eslint-plugin": "npm:^8.59.4"
@@ -7181,7 +7181,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/store@npm:0.7.2, @tanstack/store@npm:^0.7.2":
+"@tanstack/store@npm:0.7.2":
   version: 0.7.2
   resolution: "@tanstack/store@npm:0.7.2"
   checksum: 10c0/7b9764d156365d0a65b8be87fc67dcad16a45dd260b43e7c90162b39a940a1c764701e6b5f9e5e1e34ec77c86348332db343c658901f67972119d6f1ddf58f1f
@@ -7192,6 +7192,13 @@ __metadata:
   version: 0.9.3
   resolution: "@tanstack/store@npm:0.9.3"
   checksum: 10c0/ec022c792c298be0717d7a2d06d6db4459077db775a27d86a2a248f446257e133c5d7c77a74bf6a4fa6993cfaef09b6f58a68a601c3becca834ed0b457ebe824
+  languageName: node
+  linkType: hard
+
+"@tanstack/store@npm:^0.11.2":
+  version: 0.11.2
+  resolution: "@tanstack/store@npm:0.11.2"
+  checksum: 10c0/5422149c853c16e642a0ddfb51c2b4a867a11516069d3b9647659212e9762b86d609144de6ac6ec099b0360c3b198d1243f613148d69c1028dee56382f0430cd
   languageName: node
   linkType: hard
 
