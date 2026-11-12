@@ -1,5 +1,6 @@
-import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
+
+import { Store } from "../../store";
 
 import Feed from "./feed";
 import type { FeedClientOptions, FeedMetadata } from "./interfaces";
@@ -75,10 +76,7 @@ export class FeedSocketManager {
 
   // A reactive store that captures a new socket event, that notifies any feed
   // clients that have subscribed.
-  private inbox: Store<
-    FeedSocketInbox,
-    (cb: FeedSocketInbox) => FeedSocketInbox
-  >;
+  private inbox: Store<FeedSocketInbox>;
 
   constructor(readonly socket: Socket) {
     this.channels = {};

@@ -86,4 +86,4 @@ export { usePreferences } from "./modules/preferences";
 // be available to be imported into the consumer package, and be part of the
 // same module graph. This potentially helps Next.js App Router to bundle client
 // side components together correctly.
-export { useStore } from "@tanstack/react-store";
+export { useStore } from "./modules/core/hooks/useStore";

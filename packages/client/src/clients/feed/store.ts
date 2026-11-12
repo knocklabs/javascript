@@ -1,7 +1,7 @@
 import { GenericData } from "@knocklabs/types";
-import { Store } from "@tanstack/store";
 
 import { NetworkStatus } from "../../networkStatus";
+import { Store } from "../../store";
 
 import { FeedItem, FeedMetadata, FeedResponse } from "./interfaces";
 import { FeedStoreState, StoreFeedResultOptions } from "./types";
@@ -149,7 +149,7 @@ export class FeedStore {
   }
 
   subscribe(listener: (state: FeedStoreState) => void) {
-    return this.store.subscribe((state) => listener(state.currentVal));
+    return this.store.subscribe((state) => listener(state));
   }
 }
 

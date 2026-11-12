@@ -1,5 +1,6 @@
 import { Feed, type FeedStoreState } from "@knocklabs/client";
-import { useStore } from "@tanstack/react-store";
+
+import { useStore } from "../../core/hooks/useStore";
 
 export type Selector<T> = (state: FeedStoreState) => T;
 
