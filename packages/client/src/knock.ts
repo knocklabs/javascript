@@ -1,5 +1,3 @@
-import { Store } from "@tanstack/store";
-
 import ApiClient from "./api";
 import FeedClient from "./clients/feed";
 import MessageClient from "./clients/messages";
@@ -19,6 +17,7 @@ import {
   UserTokenExpiringCallback,
 } from "./interfaces";
 import { jwtDecode } from "./jwt";
+import { Store } from "./store";
 
 const DEFAULT_HOST = "https://api.knock.app";
 

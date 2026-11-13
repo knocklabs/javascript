@@ -1,9 +1,9 @@
 import { GenericData } from "@knocklabs/types";
-import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
 import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
+import { Store } from "../../store";
 
 import {
   DEFAULT_GROUP_KEY,

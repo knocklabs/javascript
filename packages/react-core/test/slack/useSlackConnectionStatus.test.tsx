@@ -1,5 +1,4 @@
 import type KnockClient from "@knocklabs/client";
-import { Store } from "@tanstack/react-store";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -12,11 +11,14 @@ const buildMockKnock = (authCheckImpl: () => Promise<unknown>) => {
       authCheck: vi.fn(authCheckImpl),
     },
     // Minimal subscribable auth store so `useKnockAuthState` can read the userId.
-    authStore: new Store({
-      status: "authenticated",
-      userId: "user_1",
-      userToken: undefined,
-    }),
+    authStore: {
+      state: {
+        status: "authenticated",
+        userId: "user_1",
+        userToken: undefined,
+      },
+      subscribe: () => () => {},
+    },
   } as unknown as KnockClient;
 };
 
@@ -104,11 +106,10 @@ describe("useSlackConnectionStatus", () => {
     const buildKnockWithUser = (userId: string) =>
       ({
         slack: { authCheck },
-        authStore: new Store({
-          status: "authenticated",
-          userId,
-          userToken: undefined,
-        }),
+        authStore: {
+          state: { status: "authenticated", userId, userToken: undefined },
+          subscribe: () => () => {},
+        },
       }) as unknown as KnockClient;
 
     const { result, rerender } = renderHook(
@@ -143,12 +144,9 @@ describe("useSlackConnectionStatus", () => {
         get state() {
           return state;
         },
-        get() {
-          return state;
-        },
         subscribe(cb: () => void) {
           listeners.add(cb);
-          return { unsubscribe: () => listeners.delete(cb) };
+          return () => listeners.delete(cb);
         },
         setUserId(next: string) {
           state = { ...state, userId: next };
@@ -206,12 +204,9 @@ describe("useSlackConnectionStatus", () => {
         get state() {
           return state;
         },
-        get() {
-          return state;
-        },
         subscribe(cb: () => void) {
           listeners.add(cb);
-          return { unsubscribe: () => listeners.delete(cb) };
+          return () => listeners.delete(cb);
         },
         setUserId(next: string) {
           state = { ...state, userId: next };

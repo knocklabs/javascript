@@ -1,4 +1,3 @@
-import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -8,9 +7,10 @@ import {
   FeedSocketManager,
   SocketEventType,
 } from "../../../src/clients/feed/socket-manager";
+import { Store } from "../../../src/store";
 
 // Mock dependencies
-vi.mock("@tanstack/store");
+vi.mock("../../../src/store");
 vi.mock("phoenix");
 
 describe("FeedSocketManager", () => {
@@ -41,7 +41,7 @@ describe("FeedSocketManager", () => {
     mockStore = {
       state: {},
       setState: vi.fn(),
-      subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+      subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe function
     } as unknown as Store<unknown>;
 
     // Mock Feed
@@ -188,25 +188,19 @@ describe("FeedSocketManager", () => {
 
     test("sets up store subscription and returns unsubscribe function", () => {
       const mockUnsubscribe = vi.fn();
-      vi.mocked(mockStore.subscribe).mockReturnValue({
-        unsubscribe: mockUnsubscribe,
-      });
+      vi.mocked(mockStore.subscribe).mockReturnValue(mockUnsubscribe);
 
       const result = socketManager.join(mockFeed);
 
       expect(mockStore.subscribe).toHaveBeenCalledWith(expect.any(Function));
-      expect(mockUnsubscribe).not.toHaveBeenCalled();
-
-      result();
-
-      expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+      expect(result).toBe(mockUnsubscribe);
     });
 
     test("handles store subscription callback", () => {
       let subscriptionCallback: (() => void) | undefined;
       vi.mocked(mockStore.subscribe).mockImplementation((callback) => {
         subscriptionCallback = callback;
-        return { unsubscribe: vi.fn() };
+        return vi.fn();
       });
 
       const mockPayload = { event: "new-message", data: {} };
@@ -224,7 +218,7 @@ describe("FeedSocketManager", () => {
       let subscriptionCallback: (() => void) | undefined;
       vi.mocked(mockStore.subscribe).mockImplementation((callback) => {
         subscriptionCallback = callback;
-        return { unsubscribe: vi.fn() };
+        return vi.fn();
       });
 
       mockStore.state = {}; // No payload for this reference id

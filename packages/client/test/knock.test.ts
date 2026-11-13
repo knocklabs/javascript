@@ -937,7 +937,7 @@ describe("Knock Client", () => {
     test("notifies subscribers on login", () => {
       const knock = new Knock("pk_test_12345");
       const listener = vi.fn();
-      const { unsubscribe } = knock.authStore.subscribe(listener);
+      const unsubscribe = knock.authStore.subscribe(listener);
 
       knock.authenticate("user_123", "token_456");
 
@@ -1028,7 +1028,7 @@ describe("Knock Client", () => {
       knock.authenticate("user_123", "token_456");
 
       const listener = vi.fn();
-      const { unsubscribe } = knock.authStore.subscribe(listener);
+      const unsubscribe = knock.authStore.subscribe(listener);
 
       knock.logout();
 

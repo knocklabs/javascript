@@ -1,5 +1,6 @@
-import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
+
+import { Store } from "../../store";
 
 import Feed from "./feed";
 import type { FeedClientOptions, FeedMetadata } from "./interfaces";
@@ -129,14 +130,14 @@ export class FeedSocketManager {
 
     // Let the feed client subscribe to the "inbox", so it can be notified
     // when there's a new socket event that is relevant to it
-    const subscription = this.inbox.subscribe(() => {
+    const unsub = this.inbox.subscribe(() => {
       const payload = this.inbox.state[referenceId];
       if (!payload) return;
 
       feed.handleSocketEvent(payload);
     });
 
-    return () => subscription.unsubscribe();
+    return unsub;
   }
 
   leave(feed: Feed) {
