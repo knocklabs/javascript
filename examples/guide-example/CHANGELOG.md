@@ -1,5 +1,17 @@
 # guide-example
 
+## 0.0.94
+
+### Patch Changes
+
+- Updated dependencies [0ec18fd]
+- Updated dependencies [f7d477f]
+- Updated dependencies [d952496]
+- Updated dependencies [dcb80b7]
+- Updated dependencies [07c61ac]
+  - @knocklabs/react@0.15.2
+  - @knocklabs/client@0.23.2
+
 ## 0.0.93
 
 ### Patch Changes
