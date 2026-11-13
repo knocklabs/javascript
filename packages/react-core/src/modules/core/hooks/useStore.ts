@@ -10,8 +10,8 @@ type StoreSource<T> = {
  * its state.
  *
  * This wraps `useSelector` from `@tanstack/react-store`, but compares selected
- * values with `shallow` by default. `@tanstack/react-store` before 0.11 always
- * used `shallow`; since 0.11 the default is `===`. Without `shallow`, a
+ * values with `shallow` by default. `@tanstack/react-store` before 0.9 always
+ * used `shallow`; since 0.9 the default is `===`. Without `shallow`, a
  * selector that returns a new object or array re-renders the component on
  * every store update.
  *
@@ -22,12 +22,8 @@ type StoreSource<T> = {
  * }));
  * ```
  */
-export function useStore<TSource, TSelected = NoInfer<TSource>>(
+export const useStore = <TSource, TSelected = NoInfer<TSource>>(
   source: StoreSource<TSource>,
   selector?: (snapshot: TSource) => TSelected,
   compare: (a: TSelected, b: TSelected) => boolean = shallow,
-): TSelected {
-  return useSelector(source, selector, { compare });
-}
-
-export default useStore;
+): TSelected => useSelector(source, selector, { compare });
