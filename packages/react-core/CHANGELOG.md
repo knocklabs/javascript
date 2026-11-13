@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.17.2
+
+### Patch Changes
+
+- f7d477f: chore(deps): bump @tanstack/store from 0.7.2 to 0.11.2 and @tanstack/react-store from 0.7.3 to 0.11.2
+
+  `knock.authStore`, `knockGuideClient.store`, and `feedClient.store` keep their existing API: `subscribe()` returns an unsubscribe function, and listeners receive `{ prevVal, currentVal }`.
+
+- dcb80b7: Patch the minimatch 9.0.9 copy flagged by Vanta. `minimatch@^9.0.0`, `^9.0.3`, and `^9.0.4` now resolve to 11.0.8, and `node-gyp@latest` now resolves to 13.1.0, which drops `glob@10`.
+- 07c61ac: Patch dependencies flagged by Vanta. `undici@^8.12.1` now resolves to 8.12.4, Expo 58.0.24 drops `glob@13`, and `rimraf@^6.1.4` uses the patched `glob@14` line.
+- Updated dependencies [f7d477f]
+- Updated dependencies [dcb80b7]
+- Updated dependencies [07c61ac]
+  - @knocklabs/client@0.23.2
+
 ## 0.17.1
 
 ### Patch Changes

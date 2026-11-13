@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.15.2
+
+### Patch Changes
+
+- 0ec18fd: chore(deps): bump @radix-ui/react-hover-card from 1.1.15 to 1.2.1
+- d952496: chore(deps): bump the telegraph-packages group across 1 directory with 14 updates
+- dcb80b7: Patch the minimatch 9.0.9 copy flagged by Vanta. `minimatch@^9.0.0`, `^9.0.3`, and `^9.0.4` now resolve to 11.0.8, and `node-gyp@latest` now resolves to 13.1.0, which drops `glob@10`.
+- 07c61ac: Patch dependencies flagged by Vanta. `undici@^8.12.1` now resolves to 8.12.4, Expo 58.0.24 drops `glob@13`, and `rimraf@^6.1.4` uses the patched `glob@14` line.
+- Updated dependencies [f7d477f]
+- Updated dependencies [dcb80b7]
+- Updated dependencies [07c61ac]
+  - @knocklabs/client@0.23.2
+  - @knocklabs/react-core@0.17.2
+
 ## 0.15.1
 
 ### Patch Changes
