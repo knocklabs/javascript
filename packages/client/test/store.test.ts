@@ -9,10 +9,12 @@ describe("Store", () => {
 
     store.subscribe(listener);
     store.setState((state) => ({ count: state.count + 1 }));
+    store.setState((state) => ({ count: state.count + 1 }));
 
-    expect(listener).toHaveBeenCalledExactlyOnceWith({
-      prevVal: { count: 0 },
-      currentVal: { count: 1 },
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenLastCalledWith({
+      prevVal: { count: 1 },
+      currentVal: { count: 2 },
     });
   });
 
@@ -68,7 +70,8 @@ describe("Store", () => {
     expect(store.listeners.has(listener)).toBe(true);
 
     store.setState({ count: 1 });
-    expect(store.prevState).toEqual({ count: 0 });
+    store.setState({ count: 2 });
+    expect(store.prevState).toEqual({ count: 1 });
 
     unsubscribe();
     expect(store.listeners.has(listener)).toBe(false);
