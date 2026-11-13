@@ -55,6 +55,18 @@ describe("feed store", () => {
 
       expect(listener).toHaveBeenCalledWith(initialStoreState);
     });
+    test("subscribe returns a function that stops notifying the listener", () => {
+      const store = createStore();
+      const listener = vi.fn();
+
+      const unsubscribe = store.subscribe(listener);
+      store.getState().setNetworkStatus(NetworkStatus.loading);
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      unsubscribe();
+      store.getState().setNetworkStatus(NetworkStatus.ready);
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("setNetworkStatus", () => {

@@ -1,5 +1,6 @@
 import Knock, { KnockAuthState } from "@knocklabs/client";
-import { useStore } from "@tanstack/react-store";
+
+import { useStore } from "./useStore";
 
 /**
  * Subscribes to a Knock client's authentication state, re-rendering when it

@@ -41,7 +41,7 @@ describe("FeedSocketManager", () => {
     mockStore = {
       state: {},
       setState: vi.fn(),
-      subscribe: vi.fn(() => vi.fn()), // Returns unsubscribe function
+      subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
     } as unknown as Store<unknown>;
 
     // Mock Feed
@@ -188,19 +188,25 @@ describe("FeedSocketManager", () => {
 
     test("sets up store subscription and returns unsubscribe function", () => {
       const mockUnsubscribe = vi.fn();
-      vi.mocked(mockStore.subscribe).mockReturnValue(mockUnsubscribe);
+      vi.mocked(mockStore.subscribe).mockReturnValue({
+        unsubscribe: mockUnsubscribe,
+      });
 
       const result = socketManager.join(mockFeed);
 
       expect(mockStore.subscribe).toHaveBeenCalledWith(expect.any(Function));
-      expect(result).toBe(mockUnsubscribe);
+      expect(mockUnsubscribe).not.toHaveBeenCalled();
+
+      result();
+
+      expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
     });
 
     test("handles store subscription callback", () => {
       let subscriptionCallback: (() => void) | undefined;
       vi.mocked(mockStore.subscribe).mockImplementation((callback) => {
         subscriptionCallback = callback;
-        return vi.fn();
+        return { unsubscribe: vi.fn() };
       });
 
       const mockPayload = { event: "new-message", data: {} };
@@ -218,7 +224,7 @@ describe("FeedSocketManager", () => {
       let subscriptionCallback: (() => void) | undefined;
       vi.mocked(mockStore.subscribe).mockImplementation((callback) => {
         subscriptionCallback = callback;
-        return vi.fn();
+        return { unsubscribe: vi.fn() };
       });
 
       mockStore.state = {}; // No payload for this reference id

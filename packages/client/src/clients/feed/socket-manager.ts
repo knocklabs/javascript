@@ -75,10 +75,7 @@ export class FeedSocketManager {
 
   // A reactive store that captures a new socket event, that notifies any feed
   // clients that have subscribed.
-  private inbox: Store<
-    FeedSocketInbox,
-    (cb: FeedSocketInbox) => FeedSocketInbox
-  >;
+  private inbox: Store<FeedSocketInbox>;
 
   constructor(readonly socket: Socket) {
     this.channels = {};
@@ -132,14 +129,14 @@ export class FeedSocketManager {
 
     // Let the feed client subscribe to the "inbox", so it can be notified
     // when there's a new socket event that is relevant to it
-    const unsub = this.inbox.subscribe(() => {
+    const subscription = this.inbox.subscribe(() => {
       const payload = this.inbox.state[referenceId];
       if (!payload) return;
 
       feed.handleSocketEvent(payload);
     });
 
-    return unsub;
+    return () => subscription.unsubscribe();
   }
 
   leave(feed: Feed) {

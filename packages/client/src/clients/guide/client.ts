@@ -255,7 +255,7 @@ export const checkActivatable = (
 };
 
 export class KnockGuideClient {
-  public store: Store<StoreState, (state: StoreState) => StoreState>;
+  public store: Store<StoreState>;
 
   // Phoenix channels for real time guide updates over websocket
   private socket: Socket | undefined;

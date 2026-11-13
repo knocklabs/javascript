@@ -149,7 +149,10 @@ export class FeedStore {
   }
 
   subscribe(listener: (state: FeedStoreState) => void) {
-    return this.store.subscribe((state) => listener(state.currentVal));
+    const subscription = this.store.subscribe(listener);
+    // Return a function, like zustand does, rather than tanstack's
+    // `{ unsubscribe }` object.
+    return () => subscription.unsubscribe();
   }
 }
 

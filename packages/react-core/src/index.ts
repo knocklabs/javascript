@@ -23,6 +23,7 @@ export {
   useKnockAuthState,
   useKnockClient,
   useStableOptions,
+  useStore,
 } from "./modules/core";
 export {
   KnockFeedProvider,
@@ -81,9 +82,3 @@ export {
 export { type RecipientObject } from "./interfaces";
 
 export { usePreferences } from "./modules/preferences";
-
-// Export the useStore hook from @tanstack/react-store library so that it can
-// be available to be imported into the consumer package, and be part of the
-// same module graph. This potentially helps Next.js App Router to bundle client
-// side components together correctly.
-export { useStore } from "@tanstack/react-store";

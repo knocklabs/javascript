@@ -4,7 +4,8 @@ import {
   KnockGuideStep,
   KnockSelectGuideOpts,
 } from "@knocklabs/client";
-import { useStore } from "@tanstack/react-store";
+
+import { useStore } from "../../core";
 
 import { UseGuideContextReturn, useGuideContext } from "./useGuideContext";
 
