@@ -54,7 +54,7 @@
     "@knocklabs/react-core": "workspace:^",
     "react-native-get-random-values": "^2.0.0",
     "react-native-render-html": "^6.3.4",
-    "react-native-svg": "~15.16.0"
+    "react-native-svg": "~15.16.1"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^2.0.1",
