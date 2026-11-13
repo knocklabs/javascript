@@ -1,5 +1,5 @@
 ---
-"@knocklabs/client": minor
+"@knocklabs/client": patch
 "@knocklabs/react-core": patch
 ---
 
