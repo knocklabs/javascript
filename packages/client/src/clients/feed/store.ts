@@ -1,7 +1,7 @@
 import { GenericData } from "@knocklabs/types";
-import { Store } from "@tanstack/store";
 
 import { NetworkStatus } from "../../networkStatus";
+import { Store } from "../../store";
 
 import { FeedItem, FeedMetadata, FeedResponse } from "./interfaces";
 import { FeedStoreState, StoreFeedResultOptions } from "./types";

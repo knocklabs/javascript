@@ -1,9 +1,9 @@
 import { GenericData } from "@knocklabs/types";
-import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
 import { URLPattern } from "urlpattern-polyfill";
 
 import Knock from "../../knock";
+import { Store } from "../../store";
 
 import {
   DEFAULT_GROUP_KEY,
@@ -255,7 +255,7 @@ export const checkActivatable = (
 };
 
 export class KnockGuideClient {
-  public store: Store<StoreState, (state: StoreState) => StoreState>;
+  public store: Store<StoreState>;
 
   // Phoenix channels for real time guide updates over websocket
   private socket: Socket | undefined;

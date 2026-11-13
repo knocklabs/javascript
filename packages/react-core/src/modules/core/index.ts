@@ -10,6 +10,7 @@ export {
   useKnockAuthState,
   useAuthPostMessageListener,
   useAuthPolling,
+  useStore,
 } from "./hooks";
 export { FilterStatus, type ColorMode } from "./constants";
 export {

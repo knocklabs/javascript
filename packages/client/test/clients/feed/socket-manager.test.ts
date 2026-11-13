@@ -1,4 +1,3 @@
-import { Store } from "@tanstack/store";
 import { Channel, Socket } from "phoenix";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -8,9 +7,10 @@ import {
   FeedSocketManager,
   SocketEventType,
 } from "../../../src/clients/feed/socket-manager";
+import { Store } from "../../../src/store";
 
 // Mock dependencies
-vi.mock("@tanstack/store");
+vi.mock("../../../src/store");
 vi.mock("phoenix");
 
 describe("FeedSocketManager", () => {
