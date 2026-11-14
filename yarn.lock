@@ -18538,19 +18538,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"seroval-plugins@npm:^1.5.0":
-  version: 1.7.2
-  resolution: "seroval-plugins@npm:1.7.2"
+"seroval-plugins@npm:1.7.8":
+  version: 1.7.8
+  resolution: "seroval-plugins@npm:1.7.8"
   peerDependencies:
     seroval: ^1.0
-  checksum: 10c0/4e907af6ea3d2c88cf1dac847771ae39af8a614305b8783da0284d5b4b8c2a8dacca5ea2b55692f1773492ec07be213c2784855a4e0412f941d45199ea8a7ba4
+  checksum: 10c0/1b71ad4d014cb1256e014230e870b977deeb7689dc2d962ae4aaeda2e6346bd9870c5b010d44bdc54de20bd9ab8d3f2c7fd63d9c523dd84bcc820e34b75ad190
   languageName: node
   linkType: hard
 
-"seroval@npm:^1.5.0":
-  version: 1.7.2
-  resolution: "seroval@npm:1.7.2"
-  checksum: 10c0/aa81fdfe9f4c90230082c660348266dd6cfe133bc72ab8e8113aac65e3a58c3f6a9670c6f6f9fc685381be18df8aa7df6e5f399b60988ddf1325edba4c1e0949
+"seroval@npm:1.7.10":
+  version: 1.7.10
+  resolution: "seroval@npm:1.7.10"
+  checksum: 10c0/0c0f6d3ef7562f2de7acd761094f646cc739b45080472097d82b23d00ec8aea151132962a01fd69020ef1c4b09c5cd7b82b743741b64d14192513e39dc49aa64
   languageName: node
   linkType: hard
 
