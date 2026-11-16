@@ -78,6 +78,8 @@
     "minimatch@npm:^9.0.4": "11.0.8",
     "node-forge@npm:^1.4.0": "1.4.3",
     "node-gyp@npm:latest": "13.1.0",
+    "seroval-plugins@npm:^1.5.0": "1.7.8",
+    "seroval@npm:^1.5.0": "1.7.10",
     "undici@npm:^8.12.1": "8.12.4",
     "uuid@npm:^7.0.3": "11.1.1"
   },
