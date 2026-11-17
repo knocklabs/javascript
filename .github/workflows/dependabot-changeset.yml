@@ -47,7 +47,7 @@ jobs:
       # Checkout the PR branch for package.json analysis and committing.
       # The final step pushes with these persisted credentials.
       - name: Checkout PR branch # zizmor: ignore[artipacked]
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ steps.pr.outputs.ref }}
           token: ${{ secrets.KNOCK_ENG_BOT_GITHUB_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
       # This ensures we never execute code from an untrusted PR branch
       # when triggered via workflow_dispatch.
       - name: Checkout trusted script from main
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           sparse-checkout: .github/scripts
@@ -65,7 +65,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: "package.json"
 
