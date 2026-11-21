@@ -26,7 +26,7 @@
     "eslint": "^8.56.0",
     "postcss": "^8",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.8.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": "26.x"

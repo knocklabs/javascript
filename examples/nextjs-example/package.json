@@ -45,7 +45,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/uuid": "^10.0.0",
     "eslint": "^8.56.0",
-    "typescript": "^5.8.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": "26.x"
