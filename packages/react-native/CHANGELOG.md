@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.3
+
+### Patch Changes
+
+- 32c7a03: Resolve `ws@^7` and `ws@^7.5.10` to 7.5.14. React Native, Metro, and React DevTools request those ranges, and 7.5.10 is the copy Vanta reports for AIKIDO-2026-844803.
+
 ## 0.13.2
 
 ### Patch Changes
